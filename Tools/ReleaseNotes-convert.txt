@@ -1,0 +1,61 @@
+Version V1.4 original
+=====================
+
+"uTaskerConvert -v" to get the version number.
+
+This utility is used mainly to convert a binary input file, linked to an address suitable for operation with the
+uTasker boot loader, to an uploadable file which is recognised by the BM-boot loader.
+
+Use 1: "uTaskerConvert file1.bin file2.bin -0x22ba -b267a8200926"
+
+File1 is converted to file2 by adding a header containing details of its length and CRC16 check sum. The magic number 0x22ba is
+used to identify the project that the code is related to (it can be any 16 bit hex value). The key -b267a8200926 is used as an
+encryption key to ensure that only code converted using the project key (this can be up to 100 hex bytes long) is recognised as
+valid code by the boot loader
+
+Use 2: "uTaskerConvert file1.bin file2.bin -0x22ba -b267a8200926 -ab627735ad192b3561524512 -17cc – f109"
+
+ab627735ad192b3561524512 is an encryption key which is used to transform the data content. It must have a length dividable by 4) 
+and its length determines the strength of the coding.
+17cc is used to prime a pseudo-random number generator used during the process (should not be zero) which must also match.
+F109 is a shift value in the code which makes it much more difficult to break using brute-force techniques. Without this shift
+it would be much easier to match known code patterns at the start of the file. Since the start code can be anywhere in the data
+this avoids this possible weakness.
+
+For full details about the use see http://www.uTasker.com/docs/uTasker/uTaskerBoot_003.PDF
+
+
+
+Version V1.5 4-12-2010
+=======================
+
+Allows use with no key specified.
+
+
+
+Version V1.6 14-05-2011
+=======================
+
+Added capability to convert Motorola binary to raw binary output. This is useful for CodeWarrior binary output
+which can otherwise not be used directly as a code image - after the conversion the content is in raw binary format
+and so suitable for general binary program use.
+
+Use "uTaskerConvert uTasker_BM.bin raw.bin -b"
+
+Version V1.7 01-10-2013
+=======================
+Version 1.7 increase the maximum target size from 512k to 1M
+
+
+Version V1.8 24-04-2014
+========================
+Version 1.8 increase the maximum target size from 1M to 2M
+
+
+Version V1.9 09-06-2014
+========================
+Version 1.9 allow encryption offset values larger than the file length
+
+Version V1.10 02-10-2015
+========================
+Version 1.10 protect against motorola to raw binary conversion when (invalid) 0xffffffff length block is found

@@ -1,0 +1,17 @@
+// Change a few inputs to illustrate controlling port state
+//
++0   PORT-A ffffffff             // set all bits on port
++200 PORT-A-25 0                 // set one low
++400 PORT-A-26 0                 // set next low
++600 PORT-A-28 0                 // set next low
++1000 PORT-A-29 0                // set next low
++500 PORT-D 000005ff             // set all bits to pattern
++500 PORT-D 00000aff             // set all bits to pattern
++500 PORT-D 000005ff             // set all bits to pattern
++500 PORT-D 00000aff             // set all bits to pattern
++1000 PORT-C 00001fff            // set all bits to pattern
++1000 PORT-C 00002fff            // set all bits to pattern
++1000 PORT-C 00003fff            // set all bits to pattern
++1000 PORT-C 00004fff            // set all bits to pattern
++1000 PORT-C 00005fff            // set all bits to pattern
+// End of test

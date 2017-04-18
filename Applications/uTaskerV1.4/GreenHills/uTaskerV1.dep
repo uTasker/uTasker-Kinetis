@@ -1,0 +1,41 @@
+uTaskerV1.4: LinkerScripts\GHS_KL_128_16_BM.ld \
+ C:\ghs\comp_201416\lib\thumba\crt0.o objs\uTaskerV1.4\application.o \
+ objs\uTaskerV1.4\debug.o objs\uTaskerV1.4\KeyScan.o \
+ objs\uTaskerV1.4\modbus_app.o objs\uTaskerV1.4\NetworkIndicator.o \
+ objs\uTaskerV1.4\snmp_mib_handlers.o objs\uTaskerV1.4\usb_application.o \
+ objs\uTaskerV1.4\webInterface.o objs\uTaskerV1.4\MODBUS.o \
+ objs\uTaskerV1.4\GLCD.o objs\uTaskerV1.4\LCD.o \
+ objs\uTaskerV1.4\mass_storage.o objs\uTaskerV1.4\can_drv.o \
+ objs\uTaskerV1.4\Driver.o objs\uTaskerV1.4\eth_drv.o \
+ objs\uTaskerV1.4\GlobalTimer.o objs\uTaskerV1.4\iic_drv.o \
+ objs\uTaskerV1.4\low_power.o objs\uTaskerV1.4\SSC_drv.o \
+ objs\uTaskerV1.4\Tty_drv.o objs\uTaskerV1.4\uFile.o \
+ objs\uTaskerV1.4\uMalloc.o objs\uTaskerV1.4\uNetwork.o \
+ objs\uTaskerV1.4\USB_drv.o objs\uTaskerV1.4\uTasker.o \
+ objs\uTaskerV1.4\Watchdog.o objs\uTaskerV1.4\kinetis.o \
+ objs\uTaskerV1.4\arp.o objs\uTaskerV1.4\dhcp.o objs\uTaskerV1.4\dns.o \
+ objs\uTaskerV1.4\Ethernet.o objs\uTaskerV1.4\ftp.o \
+ objs\uTaskerV1.4\ftp_client.o objs\uTaskerV1.4\http.o \
+ objs\uTaskerV1.4\icmp.o objs\uTaskerV1.4\igmp.o objs\uTaskerV1.4\ip.o \
+ objs\uTaskerV1.4\ip_utils.o objs\uTaskerV1.4\NetBIOS.o \
+ objs\uTaskerV1.4\pop3.o objs\uTaskerV1.4\ppp.o objs\uTaskerV1.4\smtp.o \
+ objs\uTaskerV1.4\snmp.o objs\uTaskerV1.4\tcp.o objs\uTaskerV1.4\telnet.o \
+ objs\uTaskerV1.4\tftp.o objs\uTaskerV1.4\udp.o objs\uTaskerV1.4\webutils.o \
+ objs\uTaskerV1.4\zero_config.o C:\ghs\comp_201416\lib\thumba\libfmalloc.a \
+ C:\ghs\comp_201416\lib\thumba\libwchar_u16.a \
+ C:\ghs\comp_201416\lib\thumba\libansi.a \
+ C:\ghs\comp_201416\lib\thumba\libwc_u16.a \
+ C:\ghs\comp_201416\lib\thumba\libmath.a \
+ C:\ghs\comp_201416\lib\thumba\libind.a \
+ C:\ghs\comp_201416\lib\thumba\libstartup.a \
+ C:\ghs\comp_201416\lib\thumba\libsys.a \
+ C:\ghs\comp_201416\lib\thumba\libarch.a
+
+:cmdList=ccarm $(FILETYPEOPTIONS) $(OBJECTS) -MD -I../ -D_KINETIS -D_COMPILE_GHS -locatedprogram -Osize -Olink -align8 -thumb -nominlib -littleendian -cpu=cortexm0plus -object_dir=objs\uTaskerV1.4 -top_project C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Applications\uTaskerV1.4\GreenHills\uTaskerV1.4.gpj -o uTaskerV1.4 ; 
+:cmdHash=0x7df2d753
+
+:objList=LinkerScripts\GHS_KL_128_16_BM.ld objs\uTaskerV1.4\application.o objs\uTaskerV1.4\debug.o objs\uTaskerV1.4\KeyScan.o objs\uTaskerV1.4\modbus_app.o objs\uTaskerV1.4\NetworkIndicator.o objs\uTaskerV1.4\snmp_mib_handlers.o objs\uTaskerV1.4\usb_application.o objs\uTaskerV1.4\webInterface.o objs\uTaskerV1.4\MODBUS.o objs\uTaskerV1.4\GLCD.o objs\uTaskerV1.4\LCD.o objs\uTaskerV1.4\mass_storage.o objs\uTaskerV1.4\can_drv.o objs\uTaskerV1.4\Driver.o objs\uTaskerV1.4\eth_drv.o objs\uTaskerV1.4\GlobalTimer.o objs\uTaskerV1.4\iic_drv.o objs\uTaskerV1.4\low_power.o objs\uTaskerV1.4\SSC_drv.o objs\uTaskerV1.4\Tty_drv.o objs\uTaskerV1.4\uFile.o objs\uTaskerV1.4\uMalloc.o objs\uTaskerV1.4\uNetwork.o objs\uTaskerV1.4\USB_drv.o objs\uTaskerV1.4\uTasker.o objs\uTaskerV1.4\Watchdog.o objs\uTaskerV1.4\kinetis.o objs\uTaskerV1.4\arp.o objs\uTaskerV1.4\dhcp.o objs\uTaskerV1.4\dns.o objs\uTaskerV1.4\Ethernet.o objs\uTaskerV1.4\ftp.o objs\uTaskerV1.4\ftp_client.o objs\uTaskerV1.4\http.o objs\uTaskerV1.4\icmp.o objs\uTaskerV1.4\igmp.o objs\uTaskerV1.4\ip.o objs\uTaskerV1.4\ip_utils.o objs\uTaskerV1.4\NetBIOS.o objs\uTaskerV1.4\pop3.o objs\uTaskerV1.4\ppp.o objs\uTaskerV1.4\smtp.o objs\uTaskerV1.4\snmp.o objs\uTaskerV1.4\tcp.o objs\uTaskerV1.4\telnet.o objs\uTaskerV1.4\tftp.o objs\uTaskerV1.4\udp.o objs\uTaskerV1.4\webutils.o objs\uTaskerV1.4\zero_config.o objs\uTaskerV1.4\arp.o ; 
+:objHash=0x4dac1088
+
+:installDir=c:\ghs\comp_201416
+:installDirHash=0x9d4d444d

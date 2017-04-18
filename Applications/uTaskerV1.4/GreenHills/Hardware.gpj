@@ -1,0 +1,7 @@
+#!gbuild
+[Subproject]
+..\..\..\Hardware\Kinetis\kinetis.c
+..\..\..\Hardware\Kinetis\kinetis.h
+..\..\..\Hardware\Kinetis\spi_flash_kinetis_atmel.h
+..\..\..\Hardware\Kinetis\spi_flash_kinetis_sst25.h
+..\..\..\Hardware\Kinetis\spi_flash_kinetis_stmicro.h

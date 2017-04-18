@@ -1,0 +1,40 @@
+<!DOCTYPE CrossStudio_Project_File>
+<solution Name="uTaskerBoot" target="8" version="2">
+  <project Name="uTaskerBoot">
+    <configuration Name="Common" Placement="Flash" Target="MK70FN1M0xxx12" arm_architecture="v7EM" arm_core_type="Cortex-M4" arm_fpu_type="FPv4-SP-D16" arm_gcc_target="arm-unknown-eabi" arm_linker_heap_size="128" arm_linker_process_stack_size="0" arm_linker_stack_size="128" arm_simulator_memory_simulation_filename="$(TargetsDir)/Kinetis/KinetisSimulatorMemory.dll" arm_simulator_memory_simulation_parameter="MK70FN1M0xxx12;0x100000;0x0;0x0;0x20000" arm_target_debug_interface_type="ADIv5" arm_target_loader_applicable_loaders="Flash" arm_target_loader_default_loader="Flash" c_additional_options="-fms-extensions" c_user_include_directories="$(TargetsDir)/Kinetis" linker_memory_map_file="$(TargetsDir)/Kinetis/Kinetis_MemoryMap.xml" linker_memory_map_macros="NAME=MK70FN1M0xxx12;FLASHSIZE=0x100000;FlexNVMSIZE=0x0;FlexRAMSIZE=0x0;SRAMSIZE=0x20000;SVD=MK70F12" linker_output_format="bin" linker_printf_enabled="No" linker_printf_width_precision_supported="No" linker_scanf_enabled="No" linker_section_placement_file="$(StudioDir)/targets/Cortex_M/flash_placement.xml" project_directory="" project_type="Executable" property_groups_file_path="$(TargetsDir)/Kinetis/propertyGroups.xml" target_get_partname_script="GetPartName()" target_match_partname_script="MatchPartName(&quot;$(Target)&quot;)" target_reset_script="Reset()"/>
+    <configuration Name="Flash" arm_target_flash_loader_file_path="$(TargetsDir)/Kinetis/Release/Loader.elf" arm_target_flash_loader_type="LIBMEM RPC Loader" arm_target_loader_can_lock_all="No" arm_target_loader_can_lock_range="No" arm_target_loader_can_unlock_all="No" arm_target_loader_can_unlock_range="No" target_reset_script="FLASHReset()"/>
+    <folder Name="Source Files">
+      <configuration Name="Common" filter="c;cpp;cxx;cc;h;s;asm;inc"/>
+      <file file_name="../uTaskerBootLoader.c"/>
+    </folder>
+    <folder Name="System Files">
+      <file file_name="$(TargetsDir)/Kinetis/Kinetis_Target.js">
+        <configuration Name="Common" file_type="Reset Script"/>
+      </file>
+    </folder>
+    <folder Name="Hardware">
+      <file file_name="uTaskerKinetisK40_RAM.ld">
+        <configuration Name="Common" file_type="Linker Script"/>
+        <configuration Name="THUMB Release" build_exclude_from_build="Yes"/>
+      </file>
+      <file file_name="uTaskerKinetisK40.ld">
+        <configuration Name="Common" file_type="Linker Script"/>
+        <configuration Name="THUMB Release" build_exclude_from_build="Yes"/>
+      </file>
+      <file file_name="uTaskerKinetisK60.ld">
+        <configuration Name="Common" file_type="Linker Script"/>
+        <configuration Name="THUMB Release" build_exclude_from_build="No"/>
+      </file>
+      <file file_name="uTaskerKinetisK60_RAM.ld">
+        <configuration Name="Common" file_type="Linker Script"/>
+        <configuration Name="THUMB Release" build_exclude_from_build="Yes"/>
+      </file>
+      <file file_name="../../../Hardware/Kinetis/kinetis_boot.c"/>
+    </folder>
+    <configuration Name="THUMB Release" build_debug_information="Yes" c_preprocessor_definitions="ROWLEY;_GNU;_KINETIS" c_system_include_directories="../" gcc_entry_point="main" gcc_optimization_level="Optimize For Size" link_include_standard_libraries="No"/>
+  </project>
+  <configuration Name="THUMB" Platform="ARM" arm_instruction_set="THUMB" arm_library_instruction_set="THUMB" c_preprocessor_definitions="__THUMB" hidden="Yes"/>
+  <configuration Name="Debug" build_debug_information="Yes" c_preprocessor_definitions="DEBUG" gcc_optimization_level="None" hidden="Yes"/>
+  <configuration Name="THUMB Release" inherited_configurations="THUMB;Release"/>
+  <configuration Name="Release" build_debug_information="Yes" c_additional_options="-g1" c_preprocessor_definitions="NDEBUG" gcc_optimization_level="Optimize For Size" hidden="Yes"/>
+</solution>

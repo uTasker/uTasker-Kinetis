@@ -1,0 +1,5 @@
+#!gbuild
+[Subproject]
+..\config.h
+..\types.h
+..\uTaskerBootLoader.c

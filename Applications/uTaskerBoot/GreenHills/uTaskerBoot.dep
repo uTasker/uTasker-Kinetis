@@ -1,0 +1,21 @@
+uTaskerBoot: LinkerScripts\GHS_K_512_128.ld \
+ C:\ghs\comp_201416\lib\thumba2\crt0.o objs\uTaskerBoot\kinetis_boot.o \
+ objs\uTaskerBoot\uTaskerBootLoader.o \
+ C:\ghs\comp_201416\lib\thumba2\libfmalloc.a \
+ C:\ghs\comp_201416\lib\thumba2\libwchar_u16.a \
+ C:\ghs\comp_201416\lib\thumba2\libansi.a \
+ C:\ghs\comp_201416\lib\thumba2\libwc_u16.a \
+ C:\ghs\comp_201416\lib\thumba2\libmath.a \
+ C:\ghs\comp_201416\lib\thumba2\libind.a \
+ C:\ghs\comp_201416\lib\thumba2\libstartup.a \
+ C:\ghs\comp_201416\lib\thumba2\libsys.a \
+ C:\ghs\comp_201416\lib\thumba2\libarch.a
+
+:cmdList=ccarm $(FILETYPEOPTIONS) $(OBJECTS) -MD -I../ -D_KINETIS -D_COMPILE_GHS -locatedprogram -Osize -Olink -align8 -thumb -nominlib -littleendian -cpu=cortexm4 -object_dir=objs\uTaskerBoot -top_project C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Applications\uTaskerBoot\GreenHills\uTaskerBoot.gpj -o uTaskerBoot ; 
+:cmdHash=0xc8e44235
+
+:objList=LinkerScripts\GHS_K_512_128.ld objs\uTaskerBoot\kinetis_boot.o objs\uTaskerBoot\uTaskerBootLoader.o ; 
+:objHash=0x9038d5a1
+
+:installDir=c:\ghs\comp_201416
+:installDirHash=0x9d4d444d

@@ -1,0 +1,45 @@
+<html><head><meta http-equiv="content-type" content="text/html; charset=UTF-8"><title>&micro;Tasker - I/O</title>
+<style><!--body,td,a,p,.h{font-family:arial,sans-serif;}.h{font-size: 20px;}.q{color:#0000cc;}//--></style>
+</head><body style="background-image:url(Dback.jpg);background-repeat:repeat" text=#000000 link=#0000cc vlink=#551a8b alink=#ff0000 topmargin=3 marginheight=3><center><table cellpadding=0 cellspacing=0 border=0><tr><td valign=top class=h><font color=#ff0000 style=font-size:30px>
+<b style='mso-bidi-font-weight:normal'>&micro;Tasker</font> - Input/Output</b></td></tr></table>
+
+<br><i>Note: The Ports are connected to LEDs E1..E4 on the K60N512 TWR board</i><br><br>
+
+
+<form action=2I_O.htm name=r>
+
+<b>Configure and control Ports</b><br><br>
+Port PA11 - Input <input type=radio name=P0 value="i" £sI1>
+Output <input type=radio name=P0 value="o" £sO1><br>
+Port PA28 - Input <input type=radio name=P1 value="i" £sI2>
+Output <input type=radio name=P1 value="o" £sO2><br>
+Port PA29 - Input <input type=radio name=P2 value="i" £sI3>
+Output <input type=radio name=P2 value="o" £sO3><br>
+Port PA10 - Input <input type=radio name=P3 value="i" £sI4>
+Output <input type=radio name=P3 value="o" £sO4><br>
+<br><input type=submit value="Modify configuration" name=r></form>
+<form action=2I_O.htm name=p>
+<b>Port values</b><br><br>
+Port PA10, PA29, PA28, PA11  Digital value
+<input id=e type=checkbox name=O3 £sP4><label for=e></label>
+<input id=f type=checkbox name=O2 £sP3><label for=f></label>
+<input id=g type=checkbox name=O1 £sP2><label for=g></label>
+<input id=h type=checkbox name=O0 £sP1><label for=h></label>
+<table border="0">
+<tr><th><input type=submit value="Modify outputs" name=p></form>
+<tr><th><form action=2I_O.htm name=r><input type=submit value="Refresh" name=r></form>
+</table>
+<b>User defined Outputs</b>
+<table border="5" style="color:white;font-size:26px">
+<tr><th style="width:80px; height:40px; £vKa" onclick="key('a')">1</th><th style="width:80px; £vKb" onclick="key('b')">2</th><th style="width:80px; £vKc" onclick="key('c')">3</th><th style="width:80px;  £vKd" onclick="key('d')">4
+<th style="width:80px; £vKe" onclick="key('e')">5</th><th style="width:80px; £vKf" onclick="key('f')">6</th><th style="width:80px; £vKg" onclick="key('g')">7</th><th style="width:80px; £vKh" onclick="key('h')">8</th></tr>
+<tr><th style="height:40px; £vKi" onclick="key('i')">9</th><th style=" £vKj" onclick="key('j')">10</th><th style=" £vKk" onclick="key('k')">11</th><th style=" £vKl" onclick="key('l')">12</th>
+<th style="height:40px; £vKm" onclick="key('m')">13</th><th style=" £vKn" onclick="key('n')">14</th><th style=" £vKo" onclick="key('o')">15</th><th style=" £vKp" onclick="key('p')">16</th></tr>
+</table><br>
+<form action=2I_O.htm name=eq><input type=submit value="Save settings as default configuration" name=eq></form>
+</center>
+<script type="text/javascript">
+function key(id){
+var out="2I_O.htm?o"+id;location.href=out
+}</script>
+</body></html>

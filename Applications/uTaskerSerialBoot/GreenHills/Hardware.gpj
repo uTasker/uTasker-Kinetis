@@ -1,0 +1,3 @@
+#!gbuild
+[Subproject]
+..\..\..\Hardware\Kinetis\kinetis.c

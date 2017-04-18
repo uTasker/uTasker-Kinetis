@@ -1,0 +1,4 @@
+// USB MSD class test
++50  USB-1   = 55 53 42 43 60 4c 45 cb 00 00 00 00 00 00 06 1b 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00   // CBW Start/Stop Unit 1b
+
+// End of test

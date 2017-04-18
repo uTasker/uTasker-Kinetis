@@ -1,0 +1,11 @@
+#!gbuild
+[Subproject]
+..\serial_loader.c
+..\disk_loader.c
+..\usb_device_loader.c
+..\usb_host_loader.c
+..\usb_application.c
+..\webInterface.c
+..\config.h
+..\app_hw_kinetis.h
+..\usb_msd_descriptors.h

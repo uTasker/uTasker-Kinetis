@@ -1,0 +1,154 @@
+utFAT V1.0 - original version : http://www.uTasker.com/software/utFAT/utFAT1.0.zip
+=============================================================================
+
+utFAT V1.1 - 28.01.2010 : http://www.uTasker.com/software/utFAT/utFAT1.1.zip
+=============================================================================
+  05.01.2010 Modify free cluster value written to info sector during formatting {1}
+  19.01.2010 Reset file length when creating files to avoid taking values from previously deleted entres {2}
+  20.01.2010 Add new time when writing to a file - add creation parameter to function fnSetTimeDate() {3}
+  21.01.2010 Correction in fnAllocateCluster() which could cause FAT corruption on cluster growth {4}
+  26.01.2010 Add SD controller interface                                 {5}
+  27.01.2010 Correct creating, renaming and deleting files and directories in referenced sub-directories with help of flag UTDIR_SET_START {6}
+
+
+utFAT V1.2 - 30.01.2010 : http://www.uTasker.com/software/utFAT/utFAT1.2.zip
+=============================================================================
+  31.01.2010 Extend utOpenFile() mode parameter from unsigned char to unsigned short {8}
+Note slight changes to interface - see references in the directory for http, ftp and command line interface
+
+utFAT V1.3 - 16.02.2010 : http://www.uTasker.com/software/utFAT/utFAT1.3.zip
+=============================================================================
+  02.02.2010 Don't allow a file to be renamed unless open for rename or write {9}
+  02.02.2010 Don't allow a file to be written or deleted if it is read-only {10}
+  08.02.2010 Ensure that the mass storage polling is terminated after each command that needed to wait {12}
+  12.02.2010 Correct utReadFile() sector increment when end of file meets sector boundard {13}
+
+utFAT V1.4 - 15.03.2010 : http://www.uTasker.com/software/utFAT/utFAT1.4.zip
+=============================================================================
+  16.02.2010 Correct cluster counting when using info block as reference (move {4} to be generally used) {14}
+  16.02.2010 Correct original FAT sector when allocating new clusters    {15}
+  18.02.2010 Set directory back to lowest directory when the directory cluster end is exhausted {16}
+  18.02.2010 Correctly extend directory clusters                         {17}
+
+utFAT V1.5 - 30.03.2010 : http://www.uTasker.com/software/utFAT/utFAT1.5.zip
+=============================================================================
+  19.03.2010 Add force of sector load rather than a transfer to a buffer {18}
+  29.03.2010 Add fnGetLocalFileTime() to allow file data/time stamps to be returned by systems with corresponding support {19}
+  30.03.2010 Block reformat when the disk is write protected and clear disk state when starting {20}
+
+utFAT V1.6 - 18.09.2010 : http://www.uTasker.com/software/utFAT/utFAT1.6.zip
+=============================================================================
+  09.04.2010 First version of MANAGED_FILES support including delete control {21}
+  14.06.2010 Add fnWriteSector()                                         {22}
+  06.07.2010 utReadDirectory() made extern                               {23}
+  30.07.2010 Optimised local routines to avoid reading partial data when not necessary - simplifies and improves compatibility with SD controller operation
+  04.08.2010 Move various defines from here to mass_storage.h
+  06.08.2010 Introduce SDCARD_MALLOC() macro to better control the malloc() area used {24}
+  16.09.2010 Ensure that root-referenced paths work with correct location {25}
+  16.09.2010 Ensure that the public disk location entry can not be used uninitialised {26}
+
+Note slight changes to interface - see references in the directory for http, ftp and command line interface
+Modification to SD card simulator to support SD card controller interface - see SDcard_sim.c
+
+
+utFAT V1.7 - 08.10.2010 : http://www.uTasker.com/software/utFAT/utFAT1.7.zip
+=============================================================================
+  24.09.2010 Change ucDiskFlags to usDiskFlags and add DISK_NOT_PRESENT when no disk detected and DISK_TYPE_NOT_SUPPORTED when non-supported type {27}
+  25.09.2010 Add uMatchFileExtension()                                   {28}
+
+utFAT V1.8 - 05.01.2011 : http://www.uTasker.com/software/utFAT/utFAT1.8.zip
+=============================================================================
+  17.10.2010 Add NAND Flash support                                      {29}
+
+utFAT V1.9 - 02.03.2011 : http://www.uTasker.com/software/utFAT/utFAT1.9.zip
+=============================================================================
+  17.02.2011 Copy volume label when a disk is mounted                    {30}
+  21.02.2011 Cast DIR_NAME_FREE comparison                               {31}
+  24.02.2011 Add UTFAT16 support                                         {32}
+  24.02.2011 Add support for full formatting (including data section) and formatting flags {33}
+  25.02.2011 Block any write actions when the disk is write protected and allow use to select how the WP switch is read {34}
+
+
+utFAT V1.10 - 24.08.2011 : http://www.uTasker.com/software/utFAT/utFAT1.10.zip
+=============================================================================
+    20.08.2011 Correct cluster allocation over sector boundaries         {35}
+    20.08.2011 Correct big-endian cluster deletion                       {36}
+    24.08.2011 Recognise empty file names and reject them                {37}
+    24.08.2011 FAT16 cluster corrections                                 {38}
+
+utFAT V1.11 - 19.01.2012 : http://www.uTasker.com/software/utFAT/utFAT1.11.zip
+=============================================================================
+    17.09.2011 Allow UTFAT_APPEND attribute to set the file pointer straight to the end of the file when opening for write {39}
+    18.01.2012 Allow operation without UTMANAGED_FILE_COUNT and/or without UTFAT_WRITE {40}
+    18.01.2012 Enable debug output to be disabled with UTFAT_DISABLE_DEBUG_OUT {41}
+    18.01.2012 Allow fnRunThroughClusters() to return error value and limit forward seek to end of file {42}
+
+utFAT V1.12 - 05.08.2012 : http://www.uTasker.com/software/utFAT/utFAT1.12.zip
+=============================================================================
+    20.01.2012 Remove some unused variables when no UTFAT_WRITE/UTMANAGED_FILE_COUNT operation {43}
+    28.01.2012 Add LFN length protection                                 {44}
+    28.02.2012 Add LFN delete support                                    {45}
+    06.03.2012 Don't delete file content cluster chains when they don't exist {46}
+    21.03.2012 Allow directory paths aaa\bbb\ terminated with \          {47}
+    02.04.2012 Add utServer()                                            {48}
+    02.04.2012 Add SD card simulation display interface                  {49}
+    02.04.2012 Add card removal monitoring                               {50}
+    27.07.2012 Improve return result from ut_read_disk() to include errors {51}
+    27.07.2012 Add card detection input polling and interrupt modes      {52} - see http://www.utasker.com/forum/index.php?topic=1747.msg6270#msg6270
+    05.08.2012 Card removal monitoring based on checking card modified to read last section {53}
+
+utFAT V1.13 - 17.09.2013 : http://www.uTasker.com/software/utFAT/utFAT1.13.zip
+=============================================================================
+    11.08.2012 Extend card detection input polling and interrupt to SDHC controller mode and Kinetis interrupts {54}
+    12.08.2012 Extend card detection interrupt to Coldfire V2            {55}
+    09.09.2012 Extend card detection interrupt to STM32                  {56}
+    18.09.2012 Extend card detection interrupt to LPC17xx and LPC2xxx    {57}
+    20.01.2013 Add managed file read/write support                       {58}
+    11.09.2013 Reduce sector reads when seeking and correct partial sector read when data is in local {59}
+
+NAND-Flash driver:
+    20.03.2013 Added MT29F1G08ABADAH4 / MT29F2G16ABAEAWP and Kinetis     {2}
+    04.06.2013 Added NAND_MALLOC() default                               {3}
+
+
+
+utFAT V1.14 - 10.10.2013 : http://www.uTasker.com/software/utFAT/utFAT1.14.zip
+=============================================================================
+    02.10.2013 Add utTruncateFile()                                      {59} utFAT1.14
+
+
+utFAT V2.00 - 11.07.2014 : http://www.uTasker.com/software/utFAT/utFAT2.00.zip
+=============================================================================
+    11.07.2014 utFAT2.0 with full LFN write support in VFAT LFN workaround mode with optional
+coherent data caching and expert functions (like file object analysis of existing and deleted files and undelete)
+
+
+utFAT V2.01 - 06.10.2014 : http://www.uTasker.com/software/utFAT/utFAT2.01.zip
+=============================================================================
+    05.08.2014 Correct long file rename end of directory save            {1}
+    15.08.2014 Corrected =! to !=                                        {2}
+    29.08.2014 Correct creating additional directory clusters            {3}
+    03.09.2014 Remove fnCreateFile(), fnSetFileLocation() and fnInsertLFN_name() parameter {4}
+    03.09.2014 Reset any deleted location markers when moving to next paragraph {5}
+    06.10.2014 Correct brackets in fnExtractLongFileName()               {6} [uFATV2.01]
+
+
+utFAT V2.02 - 15.11.2015 : http://www.uTasker.com/software/utFAT/utFAT2.02.zip
+=============================================================================
+    30.11.2014 Add SPI_FLASH_FAT (run utFAT in external SPI based flash)
+    03.12.2014 Don't display hidden files unless the HIDDEN_TYPE_LISTING flag is set and expert functions enabled {7}
+    04.12.2014 Add FLASH_FAT (run utFAT in internal flash)
+    11.12.2014 Add fnResetDirectories() for use when a disk is re-mounted and delete valid sector after re-formatting {8}
+    13.12.2014 Ensure that the sector buffer is synchronised when writes are made using fnWriteSector() {9}
+    22.01.2015 Add option to return a file's creation time and date in its file object {10}
+    06.10.2015 Only when LFN is disabled: Corrected _utOpenDirectory() directory location returned when opening to write new files, plus reuse deleted directory space when possible {11}
+    30.10.2015 Added emulated FAT support (FAT_EMULATION)                {12} [uFATV2.02]
+
+utFAT V2.03 - 17.01.2016 : http://www.uTasker.com/software/utFAT/utFAT2.03.zip
+=============================================================================
+    16.11.2015 Ensure that EMULATED_FAT_LUMS is available                {13}
+    17.01.2016 Add utFileAttribute() - allows changing file attributes (not directories) {14}
+    17.01.2016 Reset log file name counter when skipping hidden files    {15} [uFATV2.03]
+
+
+

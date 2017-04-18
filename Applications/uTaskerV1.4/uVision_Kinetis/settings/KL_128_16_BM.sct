@@ -1,0 +1,15 @@
+;/* KL_128_16_BM.ld                                                           */
+;/* uVision memory file for the Kinetis KL - for use with the uTasker project */
+;/* Use when running in FLASH (128k FLASH / 16k CPU SRAM) - for boot loader   */
+
+LR_IROM1 0x00008080 0x00020000-0x8080  {    ; load region size_region
+  ER_IROM1 0x00008080 0x00020000-0x8080  {  ; load address = execution address
+   *.o (VECT, + FIRST)
+   *(InRoot$$Sections)
+   .ANY (+RO)
+  }
+  RW_IRAM1 0x1FFFf0c0 0x00004000-0xc0  {  ; RW data
+   .ANY (+RW +ZI)
+  }
+}
+

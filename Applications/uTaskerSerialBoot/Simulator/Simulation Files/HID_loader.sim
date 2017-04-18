@@ -1,0 +1,20 @@
+// USB HID loader test
+
++0   SUSB-0  = 21 0a 00 00 00 00 00 00              // HID class request OUT
++50  SUSB-0  = 81 06 00 22 00 00 65 00              // HID class request IN
++100 USB-0                                          // zero data token to terminate (due to returned data)
+
++50  SUSB-0  = 21 09 00 02 00 00 40 00              // HID class request (followed by erase sector command)
++50  USB-0   = a5 01 00 10 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+
++50  SUSB-0  = 21 09 00 02 00 00 40 00              // HID class request (followed by fill buffer command)
++50  USB-0   = a5 13 00 00 00 00 38 00 00 22 02 11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF 01 02 03 04 05 06 07 08 09 01 02 03 04 05 06 07 08 09 01 02 03 04 05 05 06 07 08 09 0a 0b 0c 0d 01 02 03 04 05 06
++50  SUSB-0  = 21 09 00 02 00 00 40 00              // HID class request (followed by fill buffer command)
++50  USB-0   = a5 13 38 00 00 00 02 00 00 22 02 11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF 01 02 03 04 05 06 07 08 09 01 02 03 04 05 06 07 08 09 01 02 03 04 05 05 06 07 08 09 0a 0b 0c 0d 01 02 03 04 05 06
+
++50  SUSB-0  = 21 09 00 02 00 00 40 00              // HID class request (followed by program buffer command)
++50  USB-0   = a5 12 00 14 00 00 00 04 00 22 02 11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF 01 02 03 04 05 06 07 08 09 01 02 03 04 05 06 07 08 09 01 02 03 04 05 05 06 07 08 09 0a 0b 0c 0d 01 02 03 04 05 06
+
+// note that always 64 bytes are sent - the end can be the content of an older buffer
+
+// End of test

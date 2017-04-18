@@ -1,0 +1,2 @@
+..\..\..\..\Tools\uTaskerCombine  "..\..\..\uTaskerBoot\KinetisCodeWarrior\MK60N512VMD100_BM_BOOT_FLASH\uTaskerBoot.bin" uTasker_BM_V1.4.bin 0x1000 uTaskerBM.bin
+..\..\..\..\Tools\uTaskerConvert uTasker_BM_V1.4.bin z_Upload.bin -0x1234 -a748b6531124

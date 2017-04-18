@@ -1,0 +1,8 @@
+#!gbuild
+[Program]
+	-object_dir=objs\uTaskerV1.4
+LinkerScripts\GHS_KL_128_16_BM.ld
+Source.gpj
+uTasker.gpj
+Hardware.gpj
+tcpip.gpj

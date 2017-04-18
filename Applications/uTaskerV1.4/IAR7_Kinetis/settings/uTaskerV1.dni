@@ -1,0 +1,219 @@
+[DebugChecksum]
+Checksum=1567166440
+[DisAssemblyWindow]
+NumStates=_ 1
+State 1=_ 1
+[InstructionProfiling]
+Enabled=_ 0
+[CodeCoverage]
+Enabled=_ 0
+[Exceptions]
+StopOnUncaught=_ 0
+StopOnThrow=_ 0
+[StackPlugin]
+Enabled=1
+OverflowWarningsEnabled=1
+WarningThreshold=90
+SpWarningsEnabled=1
+WarnHow=0
+UseTrigger=1
+TriggerName=main
+LimitSize=0
+ByteLimit=50
+[TraceHelper]
+Enabled=0
+ShowSource=1
+[Stack]
+FillEnabled=0
+OverflowWarningsEnabled=1
+WarningThreshold=90
+SpWarningsEnabled=1
+WarnLogOnly=1
+UseTrigger=1
+TriggerName=main
+LimitSize=0
+ByteLimit=50
+[CallStack]
+ShowArgs=0
+[Disassembly]
+MixedMode=1
+[JLinkDriver]
+TraceBufferSize=0x00010000
+TraceStallIfFIFOFull=0x00000000
+TracePortSize=0x00000004
+CStepIntDis=_ 0
+[InterruptLog]
+LogEnabled=0
+SumEnabled=0
+GraphEnabled=0
+ShowTimeLog=1
+ShowTimeSum=1
+SumSortOrder=0
+[DataLog]
+LogEnabled=0
+SumEnabled=0
+GraphEnabled=0
+ShowTimeLog=1
+ShowTimeSum=1
+[Interrupts]
+Enabled=1
+[MemoryMap]
+Enabled=0
+Base=0
+UseAuto=0
+TypeViolation=1
+UnspecRange=1
+ActionState=1
+[Jet]
+JetConnSerialNo=00289
+JetConnFoundProbes=
+DisableInterrupts=0
+MultiCoreRunAll=0
+OnlineReset=Software
+PrevWtdReset=Custom
+[PlDriver]
+MemConfigValue=C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.2_2\arm\CONFIG\debugger\Freescale\MK65FN2M0xxx18.ddf
+FirstRun=0
+[ArmDriver]
+EnableCache=1
+[CallStackLog]
+Enabled=0
+[DriverProfiling]
+Enabled=0
+Mode=1
+Graph=0
+Symbiont=0
+Exclusions=
+[PE_STARTUP]
+CPUTARGETTYPENAME=_ "ARM Processor - Autodetect"
+jtag_numbits_pre_ir=_ "0"
+jtag_tap_num=_ "0"
+jtag_use_daisy_chain=_ "0"
+user_specified_daisy_chain=_ "0"
+USE_CYCLONEPRO_RELAYS=_ "0"
+CyclonePro_poweroffonexit=_ "0"
+CyclonePro_currentvoltage=_ "128"
+CyclonePro_PowerDownDelay=_ "250"
+CyclonePro_PowerUpDelay=_ "250"
+Multilink_PowerDownDelay=_ "250"
+Multilink_PowerUpDelay=_ "1000"
+USE_SWD=_ "1"
+IO_DELAY_CNT=_ "0"
+FREQ_FX=_ "4"
+FREQ_NORMAL=_ "0"
+FREQ_OSJTAG=_ "0"
+FREQ_CYCLONE=_ "3"
+FREQ_TRACELINK=_ "3"
+FREQ_LIGHTNING=_ "1"
+FREQ_OPENSDA=_ "3"
+RESET_DELAY=_ "0"
+PORT=_ "181"
+PORT_NAME_STRING=_ ""
+interface_selection=_ "7"
+SHOWDIALOG=_ "1"
+TraceLink_MaxBufferSize=_ "1"
+[PE_STORED_DEVICES]
+device0=_ "Freescale_KL2x_KL25Z128M4"
+device1=_ "Freescale_KEx_KEAZ128M4"
+device2=_ "Freescale_KEx_KE02Z64M2"
+device3=_ "Freescale_K6x_K64FN1M0M12"
+device4=_ "Freescale_KL4x_KL43Z256M4"
+[PE_PEDEBUG]
+CURRENTDEVICE=_ "Freescale_KL4x_KL43Z256M4"
+ERASE_PROGRAM_WITHOUT_ASKING=_ "1"
+CURRENTMODE=_ "4"
+[PE_DEVICE]
+CHIPMODE=_ "Freescale_KL4x_KL43Z256M4"
+[PE_SETTINGS]
+MEMORYSTART1=_ "0"
+MEMORYSTART2=_ "0"
+MEMORYSTART3=_ "0"
+DEFAULT_SOURCE_PATH=_ "C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.2_2\arm\bin\pemicro\P&E"
+[PE_STARTUP12]
+show_hstep_assembly_details=_ "0"
+[PE_ARM]
+FILE1=_ ""
+BINTORAM=_ "1"
+BINTOFLASH=_ "0"
+BINTOFLASHDEFAULT=_ "0"
+GOTILMAIN=_ "0"
+KEEPCPROGOPEN=_ "0"
+[struct_types]
+Fmt0=TTIMETABLE-taskDelay	4	0
+[array_types]
+Fmt0=signed short[16]	4	0
+Fmt1=unsigned long[10]	4	0
+Fmt2=unsigned long[20]	4	0
+Fmt3=unsigned long[2]	4	0
+Fmt4=unsigned long[32]	4	0
+Fmt5=unsigned long[4]	4	0
+[watch_formats]
+Fmt0={W}0:ulBlockWriteLength	4	0
+[SWOManager]
+SamplingDivider=8192
+OverrideClock=0
+CpuClock=197632
+SwoClock=512
+DataLogMode=0
+ItmPortsEnabled=63
+ItmTermIOPorts=1
+ItmLogPorts=0
+ItmLogFile=$PROJ_DIR$\ITM.log
+PowerForcePC=1
+PowerConnectPC=1
+[Trace1]
+Enabled=0
+ShowSource=1
+[ETMTraceWindow]
+PortWidth=4
+PortMode=0
+CaptureDataValues=0
+CaptureDataAddresses=0
+CaptureDataRange=0
+DataFirst=0
+DataLast=-1
+StopWhen=0
+StallCPU=0
+NoPCCapture=0
+[Trace2]
+Enabled=0
+ShowSource=0
+[SWOTraceWindow]
+ForcedPcSampling=0
+ForcedInterruptLogs=0
+ForcedItmLogs=0
+EventCPI=0
+EventEXC=0
+EventFOLD=0
+EventLSU=0
+EventSLEEP=0
+[Log file]
+LoggingEnabled=_ 0
+LogFile=_ ""
+Category=_ 0
+[TermIOLog]
+LoggingEnabled=_ 0
+LogFile=_ ""
+[Breakpoints2]
+Count=0
+[Disassemble mode]
+mode=3
+[Breakpoints]
+Bp0=_ "STD_CODE" "{C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Hardware\Kinetis\kinetis_USB_OTG.h}.711.1" 0 0 0 0 "" 0 "" 0
+Bp1=_ "STD_CODE" "{C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Applications\uTaskerV1.4\usb_application.c}.2375.5" 0 0 0 0 "" 0 "" 0
+Bp2=_ "STD_CODE" "{C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Hardware\Kinetis\kinetis_USB_OTG.h}.646.21" 0 0 0 0 "" 0 "" 0
+Bp3=_ "STD_CODE" "0x00003E4C" 0 0 0 0 "" 0 "" 0
+Bp4=_ "STD_CODE" "{C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Hardware\Kinetis\kinetis_ADC.h}.502.1" 0 0 0 0 "" 0 "" 0
+Bp5=_ "STD_CODE" "{C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Hardware\Kinetis\kinetis_ADC.h}.502.1" 0 0 0 0 "" 0 "" 0
+Bp6=_ "STD_CODE" "{C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Hardware\Kinetis\kinetis_ADC.h}.502.1" 0 0 0 0 "" 0 "" 0
+Bp7=_ "STD_CODE" "{C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Hardware\Kinetis\kinetis_ADC.h}.502.1" 0 0 0 0 "" 0 "" 0
+Bp8=_ "STD_CODE" "{C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Applications\uTaskerV1.4\usb_application.c}.1113.13" 0 0 0 0 "" 0 "" 0
+Bp9=_ "STD_CODE" "0x0000054A" 0 0 0 0 "" 0 "" 0
+Bp10=_ "STD_CODE" "0x0000056C" 0 0 0 0 "" 0 "" 0
+Bp11=_ "STD_CODE" "{C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Hardware\Kinetis\kinetis_DAC.h}.205.1" 0 0 0 0 "" 0 "" 0
+Bp12=_ "STD_CODE" "0x000038E6" 0 0 0 0 "" 0 "" 0
+Bp13=_ "STD_CODE" "{C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Hardware\Kinetis\kinetis_ADC.h}.502.1" 1 0 0 0 "" 0 "" 0
+Count=14
+[Aliases]
+Count=0
+SuppressDialog=0

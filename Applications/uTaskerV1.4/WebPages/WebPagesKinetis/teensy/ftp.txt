@@ -1,0 +1,16 @@
+binary
+dir
+put "0Menu.HTM"
+put "1Lan.htm"
+put "2I_O.htm"
+put "3admin.htm"
+put "4EmailSetup.htm"
+put "5serial.htm"
+put "6help.htm"
+put "7dynamic.htm"
+put "8Stats.htm"
+put "9Generate.htm"
+put "Dback.jpg"
+put "Elogo.jpg"
+dir
+quit

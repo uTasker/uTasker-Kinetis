@@ -1,0 +1,13 @@
+"C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.2_2\arm\bin\armproc.dll" 
+
+"C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.2_2\arm\bin\armpemicro.dll" 
+
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerKinetis\Applications\uTaskerV1.4\IAR7_Kinetis\RAM\Exe\uTaskerV1.4.out" 
+
+--plugin "C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.2_2\arm\bin\armbat.dll" 
+
+--device_macro "C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.2_2\arm\config\debugger\Freescale\K6x.dmac" 
+
+
+
+

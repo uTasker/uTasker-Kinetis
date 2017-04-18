@@ -1,0 +1,59 @@
+# Make file for uTasker boot loader build for Kinetis
+#
+# 18.07.2011 Add zero_config.c and K40 linker script options
+# 20.04.2014 Add m0+ compile option and new linker script file name
+# 05.08.2014 Modified compiler and linker options to achieve around 7% smaller code size
+
+# All objects (Hardware, application, uTasker, stack)
+#
+OBJS = Build/uTaskerBootLoader.o Build/kinetis_boot.o
+
+
+
+#General dependencies
+#
+DEPENDS = ../config.h ../types.h ../../../Hardware/hardware.h ../../../Hardware/Kinetis/kinetis.h 
+
+C_FLAGS = -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections 
+#C_FLAGS = -mcpu=cortex-m0 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections 
+
+
+OPTS    = -D _GNU -D _KINETIS -g -c -Os
+
+CC      = arm-none-eabi-gcc
+CC_OBJ  = arm-none-eabi-objcopy
+CC_SIZE = arm-none-eabi-size
+
+
+all: uTaskerBoot.elf
+
+# Application files
+#
+Build/uTaskerBootLoader.o: ../uTaskerBootLoader.c $(DEPENDS)
+		$(CC) $(C_FLAGS) -I../../uTaskerBoot $(OPTS) ../uTaskerBootLoader.c -o Build/uTaskerBootLoader.o
+
+# Hardware files
+#
+
+Build/kinetis_boot.o: ../../../Hardware/Kinetis/kinetis_boot.c $(DEPENDS)
+		$(CC) $(C_FLAGS) -I../../uTaskerBoot $(OPTS) ../../../Hardware/Kinetis/kinetis_boot.c -o Build/kinetis_boot.o
+
+
+# Link
+# Create output files and show program size
+#
+uTaskerBoot.elf: $(OBJS)  K_1M_256.ld K_256_256.ld K_1M_128.ld K_512_64.ld K_256_64.ld K_128_16.ld KW_512_64.ld KW_256_32.ld KL_256_32.ld KL_128_16.ld KL_64_8.ld KL_32_4.ld KL_32_2.ld KV_32_8.ld KV_512_96.ld KE_128_16.ld KE_64_4.ld KE_8_1.ld KEA_128_16.ld
+	$(CC) $(C_FLAGS) -Os -g -TK_512_128.ld -nostartfiles -Xlinker --gc-sections -Wl,-Map,"uTaskerBoot.map" -o "uTaskerBoot.elf" $(OBJS)
+	$(CC_OBJ) --output-target=binary uTaskerBoot.elf uTaskerBoot.bin
+	$(CC_SIZE)   uTaskerBoot.elf
+	$(CC) -v
+
+
+.PHONY: clean
+clean:
+	rm uTaskerBoot.map
+	rm uTaskerBoot.elf
+	rm uTaskerBoot.bin
+
+
+# *** EOF ***

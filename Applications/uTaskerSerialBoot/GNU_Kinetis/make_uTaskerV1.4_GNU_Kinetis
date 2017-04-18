@@ -1,0 +1,200 @@
+# Make file for uTasker serial loader build for Kinetis
+#
+# 18.07.2011 Add K40 linker script options
+# 22.01.2012 Add files for SD card loader
+# 11.01.2014 Add K20D128_50 linker script options (128k program Flash / 16k SRAM)
+# 15.04.2014 Add additional files for web server uploading capability
+# 20.05.2014 Loader.h set as general dependancy
+# 05.08.2014 Modified compiler and linker options to achieve around 20% smaller code size
+# 24.03.2015 Add kinetis hardware peripheral headers as dependencies
+# 11.07.2015 Add usb_application.c
+# 23.10.2015 Add usb_host_loader, rename usb_loader.c to usb_device_loader.c, rename SDLoader.c to disk_loader.c rename Loader.c to serial_loader.c, and use new kinetis_USB_OTG.h
+
+
+# Compiler flags (thumb mode - little endian)
+# (set to Cortex-M4 or Cortex-M0+ accordingly)
+C_FLAGS = -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections 
+#C_FLAGS = -mcpu=cortex-m0plus -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections 
+
+
+# All objects (Hardware, application, uTasker, stack)
+#
+OBJS = Build/serial_loader.o Build/usb_device_loader.o Build/disk_loader.o Build/usb_host_loader.o Build/usb_application.o Build/webInterface.o \
+       Build/mass_storage.o \
+       Build/kinetis.o \
+       Build/eth_drv.o Build/Driver.o Build/uMalloc.o Build/uTasker.o Build/Tty_drv.o Build/USB_drv.o Build/uFile.o Build/Watchdog.o \
+	   Build/Ethernet.o Build/arp.o Build/ip.o Build/tftp.o Build/udp.o Build/tcp.o Build/http.o Build/dhcp.o Build/ip_utils.o Build/webutils.o Build/icmp.o
+
+
+
+#General dependencies
+#
+DEPENDS = ../config.h ../app_hw_kinetis.h ../Loader.h ../types.h ../TaskConfig.h ../../../uTasker/driver.h  ../../../uTasker/uTasker.h \
+       ../../../uTasker/utFAT/mass_storage.h \
+	   ../../../stack/tcpip.h \
+       ../../../Hardware/hardware.h ../../../Hardware/Kinetis/kinetis.h
+
+# Hardware peripheral dependencies
+#
+PERIPH_DEP = ../../../Hardware/Kinetis/spi_sc16IS7xx.h \
+             ../../../Hardware/Kinetis/kinetis_DMA.h \
+             ../../../Hardware/Kinetis/kinetis_I2S.h \
+             ../../../Hardware/Kinetis/kinetis_ENET.h \
+             ../../../Hardware/Kinetis/kinetis_USB_OTG.h \
+             ../../../Hardware/Kinetis/kinetis_USB_HS_Device.h \
+             ../../../Hardware/Kinetis/kinetis_UART.h \
+             ../../../Hardware/Kinetis/kinetis_CAN.h \
+             ../../../Hardware/Kinetis/kinetis_I2C.h \
+             ../../../Hardware/Kinetis/kinetis_FLASH.h \
+             ../../../Hardware/Kinetis/kinetis_SDHC.h \
+             ../../../Hardware/Kinetis/kinetis_PWM.h \
+             ../../../Hardware/Kinetis/kinetis_PORTS.h \
+             ../../../Hardware/Kinetis/kinetis_LLWU.h \
+             ../../../Hardware/Kinetis/kinetis_FLEXTIMER.h \
+             ../../../Hardware/Kinetis/kinetis_DAC.h \
+             ../../../Hardware/Kinetis/kinetis_ADC.h \
+             ../../../Hardware/Kinetis/kinetis_low_power.h \
+             ../../../Hardware/Kinetis/kinetis_KBI.h \
+             ../../../Hardware/Kinetis/kinetis_RTC.h \
+             ../../../Hardware/Kinetis/kinetis_PIT.h \
+             ../../../Hardware/Kinetis/kinetis_LPTMR.h \
+             ../../../Hardware/Kinetis/kinetis_PDB.h
+
+# SPI FLASH dependencies
+#
+SPI_FLASH_DEP = ../../../Hardware/Kinetis/spi_flash_kinetis_atmel.h \
+                ../../../Hardware/Kinetis/spi_flash_kinetis_stmicro.h \
+				../../../Hardware/Kinetis/spi_flash_kinetis_sst25.h \
+				../../../Hardware/Kinetis/spi_flash_w25q.h \
+				../../../Hardware/Kinetis/spi_flash_kinetis_s25fl1-k.h
+
+INC     = -I../
+
+OPTS    = -D _GNU -D _KINETIS -g -c -Os
+
+CC      = arm-none-eabi-gcc
+CC_OBJ  = arm-none-eabi-objcopy
+CC_SIZE = arm-none-eabi-size
+
+
+all: uTaskerSerialBoot.elf
+
+# Application files
+#
+Build/serial_loader.o: ../serial_loader.c $(DEPENDS) 
+		$(CC) $(C_FLAGS) -I../../uTaskerSerialBoot $(OPTS) ../serial_loader.c -o Build/serial_loader.o
+
+Build/usb_device_loader.o: ../usb_device_loader.c $(DEPENDS)
+		$(CC) $(C_FLAGS) -I../../uTaskerSerialBoot $(OPTS) ../usb_device_loader.c -o Build/usb_device_loader.o
+
+Build/disk_loader.o: ../disk_loader.c $(DEPENDS)
+		$(CC) $(C_FLAGS) -I../../uTaskerSerialBoot $(OPTS) ../disk_loader.c -o Build/disk_loader.o
+
+Build/usb_host_loader.o: ../usb_host_loader.c $(DEPENDS)
+		$(CC) $(C_FLAGS) -I../../uTaskerSerialBoot $(OPTS) ../usb_host_loader.c -o Build/usb_host_loader.o
+
+Build/usb_application.o: ../usb_application.c $(DEPENDS) ../usb_msd_descriptors.h
+		$(CC) $(C_FLAGS) -I../../uTaskerSerialBoot $(OPTS) ../usb_application.c -o Build/usb_application.o
+
+Build/webInterface.o: ../webInterface.c $(DEPENDS)
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../webInterface.c -o Build/webInterface.o
+
+
+
+# Hardware files
+#
+Build/kinetis.o: ../../../Hardware/Kinetis/kinetis.c $(DEPENDS) $(PERIPH_DEP) $(SPI_FLASH_DEP)
+		$(CC) $(C_FLAGS) -I../../uTaskerSerialBoot $(OPTS) ../../../Hardware/Kinetis/kinetis.c -o Build/kinetis.o
+
+
+# uTasker files
+#
+Build/uTasker.o: ../../../uTasker/uTasker.c $(DEPENDS)
+		$(CC) $(C_FLAGS) -I../../uTaskerSerialBoot $(OPTS) ../../../uTasker/uTasker.c -o Build/uTasker.o
+
+Build/Driver.o: ../../../uTasker/Driver.c $(DEPENDS)
+		$(CC) $(C_FLAGS) -I../../uTaskerSerialBoot $(OPTS) ../../../uTasker/Driver.c -o Build/Driver.o
+
+Build/uMalloc.o: ../../../uTasker/uMalloc.c $(DEPENDS)
+		$(CC) $(C_FLAGS) -I../../uTaskerSerialBoot $(OPTS) ../../../uTasker/uMalloc.c -o Build/uMalloc.o
+
+Build/Tty_drv.o: ../../../uTasker/Tty_drv.c $(DEPENDS)
+		$(CC) $(C_FLAGS) -I../../uTaskerSerialBoot $(OPTS) ../../../uTasker/Tty_drv.c -o Build/Tty_drv.o
+
+Build/USB_drv.o: ../../../uTasker/USB_drv.c $(DEPENDS)
+		$(CC) $(C_FLAGS) -I../../uTaskerSerialBoot $(OPTS) ../../../uTasker/USB_drv.c -o Build/USB_drv.o
+
+Build/uFile.o: ../../../uTasker/uFile.c $(DEPENDS)
+		$(CC) $(C_FLAGS) -I../../uTaskerSerialBoot $(OPTS) ../../../uTasker/uFile.c -o Build/uFile.o
+
+Build/Watchdog.o: ../../../uTasker/Watchdog.c $(DEPENDS)
+		$(CC) $(C_FLAGS) -I../../uTaskerSerialBoot $(OPTS) ../../../uTasker/Watchdog.c -o Build/Watchdog.o
+
+Build/eth_drv.o: ../../../uTasker/eth_drv.c $(DEPENDS)
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../../../uTasker/eth_drv.c -o Build/eth_drv.o
+
+
+
+# uTasker TCP/IP files
+#
+Build/Ethernet.o: ../../../stack/Ethernet.c $(DEPENDS)
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../../../stack/Ethernet.c -o Build/Ethernet.o
+
+Build/arp.o: ../../../stack/arp.c $(DEPENDS)
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../../../stack/arp.c -o Build/arp.o
+
+Build/http.o: ../../../stack/http.c $(DEPENDS)
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../../../stack/http.c -o Build/http.o
+
+Build/dhcp.o: ../../../stack/dhcp.c $(DEPENDS)
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../../../stack/dhcp.c -o Build/dhcp.o
+
+Build/tftp.o: ../../../stack/tftp.c $(DEPENDS)
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../../../stack/tftp.c -o Build/tftp.o
+
+Build/icmp.o: ../../../stack/icmp.c $(DEPENDS)
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../../../stack/icmp.c -o Build/icmp.o
+
+Build/ip_utils.o: ../../../stack/ip_utils.c $(DEPENDS)
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../../../stack/ip_utils.c -o Build/ip_utils.o
+
+Build/ip.o: ../../../stack/ip.c $(DEPENDS)
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../../../stack/ip.c -o Build/ip.o
+
+Build/udp.o: ../../../stack/udp.c $(DEPENDS)
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../../../stack/udp.c -o Build/udp.o
+
+Build/tcp.o: ../../../stack/tcp.c $(DEPENDS)
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../../../stack/tcp.c -o Build/tcp.o
+
+Build/webutils.o: ../../../stack/webutils.c $(DEPENDS)
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../../../stack/webutils.c -o Build/webutils.o
+
+
+# utFAT files
+#
+Build/mass_storage.o: ../../../uTasker/utFAT/mass_storage.c $(DEPENDS)
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../../../uTasker/utFAT/mass_storage.c -o Build/mass_storage.o
+
+
+
+# Link
+# Create output files and show program size
+#
+uTaskerSerialBoot.elf: $(OBJS) K_1M_256.ld K_256_256.ld K_1M_128.ld K_512_64.ld K_256_64.ld K_128_16.ld KW_512_64.ld KW_256_32.ld KL_256_32.ld KL_128_16.ld KL_64_8.ld KL_32_4.ld KL_32_2.ld KV_32_8.ld KV_512_96.ld KE_128_16.ld KE_64_4.ld KE_8_1.ld KEA_128_16.ld
+	$(CC) $(C_FLAGS) -Os -g -TK_1M_256.ld -nostartfiles -Xlinker --gc-sections -Wl,-Map,"uTaskerSerialBoot.map" -o "uTaskerSerialBoot.elf" $(OBJS)
+	$(CC_OBJ) --output-target=srec uTaskerSerialBoot.elf uTaskerSerialBoot.s19
+	$(CC_OBJ) --output-target=ihex uTaskerSerialBoot.elf uTaskerSerialBoot.hex
+	$(CC_OBJ) --only-section=.data --only-section=.init --only-section=.text --only-section=.rodata --only-section=.vectors --only-section=.f_config --output-target=binary uTaskerSerialBoot.elf uTaskerSerialBoot.bin
+	$(CC_SIZE)   uTaskerSerialBoot.elf
+	$(CC) -v
+
+
+.PHONY: clean
+clean:
+	rm uTaskerSerialBoot.map
+	rm uTaskerSerialBoot.elf
+	rm uTaskerSerialBoot.s19
+
+
+# *** EOF ***

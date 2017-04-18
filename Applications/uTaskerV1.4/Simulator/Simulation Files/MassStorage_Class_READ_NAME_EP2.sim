@@ -1,0 +1,8 @@
+// USB CDC class test
+
+
++50  USB-2   = 55 53 42 43 e0 d8 cf 8b 24 00 00 00 80 00 06 12 00 00 00 24 00 00 00 00 00 00 00 00 00 00 00   // UFI_INQUIRY 
+
+
+
+// End of test

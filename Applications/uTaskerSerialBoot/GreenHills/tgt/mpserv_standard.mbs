@@ -1,0 +1,21 @@
+// There's 0x4000 bytes of ram at 0x1fffe000
+
+target tr
+target rw epsr 0x01z
+target mw   0x1fffff00 0x0000f242
+target mw   0x1fffff04 0x0005f2c4  
+target mw   0x1fffff08 0x5120f24c  
+target mw   0x1fffff0c 0x1228f64d  
+target mw 2 0x1fffff10 0x81c1          
+target mw 2 0x1fffff12 0x81c2          
+target mw   0x1fffff14 0x13d2f240  
+target mw 2 0x1fffff18 0x8003          
+target mw 2 0x1fffff1a 0xbf00          
+target mw 2 0x1fffff1c 0xbf00          
+target mw 2 0x1fffff1e 0xbf00          
+target mw 2 0x1fffff20 0xbf00          
+target mw 2 0x1fffff22 0xe7fa          
+target rw pc 0x1fffff00
+target tc
+target sleep 1
+target th

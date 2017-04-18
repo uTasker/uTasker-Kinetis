@@ -1,0 +1,63 @@
+// SLCD definition for the TWRPI-SLCD on the TWR-KL46Z48M board (350 x 90 pixels used as base)
+//
+
+// bit map defines (these should be monochrome bitmaps) - BMP0 to BMP99 possible
+//
+BMP0  "freescale1.bmp"
+BMP1  "digit1.bmp"
+BMP2  "seven_seg_b_l.bmp" 
+BMP3  "seven_seg_t_l.bmp" 
+BMP4  "seven_seg_top.bmp"
+BMP5  "seven_seg_b_r.bmp"
+BMP6  "seven_seg_t_r.bmp"
+BMP7  "seven_seg_mid.bmp"
+BMP8  "seven_seg_bot.bmp"
+BMP9  "degree.bmp"
+BMP10 "percent.bmp"
+BMP11 "am.bmp"
+BMP12 "pm.bmp"
+BMP13 "dp.bmp"
+
+// backplane bits
+//
+bx                      // not used
+
+// front plane bits
+// segment number, BMP number, x-coordinate, y-coordinate
+//
+f195 0 20  15           // freescale logo (24-8)
+
+f11 1 105 5            // '1' (1-8)
+
+f192 3 125 5            // first 7-segment - top left (24-1)
+f194 2 125 5            // bottom left (24-4)
+f177 6 153 5            // top right (22-2)
+f178 5 153 5            // bottom right (22-4)
+f176 4 125 4            // top (22-1)
+f193 7 125 41           // middle (24-2)
+f179 8 125 78           // bottom (22-8)
+
+f163 13 180 26          // ':' (20-8)
+
+f160 3 205 5            // second 7-segment - top left (20-1)
+f162 2 205 5            // bottom left (20-4)
+f25 6 233 5             // top right (3-2)
+f26 5 233 5             // bottom right (3-4)
+f24 4 205 4             // top (3-1)
+f161 7 205 41           // middle (20-2)
+f27 8 205 78            // bottom (3-8)
+
+f8 3 255 5              // second 7-segment - top left (1-1)
+f10 2 255 5             // bottom left (1-4)
+f185 6 283 5            // top right (23-2)
+f186 5 283 5            // bottom right (23-4)
+f184 4 255 4            // top (23-1)
+f9 7 255 41             // middle (1-2)
+f187 8 255 78           // bottom (23-8)
+
+f0 9 310 7              // ° (0-1)
+f1 10 335 35            // % (0-2)
+f2 11 330 53            // AM (0-4)
+f3 12 330 69            // PM (0-8)
+
+// end of file

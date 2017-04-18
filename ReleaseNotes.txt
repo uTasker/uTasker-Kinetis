@@ -1,0 +1,422 @@
+Beta 0.0 - 14.01.2011
+=====================
+Contains uTaskerV1.4 project with builds for:
+- VisualStudio 6
+- VisualStudio 2010
+- IAR6
+- Rowley Crossworks 2.1
+- GCC standalone
+
+Target for TWR-K60N512 with TWR-SER and TWR-LCD
+- TFT demo (When no TWR-LCD available remove SUPPORT_GLCD in config.h)
+- Ethernet Demo (when no TWR-SER available remove ETH_INTERFACE in config.h)
+-- Default IP address 192.168.0.3
+-- Default NETBios name "KINETIS"
+-- Telnet, Web server, FTP server with uFileSystem from internal FLASH
+- E1 blink at 2.5Hz
+
+
+Beta 0.1 - 27.01.2011
+=====================
+Environment suitable for Codewarrior V10.1, including CodeWarrior project and Keil uVision4 project.
+- New set of web pages for the Kinetis and operating port control
+- IPv6 basic included
+- USB included but not tested
+
+Beta 0.2 - 29.01.2011
+=====================
+- UART driver added - configured for UART3 to suit the TWR-SER board connection
+- LEDs can be controlled via web server or serial menu
+
+Beta 0.3 - 30.01.2011
+=====================
+- PITs 1..4 supported (see single -shot test in ADC_Timers.h)
+
+Beta 0.4 - 04.02.2011
+=====================
+- WATCHDOG added (hold SW1 on tower board to start with disabled watchdog)
+- Reset command and display of reset cause on web page
+- UART 7 bit mode supported with automatic masking of parity bit
+
+Beta 0.5 - 10.03.2011
+=====================
+- GLCDLIB extended with Bitmap windowing support
+- Task Performance monitor added (MONITOR_PERFORMANCE) - request via command line menu interface
+- RTC, ADC and DAC registers added
+- USB Mass storage improvements
+
+Beta 0.6 - 02.04.2011
+=====================
+- I2C driver added (not tesed)
+- SD card support via SPI added (not tested)
+- UART HW Flow control and RS485 HW support (MODBUS compatibility) added (not tested)
+- Optional DMA support for uMemcpy() and uMemset()
+- Includes boot loader and serial loader projects: serial loader tested with simulator and builds with
+IAR and GCC
+
+Beta 0.7 - 06.04.2011
+=====================
+- Additional boot loader and serial loader projects: present set = VS6, VS2010, IAR, GCC, Keil uVision
+- uTaskerFileCreate V1.7 updated (see http://www.utasker.com/forum/index.php?topic=1114.msg5330#msg5330)
+
+Beta 0.8 - 10.04.2011
+=====================
+- Complete set of projects for following compilers included:
+IAR, Keil, CodeWarrior 10.1, GCC, Rowley Crossworks
+a) uTaskerV1.4 demo project for standalone and boot-loader operation (targets)
+b) uTaskerSerialLoader
+c) utaskerBoot
+
+- SD card support via SPI tested on TWR kit using local SD card slot and remote uSD card slot
+(requires board modification as described in http://www.utasker.com/docs/KINETIS/uTaskerV1.4_Kinetis_demo.pdf)
+
+Beta 0.9 - 25.04.2011
+=====================
+- SPI Flash drivers added for ATMEL, ST and SST SPI devices
+- Bootloader includes SPI Flash support
+- RS485 automatic RTS support now tested
+
+Beta 0.10 - 12.05.2011
+======================
+- 100 pin K60 added to simulator
+- USB Device operational
+- USB MSD boot loader added to serial boot loader project
+- ATMEL SPI operation validated
+- I2C operation validated
+
+
+Beta 0.11 - 18.07.2011
+======================
+- uTaskerConvert.exe V1.6 - "uTaskerConvert.exe uTasker_BM.bin raw.bin -b" can be used to convert an input file in Motorola binary format to raw binary format.
+- uTaskerFileCreate.exe Version V1.8 - corrected conversion of 24-bit bitmaps with pixel width not divisible by 8
+- New USB VID/PID for Freescale MSD project
+- SDHC Controller added
+- USB MSD Boot Loader - password software protection added (see http://www.utasker.com/forum/index.php?topic=1434.msg5576#msg5576)
+- K40 tower board support added (crystal configuration instead of external clock source - 8MHz)
+- K40 Kwikstik support added (crystal configuration instead of external clock source - 4MHz)
+- K40 TWRPI-SLCD and Kwikstik SLCD initialisations added and Freescale Logo blink
+- K40 / K60 compiler configurations
+- Zero-configuration (Auto-IP) preliminary support according to http://www.utasker.com/docs/uTasker/uTasker_zero_config.pdf
+
+Beta 0.12 - 01.08.2011
+======================
+- SLCD interface and SLCD simulator added according to http://www.utasker.com/docs/uTasker/uTasker_SLCD.pdf
+and shown in the video http://www.youtube.com/watch?v=nm2DmZv1rj8
+- some K40 CW10.1 target settings corrections
+- added option RAM test to application.c [#define RAM_TEST] - according to http://www.utasker.com/docs/uTasker/uTasker_RAM_test.pdf
+- UART simulator extended to handle 6 internal UARTs and 4 external ones
+- SDHC controller simulation completed (utFAT/SD card operation possible in simulator when SDHC or SPI interface used)
+- RTC support added - driver includes in-built time/Gregorian calender support according to: http://www.utasker.com/forum/index.php?topic=1656.0
+
+
+Beta 0.13 - 19.10.2011
+======================
+- validated version of zero-configuration, including state display in simulator.
+- Option (SPECIAL_LCD_DEMO) to stop GLCD demo when an image is posted to the TFT via HTTP
+- Character LCD simulator allows read of character content.
+- INDIVIDUAL_BUFFERED_TCP_BUFFER_SIZE allows buffered TCP sockets to define different buffer sizes for each socket. Use extern unsigned short fnDefineTCPBufferSize(USOCKET TCP_socket, unsigned short usBufferSize); to allocate the size to be used by the socket before first use. TCP_BUFFER is used (for compatibility) if no size of set.
+- Simulation assertions use _EXCEPTION("text indication cause of assertion")
+- Counter of number of times the start web side has been served added to the demonstration
+- Display connection IPv4 address on start page of web server
+- Enabling SUPPORT_FILE_TIME_STAMP (requires SUPPORT_RTC) adds date/time stamps to utFAT file/directory writes.
+- _VARIABLE_HTTP_PORT allows the HTTP server to be started with a user-defined port number rather than fixed port 80.
+- DNS_SERVER_OWN_ADDRESS adds command to set individual DNS server address, otherwise it follows the default gateway value.
+- CW10.1 boot loader linker scripts corrected. Boot loader output is converted to binary using post build step - the path in convert_binary_k40.bat and convert_binary_k60.bat will need to be set to local computer path.
+- Keil uVision projects changed to use Keil variable initialisation - also BM targets modified and verified.
+- RTC interface extended for compatibility with Coldfire RTC (minutes, hours, day, stopwatch and alarm interrupts): refence see #define RTC_TEST in application.c
+- RNGB optionally used for random number generation
+- corrections in utFAT when writing clusters over sector boundaries and deleting clusters on big-endian processors.
+- utFAT FAT16 mode corrections.
+- uFileSystem revision 1 including seamless file operation in multiple storage media and multiple devices in each media - generic rework to allow simpler extension with new types as well as device count being set at run-time.
+- EXTENDED_UFILESYSTEM extended with UFILESYSTEM_APPEND - see http://www.utasker.com/docs/uTasker/uTaskerFileSystem_3.PDF (version 0.05) [fully implemented for Kinetis Flash type requiring line writing in internal flash]
+- uFileSystem revision 1 - see http://www.utasker.com/docs/uTasker/uTaskerFileSystem_Revision1.pdf
+[new uFileSystem revision 1 fully integrated]
+- General support (including complete port simulation of all types and packages) for K10, K20, K30, K40, K50, K51, K52, K53 and K60 [80/81 pin, 100 pin, 121 pin and 144 pins, where appropriate].
+- Ethernet PHY control implemented to allow 10/100M, half and full duplex in RMII mode
+- Errata E2644 and E2647 respected to disable speculation and caching when necessary to ensure stable flash operation
+- Add reset cause display to web server admin page
+- Add time display on web server admin page when RTC enabled
+- Ethernet check sum offloading options added
+- Legacy and enhanced Ethernet modes supported
+
+
+Beta 0.14 - 31.12.2011
+======================
+- SINGLE_FILE_SIZE is no longer used. FILE_GRANULARITY is now used exclusively in all uFileSystem components (the meaning is the same)
+- Allow scrolling up and down to previous commands in command line and editing the command with option PREVIOUS_COMMAND_BUFFERS as number of buffers
+- FTP client according to the FTP client user's guide: http://www.utasker.com/docs/uTasker/uTaskerFTP_client.pdf
+- K70 (196 and 256 pin MAPBGA) and K61 (144, 196 and 256 pin MAPBGA)
+- Some corrections to extended file system now verified for over 1'000 files and FTP directory listings
+- Dual FlexCAN driver including interraction with CAN systems from uTasker simulator using KOMODO CAN DUO
+
+Beta 0.15 - 02.02.2012
+======================
+- Correct _CONFIG_PORT_OUTPUT_FAST_LOW(), _CONFIG_PORT_OUTPUT_FAST_HIGH(), _CONFIG_PORT_INPUT_FAST_LOW() and _CONFIG_PORT_INPUT_FAST_HIGH() macros to select GPIO mode and follow peripheral changes in the simulator
+- Add new routine to optimally calculate CAN clock settings (fnOptimalCAN_clock()).
+- HID mouse added to USB device support - define USE_USB_HID_MOUSE enables in config.h
+- PWM on FlexTimers - see Appendix E of http://www.utasker.com/docs/uTasker/uTaskerHWTimers.PDF for example
+- Boot loading from SD card added as option to serial loader project
+
+
+Release 1.4.0 - 22.02.2012
+==========================
+- Additional queue protection added to allow nested writes and nested reads from same queue in interrupts
+- New target for TWR-K60F120M (configuration allows high speed FPU based devices to be used)
+- SD card recognition in SDHC mode corrected
+- The size of SD card larger than 4G is now displayed in kBytes to stop byte length overflow in 32 bit format
+- SD card simulator can be configured to simulate 1G, 2G, 4G, 8G and 16G SD cards, as well as no SD card inserted
+- Rowely Crosswork projects reworked to include RAM based debugging as well as Flash based
+
+
+Release 1.4.1 - 27.04.2012
+==========================
+- Long File Name delete added using define UTFAT_LFN_DELETE
+- Access to SD card (utFAT) controllable individually for HTTP and FTP; root directories can be changed during operation.
+- SD card visualisation in simulator (preliminary)
+- Optional polling of SD card to detect removal during operation
+- Corrected UDP and IPV6 checksum insertion when offloading enabled
+- Added TWR-K70F120M support
+- Added TWR-K53N512 support
+- Added TWR-K20N50M support
+- K20 (32..144 pin parts included in simulator)
+- Advanced IPv6 support with link-local and global IPv6 addresses. TCP based services (such as HTTP and FTP) are operational on link-local IPv6 address and global IPv6 address as well as IPv4 (dual-stack).
+- Global IPv6 address can be optionally tunnelled in 6in4 (tunnelling IP address is configurable) when native IPv6 is not possible.
+- Configurable 6in4 relay agent to expose multiple IPv6 devices behind simple IPv4 routers.
+- Start web page shows IPv4 or IPv6 source address depending on connection.
+- Flash programming adaptation to respect FPU type Flash with phrase write rather than word write (corresponding adjustment to uParameterSystem interface and 4k Flash sector size)
+- UART DMA support on transmission (up to 6 UARTs) and reception (half or full buffer notifications) - simulation of DMA operation integrated
+- Configurable DMA channels and priorities
+- New I2C simulation devices (PCA9539, PCF2129A)
+- PWM support (FTM)
+- Ethernet bridging support
+- Buzzer output simulation (eg. for use with keypad)
+- Frontpanel simulation support with connection of keys and LEDs to ports - including external I2C port expanders
+- User button simulation in front-panel and configurable frontpanel image
+- x,y coordinates shown when mouse is on keypad/front panel
+- Touch Sense support including simulation
+- Improved CW10.2 projects for simple building with bootloader support
+- Task performance monitoring configuration
+- ADC support including (preliminary) simulation support
+- define HTTP_POST_DEFINES_PAGE allows user file to be served as specified by the file name in a POST, rather than special uFile name
+- define HTTP_SET_USERFILE_START_PAGE allow a specific user file to act as HTTP default start side
+- define HTTP_SERVE_ONLY_USER_FILES allows serving exclusively user files - if a defined user file is not found display 404 error rather than a uFileSystem equivalent
+
+
+Release 1.4.2 - 9.9.2013
+============================
+- Ethernet Boot Loader added to Full Licensed Project.
+- TCP/IP stack adapted for multiple interface and multiple network support - see http://www.utasker.com/forum/index.php?topic=1748.0 for details about application compatibility.
+- FTP client only commands ASCII or Binary modes when it is not known in which mode it is presently in and a change is needed.
+- FTP client Listing and Getting requires both the server's success response and the data connection to be closed before terminating and informing of success.
+- FTP client now supports operation with servers over IPv6.
+- Free running UART DMA reception mode
+- Reset TCP connections when SYN (without ACK) received on connected TCP port.
+- Devices that support EMAC little-endian mode of operation use this automatically (see ETHER_DBSWP bit).
+- Optional polling of SD card to detect removal during operation (by reading a sector), by polling card detect switch, or based on card detect switch interrupt (see http://www.utasker.com/forum/index.php?topic=1747.msg6270#msg6270).
+- Program once area supported (SUPPORT_PROGRAM_ONCE) and MAC address can optionally be stored there (MAC_FROM_USER_REG) - when this is enabled the MAC address is only saved to the OTP area when saved using the MAC command via the command line index. This can never be deleted!!
+- EmCraft K70F120 and K61F150 configurations added.
+- uTaskerCombine has new optional srec output as well as srec/ihex offset parameter
+- uTaskerV1.4 project uses a new include file for debug.c called debug_hal.h. This includes some hardware specific functions allowing easier management of processor and hardware target types
+- Managed read and managed write support added
+- Add PHY SMI mode and KSZ8863 support including tail-tagging mode
+- PHY_POLL_LINK support for designs without PHY interrupt line
+- DHCP_HOST_NAME option for DHCP
+- Respect peer's MSS when sending HTTP frames
+- TCP polling timer enabled only when required by a socket
+- Optional high resolution TCP polling timer resolution (T_TCP_PERIOD)
+- Don't reply to NetBios requests when DHCP is still resolving
+- _EXTENDED_HTTP_MIME_CONTENT_SUPPORT activates HTTP content-type to be added to HTTP header
+- Magic Ethernet frame reception support added
+"The define _MAGIC_RESET_FRAME enables magic frame checking support.
+Initially no checking is done until it is enabled by calling fnEnableMagicFrames(1).
+It can later be disabled if require by calling fnEnableMagicFrames(0).
+When active, each received Ethernet frame is checked directly in the receive interrupt routine for Ethernet payloads of 93 bytes in length.
+The definition of _MAGIC_RESET_FRAME determines the magic frame pattern that is expected (repeated 16 bit value) - for example
+#define _MAGIC_RESET_FRAME        0x1234
+A magic frame must then contain this value repeated 24 times in the first 60 bytes of the payload (following the two Ethernet II MAC addresses) in order to be recognised.
+The 61st byte in the frame can then be used as code to trigger an action. The value 0x01 causes the board to reset and place a code in the boot loader mail box so that the boot loader can recognise that the board was reset via use of a magic frame. The boot loader will normally remain in the boot loader mode (possibly for a limited period of time) to allow software updates to be accepted.
+The final 32 bytes of the frame are undefined and can have any pattern. The user can use these as optional information bytes if required (for example, there is adequate space to pass 2 IPv6 addresses for special configuration purposes, etc.)
+The handling interface has to be supplied by the user (eg. in application.c) as follows:
+extern void fnMagicFrame(unsigned char ucType, unsigned char usOptionalDate[32]) {}"
+- Add ELZET80_DEVICE_DISCOVERY
+- ELZET80 Network-Utility for discovery and commanded reset to boot loader mode
+- Add IP multicast rx and tx
+- MEMORY_DEBUGGER adds a memory debugger (memory display, memory modify and memory fill) to the command line interface
+- DAC interface added for non-buffered software mode
+- SDRAM with secondary uMalloc() area in external memory
+- PARAMETER_NO_ALIGNMENT option to improve parameter block efficiency when byte writes are not needed (the application must write aligned blocks)
+- High-speed USB device support for Kinetis devices with this controller [#define USB_HS_INTERFACE]
+- KBED configurations added (KBED and NETK60)
+- ST7565S LCD support added via flex bus or SPI
+- HS USB MSD boot loader mode
+- TWR-SER2 support (Ethernet/HS USB)
+
+
+Release 1.4.3 - 2.1.2014
+========================
+- Added general purpose routine uReverseMemcpy() [same as memcpy but in reverse order - useful when right-shifting buffers] - also using DMA as option
+- Serial Loader supports SREC, USB-MSD and SD-card at the same time
+- utFATV2.0 - Beta
+- ADC -> DAC buffered mode based on PDB/DMA with digital delay line demonstration
+
+
+Release 1.4.4 - 16.4.2014
+=========================
+- Initial KL support added (FRDM_KL02Z, FRDM_KL05Z, FRDM_KL25Z, FRDM_KL26Z, TWR_KL25Z48M, TWR_KL46Z48M)
+- Additional board configurations added (FRDM_K20D50M, TWR_K20D72M, TEENSY_3_1, TWR_K21D50M, TWR_K21F120M, TWR_K40D100M, FRDM-K64F, TWR_K64F120M)
+- Flexible serial loader configurations for all board configurations included
+- Atollic project included
+- CodeWarrior 10.5 project reconfigured for GCC compiler so that KL devices can be used
+- USB host mode Beta
+- LED simulation configuration has an additional control to define whether the LED is in the '0' or '1' state should the driving pin be configured as an input.
+- Port details displayed when mouse hovers over connected inputs/switches on board
+- Multi-colour LED colour mixture support in the simulator
+- SNMPV1 and SNMPV2c with multiple manager support, MIB table according to rfc 1213 and user entry capability
+- IGMP v1 support on multiple networks and interfaces
+- 3-axis accelerometers (MMA8451Q and MMA7660F)
+- 6-axis sensor (accelerometer/magnetometer FXOS8700CQ)
+- Wave file recorder added to DMA controlled ADC streaming
+- Multiple network IP/MACs displayed in simulator (test two IP addresses with "#defined IP_NETWORK_COUNT 2")
+- Standalone web server software upload support added to serial loader project
+- Single shot and periodic interrupts option using FlexTimer
+
+
+Release 1.4.5 - 4.5.2014
+=========================
+- Add KL RTC support based on LPO 1kHz or external clock (plus time display in KL46 SLCDs) [see SUPPORT_RTC and SUPPORT_SLCD]
+- Add KL PIT support (single-shot and periodic interrupts) [see SUPPORT_PITS and TEST_PIT in ADC_Timers.h]
+- Add KL TPM support (PWM, single-shot and period interrupts) [see SUPPORT_TIMER and SUPPORT_PWM_MODULE and TEST_TIMER and TEST_PWM in ADC_Timers.h]
+- I2C lockup detection and recovery added to I2C driver (if a reset took place when a slave device was in the process of returning an acknowledgment the I2C bus can get stuck in a bus busy state - this is detected and clocks generated on the SCL line to free the slave and allow normal operation without requiring a power cycle)
+- HID loader support for Freescale PC program "HIDBootloader.exe" from the application note AN4764 "Freescale HID Bootloader"
+- FRDM-K64F configuration changes to match some K64 peripherals and board requirements
+
+- KDS (Kinetis Design Studio) support added.
+IMPORTANT: This release is configured by default for the FRDM-K64F and so can be imported directly into KDS. To work with CodeWarrior copy the Eclipse project files from \Applications\uTaskerV1.4\KinetisCodeWarrior\ProjectSettings to the project root directory after removing the KDS ones from that location; switch between CW10.x, KDS and Atollic using the same method - there is a corresponding set of Eclipse project files in:
+- \Applications\uTaskerV1.4\KinetisDesignStudio\Project_Settings
+- \Applications\uTaskerV1.4\KinetisCodeWarrior\ProjectSettings
+- \Applications\uTaskerV1.4\KinetisAtollic\Project_Settings
+It is recommended to keep a backup of these settings when switching between IDEs in case one environment corrupts the setting of others.
+
+Get latest news about KDS and help in case of problems at https://community.freescale.com/community/kinetis-design-studio
+
+
+Release 1.4.6 - 12.6.2014
+=========================
+- Add KL DMA support for memcpy() and memset()
+- Add KL DMA support for UART transmission (UARTs 0, 1 and 2)
+- Add KL port interrupt support
+- KL02, KL04 and KL05 I2C and TPM pin configurations added
+- FlexNVM support added as data memory
+- K64F DMA and ADC setup added
+- Interrupt driven accelerometer setups added
+- Memory debug interface improved and extended with storage display and modification capabilities
+- Encrypted SD card loader support
+- CooCox CoIDE projects added
+- Crossbar configuration added for optimised DMA priority control
+- KBOOT 1.0.1 HID mode added to serial loader
+
+
+Release 1.4.7 - 8.7.2014
+=========================
+- LPTMR support added
+- Optimised DMA based uMemset()/uMemcpy()/uReverseMemcpy() to utilise widest transfer sizes possible (aligned buffer copies can be 7.5x faster than conventional byte based memcpy())
+- PWM_LED_CONTROL option added to allow RGB colour control (available on various Freescale boards) based on accelerometer readings
+- USB clock configuration based on PLL1 added (mainly for use by 150MHz parts at full speed)
+- Add operating details (memory sizes, bus and flash clock speeds and UART settings) to simulator status bar
+- Added KE02 serial boot loader (initial KE family support)
+- Added KE02 application (UART, I2C FTM with PWMs, SPI with SD-card)
+
+
+Release 1.4.x (presently latest developer's version)
+====================================================
+- KBOOT serial mode option added to serial loader
+- K02F, KE04, KE06, KEA128, KL03, KL43, K22,  K24, KL27, KV10 and KV31 support added
+- Added Coffeebrain Capuccino-KL27 support
+- Teensy LC support
+- Low power support for WAIT, STOP, VLPS added, including unrestricted UART operation up to 57600 Baud in STOP based modes [FRDM-K64F] (higher Bauds possible but single reception byte errors can occur occasionally)
+- KL TPM configurations to use OSCERCLK or MCGIRCLK instead of MCGPLLCLK/2 or MCGFLLCLK
+- Low power timer Tick option (K and KL devices)
+- RTC Tick option (KE devices)
+- USB HID keyboard mode
+- Multiple USB-CDC interfaces added, also in combination with other composite classes
+- Composite USB device configurations added (mixtures of USB-MSD, USB-HID (mouse or keyboard) and (mutiple) USB-CDC)
+- Updated extended file system to require the user to avoid using more that 61 blocks in the standard range and changed from "ZXXX" to "zXXX".
+- Crystal-less USB option for K22, K24, KL26, K63, K64, K65 and K66 devices (USB_CRYSTAL_LESS) plus RUN_FROM_DEFAULT_CLOCK option to run from default FLL configuration (20..25MHz) without external clocks.
+- True 2 stop bit mode added to UARTs which have no 2-stop bit support on their UARTs (interface tx needs to be used in interrupt driven mode and not DMA mode and option TRUE_UART_TX_2_STOPS enabled)
+- Optional multiple FTP sessions supported (FTP_CONNECTIONS defines the quantity) 2 allows operation with FTP clients that require more than one for file transfers (such as Internet Explorer).
+- K70 RGB support added
+- Optional use of "section" programming operation for internal Flash programming
+- KE IRQ support
+- KE Keyboard interrupt support
+- KE02 EEPROM support added
+- LLWU low-leakage wakeup from LLS mode added
+- Option for locating fixed interrupt vectors in flash
+- USB IN/OUT endpoints can share a single Kinetis USB controller endpoint
+- utFAT in SPI Flash (AT45DBxxx with 512/528 byte page size) and in internal flash
+- Time keeper module added which controls RTC, time-zones, daylight saving, time conversions, display and SNTP operation (based on simple second counter or RTC)
+- RTC alarm and wakeup from low leakage modes
+- Software RTC (with time maintained across resets) for devices without in-built RTC
+- TELNET client
+- Updated SNMPv1/V2c for enterprise MIB operation
+- Green Hills project added
+- Software FIFO (queue) driver added
+- Single/Double SC16IS7xx SPI extension for additional 2/4 UARTs added.
+- Integrated FreeMaster USB/serial support with additional write support in internal and/or external SPI Flash (provisional implementation)
+- Touchscreen mouse interface added with press, release and move events
+- Kinetis peripherals removed from kinetis.c to their own individual include files
+- IAR projects udated to IAR7
+- uVision projects udated to uVision5
+- Microchip ENC624J600 driver allowing dual-port Ethernet operation on parts with Ethernet or Ethernet extension for parts without
+- Spansion S25FL SPI flash driver added with automatic suspend/resume to interrupt sector erasure
+- Modbus ASCII possible on multiple USB-CDC interfaces, together with command line menu and USB-UART bridges on further CDCs.
+- Optional out-of-order TCP frame input buffer (USE_OUT_OF_ORDER_TCP_RX_BUFFER)
+- Composite USB-MSD and KBOOT serial loader configuration
+- USB-MSD loader full MAC OSX and Windows 8.1 compatibility
+- Optional AN2295 Freescale Developer's Serial Bootloader compatibility mode added to the serial loader
+- Nordic-Semi nRF24201+ 2.4GHz application radio support
+- HID raw USB device support added
+- Winbond W25Q SPI flash driver added
+- USB host MSD boot loader (with optional device mode at the same time)
+- utFAT on both SD card and memory stick (multiple disks)
+- New board/device support: KW21, KW24
+- I2C slave support
+- Double-buffered I2C operation (master and slave compatibility with KLx7 for example)
+- tinyK20 target
+- rcARM target
+- USB-MSD Host/Device loader using new USB-OTG driver (allows host [memory stick] and device loader mode at the same time, with automatic detection of the mode to use). See the updated user's guide: http://www.utasker.com/docs/uTasker/uTaskerSerialLoader.PDF
+- Emulated FAT - see http://www.utasker.com/docs/uTasker/uTaskerEmulatedFAT.pdf
+- Touch Slider for KL boards
+- Display worst-case stack use depth
+- USB device driver replaced with USB OTG driver
+- Memory Swap support (available in several Kinetis parts) - with UART S-REC and USB-MSD operation: see http://www.utasker.com/forum/index.php?topic=1909.0
+- Memory stick (USB-host) support (FAT), also in parallel with SD card operation (SD card is disk D: and Memory stick is disk E:)
+- Serial loader supports Intel Hex and/or SREC
+- USB-CDC SREC/iHex mode in serial loader
+- USB-MSD memory stick loader supports deleting the file after successful loading
+- USB-MSD host supports memory sticks that share bulk endpoints to IN and OUT
+- Memory stick disk simulation added (equivalent to SD card simulator) - saved as MEMSTICKx.bin (where there are multiple files for multiple LUNs (x); x = 0 if single LUN)
+- Faster disk simulation method enabled (thanks to Steve S.)
+- USB-CDC host mode for connection to USB-CDC devices for bi-directional communication link (virtual COM between two boards)
+- DHCP client supports resolving on multiple networks and interfaces
+- FRDM-K82F support
+- DAC and PWM sigal generator from buffer using DMA
+- Buffer<->peripheral support integrated in DMA driver
+- IP fragmentation/de-fragmentation option
+- Integrated EzPort cloner
+- USB Audio device class
+- RNDIS support added (USB-Ethernet adapter which can operate together with the TCP/IP stack without an Ethernet interface)
+- FreeLON board support
+- Blaze support
+
+
+In progress:
+
+- Dusk/Dawn support based on date and geographical co-ordinates
+- SSDP (Simple Service Discovery Protocol)
+- OpenSSl and mbed TLS library inclusion for SSL/TLS
+- Wear levelling in SPI and internal Flash
+- New board/device support: KM34
+- Nordic-Semi nRF24201+ 2.4GHz radio support with TCP/IP extension operation (eg. TCP/IP low power wifi/radio bridge to devices with this interface)
+- integrated PPP to aid in routing between serial networks (including USB-CDC PPP)
+- COSMIC project added
+

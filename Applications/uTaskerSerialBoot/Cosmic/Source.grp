@@ -1,0 +1,8 @@
+#	Group File Created by IDEA 
+#	Project: uTaskerSerialBoot
+#	Thu Jan 29 05:35:45 2015
+#
+"..\loader.o"
+"..\sdloader.o"
+"..\usb_loader.o"
+"..\webinterface.o"

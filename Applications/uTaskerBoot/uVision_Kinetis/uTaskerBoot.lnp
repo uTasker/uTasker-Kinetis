@@ -1,0 +1,5 @@
+--cpu Cortex-M4 "can_drv.o" "driver.o" "eth_drv.o" "globaltimer.o" "iic_drv.o" "low_power.o" "ssc_drv.o" "tty_drv.o" "ufile.o" "umalloc.o" "unetwork.o" "usb_drv.o" "utasker.o" "watchdog.o" "arp.o" "dhcp.o" "dns.o" "ethernet.o" "ftp.o" "http.o" "icmp.o" "ip.o" "ip_utils.o" "netbios.o" "pop3.o" "ppp.o" "smtp.o" "snmp.o" "tcp.o" "telnet.o" "tftp.o" "udp.o" "webutils.o" "application.o" "debug.o" "keyscan.o" "modbus_app.o" "networkindicator.o" "usb_application.o" "webinterface.o" "kinetis.o" "mass_storage.o" "modbus.o" "glcd.o" "lcd.o" --library_type=microlib --strict --scatter "uTaskerBoot.sct" 
+--entry main
+--first reset_vect --autoat --summary_stderr --info summarysizes --map --xref --callgraph --symbols 
+--info sizes --info totals --info unused --info veneers 
+ --list ".\uTaskerV1.map" -o "uTaskerBoot.axf"

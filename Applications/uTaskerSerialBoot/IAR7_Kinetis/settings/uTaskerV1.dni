@@ -1,0 +1,80 @@
+[DebugChecksum]
+Checksum=293093729
+[DisAssemblyWindow]
+NumStates=_ 1
+State 1=_ 1
+[InstructionProfiling]
+Enabled=_ 0
+[CodeCoverage]
+Enabled=_ 0
+[Exceptions]
+StopOnUncaught=_ 0
+StopOnThrow=_ 0
+[StackPlugin]
+Enabled=1
+OverflowWarningsEnabled=1
+WarningThreshold=90
+SpWarningsEnabled=1
+WarnHow=0
+UseTrigger=1
+TriggerName=main
+LimitSize=0
+ByteLimit=50
+[CallStackLog]
+Enabled=0
+[DriverProfiling]
+Enabled=0
+Mode=1
+Graph=0
+Symbiont=0
+[InterruptLog]
+LogEnabled=0
+SumEnabled=0
+GraphEnabled=0
+ShowTimeLog=1
+ShowTimeSum=1
+SumSortOrder=0
+[Interrupts]
+Enabled=1
+[MemoryMap]
+Enabled=0
+Base=0
+UseAuto=0
+TypeViolation=1
+UnspecRange=1
+ActionState=1
+[TraceHelper]
+Enabled=0
+ShowSource=1
+[Log file]
+LoggingEnabled=_ 0
+LogFile=_ ""
+Category=_ 0
+[TermIOLog]
+LoggingEnabled=_ 0
+LogFile=_ ""
+[Disassemble mode]
+mode=3
+[Breakpoints]
+Bp0=_ "STD_CODE" "{$PROJ_DIR$\low_level_init.c}.33.3@1" 0 0 0 0 "" 0 "" 0
+Bp1=_ "STD_CODE" "{C:\Windows\system32}.281.13@1" 0 0 0 0 "" 0 "" 0
+Bp2=_ "STD_CODE" "{C:\MJBC\Internal\uTaskerBeta\Hardware\Kinetis\kinetis.c}.493.5@1" 0 0 0 0 "" 0 "" 0
+Bp3=_ "STD_CODE" "{C:\Windows\system32}.280.13@1" 0 0 0 0 "" 0 "" 0
+Bp4=_ "STD_CODE" "{C:\MJBC\Internal\uTaskerBeta\Hardware\Kinetis\kinetis.c}.516.5@1" 0 0 0 0 "" 0 "" 0
+Bp5=_ "STD_CODE" "0x1FFF156E" 0 0 0 0 "" 0 "" 0
+Bp6=_ "STD_CODE" "0x1FFF1570" 0 0 0 0 "" 0 "" 0
+Bp7=_ "STD_CODE" "0x000088D8" 0 0 0 0 "" 0 "" 0
+Bp8=_ "STD_CODE" "0x000088F8" 0 0 0 0 "" 0 "" 0
+Bp9=_ "STD_CODE" "0x0000896E" 0 0 0 0 "" 0 "" 0
+Bp10=_ "STD_CODE" "0x000088DE" 0 0 0 0 "" 0 "" 0
+Bp11=_ "STD_CODE" "0x000088F6" 0 0 0 0 "" 0 "" 0
+Bp12=_ "STD_CODE" "0x0000257C" 0 0 0 0 "" 0 "" 0
+Bp13=_ "STD_CODE" "0x000090C4" 0 0 0 0 "" 0 "" 0
+Bp14=_ "STD_CODE" "0x000025FE" 0 0 0 0 "" 0 "" 0
+Bp15=_ "STD_CODE" "0x1FFF3140" 0 0 0 0 "" 0 "" 0
+Bp16=_ "STD_CODE" "0x1FFF3154" 0 0 0 0 "" 0 "" 0
+Bp17=_ "STD_CODE" "0x1FFF3E32" 0 0 0 0 "" 0 "" 0
+Count=18
+[Aliases]
+Count=0
+SuppressDialog=0

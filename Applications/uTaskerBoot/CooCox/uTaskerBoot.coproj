@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Project version="2G - 1.7.6" name="uTaskerBoot">
+  <Target name="uTaskerBoot" isCurrent="1">
+    <Device manufacturerId="1" manufacturerName="ARM" chipId="4" chipName="M4" boardId="" boardName=""/>
+    <BuildOption>
+      <Compile>
+        <Option name="OptimizationLevel" value="4"/>
+        <Option name="UseFPU" value="0"/>
+        <Option name="UserEditCompiler" value=""/>
+        <Option name="SupportCPlusplus" value="0"/>
+        <Includepaths>
+          <Includepath path="."/>
+          <Includepath path=".."/>
+        </Includepaths>
+        <DefinedSymbols>
+          <Define name="_GNU"/>
+          <Define name="_KINETIS"/>
+        </DefinedSymbols>
+      </Compile>
+      <Link useDefault="0">
+        <Option name="DiscardUnusedSection" value="0"/>
+        <Option name="UserEditLinkder" value=""/>
+        <Option name="UseMemoryLayout" value="0"/>
+        <Option name="nostartfiles" value="1"/>
+        <Option name="LTO" value="0"/>
+        <Option name="IsNewStartupCode" value="1"/>
+        <Option name="Library" value="Not use C Library"/>
+        <LinkedLibraries/>
+        <MemoryAreas debugInFlashNotRAM="1">
+          <Memory name="IROM1" type="ReadOnly" size="0x00008000" startValue="0x20000000"/>
+          <Memory name="IRAM1" type="ReadWrite" size="0x00000800" startValue="0x10000000"/>
+          <Memory name="IROM2" type="ReadOnly" size="" startValue=""/>
+          <Memory name="IRAM2" type="ReadWrite" size="" startValue=""/>
+        </MemoryAreas>
+        <LocateLinkFile path="../../utaskerv1.4/kinetiscodewarrior/linker_files/k_256_32.ld" type="0"/>
+      </Link>
+      <Output>
+        <Option name="OutputFileType" value="0"/>
+        <Option name="Path" value="./"/>
+        <Option name="Name" value="uTaskerV1.4"/>
+        <Option name="HEX" value="1"/>
+        <Option name="BIN" value="1"/>
+      </Output>
+      <User>
+        <UserRun name="Run#1" type="Before" checked="0" value=""/>
+        <UserRun name="Run#1" type="After" checked="0" value=""/>
+      </User>
+    </BuildOption>
+    <DebugOption>
+      <Option name="org.coocox.codebugger.gdbjtag.core.adapter" value="OpenJTAG"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.debugMode" value="JTAG"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.clockDiv" value="500K"/>
+      <Option name="org.coocox.codebugger.gdbjtag.corerunToMain" value="0"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.jlinkgdbserver" value=""/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.userDefineGDBScript" value=""/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.targetEndianess" value="0"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.jlinkResetMode" value="Type 0: Normal"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.resetMode" value="SYSRESETREQ"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.ifSemihost" value="0"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.ifCacheRom" value="1"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.ipAddress" value="127.0.0.1"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.portNumber" value="2009"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.autoDownload" value="0"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.verify" value="1"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.downloadFuction" value="Do not Erase"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.defaultAlgorithm" value="./klxx_128_prg_no_cfg.elf"/>
+    </DebugOption>
+    <ExcludeFile/>
+  </Target>
+  <Components path="./"/>
+  <Files>
+    <File name="Hardware/hardware.h" path="../../../Hardware/hardware.h" type="1"/>
+    <File name="Hardware" path="" type="2"/>
+    <File name="Applications/uTaskerBoot" path="" type="2"/>
+    <File name="Applications/uTaskerBoot/types.h" path="../types.h" type="1"/>
+    <File name="Hardware/spi_flash_kinetis_sst25.h" path="../../../Hardware/Kinetis/spi_flash_kinetis_sst25.h" type="1"/>
+    <File name="Applications/uTaskerBoot/config.h" path="../config.h" type="1"/>
+    <File name="Hardware/spi_flash_kinetis_atmel.h" path="../../../Hardware/Kinetis/spi_flash_kinetis_atmel.h" type="1"/>
+    <File name="Hardware/kinetis_boot.c" path="../../../Hardware/Kinetis/kinetis_boot.c" type="1"/>
+    <File name="Applications/uTaskerBoot/uTaskerBootLoader.c" path="../uTaskerBootLoader.c" type="1"/>
+    <File name="Hardware/kinetis.h" path="../../../Hardware/Kinetis/kinetis.h" type="1"/>
+    <File name="Applications" path="" type="2"/>
+    <File name="Hardware/spi_flash_kinetis_stmicro.h" path="../../../Hardware/Kinetis/spi_flash_kinetis_stmicro.h" type="1"/>
+  </Files>
+</Project>

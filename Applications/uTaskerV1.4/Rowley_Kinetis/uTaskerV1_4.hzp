@@ -1,0 +1,116 @@
+<!DOCTYPE CrossStudio_Project_File>
+<solution Name="uTaskerV1_4" target="8" version="2">
+  <project Name="uTaskerV1_4">
+    <configuration Name="Common" Placement="Flash" Target="MKL02Z16xxx4" arm_architecture="v6M" arm_core_type="Cortex-M0" arm_fpu_type="None" arm_gcc_target="arm-unknown-eabi" arm_linker_heap_size="128" arm_linker_process_stack_size="0" arm_linker_stack_size="128" arm_simulator_memory_simulation_filename="$(TargetsDir)/Kinetis/KinetisSimulatorMemory.dll" arm_simulator_memory_simulation_parameter="MKL02Z16xxx4;0x4000;0x0;0x0;0x800" arm_target_debug_interface_type="ADIv5" arm_target_loader_applicable_loaders="Flash" arm_target_loader_default_loader="Flash" c_additional_options="-fms-extensions" c_user_include_directories="$(TargetsDir)/Kinetis" linker_memory_map_file="$(TargetsDir)/Kinetis/MKL02Z16xxx4_MemoryMap.xml" linker_memory_map_macros="NAME=MK20DX128xxx5;FLASHSIZE=0x20000;FlexNVMSIZE=0x8000;FlexRAMSIZE=0x800;SRAMSIZE=0x4000;SVD=MK20D5" linker_output_format="bin" linker_printf_enabled="No" linker_printf_width_precision_supported="No" linker_scanf_enabled="No" linker_section_placement_file="$(StudioDir)/targets/Cortex_M/flash_placement.xml" project_directory="" project_type="Executable" property_groups_file_path="$(TargetsDir)/Kinetis/propertyGroups.xml" target_get_partname_script="GetPartName()" target_match_partname_script="MatchPartName(&quot;$(Target)&quot;)" target_reset_script="Reset()"/>
+    <configuration Name="Flash" arm_target_flash_loader_file_path="$(TargetsDir)/Kinetis/Release/LoaderL.elf" arm_target_flash_loader_type="LIBMEM RPC Loader" arm_target_loader_can_lock_all="No" arm_target_loader_can_lock_range="No" arm_target_loader_can_unlock_all="No" arm_target_loader_can_unlock_range="No" target_reset_script="FLASHReset()"/>
+    <folder Name="Source Files">
+      <configuration Name="Common" filter="c;cpp;cxx;cc;h;s;asm;inc"/>
+      <file file_name="../application.c"/>
+      <file file_name="../debug.c"/>
+      <file file_name="../KeyScan.c"/>
+      <file file_name="../modbus_app.c"/>
+      <file file_name="../NetworkIndicator.c"/>
+      <file file_name="../snmp_mib_handlers.c"/>
+      <file file_name="../usb_application.c"/>
+      <file file_name="../webInterface.c"/>
+    </folder>
+    <folder Name="System Files">
+      <file file_name="$(TargetsDir)/Kinetis/Kinetis_Target.js">
+        <configuration Name="Common" file_type="Reset Script"/>
+      </file>
+    </folder>
+    <folder Name="Hardware" file_name="">
+      <file file_name="../../../Hardware/Kinetis/kinetis.c"/>
+      <file file_name="../GNU_Kinetis/KL_256_32.ld">
+        <configuration Name="Common" file_type="Linker Script"/>
+        <configuration Name="THUMB Debug" build_exclude_from_build="Yes"/>
+        <configuration Name="THUMB BM BOOT" build_exclude_from_build="Yes"/>
+      </file>
+      <file file_name="../GNU_Kinetis/K_1M_128.ld">
+        <configuration Name="Common" file_type="Linker Script"/>
+        <configuration Name="THUMB Release" build_exclude_from_build="Yes"/>
+        <configuration Name="THUMB Debug" build_exclude_from_build="Yes"/>
+        <configuration Name="THUMB BM BOOT" build_exclude_from_build="Yes"/>
+      </file>
+      <file file_name="../GNU_Kinetis/K_1M_128_BM.ld">
+        <configuration Name="Common" file_type="Linker Script"/>
+        <configuration Name="THUMB Release" build_exclude_from_build="Yes"/>
+        <configuration Name="THUMB Debug" build_exclude_from_build="Yes"/>
+      </file>
+      <file file_name="../GNU_Kinetis/K_128_RAM.ld">
+        <configuration Name="Common" file_type="Linker Script"/>
+        <configuration Name="THUMB Release" build_exclude_from_build="Yes"/>
+        <configuration Name="THUMB BM BOOT" build_exclude_from_build="Yes"/>
+      </file>
+    </folder>
+    <configuration Name="THUMB Debug" c_preprocessor_definitions="ROWLEY;_GNU;_KINETIS" c_system_include_directories="../" gcc_entry_point="main" gcc_optimization_level="Optimize For Size" link_include_standard_libraries="Yes"/>
+    <folder Name="uTasker" file_name="">
+      <folder Name="utFAT">
+        <file file_name="../../../uTasker/utFAT/mass_storage.c"/>
+      </folder>
+      <file file_name="../../../uTasker/Driver.c"/>
+      <file file_name="../../../uTasker/Tty_drv.c"/>
+      <file file_name="../../../uTasker/uFile.c"/>
+      <file file_name="../../../uTasker/uMalloc.c"/>
+      <file file_name="../../../uTasker/USB_drv.c"/>
+      <file file_name="../../../uTasker/uTasker.c"/>
+      <file file_name="../../../uTasker/Watchdog.c"/>
+      <folder Name="uGLCDLIB">
+        <file file_name="../../../uTasker/uGLCDLIB/GLCD.c"/>
+        <file file_name="../../../uTasker/uGLCDLIB/glcd.h"/>
+        <file file_name="../../../uTasker/uGLCDLIB/glcd_cglcd.h"/>
+        <file file_name="../../../uTasker/uGLCDLIB/glcd_fonts.h"/>
+        <file file_name="../../../uTasker/uGLCDLIB/glcd_nokia.h"/>
+        <file file_name="../../../uTasker/uGLCDLIB/glcd_oled.h"/>
+        <file file_name="../../../uTasker/uGLCDLIB/glcd_samsung.h"/>
+        <file file_name="../../../uTasker/uGLCDLIB/glcd_tft.h"/>
+        <file file_name="../../../uTasker/uGLCDLIB/glcd_toshiba.h"/>
+        <file file_name="../../../uTasker/uGLCDLIB/LCD.c"/>
+      </folder>
+      <folder Name="MODBUS">
+        <file file_name="../../../uTasker/MODBUS/MODBUS.c"/>
+      </folder>
+      <file file_name="../../../uTasker/can_drv.c"/>
+      <file file_name="../../../uTasker/eth_drv.c"/>
+      <file file_name="../../../uTasker/GlobalTimer.c"/>
+      <file file_name="../../../uTasker/iic_drv.c"/>
+      <file file_name="../../../uTasker/low_power.c"/>
+      <file file_name="../../../uTasker/SSC_drv.c"/>
+      <file file_name="../../../uTasker/uNetwork.c"/>
+      <file file_name="../../../uTasker/time_keeper.c"/>
+    </folder>
+    <folder Name="TCP/IP">
+      <file file_name="../../../stack/ip_utils.c"/>
+      <file file_name="../../../stack/arp.c"/>
+      <file file_name="../../../stack/dhcp.c"/>
+      <file file_name="../../../stack/dns.c"/>
+      <file file_name="../../../stack/Ethernet.c"/>
+      <file file_name="../../../stack/ftp.c"/>
+      <file file_name="../../../stack/ftp_client.c"/>
+      <file file_name="../../../stack/http.c"/>
+      <file file_name="../../../stack/icmp.c"/>
+      <file file_name="../../../stack/igmp.c"/>
+      <file file_name="../../../stack/ip.c"/>
+      <file file_name="../../../stack/NetBIOS.c"/>
+      <file file_name="../../../stack/pop3.c"/>
+      <file file_name="../../../stack/ppp.c"/>
+      <file file_name="../../../stack/smtp.c"/>
+      <file file_name="../../../stack/snmp.c"/>
+      <file file_name="../../../stack/tcp.c"/>
+      <file file_name="../../../stack/tcpip.h"/>
+      <file file_name="../../../stack/telnet.c"/>
+      <file file_name="../../../stack/tftp.c"/>
+      <file file_name="../../../stack/udp.c"/>
+      <file file_name="../../../stack/webutils.c"/>
+      <file file_name="../../../stack/zero_config.c"/>
+    </folder>
+    <configuration Name="THUMB Release" build_debug_information="Yes" c_preprocessor_definitions="ROWLEY;_GNU;_KINETIS" c_system_include_directories="../" gcc_entry_point="main" gcc_optimization_level="Optimize For Size" link_include_standard_libraries="Yes" linker_output_format="bin"/>
+    <configuration Name="THUMB BM BOOT" arm_instruction_set="Thumb" c_preprocessor_definitions="ROWLEY;_GNU;_KINETIS" c_system_include_directories="../" gcc_entry_point="main" gcc_optimization_level="Optimize For Size" link_include_standard_libraries="Yes"/>
+  </project>
+  <configuration Name="THUMB Debug" inherited_configurations="THUMB;Debug"/>
+  <configuration Name="THUMB" Platform="ARM" arm_instruction_set="THUMB" arm_library_instruction_set="THUMB" c_preprocessor_definitions="__THUMB" hidden="Yes"/>
+  <configuration Name="Debug" build_debug_information="Yes" c_preprocessor_definitions="DEBUG" gcc_optimization_level="Optimize For Size" hidden="Yes"/>
+  <configuration Name="THUMB Release" gcc_optimization_level="Optimize For Size" inherited_configurations="THUMB;Release"/>
+  <configuration Name="Release" build_debug_information="Yes" c_preprocessor_definitions="NDEBUG" gcc_optimization_level="Optimize For Size" hidden="Yes"/>
+  <configuration Name="THUMB BM BOOT"/>
+</solution>

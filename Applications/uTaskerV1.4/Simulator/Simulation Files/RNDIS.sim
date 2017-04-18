@@ -1,0 +1,194 @@
+// RNDIS
+
++0 SUSB-0    = 21 00 00 00 00 00 18 00              // SETUP - send encapsulated command
++50 USB-0    = 02 00 00 00 18 00 00 00              // OUT - assume 8 byte endpoint 0 length (REMOTE_NDIS_INITIALIZE_MSG)
++50 USB-0    = 02 00 00 00 01 00 00 00
++50 USB-0    = 00 00 00 00 00 40 00 00
+
+// The device will response with a "Response Available" on its interrupt endpoint
+
++50 SUSB-0   = a1 01 00 00 00 00 00 10              // SETUP - get encapsulated response
+// The device will send the response on endpoint 0
+
++50 SUSB-0   = 21 00 00 00 00 00 1C 00              // SETUP - send encapsulated command
++50 USB-0    = 04 00 00 00 1C 00 00 00              // OUT - assume 8 byte endpoint 0 length (REMOTE_NDIS_QUERY_MSG)
++50 USB-0    = 03 00 00 00 01 01 01 00              // OID_GEN_SUPPORTED_LIST
++50 USB-0    = 00 00 00 00 14 00 00 00
++50 USB-0    = 00 00 00 00
+
+// The device will response with a "Response Available" on its interrupt endpoint
+
++50 SUSB-0   = a1 01 00 00 00 00 00 10              // SETUP - get encapsulated response
+// The device will send the response on endpoint 0
+
++50 SUSB-0   = 21 00 00 00 00 00 20 00              // SETUP - send encapsulated command
++50 USB-0    = 04 00 00 00 20 00 00 00              // OUT - assume 8 byte endpoint 0 length (REMOTE_NDIS_QUERY_MSG)
++50 USB-0    = 04 00 00 00 06 01 01 00              // OID_GEN_MAXIMUM_FRAME_SIZE
++50 USB-0    = 04 00 00 00 14 00 00 00
++50 USB-0    = 00 00 00 00 00 00 00 00
+
+// The device will response with a "Response Available" on its interrupt endpoint
++50 SUSB-0   = a1 01 00 00 00 00 00 10              // SETUP - get encapsulated response
+// The device will send the response on endpoint 0
+
++50 SUSB-0   = 21 00 00 00 00 00 20 00              // SETUP - send encapsulated command
++50 USB-0    = 04 00 00 00 20 00 00 00              // OUT - assume 8 byte endpoint 0 length (REMOTE_NDIS_QUERY_MSG)
++50 USB-0    = 05 00 00 00 04 01 01 01              // OID_802_3_MAXIMUM_LIST_SIZE
++50 USB-0    = 04 00 00 00 14 00 00 00
++50 USB-0    = 00 00 00 00 00 00 00 00
+
+// The device will response with a "Response Available" on its interrupt endpoint
++50 SUSB-0   = a1 01 00 00 00 00 00 10              // SETUP - get encapsulated response
+// The device will send the response on endpoint 0
+
++50 SUSB-0   = 21 00 00 00 00 00 22 00              // SETUP - send encapsulated command
++50 USB-0    = 04 00 00 00 22 00 00 00              // OUT - assume 8 byte endpoint 0 length (REMOTE_NDIS_QUERY_MSG)
++50 USB-0    = 06 00 00 00 02 01 01 01              // OID_802_3_CURRENT_ADDRESS
++50 USB-0    = 06 00 00 00 14 00 00 00
++50 USB-0    = 00 00 00 00 00 00 00 00
++50 USB-0    = 00 00
+
+// The device will response with a "Response Available" on its interrupt endpoint
++50 SUSB-0   = a1 01 00 00 00 00 00 10              // SETUP - get encapsulated response
+// The device will send the response on endpoint 0
+
++50 SUSB-0   = 21 00 00 00 00 00 22 00              // SETUP - send encapsulated command
++50 USB-0    = 04 00 00 00 22 00 00 00              // OUT - assume 8 byte endpoint 0 length (REMOTE_NDIS_QUERY_MSG)
++50 USB-0    = 08 00 00 00 01 01 01 01              // OID_802_3_PERMANENT_ADDRESS
++50 USB-0    = 06 00 00 00 14 00 00 00
++50 USB-0    = 00 00 00 00 00 00 00 00
++50 USB-0    = 00 00
+
+// The device will response with a "Response Available" on its interrupt endpoint
++50 SUSB-0   = a1 01 00 00 00 00 00 10              // SETUP - get encapsulated response
+// The device will send the response on endpoint 0
+
++50 SUSB-0   = 21 00 00 00 00 00 20 00              // SETUP - send encapsulated command
++50 USB-0    = 04 00 00 00 20 00 00 00              // OUT - assume 8 byte endpoint 0 length (REMOTE_NDIS_QUERY_MSG)
++50 USB-0    = 09 00 00 00 14 01 01 00              // OID_GEN_MEDIA_CONNECT_STATUS
++50 USB-0    = 04 00 00 00 14 00 00 00
++50 USB-0    = 00 00 00 00 20 0a 43 20
+
+// The device will response with a "Response Available" on its interrupt endpoint
++50 SUSB-0   = a1 01 00 00 00 00 00 10              // SETUP - get encapsulated response
+// The device will send the response on endpoint 0
+
++50 SUSB-0   = 21 00 00 00 00 00 24 00              // SETUP - send encapsulated command
++50 USB-0    = 04 00 00 00 24 00 00 00              // OUT - assume 8 byte endpoint 0 length (REMOTE_NDIS_QUERY_MSG)
++50 USB-0    = 0a 00 00 00 04 01 02 00              // OID_GEN_RCV_ERROR
++50 USB-0    = 08 00 00 00 14 00 00 00
++50 USB-0    = 00 00 00 00 00 00 00 00
++50 USB-0    = 00 00 00 00
+
+// The device will response with a "Response Available" on its interrupt endpoint
++50 SUSB-0   = a1 01 00 00 00 00 00 10              // SETUP - get encapsulated response
+// The device will send the response on endpoint 0
+
++50 SUSB-0   = 21 00 00 00 00 00 24 00              // SETUP - send encapsulated command
++50 USB-0    = 04 00 00 00 24 00 00 00              // OUT - assume 8 byte endpoint 0 length (REMOTE_NDIS_QUERY_MSG)
++50 USB-0    = 0a 00 00 00 05 01 02 00              // OID_GEN_RCV_NO_BUFFER
++50 USB-0    = 08 00 00 00 14 00 00 00
++50 USB-0    = 00 00 00 00 00 00 00 00
++50 USB-0    = 00 00 00 00
+
+// The device will response with a "Response Available" on its interrupt endpoint
++50 SUSB-0   = a1 01 00 00 00 00 00 10              // SETUP - get encapsulated response
+// The device will send the response on endpoint 0
+
++50 SUSB-0   = 21 00 00 00 00 00 24 00              // SETUP - send encapsulated command
++50 USB-0    = 04 00 00 00 24 00 00 00              // OUT - assume 8 byte endpoint 0 length (REMOTE_NDIS_QUERY_MSG)
++50 USB-0    = 0a 00 00 00 03 01 02 00              // OID_GEN_XMIT_ERROR
++50 USB-0    = 08 00 00 00 14 00 00 00
++50 USB-0    = 00 00 00 00 00 00 00 00
++50 USB-0    = 00 00 00 00
+
+// The device will response with a "Response Available" on its interrupt endpoint
++50 SUSB-0   = a1 01 00 00 00 00 00 10              // SETUP - get encapsulated response
+// The device will send the response on endpoint 0
+
++50 SUSB-0   = 21 00 00 00 00 00 20 00              // SETUP - send encapsulated command
++50 USB-0    = 05 00 00 00 20 00 00 00              // OUT - assume 8 byte endpoint 0 length (REMOTE_NDIS_SET_MSG)
++50 USB-0    = 09 00 00 00 0e 01 01 00              // OID_GEN_CURRENT_PACKET_FILTER
++50 USB-0    = 04 00 00 00 14 00 00 00
++50 USB-0    = 00 00 00 00 0b 00 00 00
+
+// The device will response with a "Response Available" on its interrupt endpoint
++50 SUSB-0   = a1 01 00 00 00 00 00 10              // SETUP - get encapsulated response
+// The device will send the response on endpoint 0
+
++50 SUSB-0   = 21 00 00 00 00 00 20 00              // SETUP - send encapsulated command
++50 USB-0    = 05 00 00 00 20 00 00 00              // OUT - assume 8 byte endpoint 0 length (REMOTE_NDIS_SET_MSG)
++50 USB-0    = 0a 00 00 00 0e 01 01 00              // OID_GEN_CURRENT_PACKET_FILTER
++50 USB-0    = 04 00 00 00 14 00 00 00
++50 USB-0    = 00 00 00 00 0f 00 00 00
+
+// The device will response with a "Response Available" on its interrupt endpoint
++50 SUSB-0   = a1 01 00 00 00 00 00 10              // SETUP - get encapsulated response
+// The device will send the response on endpoint 0
+
++50 SUSB-0   = 21 00 00 00 00 00 4c 00              // SETUP - send encapsulated command
++50 USB-0    = 04 00 00 00 4c 00 00 00              // OUT - assume 8 byte endpoint 0 length (REMOTE_NDIS_QUERY_MSG)
++50 USB-0    = 0b 00 00 00 14 01 01 00              // OID_GEN_MEDIA_CONNECT_STATUS
++50 USB-0    = 30 00 00 00 14 00 00 00
++50 USB-0    = 00 00 00 00 40 42 0f 00
++50 USB-0    = 00 00 00 00 00 00 00 00
++50 USB-0    = 00 00 00 00 00 00 00 00
++50 USB-0    = 00 00 00 00 00 00 00 00
++50 USB-0    = 00 00 00 00 00 00 00 00
++50 USB-0    = 00 00 00 00 00 00 00 00
++50 USB-0    = 00 00 00 00
+
+// The device will response with a "Response Available" on its interrupt endpoint
++50 SUSB-0   = a1 01 00 00 00 00 00 10              // SETUP - get encapsulated response
+// The device will send the response on endpoint 0
+
++50 SUSB-0   = 21 00 00 00 00 00 4c 00              // SETUP - send encapsulated command
++50 USB-0    = 04 00 00 00 4c 00 00 00              // OUT - assume 8 byte endpoint 0 length (REMOTE_NDIS_QUERY_MSG)
++50 USB-0    = 0c 00 00 00 01 01 02 00              // OID_GEN_MEDIA_CONNECT_STATUS
++50 USB-0    = 30 00 00 00 14 00 00 00
++50 USB-0    = 00 00 00 00 00 00 00 00
++50 USB-0    = 00 00 00 00 00 00 00 00
++50 USB-0    = 00 00 00 00 00 00 00 00
++50 USB-0    = 00 00 00 00 00 00 00 00
++50 USB-0    = 00 00 00 00 00 00 00 00
++50 USB-0    = 00 00 00 00 00 00 00 00
++50 USB-0    = 00 00 00 00
+
+// The device will response with a "Response Available" on its interrupt endpoint
++50 SUSB-0   = a1 01 00 00 00 00 00 10              // SETUP - get encapsulated response
+// The device will send the response on endpoint 0
+
++50 SUSB-0   = 21 00 00 00 00 00 4c 00              // SETUP - send encapsulated command
++50 USB-0    = 04 00 00 00 4c 00 00 00              // OUT - assume 8 byte endpoint 0 length (REMOTE_NDIS_QUERY_MSG)
++50 USB-0    = 0d 00 00 00 07 01 01 00              // OID_GEN_LINK_SPEED
++50 USB-0    = 30 00 00 00 14 00 00 00
++50 USB-0    = 00 00 00 00 00 00 00 00
++50 USB-0    = 00 00 00 00 00 00 00 00
++50 USB-0    = 00 00 00 00 00 00 00 00
++50 USB-0    = 80 80 07 00 00 00 00 00
++50 USB-0    = 00 00 00 00 0c 00 00 00
++50 USB-0    = 00 00 00 00 90 9d e3 b3
++50 USB-0    = 00 e0 ff ff
+
+// The device will response with a "Response Available" on its interrupt endpoint
++50 SUSB-0   = a1 01 00 00 00 00 00 10              // SETUP - get encapsulated response
+// The device will send the response on endpoint 0
+
+
++50 SUSB-0   = 21 00 00 00 00 00 4c 00              // SETUP - send encapsulated command
++50 USB-0    = 04 00 00 00 4c 00 00 00              // OUT - assume 8 byte endpoint 0 length (REMOTE_NDIS_QUERY_MSG)
++50 USB-0    = 0e 00 00 00 14 01 01 00              // OID_GEN_MEDIA_CONNECT_STATUS
++50 USB-0    = 30 00 00 00 14 00 00 00
++50 USB-0    = 00 00 00 00 40 42 0f 00
++50 USB-0    = 00 00 00 00 00 00 00 00
++50 USB-0    = 00 00 00 00 00 00 00 00
++50 USB-0    = 80 80 07 00 00 00 00 00
++50 USB-0    = 00 00 00 00 0c 00 00 00
++50 USB-0    = 00 00 00 00 90 9d e3 b3
++50 USB-0    = 00 e0 ff ff
+
+// The device will response with a "Response Available" on its interrupt endpoint
++50 SUSB-0   = a1 01 00 00 00 00 00 10              // SETUP - get encapsulated response
+// The device will send the response on endpoint 0
+
+// End of test

@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual C++ Express 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "uTasker", "uTaskerBoot.vcxproj", "{0E9D41E1-33BA-4CF4-B6DA-F17ECE8CDCEB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		uTaskerBoot_Kinetis plus GCC build|Win32 = uTaskerBoot_Kinetis plus GCC build|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0E9D41E1-33BA-4CF4-B6DA-F17ECE8CDCEB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0E9D41E1-33BA-4CF4-B6DA-F17ECE8CDCEB}.Debug|Win32.Build.0 = Debug|Win32
+		{0E9D41E1-33BA-4CF4-B6DA-F17ECE8CDCEB}.uTaskerBoot_Kinetis plus GCC build|Win32.ActiveCfg = Win32 Debug and GNU target|Win32
+		{0E9D41E1-33BA-4CF4-B6DA-F17ECE8CDCEB}.uTaskerBoot_Kinetis plus GCC build|Win32.Build.0 = Win32 Debug and GNU target|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

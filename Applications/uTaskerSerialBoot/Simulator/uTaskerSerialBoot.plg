@@ -1,0 +1,189 @@
+<html>
+<body>
+<pre>
+<h1>Erstellungsprotokoll</h1>
+<h3>
+--------------------Konfiguration: uTasker - Win32 uTasker Kinetis plus GNU build--------------------
+</h3>
+<h3>Befehlszeilen</h3>
+Erstellen der temporären Datei  "C:\Users\Mark\AppData\Local\Temp\RSP31F9.tmp" mit Inhalten
+[
+/nologo /MLd /W3 /Gm /GX /ZI /Od /I ".\..\." /I ".\..\..\..\WinSim\WpdPack_3_1\WpdPack\Include" /I "." /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_KINETIS" /D "ETHEREAL" /FR"uTasker___Win32_uTasker_Kinetis_plus_GNU_build/" /Fp"uTasker___Win32_uTasker_Kinetis_plus_GNU_build/uTaskerSerialBoot.pch" /YX /Fo"uTasker___Win32_uTasker_Kinetis_plus_GNU_build/" /Fd"uTasker___Win32_uTasker_Kinetis_plus_GNU_build/" /FD /GZ /c 
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Applications\uTaskerSerialBoot\Loader.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Applications\uTaskerSerialBoot\SDLoader.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Applications\uTaskerSerialBoot\usb_loader.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Applications\uTaskerSerialBoot\webInterface.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\uTasker\utFAT\mass_storage.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\uTasker\Driver.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\uTasker\eth_drv.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\uTasker\Tty_drv.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\uTasker\uFile.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\uTasker\uMalloc.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\uTasker\USB_drv.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\uTasker\uTasker.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\uTasker\Watchdog.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Hardware\Kinetis\kinetis.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Hardware\Kinetis\kinetis_ports.cpp"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Hardware\Kinetis\kinetisSim.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\WinSim\Ethereal.cpp"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\WinSim\FileToDisk.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Hardware\IIC_devices\IIC_dev.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\WinSim\LCD\KeyPadSim.cpp"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\WinSim\LCD\LCDSim.cpp"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\WinSim\PortSim.cpp"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\WinSim\SDcard_sim.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\WinSim\WinPcap.cpp"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\WinSim\WinSim.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\WinSim\WinSimMain.cpp"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\stack\arp.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\stack\dhcp.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\stack\Ethernet.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\stack\http.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\stack\icmp.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\stack\ip.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\stack\ip_utils.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\stack\tcp.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\stack\tftp.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\stack\udp.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\stack\webutils.c"
+]
+Creating command line "cl.exe @C:\Users\Mark\AppData\Local\Temp\RSP31F9.tmp" 
+Erstellen der temporären Datei  "C:\Users\Mark\AppData\Local\Temp\RSP31FA.tmp" mit Inhalten
+[
+kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib wpcap.lib /nologo /subsystem:windows /incremental:yes /pdb:"uTasker___Win32_uTasker_Kinetis_plus_GNU_build/uTaskerSerialBoot.pdb" /debug /machine:I386 /out:"uTasker___Win32_uTasker_Kinetis_plus_GNU_build/uTaskerSerialBoot.exe" /pdbtype:sept /libpath:".\..\..\..\WinSim\WpdPack_3_1\WpdPack\Lib" 
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\Loader.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\SDLoader.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\usb_loader.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\webInterface.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\mass_storage.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\Driver.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\eth_drv.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\Tty_drv.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\uFile.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\uMalloc.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\USB_drv.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\uTasker.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\Watchdog.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\kinetis.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\kinetis_ports.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\kinetisSim.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\Ethereal.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\FileToDisk.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\IIC_dev.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\KeyPadSim.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\LCDSim.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\PortSim.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\SDcard_sim.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\WinPcap.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\WinSim.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\WinSimMain.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\arp.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\dhcp.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\Ethernet.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\http.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\icmp.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\ip.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\ip_utils.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\tcp.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\tftp.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\udp.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\webutils.obj
+.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build\uTasker.res
+]
+Erstellen der Befehlzeile "link.exe @C:\Users\Mark\AppData\Local\Temp\RSP31FA.tmp"
+<h3>Ausgabefenster</h3>
+Kompilierung läuft...
+Loader.c
+SDLoader.c
+usb_loader.c
+webInterface.c
+mass_storage.c
+Driver.c
+eth_drv.c
+Tty_drv.c
+uFile.c
+uMalloc.c
+USB_drv.c
+uTasker.c
+Watchdog.c
+kinetis.c
+kinetisSim.c
+FileToDisk.c
+IIC_dev.c
+SDcard_sim.c
+WinSim.c
+arp.c
+dhcp.c
+Ethernet.c
+http.c
+icmp.c
+ip.c
+ip_utils.c
+tcp.c
+tftp.c
+udp.c
+webutils.c
+kinetis_ports.cpp
+Ethereal.cpp
+KeyPadSim.cpp
+LCDSim.cpp
+PortSim.cpp
+WinPcap.cpp
+WinSimMain.cpp
+Linker-Vorgang läuft...
+Erstellen der temporären Datei  "C:\Users\Mark\AppData\Local\Temp\RSP4B74.bat" mit Inhalten
+[
+@echo off
+cd ..\GNU_Kinetis
+Build_Kinetis.bat
+]
+Erstellen der Befehlzeile "C:\Users\Mark\AppData\Local\Temp\RSP4B74.bat"
+
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../../uTaskerSerialBoot -D _GNU -D _KINETIS -g -c -Os ../Loader.c -o Build/Loader.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../../uTaskerSerialBoot -D _GNU -D _KINETIS -g -c -Os ../usb_loader.c -o Build/usb_loader.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../../uTaskerSerialBoot -D _GNU -D _KINETIS -g -c -Os ../SDLoader.c -o Build/SDLoader.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../webInterface.c -o Build/webInterface.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../uTasker/utFAT/mass_storage.c -o Build/mass_storage.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../../uTaskerSerialBoot -D _GNU -D _KINETIS -g -c -Os ../../../Hardware/Kinetis/kinetis.c -o Build/kinetis.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../uTasker/eth_drv.c -o Build/eth_drv.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../../uTaskerSerialBoot -D _GNU -D _KINETIS -g -c -Os ../../../uTasker/Driver.c -o Build/Driver.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../../uTaskerSerialBoot -D _GNU -D _KINETIS -g -c -Os ../../../uTasker/uMalloc.c -o Build/uMalloc.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../../uTaskerSerialBoot -D _GNU -D _KINETIS -g -c -Os ../../../uTasker/uTasker.c -o Build/uTasker.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../../uTaskerSerialBoot -D _GNU -D _KINETIS -g -c -Os ../../../uTasker/Tty_drv.c -o Build/Tty_drv.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../../uTaskerSerialBoot -D _GNU -D _KINETIS -g -c -Os ../../../uTasker/USB_drv.c -o Build/USB_drv.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../../uTaskerSerialBoot -D _GNU -D _KINETIS -g -c -Os ../../../uTasker/uFile.c -o Build/uFile.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../../uTaskerSerialBoot -D _GNU -D _KINETIS -g -c -Os ../../../uTasker/Watchdog.c -o Build/Watchdog.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../stack/Ethernet.c -o Build/Ethernet.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../stack/arp.c -o Build/arp.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../stack/ip.c -o Build/ip.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../stack/tftp.c -o Build/tftp.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../stack/udp.c -o Build/udp.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../stack/tcp.c -o Build/tcp.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../stack/http.c -o Build/http.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../stack/dhcp.c -o Build/dhcp.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../stack/ip_utils.c -o Build/ip_utils.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../stack/webutils.c -o Build/webutils.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../stack/icmp.c -o Build/icmp.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -Os -g -TK_256_64.ld -nostartfiles -Xlinker --gc-sections -Wl,-Map,"uTaskerSerialBoot.map" -o "uTaskerSerialBoot.elf" Build/Loader.o Build/usb_loader.o Build/SDLoader.o Build/webInterface.o Build/mass_storage.o Build/kinetis.o Build/eth_drv.o Build/Driver.o Build/uMalloc.o Build/uTasker.o Build/Tty_drv.o Build/USB_drv.o Build/uFile.o Build/Watchdog.o Build/Ethernet.o Build/arp.o Build/ip.o Build/tftp.o Build/udp.o Build/tcp.o Build/http.o Build/dhcp.o Build/ip_utils.o Build/webutils.o Build/icmp.o
+arm-none-eabi-objcopy --output-target=srec uTaskerSerialBoot.elf uTaskerSerialBoot.s19
+arm-none-eabi-objcopy --output-target=ihex uTaskerSerialBoot.elf uTaskerSerialBoot.hex
+arm-none-eabi-objcopy --only-section=.data --only-section=.init --only-section=.text --only-section=.rodata --only-section=.vectors --only-section=.f_config --output-target=binary uTaskerSerialBoot.elf uTaskerSerialBoot.bin
+arm-none-eabi-size   uTaskerSerialBoot.elf
+   text    data     bss     dec     hex filename
+  17358      27   10395   27780    6c84 uTaskerSerialBoot.elf
+arm-none-eabi-gcc -v
+Using built-in specs.
+COLLECT_GCC=arm-none-eabi-gcc
+COLLECT_LTO_WRAPPER=c:/freescale/kds_1.1.1/toolchain/bin/../libexec/gcc/arm-none-eabi/4.8.0/lto-wrapper.exe
+Target: arm-none-eabi
+Configured with: /work/joes/kds-releases/1.1.1/src/gcc-4.8-kiln/configure --build=i686-unknown-linux-gnu --disable-libssp --disable-nls --disable-plugin --enable-languages=c,c++ --host=i686-w64-mingw32 --htmldir=/opt/Freescale/KDS_1.1.1/doc/html/gcc --infodir=/opt/Freescale/KDS_1.1.1/doc/info/gcc --mandir=/opt/Freescale/KDS_1.1.1/doc/man/gcc --pdfdir=/opt/Freescale/KDS_1.1.1/doc/pdf/gcc --prefix=/opt/Freescale/KDS_1.1.1/toolchain --target=arm-none-eabi --with-bugurl='Freescale Support <support@freescale.com>' --with-cpu=cortex-m0 --with-gmp=/work/joes/kds-releases/1.1.1/obj/host_i686-w64-mingw32/gmp/somn_install --with-mode=thumb --with-mpc=/work/joes/kds-releases/1.1.1/obj/host_i686-w64-mingw32/mpc/somn_install --with-mpfr=/work/joes/kds-releases/1.1.1/obj/host_i686-w64-mingw32/mpfr/somn_install --with-newlib --with-pkgversion='Kinetis Design Studio v1.1.1' --with-sysroot=/work/joes/kds-releases/1.1.1/install/i686-w64-mingw32/arm-none-eabi
+Thread model: single
+gcc version 4.8.0 (Kinetis Design Studio v1.1.1) 
+
+
+
+<h3>Ergebnisse</h3>
+uTaskerSerialBoot.exe - 0 Fehler, 0 Warnung(en)
+</pre>
+</body>
+</html>

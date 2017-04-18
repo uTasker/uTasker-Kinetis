@@ -1,0 +1,65 @@
+// SLCD definition for the Luminex LCD-S401M16KR on the FRDM-KL43Z (260 x 95 pixels used as base)
+//
+
+// bit map defines (these should be monochrome bitmaps) - BMP0 to BMP99 possible
+//
+BMP0  "freescale1.bmp"
+BMP1  "digit1.bmp"
+BMP2  "seven_seg_b_l.bmp" 
+BMP3  "seven_seg_t_l.bmp" 
+BMP4  "seven_seg_top.bmp"
+BMP5  "seven_seg_b_r.bmp"
+BMP6  "seven_seg_t_r.bmp"
+BMP7  "seven_seg_mid.bmp"
+BMP8  "seven_seg_bot.bmp"
+BMP9  "sp.bmp"
+BMP10 "dp.bmp"
+
+// Back-plane bits
+//
+bx                      // not used
+
+// Front-plane bits
+// segment number, BMP number, x-coordinate, y-coordinate
+//
+
+f163 3 25 8             // first 7-segment - top left (20-4)
+f161 2 25 8             // bottom left (20-2)
+f194 6 53 8             // top right (24-3)
+f193 5 53 8             // bottom right (24-2)
+f195 4 25 7             // top (24-4)
+f162 7 25 44            // middle (20-3)
+f160 8 25 81            // bottom (20-1)
+
+f192 9 65 75            // '.' (24-1)
+
+f211 3 79 8             // first 7-segment - top left (26-4)
+f209 2 79 8             // bottom left (26-2)
+f218 6 107 8            // top right (27-3)
+f217 5 107 8            // bottom right (27-2)
+f219 4 79 7             // top (27-4)
+f210 7 79 44            // middle (26-3)
+f208 8 79 81            // bottom (26-1)
+
+f216 9 123 75           // '.' (27-1)
+f352 10 123 25          // ':' (44-1)
+
+f323 3 142 8            // first 7-segment - top left (40-4)
+f321 2 142 8            // bottom left (40-2)
+f338 6 171 8            // top right (42-3)
+f337 5 171 8            // bottom right (42-2)
+f339 4 142 7            // top (42-4)
+f322 7 142 44           // middle (40-3)
+f320 8 142 81           // bottom (40-1)
+
+f336 9 184 75           // '.' (42-1)
+
+f347 3 200 8            // first 7-segment - top left (43-4)
+f345 2 200 8            // bottom left (43-2)
+f354 6 229 8            // top right (44-3)
+f353 5 229 8            // bottom right (44-2)
+f355 4 200 7            // top (44-4)
+f346 7 200 44           // middle (43-3)
+f344 8 200 81           // bottom (43-1)
+
+// end of file

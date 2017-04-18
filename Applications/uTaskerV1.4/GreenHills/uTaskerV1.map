@@ -1,0 +1,396 @@
+Host OS:	Windows
+ELXR: Copyright (C) 1983-2014 Green Hills Software.  All Rights Reversed.
+Release: Compiler v2014.1.6
+Build Directory: [Directory] COMP-VAL-WIN28:c:/autoval2/v2014.1-2014-08-25/win32-comp-ecom
+Revision: [VCInfo] http://toolsvc/branches/release-branch-2014-1-comp/src@515099 (built by auto-compiler)
+Revision Date: Tue Aug 26 06:01:12 2014
+
+
+
+
+Load Map Tue Jan 27 19:24:59 2015
+Image Summary
+
+  Section              Base      Size(hex)    Size(dec)  SecOffs
+  .vectors             00008080  00000008            8   00001a0
+  .text                00008088  00006d5c        27996   00001a8
+  .syscall             0000ede4  00000004            4   0006f04
+  .intercall           0000ede8  00000000            0   0000000
+  .interfunc           0000ede8  00000004            4   0006f08
+  .rodata              0000edec  000019f4         6644   0006f0c
+  .sdata2              000107e0  00000000            0   0000000
+  .secinfo             000107e0  00000054           84   0008900
+  .fixaddr             00010834  00000000            0   0000000
+  .fixtype             00010834  00000000            0   0000000
+  .CROM.sdata          00010834  00000000            0   0000000
+  .CROM.data           00010834  0000004c           76   0008954
+  .sdabase             1ffff0c0  00000000            0   0000000
+  .sbss                1ffff0c0  00000000            0   0000000
+  .sdata               1ffff0c0  00000000            0   0000000
+  .data                1ffff0c0  00000058           88   0008954
+  .bss                 1ffff118  00000444         1092   0000000
+  .ghcovfz             1ffff55c  00000000            0   0000000
+  .ghcovcz             1ffff55c  00000000            0   0000000
+  .ghcovdz             1ffff55c  00000000            0   0000000
+  .heap                1ffff560  00000800         2048   0000000
+  .stack               20002ff0  00000000            0   0000000
+  .UNCOMPRESSED.sdata  00000000  00000000            0   0000000
+  .UNCOMPRESSED.data   00000000  00000058           88   00089a0
+  .f_config            00010880  00000010           16   00089f8
+  .linfix              00000000  00000654         1620   0008a08
+  .gstackfix           00000000  00000000            0   0000000
+
+Load Map Tue Jan 27 19:24:59 2015
+Module Summary
+
+  Origin+Size    Section          Module
+00008088+00006c  .text            crt0.o
+1ffff16c+00000c  .bss             application.o
+000080f4+000480  .text            application.o
+0000edec+00055c  .rodata          application.o
+1ffff0c0+000001  .data            application.o
+1ffff178+0000dc  .bss             debug.o
+00008574+001afa  .text            debug.o
+0000f348+0011e2  .rodata          debug.o
+1ffff0c4+000008  .data            debug.o
+0000a070+000560  .text            usb_application.o
+1ffff254+000018  .bss             usb_application.o
+0001052c+0000ec  .rodata          usb_application.o
+00010618+000009  .rodata          webInterface.o
+1ffff0cc+000001  .data            Driver.o
+1ffff26c+000007  .bss             Driver.o
+0000a5d0+00064c  .text            Driver.o
+0000ac1c+000012  .text            low_power.o
+0000ac30+0006fe  .text            Tty_drv.o
+1ffff274+000018  .bss             Tty_drv.o
+0000b330+00034c  .text            uFile.o
+1ffff28c+000014  .bss             uFile.o
+0000b67c+0000cc  .text            uMalloc.o
+1ffff2a0+00000c  .bss             uMalloc.o
+0000b748+000b1c  .text            USB_drv.o
+1ffff2ac+000008  .bss             USB_drv.o
+00010622+00000e  .rodata          USB_drv.o
+0000c264+000390  .text            uTasker.o
+1ffff2b4+00000c  .bss             uTasker.o
+0000c5f4+000008  .text            Watchdog.o
+0000c5fc+002322  .text            kinetis.o
+1ffff0d0+000048  .data            kinetis.o
+1ffff2c0+000298  .bss             kinetis.o
+00010630+0001b0  .rodata          kinetis.o
+00008080+000008  .vectors         kinetis.o
+00010880+000010  .f_config        kinetis.o
+0000e91e+000036  .text            ip_utils.o
+0000e954+000014  .text            libansi.a(ccexit.o)
+0000e968+000220  .text            libstartup.a(ind_crt0.o)
+0000eb88+0000ac  .text            libstartup.a(ind_uzip.o)
+0000ec34+000036  .text            libstartup.a(ind_mset.o)
+0000ec6a+00002a  .text            libstartup.a(ind_mcpy.o)
+0000ec94+000034  .text            libsys.a(ind_exit.o)
+1ffff558+000004  .bss             libsys.a(ind_exit.o)
+0000ede4+000004  .syscall         libsys.a(ind_dots.o)
+0000ecc8+000024  .text            libsys.a(ind_call.o)
+0000ecec+000064  .text            libsys.a(ind_crt1.o)
+0000ed50+000002  .text            libsys.a(ind_lock.o)
+0000ed54+00000c  .text            libsys.a(ind_errn.o)
+0000ed60+000012  .text            libarch.a(indarchj.o)
+0000ed74+00003c  .text            libarch.a(indarchi.o)
+0000ede8+000002  .interfunc       libarch.a(indarch5.o)
+0000edea+000002  .interfunc       libarch.a(indarch3.o)
+0000edb0+000034  .text            libarch.a(indarch1.o)
+00000000+000654  .linfix          <Linker supplemental debug info>
+00000000+000058  .UNCOMPRESSED.data <UNCOMPRESSED>
+000107e0+000054  .secinfo         <section info>
+1ffff118+000051  COMMON -> .bss   <commons>
+
+Load Map Tue Jan 27 19:24:59 2015
+Global Symbols (sorted alphabetically)
+
+ .text            0000961a+00000a ..ghs.cf.sub.10
+ .text            0000a070+000018 ..ghs.cf.sub.11
+ .text            0000a04c+00000c ..ghs.cf.sub.12
+ .text            0000b308+000014 ..ghs.cf.sub.13
+ .text            0000c234+000014 ..ghs.cf.sub.14
+ .text            0000b31c+000012 ..ghs.cf.sub.15
+ .text            0000a5c4+00000c ..ghs.cf.sub.16
+ .text            0000a058+00000a ..ghs.cf.sub.17
+ .text            0000a062+00000c ..ghs.cf.sub.18
+ .text            0000ac30+00000a ..ghs.cf.sub.19
+ .text            0000eb78+000010 ..ghs.cf.sub.20
+ .text            0000c248+00000e ..ghs.cf.sub.21
+ .text            0000c256+00000e ..ghs.cf.sub.22
+ .text            00009d5a+00000e ..ghs.cf.sub.23
+ .text            0000a028+00000e ..ghs.cf.sub.4
+ .text            0000b748+000022 ..ghs.cf.sub.5
+ .text            0000a036+00000e ..ghs.cf.sub.6
+ .text            00009610+00000a ..ghs.cf.sub.7
+ .text            0000a044+000008 ..ghs.cf.sub.8
+ .text            0000c218+00001c ..ghs.cf.sub.9
+ .data            1ffff0cc+000001 DebugHandle
+ .data            1ffff0ee+000001 OurConfigNr
+ .bss             1ffff168+000001 SerialPortID
+ .text            0000ec94+00002a _Exit
+                  00000000+000000 __atexit_cleanup_func
+                  1ffff55c+000000 __bss_end__
+                  1ffff118+000000 __bss_start__
+                  00000000+000000 __cpp_exception_cleanup
+                  00000000+000000 __cpp_exception_init
+                  1ffff118+000000 __data_end__
+                  00010834+000000 __data_load_start__
+                  1ffff0c0+000000 __data_start__
+                  00000000+000000 __division_by_zero
+ .syscall         0000ede4+000004 __dotsyscall
+ .f_config        00010880+000010 __flash_config
+                  00000000+000004 __gh_errno_ptr
+                  00000000+000006 __gh_get_errno
+                  00000000+000000 __gh_iob_init
+ .text            0000ed50+000002 __gh_lock_init
+ .text            0000ed54+000006 __gh_set_errno
+                  00000000+000002 __ghsLock
+ .interfunc       0000edea+000002 __ghsThumbBLR
+                  00000000+000002 __ghsThumbBLR0
+ .interfunc       0000ede8+000002 __ghsThumbBLR1
+                  00000000+000002 __ghsUnlock
+                  00000000+00001a __ghs_at_exit
+                  00000000+000000 __ghs_board_cache_sync
+                  00000000+000000 __ghs_board_devices_init
+                  00000000+000000 __ghs_board_memory_init
+                  00000000+000000 __ghs_checksum
+                  00000000+000000 __ghs_coverage_init
+                  00000000+000000 __ghs_cpp_exception_cleanup
+                  00000000+000000 __ghs_cpp_exception_init
+ .text            0000eb88+0000a6 __ghs_decompress
+                  00000000+000002 __ghs_enterblock_func
+ .text            0000e968+0001b2 __ghs_ind_crt0
+ .text            0000ecec+000040 __ghs_ind_crt1
+ .syscall         0000ede4+000004 __ghs_initial_dotsyscall
+                  00000002+000000 __ghs_log_fee_level
+                  00000000+000000 __ghs_manprf_init
+                  00000000+000000 __ghs_rambootcodeend
+                  00000000+000000 __ghs_rambootcodestart
+                  20002ff0+000000 __ghs_ramend
+                  1ffff0c0+000000 __ghs_ramstart
+                  00010834+000000 __ghs_rombootcodeend
+                  00008088+000000 __ghs_rombootcodestart
+                  00020000+000000 __ghs_romend
+                  00008080+000000 __ghs_romstart
+                  00000000+000000 __ghs_set_stack_chk_guard
+ .text            0000ecc8+00001e __ghs_syscall
+                  00000000+000020 __ghs_syscall64
+                  00000000+000000 __ghs_validate_ghtws
+ .fixaddr         00010834+000000 __ghsbegin_fixaddr
+ .fixtype         00010834+000000 __ghsbegin_fixtype
+                  00000000+000000 __ghsbegin_picbase
+                  00000000+000000 __ghsbegin_pidbase
+                  00000000+000000 __ghsbegin_robase
+ .secinfo         000107e0+000000 __ghsbegin_secinfo
+ .secinfo         0001081c+000000 __ghsbinfo_aclear
+ .secinfo         0001081c+000000 __ghsbinfo_acopy
+ .secinfo         000107e0+00003c __ghsbinfo_clear
+ .secinfo         00010834+000000 __ghsbinfo_comacopy
+ .secinfo         0001081c+000018 __ghsbinfo_comcopy
+ .secinfo         00010834+000000 __ghsbinfo_comtcopy
+ .secinfo         0001081c+000000 __ghsbinfo_copy
+ .secinfo         0001081c+000000 __ghsbinfo_tcopy
+ .secinfo         0001081c+000000 __ghseinfo_clear
+ .secinfo         00010834+000000 __ghseinfo_comcopy
+ .secinfo         0001081c+000000 __ghseinfo_copy
+ .fixaddr         00010834+000000 __ghsend_fixaddr
+ .stack           20002ff0+000000 __ghsend_stack
+                  00000000+000000 __ghssize_fixaddr
+                  1ffff55c+000000 __heap_end__
+ .text            0000edb0+000028 __sdiv_32_32
+ .text            0000edd8+00000c __smod_32_32
+                  00000000+000000 __text_end__
+                  00000000+000000 __text_load_start__
+                  00000000+000000 __text_start__
+ .text            0000ed60+000012 __udiv10
+ .text            0000ed74+000038 __udiv_32_32
+                  00000000+000018 __umod10
+                  00000000+00000c __umod_32_32
+ .vectors         00008080+000008 __vector_table
+                  00000000+000000 _cleanup
+ .text            0000ec94+00002a _exit
+                  00000000+000008 _start
+ .text            00008088+000040 _start_T
+ .data            1ffff0f0+000028 cMimeTable
+ .rodata          0000f308+000040 cParameters
+ .rodata          00010618+000009 cSoftwareVersion
+ .rodata          00010638+000008 ctNodes
+ .rodata          00010630+000008 ctOurHeap
+ .rodata          00010640+000060 ctTaskTable
+ .bss             1ffff158+000010 diInput1
+ .text            0000b76a+000158 entry_usb
+ .bss             1ffff120+000004 environ
+ .bss             1ffff124+000004 errno
+ .text            0000e954+00000c exit
+                  00000000+000004 fnAbortTxDMA
+ .text            0000ccd4+0000e4 fnActivateHWEndpoint
+ .text            00009ec4+00011e fnAddResetCause
+ .text            0000a5fc+000070 fnAllocateQueue
+ .text            000080f4+00019e fnApplication
+                  00000000+000010 fnAreWeValidating
+ .text            0000a9d6+0000cc fnBufferDec
+ .text            0000aab2+000084 fnBufferHex
+ .text            0000d3a8+000024 fnClearTxInt
+ .text            000092a8+0001e4 fnCommandInput
+ .text            00009d68+000106 fnConfigPort
+ .text            0000d014+000140 fnConfigSCI
+ .text            0000ce14+000162 fnConfigUSB
+                  00000000+000002 fnConfigureFtpServer
+ .text            0000ddb8+0007a0 fnConfigureInterrupt
+ .text            0000dbdc+00013a fnConfigureRTC
+ .text            0000e8ac+000026 fnConnectGPIO
+ .text            0000cdb8+00005c fnConsumeUSB_out
+ .text            0000b3de+000016 fnConvertName
+ .text            00008574+00006e fnDebug
+ .text            0000aaa2+000010 fnDebugDec
+ .text            0000ab36+00000c fnDebugHex
+ .text            0000a9ca+00000c fnDebugMsg
+ .text            0000ab6c+000042 fnDecStrHex
+ .text            0000b39a+000044 fnDelPar
+                  00000000+00000e fnDelayLoop
+ .text            0000e558+00011c fnDoLowPower
+ .text            0000999a+0001ca fnDownload
+ .text            0000a6aa+000028 fnDriver
+ .text            0000954a+000010 fnEchoInput
+ .text            0000bf42+000066 fnEndpointData
+ .text            0000c81e+000034 fnEnterInterrupt
+ .text            0000b3f4+000006 fnEnterUserFiles
+ .text            0000d4de+00002e fnEraseFlashSector
+                  00000000+000020 fnEventMessage
+ .text            0000a870+000090 fnFillBuf
+                  00000000+00001e fnFlush
+                  00000000+000014 fnFlushSerialRx
+ .text            0000a802+00006e fnGetBuf
+                  00000000+000020 fnGetDataBlock
+                  00000000+000030 fnGetEthernetPars
+ .text            0000e674+00008c fnGetLowPowerMode
+                  00000000+000004 fnGetMultiDropByte
+ .text            00008336+00014e fnGetOurParameters
+ .text            0000c1fe+000010 fnGetPairedIN
+ .text            0000b36a+000030 fnGetPar
+ .text            0000d62a+000032 fnGetParameters
+ .text            0000d5d0+00000e fnGetParsFile
+                  00000000+000016 fnGetQueueHandle
+ .text            0000cc88+00004c fnGetUSB_HW
+ .text            0000a46e+000008 fnGetUSB_config_descriptor
+ .text            0000a466+000008 fnGetUSB_device_descriptor
+ .text            0000a476+000028 fnGetUSB_string_entry
+                  00000000+00002e fnGetUserMimeType
+ .text            0000d5de+00004c fnGetValidPars
+ .text            0000829e+00004c fnGotoNextState
+ .text            0000b71c+00000c fnHeapAvailable
+ .text            0000b728+000010 fnHeapFree
+ .text            0000ab42+00002a fnHexStrHex
+ .text            0000b67c+000036 fnInitialiseHeap
+ .text            00009624+0002d0 fnInitialisePorts
+ .text            0000c722+00001c fnInitialiseRND
+ .text            000094d8+000072 fnInitiateLogin
+ .text            0000a97e+000026 fnInterruptMessage
+ .text            0000ac1c+000012 fnLowPower
+                  00000000+00000e fnMassEraseFlash
+ .text            0000a7e4+00001e fnMsgs
+ .text            0000a5d0+000010 fnNeedQueues
+                  00000000+000004 fnNetworkTx
+ .text            0000a66c+00003e fnOpen
+ .text            0000aeb6+0000f4 fnOpenTTY
+ .text            0000b8c2+0000b4 fnOpenUSB
+ .text            00009d2c+00002e fnPortInputConfig
+ .text            00009cc8+000064 fnPortState
+                  00000000+000002 fnPrepareRxDMA
+ .text            0000a9a4+000026 fnPrint
+                  00000000+000040 fnProgramOnce
+ .text            0000c3c4+000016 fnRandom
+ .text            0000a7ca+00001a fnRead
+ .text            0000e7a4+000006 fnResetBoard
+ .text            0000955a+00006a fnResetChanges
+ .text            000084a8+00000a fnRestoreDebugHandle
+ .text            00009950+000024 fnRestoreFactory
+ .text            0000c740+00001e fnRetriggerWatchdog
+ .text            0000c59e+00004c fnRtmkSystemTick
+ .text            0000d398+000010 fnRxOff
+ .text            0000d332+000066 fnRxOn
+ .text            00008484+000024 fnSaveDebugHandle
+ .text            000098f4+00005c fnSaveNewPars
+ .text            000095c4+00004c fnSavePorts
+ .text            0000b136+0001b8 fnSciRxByte
+ .text            0000b2ee+00000e fnSciTxByte
+ .text            0000a952+00002c fnSearchID
+ .text            0000a454+000008 fnSendToUSB
+ .text            00008292+00000c fnSetDefaultNetwork
+ .text            0000e700+0000a4 fnSetLowPowerMode
+ .text            000084b2+00006a fnSetNewSerialMode
+                  00000000+000060 fnSetNewValue
+ .text            0000b330+00003a fnSetPar
+ .text            0000d668+0000d2 fnSetParameters
+ .text            00009e6e+000056 fnSetPortOut
+ .text            00009b64+0000a0 fnSetShowTime
+ .text            0000c0f6+000086 fnSetUSBConfigState
+ .text            0000c1ea+000014 fnSetUSBEndpointState
+ .text            0000a45c+00000a fnSetUSB_debug
+ .text            00009fe2+000030 fnShowLowPowerMode
+ .text            00009c8a+00003e fnShowSN
+                  00000000+000010 fnSkipWhiteSpace
+ .text            0000b706+000016 fnStackFree
+ .text            0000c868+000038 fnStartTick
+                  00000000+000020 fnStats
+ .text            0000a088+0003cc fnTaskUSB
+ .text            0000c5f4+000008 fnTaskWatchdog
+                  00000000+000078 fnTogglePortOut
+ .text            0000d3cc+000030 fnTxByte
+ .text            0000d3fc+00003a fnTxByteDMA
+ .text            0000d322+000010 fnTxOff
+ .text            0000d2bc+000066 fnTxOn
+ .text            0000c9a8+000028 fnUSB_error_counters
+ .text            0000bada+000468 fnUSB_handle_frame
+ .text            0000c95c+00004c fnUnhaltEndpoint
+ .text            00009c04+000086 fnUpTime
+                  00000000+000002 fnUserHWInit
+                  00000000+00006c fnUserPortState
+                  00000000+000010 fnWeHaveBeenValidated
+ .text            0000a6d2+0000f8 fnWrite
+ .text            0000d550+000080 fnWriteBytesFlash
+                  00000000+00003c function
+ .text            0000c636+0000ec main
+ .text            0000ec6a+00002a memcpy
+ .text            0000ec34+000036 memset
+ .bss             1ffff128+000018 network
+ .bss             1ffff140+000018 network_flash
+ .bss             1ffff170+000004 parameters
+ .bss             1ffff11c+000004 ptrSeed
+ .bss             1ffff26c+000004 que_ids
+                  00000000+00000c start_application
+ .bss             1ffff16c+000004 temp_pars
+ .text            0000c75e+0000b2 uDisable_Interrupt
+ .text            0000c810+00000e uEnable_Interrupt
+ .text            0000b630+000048 uFileCloseMime
+ .text            0000b4e6+000010 uFileErase
+ .text            0000b4f6+00013a uFileWrite
+                  00000000+00006a uGetFileData
+ .text            0000b464+000038 uGetFileLength
+                  00000000+00002e uGetFileName
+ .text            0000c46c+00001c uGetTaskState
+ .text            0000b6b2+000038 uMalloc
+ .text            0000b6ea+00001c uMallocAlign
+                  00000000+000002 uMask_Interrupt
+ .text            0000abbe+00001a uMemcmp
+ .text            0000e7aa+000090 uMemcpy
+ .text            0000e83a+000072 uMemset
+ .text            0000c43e+00002e uNoSchedule
+ .text            0000b442+000022 uOpenFile
+ .text            0000b49c+00004a uOpenNextMimeFile
+ .text            0000b3fa+000028 uOpenUserFile
+                  00000000+000016 uReverseMemcpy
+ .text            0000e91e+000036 uStrEquiv
+ .text            0000abd8+000022 uStrcmp
+ .text            0000abfa+000010 uStrcpy
+ .text            0000ac0a+000012 uStrlen
+ .text            0000c4e2+000062 uTaskerMonoTimer
+                  00000000+000048 uTaskerRemainingTime
+ .text            0000c3da+000064 uTaskerSchedule
+ .text            0000c264+000160 uTaskerStart
+ .text            0000c488+00005a uTaskerStateChange
+ .text            0000c55c+000042 uTaskerStopTimer
+ .bss             1ffff118+000004 uTaskerSystemTick
+ .bss             1ffff17a+000002 usData_state
+ .bss             1ffff178+000002 usUSB_state

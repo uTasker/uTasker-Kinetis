@@ -1,0 +1,29 @@
+uTaskerSerialBoot: LinkerScripts\GHS_KL_128_16.ld \
+ C:\ghs\comp_201416\lib\thumba\crt0.o objs\uTaskerSerialBoot\Loader.o \
+ objs\uTaskerSerialBoot\SDLoader.o objs\uTaskerSerialBoot\usb_loader.o \
+ objs\uTaskerSerialBoot\webInterface.o objs\uTaskerSerialBoot\mass_storage.o \
+ objs\uTaskerSerialBoot\can_drv.o objs\uTaskerSerialBoot\Driver.o \
+ objs\uTaskerSerialBoot\eth_drv.o objs\uTaskerSerialBoot\GlobalTimer.o \
+ objs\uTaskerSerialBoot\iic_drv.o objs\uTaskerSerialBoot\low_power.o \
+ objs\uTaskerSerialBoot\SSC_drv.o objs\uTaskerSerialBoot\Tty_drv.o \
+ objs\uTaskerSerialBoot\uFile.o objs\uTaskerSerialBoot\uMalloc.o \
+ objs\uTaskerSerialBoot\uNetwork.o objs\uTaskerSerialBoot\USB_drv.o \
+ objs\uTaskerSerialBoot\uTasker.o objs\uTaskerSerialBoot\Watchdog.o \
+ objs\uTaskerSerialBoot\kinetis.o C:\ghs\comp_201416\lib\thumba\libfmalloc.a \
+ C:\ghs\comp_201416\lib\thumba\libwchar_u16.a \
+ C:\ghs\comp_201416\lib\thumba\libansi.a \
+ C:\ghs\comp_201416\lib\thumba\libwc_u16.a \
+ C:\ghs\comp_201416\lib\thumba\libmath.a \
+ C:\ghs\comp_201416\lib\thumba\libind.a \
+ C:\ghs\comp_201416\lib\thumba\libstartup.a \
+ C:\ghs\comp_201416\lib\thumba\libsys.a \
+ C:\ghs\comp_201416\lib\thumba\libarch.a
+
+:cmdList=ccarm $(FILETYPEOPTIONS) $(OBJECTS) -MD -I../ -D_KINETIS -D_COMPILE_GHS -locatedprogram -Osize -Olink -align8 -thumb -nominlib -littleendian -cpu=cortexm0plus -object_dir=objs\uTaskerSerialBoot -top_project C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Applications\uTaskerSerialBoot\GreenHills\uTaskerSerialBoot.gpj -o uTaskerSerialBoot ; 
+:cmdHash=0x299b294d
+
+:objList=LinkerScripts\GHS_KL_128_16.ld objs\uTaskerSerialBoot\Loader.o objs\uTaskerSerialBoot\SDLoader.o objs\uTaskerSerialBoot\usb_loader.o objs\uTaskerSerialBoot\webInterface.o objs\uTaskerSerialBoot\mass_storage.o objs\uTaskerSerialBoot\can_drv.o objs\uTaskerSerialBoot\Driver.o objs\uTaskerSerialBoot\eth_drv.o objs\uTaskerSerialBoot\GlobalTimer.o objs\uTaskerSerialBoot\iic_drv.o objs\uTaskerSerialBoot\low_power.o objs\uTaskerSerialBoot\SSC_drv.o objs\uTaskerSerialBoot\Tty_drv.o objs\uTaskerSerialBoot\uFile.o objs\uTaskerSerialBoot\uMalloc.o objs\uTaskerSerialBoot\uNetwork.o objs\uTaskerSerialBoot\USB_drv.o objs\uTaskerSerialBoot\uTasker.o objs\uTaskerSerialBoot\Watchdog.o objs\uTaskerSerialBoot\kinetis.o ; 
+:objHash=0xdc7f01b3
+
+:installDir=c:\ghs\comp_201416
+:installDirHash=0x9d4d444d

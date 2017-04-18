@@ -1,0 +1,312 @@
+<html>
+<body>
+<pre>
+<h1>Erstellungsprotokoll</h1>
+<h3>
+--------------------Konfiguration: uTasker - Win32 uTasker kinetis plus GNU build--------------------
+</h3>
+<h3>Befehlszeilen</h3>
+Erstellen der temporären Datei  "C:\Users\Mark\AppData\Local\Temp\RSP21DB.tmp" mit Inhalten
+[
+/nologo /MTd /W3 /Gm /GX /ZI /Od /I ".\..\." /I ".\..\..\..\WinSim\WpdPack_3_1\WpdPack\Include" /I "." /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_KINETIS" /D "ETHEREAL" /D "_EXE" /FR"uTasker___Win32_uTasker_kinetis_plus_GNU_build/" /Fp"uTasker___Win32_uTasker_kinetis_plus_GNU_build/uTaskerV1-4.pch" /YX /Fo"uTasker___Win32_uTasker_kinetis_plus_GNU_build/" /Fd"uTasker___Win32_uTasker_kinetis_plus_GNU_build/" /FD /GZ /c 
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Applications\uTaskerV1.4\application.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Applications\uTaskerV1.4\debug.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Applications\uTaskerV1.4\KeyScan.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Applications\uTaskerV1.4\modbus_app.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Applications\uTaskerV1.4\NetworkIndicator.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Applications\uTaskerV1.4\snmp_mib_handlers.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Applications\uTaskerV1.4\usb_application.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Applications\uTaskerV1.4\webInterface.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\uTasker\MODBUS\MODBUS.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\uTasker\uGLCDLIB\GLCD.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\uTasker\uGLCDLIB\LCD.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\uTasker\utFAT\mass_storage.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\uTasker\can_drv.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\uTasker\Driver.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\uTasker\eth_drv.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\uTasker\GlobalTimer.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\uTasker\iic_drv.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\uTasker\low_power.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\uTasker\SSC_drv.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\uTasker\Tty_drv.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\uTasker\uFile.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\uTasker\uMalloc.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\uTasker\uNetwork.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\uTasker\USB_drv.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\uTasker\uTasker.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\uTasker\Watchdog.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\stack\arp.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\stack\dhcp.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\stack\dns.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\stack\Ethernet.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\stack\ftp.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\stack\ftp_client.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\stack\http.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\stack\icmp.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\stack\igmp.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\stack\ip.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\stack\ip_utils.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\stack\NetBIOS.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\stack\pop3.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\stack\ppp.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\stack\smtp.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\stack\snmp.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\stack\tcp.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\stack\telnet.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\stack\tftp.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\stack\udp.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\stack\webutils.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\stack\zero_config.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Hardware\Kinetis\kinetis.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Hardware\Kinetis\kinetis_ports.cpp"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Hardware\Kinetis\kinetisSim.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\WinSim\Ethereal.cpp"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\WinSim\FileToDisk.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Hardware\IIC_devices\IIC_dev.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\WinSim\LCD\KeyPadSim.cpp"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\WinSim\LCD\LCDSim.cpp"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\WinSim\PortSim.cpp"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\WinSim\SDcard_sim.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\WinSim\WinPcap.cpp"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\WinSim\WinSim.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\WinSim\WinSimMain.cpp"
+]
+Creating command line "cl.exe @C:\Users\Mark\AppData\Local\Temp\RSP21DB.tmp" 
+Erstellen der temporären Datei  "C:\Users\Mark\AppData\Local\Temp\RSP21DC.tmp" mit Inhalten
+[
+kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib wpcap.lib /nologo /subsystem:windows /incremental:yes /pdb:"uTasker___Win32_uTasker_kinetis_plus_GNU_build/uTaskerV1-4.pdb" /debug /machine:I386 /out:"uTasker___Win32_uTasker_kinetis_plus_GNU_build/uTaskerV1-4.exe" /pdbtype:sept /libpath:".\..\..\..\WinSim\WpdPack_3_1\WpdPack\Lib" 
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\application.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\debug.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\KeyScan.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\modbus_app.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\NetworkIndicator.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\snmp_mib_handlers.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\usb_application.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\webInterface.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\MODBUS.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\GLCD.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\LCD.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\mass_storage.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\can_drv.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\Driver.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\eth_drv.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\GlobalTimer.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\iic_drv.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\low_power.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\SSC_drv.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\Tty_drv.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\uFile.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\uMalloc.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\uNetwork.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\USB_drv.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\uTasker.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\Watchdog.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\arp.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\dhcp.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\dns.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\Ethernet.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\ftp.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\ftp_client.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\http.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\icmp.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\igmp.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\ip.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\ip_utils.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\NetBIOS.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\pop3.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\ppp.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\smtp.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\snmp.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\tcp.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\telnet.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\tftp.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\udp.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\webutils.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\zero_config.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\kinetis.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\kinetis_ports.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\kinetisSim.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\Ethereal.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\FileToDisk.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\IIC_dev.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\KeyPadSim.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\komodo.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\LCDSim.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\PortSim.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\SDcard_sim.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\WinPcap.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\WinSim.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\WinSimMain.obj
+.\uTasker___Win32_uTasker_kinetis_plus_GNU_build\uTasker.res
+]
+Erstellen der Befehlzeile "link.exe @C:\Users\Mark\AppData\Local\Temp\RSP21DC.tmp"
+<h3>Ausgabefenster</h3>
+Kompilierung läuft...
+application.c
+debug.c
+KeyScan.c
+modbus_app.c
+NetworkIndicator.c
+snmp_mib_handlers.c
+usb_application.c
+webInterface.c
+MODBUS.c
+GLCD.c
+LCD.c
+mass_storage.c
+can_drv.c
+Driver.c
+eth_drv.c
+GlobalTimer.c
+iic_drv.c
+low_power.c
+SSC_drv.c
+Tty_drv.c
+uFile.c
+uMalloc.c
+uNetwork.c
+USB_drv.c
+uTasker.c
+Watchdog.c
+arp.c
+dhcp.c
+dns.c
+Ethernet.c
+ftp.c
+ftp_client.c
+http.c
+icmp.c
+igmp.c
+ip.c
+ip_utils.c
+NetBIOS.c
+pop3.c
+ppp.c
+smtp.c
+snmp.c
+tcp.c
+telnet.c
+tftp.c
+udp.c
+webutils.c
+zero_config.c
+kinetis.c
+kinetisSim.c
+FileToDisk.c
+IIC_dev.c
+SDcard_sim.c
+WinSim.c
+kinetis_ports.cpp
+Ethereal.cpp
+KeyPadSim.cpp
+LCDSim.cpp
+PortSim.cpp
+WinPcap.cpp
+WinSimMain.cpp
+Linker-Vorgang läuft...
+Erstellen der temporären Datei  "C:\Users\Mark\AppData\Local\Temp\RSP4B5D.bat" mit Inhalten
+[
+@echo off
+cd ..\GNU_Kinetis
+Build_Kinetis.bat
+]
+Erstellen der Befehlzeile "C:\Users\Mark\AppData\Local\Temp\RSP4B5D.bat"
+
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../application.c -o Build/application.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../debug.c -o Build/debug.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../webInterface.c -o Build/webInterface.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../KeyScan.c -o Build/KeyScan.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../NetworkIndicator.c -o Build/NetworkIndicator.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../usb_application.c -o Build/usb_application.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../snmp_mib_handlers.c -o Build/snmp_mib_handlers.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../uTasker/MODBUS/MODBUS.c -o Build/MODBUS.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../modbus_app.c -o Build/modbus_app.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../uTasker/utFAT/mass_storage.c -o Build/mass_storage.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../uTasker/uGLCDLIB/GLCD.c -o Build/GLCD.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../uTasker/uGLCDLIB/LCD.c -o Build/LCD.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../uTasker/eth_drv.c -o Build/eth_drv.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../uTasker/Driver.c -o Build/Driver.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../uTasker/uMalloc.c -o Build/uMalloc.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../uTasker/uTasker.c -o Build/uTasker.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../uTasker/Tty_drv.c -o Build/Tty_drv.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../uTasker/iic_drv.c -o Build/iic_drv.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../uTasker/USB_drv.c -o Build/USB_drv.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../uTasker/uFile.c -o Build/uFile.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../uTasker/Watchdog.c -o Build/Watchdog.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../uTasker/GlobalTimer.c -o Build/GlobalTimer.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../uTasker/low_power.c -o Build/low_power.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../uTasker/can_drv.c -o Build/can_drv.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../stack/Ethernet.c -o Build/Ethernet.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../stack/arp.c -o Build/arp.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../stack/dhcp.c -o Build/dhcp.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../stack/dns.c -o Build/dns.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../stack/ftp.c -o Build/ftp.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../stack/http.c -o Build/http.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../stack/icmp.c -o Build/icmp.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../stack/ip_utils.c -o Build/ip_utils.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../stack/ip.c -o Build/ip.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../stack/pop3.c -o Build/pop3.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../stack/smtp.c -o Build/smtp.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../stack/snmp.c -o Build/snmp.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../stack/tcp.c -o Build/tcp.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../stack/telnet.c -o Build/telnet.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../stack/tftp.c -o Build/tftp.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../stack/udp.c -o Build/udp.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../stack/webutils.c -o Build/webutils.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../stack/NetBIOS.c -o Build/NetBIOS.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../stack/zero_config.c -o Build/zero_config.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../stack/ftp_client.c -o Build/ftp_client.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../stack/igmp.c -o Build/igmp.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os ../../../Hardware/Kinetis/kinetis.c -o Build/kinetis.o
+../../../Hardware/Kinetis/kinetis.c: In function '_ADC_DMA_Interrupt_2':
+../../../Hardware/Kinetis/kinetis.c:9900:30: warning: variable 'adc_result' set but not used [-Wunused-but-set-variable]
+         ADC_INTERRUPT_RESULT adc_result;
+                              ^
+../../../Hardware/Kinetis/kinetis.c: In function '_ADC_DMA_Interrupt_3':
+../../../Hardware/Kinetis/kinetis.c:9926:30: warning: variable 'adc_result' set but not used [-Wunused-but-set-variable]
+         ADC_INTERRUPT_RESULT adc_result;
+                              ^
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -Os -g -TK_128_16.ld -nostartfiles -Xlinker --gc-sections -Wl,-Map,"uTaskerV1.4.map" -o "uTaskerV1.4.elf" Build/application.o Build/debug.o Build/webInterface.o Build/KeyScan.o Build/NetworkIndicator.o Build/usb_application.o Build/snmp_mib_handlers.o Build/MODBUS.o Build/modbus_app.o Build/mass_storage.o Build/GLCD.o Build/LCD.o Build/eth_drv.o Build/Driver.o Build/uMalloc.o Build/uTasker.o Build/Tty_drv.o Build/iic_drv.o Build/USB_drv.o Build/uFile.o Build/Watchdog.o Build/GlobalTimer.o Build/low_power.o Build/can_drv.o Build/Ethernet.o Build/arp.o Build/dhcp.o Build/dns.o Build/ftp.o Build/http.o Build/icmp.o Build/ip_utils.o Build/ip.o Build/pop3.o Build/smtp.o Build/snmp.o Build/tcp.o Build/telnet.o Build/tftp.o Build/udp.o Build/webutils.o Build/NetBIOS.o Build/zero_config.o Build/ftp_client.o Build/igmp.o Build/kinetis.o
+arm-none-eabi-objcopy --only-section=.data --only-section=.init --only-section=.text --only-section=.rodata --only-section=.vectors --only-section=.f_config --output-target=srec uTaskerV1.4.elf uTaskerV1.4.srec
+arm-none-eabi-objcopy --only-section=.data --only-section=.init --only-section=.text --only-section=.rodata --only-section=.vectors --only-section=.f_config --output-target=ihex uTaskerV1.4.elf uTaskerV1.4.hex
+arm-none-eabi-objcopy --only-section=.data --only-section=.init --only-section=.text --only-section=.rodata --only-section=.vectors --only-section=.f_config --output-target=binary uTaskerV1.4.elf uTaskerV1.4.bin
+arm-none-eabi-size uTaskerV1.4.elf
+   text    data     bss     dec     hex filename
+ 127726     228   11120  139074   21f42 uTaskerV1.4.elf
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../ -D _GNU -D _KINETIS -g -c -Os -D _BM_BUILD ../../../Hardware/Kinetis/kinetis.c -o Build/kinetis_bm.o
+../../../Hardware/Kinetis/kinetis.c: In function '_ADC_DMA_Interrupt_2':
+../../../Hardware/Kinetis/kinetis.c:9900:30: warning: variable 'adc_result' set but not used [-Wunused-but-set-variable]
+         ADC_INTERRUPT_RESULT adc_result;
+                              ^
+../../../Hardware/Kinetis/kinetis.c: In function '_ADC_DMA_Interrupt_3':
+../../../Hardware/Kinetis/kinetis.c:9926:30: warning: variable 'adc_result' set but not used [-Wunused-but-set-variable]
+         ADC_INTERRUPT_RESULT adc_result;
+                              ^
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -Os -g -TK_1M_256_BM.ld -nostartfiles -Xlinker --gc-sections -Wl,-Map=uTaskerV1.4_BM.map -o uTaskerV1.4_BM.elf Build/application.o Build/debug.o Build/webInterface.o Build/KeyScan.o Build/NetworkIndicator.o Build/usb_application.o Build/snmp_mib_handlers.o Build/MODBUS.o Build/modbus_app.o Build/mass_storage.o Build/GLCD.o Build/LCD.o Build/eth_drv.o Build/Driver.o Build/uMalloc.o Build/uTasker.o Build/Tty_drv.o Build/iic_drv.o Build/USB_drv.o Build/uFile.o Build/Watchdog.o Build/GlobalTimer.o Build/low_power.o Build/can_drv.o Build/Ethernet.o Build/arp.o Build/dhcp.o Build/dns.o Build/ftp.o Build/http.o Build/icmp.o Build/ip_utils.o Build/ip.o Build/pop3.o Build/smtp.o Build/snmp.o Build/tcp.o Build/telnet.o Build/tftp.o Build/udp.o Build/webutils.o Build/NetBIOS.o Build/zero_config.o Build/ftp_client.o Build/igmp.o Build/kinetis_bm.o
+arm-none-eabi-objcopy --only-section=.data --only-section=.init --only-section=.text --only-section=.rodata --only-section=.vectors --output-target=srec uTaskerV1.4_BM.elf uTaskerV1.4_BM.srec
+arm-none-eabi-objcopy --only-section=.data --only-section=.init --only-section=.text --only-section=.rodata --only-section=.vectors --output-target=binary uTaskerV1.4_BM.elf uTaskerV1.4_BM.bin
+arm-none-eabi-size uTaskerV1.4_BM.elf
+   text    data     bss     dec     hex filename
+ 127710     228   11120  139058   21f32 uTaskerV1.4_BM.elf
+arm-none-eabi-gcc -v
+Using built-in specs.
+COLLECT_GCC=arm-none-eabi-gcc
+COLLECT_LTO_WRAPPER=c:/program\ files/gnu\ tools\ arm\ embedded/4.8\ 2014q3/bin/../lib/gcc/arm-none-eabi/4.8.4/lto-wrapper.exe
+Target: arm-none-eabi
+Configured with: /home/build/work/GCC-4-8-build/src/gcc/configure --build=i686-linux-gnu --host=i686-w64-mingw32 --target=arm-none-eabi --prefix=/home/build/work/GCC-4-8-build/install-mingw --libexecdir=/home/build/work/GCC-4-8-build/install-mingw/lib --infodir=/home/build/work/GCC-4-8-build/install-mingw/share/doc/gcc-arm-none-eabi/info --mandir=/home/build/work/GCC-4-8-build/install-mingw/share/doc/gcc-arm-none-eabi/man --htmldir=/home/build/work/GCC-4-8-build/install-mingw/share/doc/gcc-arm-none-eabi/html --pdfdir=/home/build/work/GCC-4-8-build/install-mingw/share/doc/gcc-arm-none-eabi/pdf --enable-languages=c,c++ --disable-decimal-float --disable-libffi --disable-libgomp --disable-libmudflap --disable-libquadmath --disable-libssp --disable-libstdcxx-pch --disable-nls --disable-shared --disable-threads --disable-tls --with-gnu-as --with-gnu-ld --with-headers=yes --with-newlib --with-python-dir=share/gcc-arm-none-eabi --with-sysroot=/home/build/work/GCC-4-8-build/install-mingw/arm-none-eabi --with-libiconv-prefix=/home/build/work/GCC-4-8-build/build-mingw/host-libs/usr --with-gmp=/home/build/work/GCC-4-8-build/build-mingw/host-libs/usr --with-mpfr=/home/build/work/GCC-4-8-build/build-mingw/host-libs/usr --with-mpc=/home/build/work/GCC-4-8-build/build-mingw/host-libs/usr --with-isl=/home/build/work/GCC-4-8-build/build-mingw/host-libs/usr --with-cloog=/home/build/work/GCC-4-8-build/build-mingw/host-libs/usr --with-libelf=/home/build/work/GCC-4-8-build/build-mingw/host-libs/usr --with-host-libstdcxx='-static-libgcc -Wl,-Bstatic,-lstdc++,-Bdynamic -lm' --with-pkgversion='GNU Tools for ARM Embedded Processors' --with-multilib-list=armv6-m,armv7-m,armv7e-m,armv7-r
+Thread model: single
+gcc version 4.8.4 20140725 (release) [ARM/embedded-4_8-branch revision 213147] (GNU Tools for ARM Embedded Processors) 
+uTaskerCombine V1.2
+
+Input file 1 could not be found. Terminating
+
+      uTaskerConvert V1.9 - supporting encryption and Motorola binary format [2M binary support]
+      uTaskerConvert V1.9 - supporting encryption and Motorola binary format [2M binary support]
+
+
+
+<h3>Ergebnisse</h3>
+uTaskerV1-4.exe - 0 Fehler, 4 Warnung(en)
+</pre>
+</body>
+</html>

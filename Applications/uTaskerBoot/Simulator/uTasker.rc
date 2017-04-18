@@ -1,0 +1,330 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#define APSTUDIO_HIDDEN_SYMBOLS
+#include "windows.h"
+#undef APSTUDIO_HIDDEN_SYMBOLS
+#include "resource.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Deutsch (Deutschland) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+#ifdef _WIN32
+LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ETHERNET1           ICON    DISCARDABLE     "uTasker.ICO"
+IDI_SMALL               ICON    DISCARDABLE     "SMALL.ICO"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDC_ETHERNET1 MENU DISCARDABLE 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&Exit",                       IDM_EXIT
+    END
+    POPUP "&UARTs"
+    BEGIN
+        MENUITEM "Simulate a receive message on UART&0", ID_TEST_RX
+        MENUITEM "Simulate a receive message on UART&1", ID_TEST_R1
+        MENUITEM "Simulate a receive message on UART&2", ID_TEST_R2
+        MENUITEM "Simulate a receive message on UART&3", ID_TEST_R3
+        MENUITEM "Simulate a receive message on UART&4", ID_TEST_R4
+        MENUITEM "Simulate a receive message on UART&5", ID_TEST_R5
+        MENUITEM "Simulate RX on &first external UART", ID_TEST_EXT_R0
+        MENUITEM "Simulate RX on &second external UART", ID_TEST_EXT_R1
+        MENUITEM "Simulate RX on &third external UART", ID_TEST_EXT_R2
+        MENUITEM "Simulate RX on f&ourth external UART", ID_TEST_EXT_R3
+    END
+    POPUP "&Wireshark"
+    BEGIN
+        MENUITEM "&Replay last file",           ID_WIRESHARK_REPLAYLASTFILE
+        MENUITEM "&Load Wireshark/Ethereal file to play back", ID_ETHEREAL
+    END
+    POPUP "&LAN"
+    BEGIN
+        MENUITEM "Select working &NIC",         ID_LAN_NIC
+    END
+    POPUP "US&B"
+    BEGIN
+        MENUITEM "&Enumeration",                ID_TEST_ENUMERATION
+        MENUITEM "&Disconnect",                 ID_USB_DISCONNECT
+        MENUITEM "Attach &low speed device",    ID_USB_CONNECTLOWSPEEDDEVICE
+        MENUITEM "Attach &full speed device",   ID_USB_CONNECTFULLSPEEDDEVICE
+
+    END
+    POPUP "&Port Sim"
+    BEGIN
+        MENUITEM "&Repeat last script",         ID_PORTSIM_REPEATLASTSCRIPT
+        MENUITEM "&Open Script",                ID_PORTSIMULATOR_OPENSCRIPT
+    END
+    POPUP "SLCD"
+    BEGIN
+        MENUITEM "Show all segments",           ID_SLCD_SHOWALLSEGMENTS
+        MENUITEM "Release segments",            ID_SLCD_RELEASESEGMENTS
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&Info...",                    IDM_ABOUT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDC_ETHERNET1 ACCELERATORS MOVEABLE PURE 
+BEGIN
+    "?",            IDM_ABOUT,              ASCII,  ALT
+    "/",            IDM_ABOUT,              ASCII,  ALT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOG DISCARDABLE  22, 17, 230, 104
+STYLE DS_MODALFRAME | WS_CAPTION | WS_SYSMENU
+CAPTION "Info"
+FONT 8, "System"
+BEGIN
+    ICON            IDI_ETHERNET1,IDC_MYICON,14,9,20,20
+    LTEXT           "µTasker Environment V1.4",IDC_STATIC,49,10,119,8,
+                    SS_NOPREFIX
+    LTEXT           "Copyright (C) 2004..2015",IDC_STATIC,49,20,119,8
+    DEFPUSHBUTTON   "OK",IDOK,195,6,30,11,WS_GROUP
+    GROUPBOX        "",IDC_STATIC,34,35,163,59
+    LTEXT           "To obtain detailed help to the µTasker project send your questions to info_uT@uTasker.com and visit the web site www.uTasker.com",
+                    IDC_STATIC,39,43,153,27
+    LTEXT           "Thank you for using the µTasker environment.",
+                    IDC_STATIC,40,77,154,14
+END
+
+IDD_NIC DIALOG DISCARDABLE  22, 17, 389, 155
+STYLE DS_MODALFRAME | WS_CAPTION | WS_SYSMENU
+CAPTION "Info"
+FONT 8, "System"
+BEGIN
+    ICON            IDI_ETHERNET1,IDC_MYICON,14,9,20,20
+    LTEXT           "Please select one of the following NICs for use with the simulator",
+                    IDC_STATIC,71,12,149,21,SS_NOPREFIX
+    DEFPUSHBUTTON   "OK",IDOK,179,122,30,11,WS_GROUP
+    COMBOBOX        IDC_COMBO1,27,42,335,73,CBS_DROPDOWN | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP
+    LTEXT           "When selecting a NIC for the first time it will immediately be activated. Changes are otherwise valid the next time the simualtion is started (terminate the simulation normally to save the setting)",
+                    IDC_STATIC,70,69,249,44
+END
+
+IDD_RESET DIALOG DISCARDABLE  22, 17, 230, 104
+STYLE DS_MODALFRAME | WS_CAPTION | WS_SYSMENU
+CAPTION "RESET"
+FONT 8, "System"
+BEGIN
+    ICON            IDI_ETHERNET1,IDC_MYICON,14,9,20,20
+    LTEXT           "µTasker Environment V1.4",IDC_STATIC,49,10,119,8,
+                    SS_NOPREFIX
+    LTEXT           "Copyright (C) 2004..2015",IDC_STATIC,49,20,119,8
+    DEFPUSHBUTTON   "OK",IDOK,195,6,30,11,WS_GROUP
+    GROUPBOX        "",IDC_STATIC,34,35,163,59
+    LTEXT           "The simulated processor has just been reset. Please restart the simulator if required.",
+                    IDC_STATIC,39,43,153,27
+    LTEXT           "Thank you for using the µTasker environment.",
+                    IDC_STATIC,40,77,154,14
+END
+
+IDD_WATCHDOG DIALOG DISCARDABLE  22, 17, 230, 140
+STYLE DS_MODALFRAME | WS_CAPTION | WS_SYSMENU
+CAPTION "WATCHDOG RESET"
+FONT 8, "System"
+BEGIN
+    ICON            IDI_ETHERNET1,IDC_MYICON,14,9,20,20
+    LTEXT           "µTasker Environment V1.4",IDC_STATIC,49,10,119,8,
+                    SS_NOPREFIX
+    LTEXT           "Copyright (C) 2004..2015",IDC_STATIC,49,20,119,8
+    DEFPUSHBUTTON   "OK",IDOK,195,6,30,11,WS_GROUP
+    GROUPBOX        "",IDC_STATIC,34,35,163,86
+    LTEXT           "The simulated device has just experienced a Watchdog timeout which lead to a reset. If this was not intentional there is probably a coding error!!",
+                    IDC_STATIC,39,44,153,36
+    LTEXT           "Thank you for using the µTasker environment.",
+                    IDC_STATIC,39,106,154,11
+    LTEXT           "Please restart the simulator if the device should restart.",
+                    IDC_STATIC,40,80,153,20
+END
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#define APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "#include ""windows.h""\r\n"
+    "#undef APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "#include ""resource.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_NIC, DIALOG
+    BEGIN
+        RIGHTMARGIN, 369
+        BOTTOMMARGIN, 144
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_APP_TITLE           "uTasker Environment"
+    IDS_HELLO               "uTasker Ethernet Simulator with embedded TCP/IP stack running...."
+    IDC_ETHERNET1           "uTasker Simulator"
+END
+
+#endif    // Deutsch (Deutschland) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Deutsch (Schweiz) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DES)
+#ifdef _WIN32
+LANGUAGE LANG_GERMAN, SUBLANG_GERMAN_SWISS
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "080704b0"
+        BEGIN
+            VALUE "Comments", "\0"
+            VALUE "CompanyName", "M.J.Butcher Consulting\0"
+            VALUE "FileDescription", "uTaskerV1-4\0"
+            VALUE "FileVersion", "1, 4, 0, 0\0"
+            VALUE "InternalName", "uTaskerV1-4\0"
+            VALUE "LegalCopyright", "Copyright © 2004..2015\0"
+            VALUE "LegalTrademarks", "\0"
+            VALUE "OriginalFilename", "uTaskerV1-4.exe\0"
+            VALUE "PrivateBuild", "\0"
+            VALUE "ProductName", "M.J.Butcher Consulting uTaskerV1-4\0"
+            VALUE "ProductVersion", "1, 4, 0, 0\0"
+            VALUE "SpecialBuild", "\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x807, 1200
+    END
+END
+
+#endif    // !_MAC
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+
+IDC_CURSOR7             CURSOR  DISCARDABLE     "cursor7.cur"
+IDC_CURSOR8             CURSOR  DISCARDABLE     "cursor8.cur"
+IDC_CURSOR9             CURSOR  DISCARDABLE     "cursor9.cur"
+IDC_CURSOR10            CURSOR  DISCARDABLE     "cursor10.cur"
+#endif    // Deutsch (Schweiz) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

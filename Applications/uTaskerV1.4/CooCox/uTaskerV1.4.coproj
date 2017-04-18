@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Project version="2G - 2.0.2" name="uTaskerV1.4">
+  <Target name="uTaskerV1.4" isCurrent="1">
+    <Device manufacturerId="1" manufacturerName="ARM" chipId="400" chipName="M4" boardId="" boardName="" coreId="" coreName=""/>
+    <BuildOption>
+      <Compile>
+        <Option name="OptimizationLevel" value="4"/>
+        <Option name="UseFPU" value="0"/>
+        <Option name="UserEditCompiler" value=""/>
+        <Option name="SupportCPlusplus" value="0"/>
+        <Option name="DEBUG" value="2"/>
+        <Option name="WARNING" value="1"/>
+        <Includepaths>
+          <Includepath path="."/>
+          <Includepath path=".."/>
+        </Includepaths>
+        <DefinedSymbols>
+          <Define name="_GNU"/>
+          <Define name="_KINETIS"/>
+        </DefinedSymbols>
+      </Compile>
+      <Link useDefault="0">
+        <Option name="DiscardUnusedSection" value="0"/>
+        <Option name="UserEditLinkder" value=""/>
+        <Option name="UseMemoryLayout" value="0"/>
+        <Option name="nostartfiles" value="1"/>
+        <Option name="LTO" value="0"/>
+        <Option name="IsNewStartupCode" value="1"/>
+        <Option name="Library" value="Not use C Library"/>
+        <LinkedLibraries/>
+        <MemoryAreas debugInFlashNotRAM="1">
+          <Memory name="IROM1" type="ReadOnly" size="0x00008000" startValue="0x20000000"/>
+          <Memory name="IRAM1" type="ReadWrite" size="0x00000800" startValue="0x10000000"/>
+          <Memory name="IROM2" type="ReadOnly" size="" startValue=""/>
+          <Memory name="IRAM2" type="ReadWrite" size="" startValue=""/>
+        </MemoryAreas>
+        <LocateLinkFile path="../gnu_kinetis/k_1m_256.ld" type="0"/>
+      </Link>
+      <Output>
+        <Option name="OutputFileType" value="0"/>
+        <Option name="Path" value="./"/>
+        <Option name="Name" value="uTaskerV1.4"/>
+        <Option name="HEX" value="1"/>
+        <Option name="BIN" value="1"/>
+      </Output>
+      <User>
+        <UserRun name="Run#1" type="Before" checked="0" value=""/>
+        <UserRun name="Run#1" type="After" checked="0" value=""/>
+      </User>
+    </BuildOption>
+    <DebugOption>
+      <Option name="org.coocox.codebugger.gdbjtag.core.adapter" value="OpenJTAG"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.debugMode" value="JTAG"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.clockDiv" value="500K"/>
+      <Option name="org.coocox.codebugger.gdbjtag.corerunToMain" value="0"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.jlinkgdbserver" value=""/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.userDefineGDBScript" value=""/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.targetEndianess" value="0"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.jlinkResetMode" value="Type 0: Normal"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.resetMode" value="SYSRESETREQ"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.ifSemihost" value="0"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.ifCacheRom" value="1"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.ipAddress" value="127.0.0.1"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.portNumber" value="2009"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.autoDownload" value="0"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.verify" value="1"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.downloadFuction" value="Do not Erase"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.defaultAlgorithm" value="./klxx_128_prg_no_cfg.elf"/>
+    </DebugOption>
+    <ExcludeFile/>
+  </Target>
+  <Target name="uTaskerV1.4_BM" isCurrent="0">
+    <Device manufacturerId="1" manufacturerName="ARM" chipId="4" chipName="M4" boardId="" boardName="" coreId="" coreName=""/>
+    <BuildOption>
+      <Compile>
+        <Option name="OptimizationLevel" value="4"/>
+        <Option name="UseFPU" value="0"/>
+        <Option name="UserEditCompiler" value=""/>
+        <Option name="SupportCPlusplus" value="0"/>
+        <Includepaths>
+          <Includepath path="."/>
+          <Includepath path=".."/>
+        </Includepaths>
+        <DefinedSymbols>
+          <Define name="_GNU"/>
+          <Define name="_KINETIS"/>
+          <Define name="_BM_BUILD"/>
+        </DefinedSymbols>
+      </Compile>
+      <Link useDefault="0">
+        <Option name="DiscardUnusedSection" value="0"/>
+        <Option name="UserEditLinkder" value=""/>
+        <Option name="UseMemoryLayout" value="0"/>
+        <Option name="nostartfiles" value="1"/>
+        <Option name="LTO" value="0"/>
+        <Option name="IsNewStartupCode" value="1"/>
+        <Option name="Library" value="Not use C Library"/>
+        <LinkedLibraries/>
+        <MemoryAreas debugInFlashNotRAM="1">
+          <Memory name="IROM1" type="ReadOnly" size="0x00008000" startValue="0x20000000"/>
+          <Memory name="IRAM1" type="ReadWrite" size="0x00000800" startValue="0x10000000"/>
+          <Memory name="IROM2" type="ReadOnly" size="" startValue=""/>
+          <Memory name="IRAM2" type="ReadWrite" size="" startValue=""/>
+        </MemoryAreas>
+        <LocateLinkFile path="../kinetiscodewarrior/linker_files/k_128_16_bm.ld" type="0"/>
+      </Link>
+      <Output>
+        <Option name="OutputFileType" value="0"/>
+        <Option name="Path" value="./"/>
+        <Option name="Name" value="uTaskerV1.4"/>
+        <Option name="HEX" value="1"/>
+        <Option name="BIN" value="1"/>
+      </Output>
+      <User>
+        <UserRun name="Run#1" type="Before" checked="0" value=""/>
+        <UserRun name="Run#1" type="After" checked="0" value=""/>
+      </User>
+    </BuildOption>
+    <DebugOption>
+      <Option name="org.coocox.codebugger.gdbjtag.core.adapter" value="OpenJTAG"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.debugMode" value="JTAG"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.clockDiv" value="500K"/>
+      <Option name="org.coocox.codebugger.gdbjtag.corerunToMain" value="0"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.jlinkgdbserver" value=""/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.userDefineGDBScript" value=""/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.targetEndianess" value="0"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.jlinkResetMode" value="Type 0: Normal"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.resetMode" value="SYSRESETREQ"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.ifSemihost" value="0"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.ifCacheRom" value="1"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.ipAddress" value="127.0.0.1"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.portNumber" value="2009"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.autoDownload" value="0"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.verify" value="1"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.downloadFuction" value="Do not Erase"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.defaultAlgorithm" value="./klxx_128_prg_no_cfg.elf"/>
+    </DebugOption>
+    <ExcludeFile/>
+  </Target>
+  <Components path="./"/>
+  <LocalComponents/>
+  <Files>
+    <File name="uTasker/uGLCDLIB/glcd_tft.h" path="../../../uTasker/uGLCDLIB/glcd_tft.h" type="1"/>
+    <File name="Applications/uTaskerV1_4/webInterface.c" path="../webInterface.c" type="1"/>
+    <File name="stack/zero_config.c" path="../../../stack/zero_config.c" type="1"/>
+    <File name="Applications/uTaskerV1_4/ADC_Timers.h" path="../ADC_Timers.h" type="1"/>
+    <File name="Applications/uTaskerV1_4/usb_application.c" path="../usb_application.c" type="1"/>
+    <File name="stack/smtp.c" path="../../../stack/smtp.c" type="1"/>
+    <File name="uTasker/uGLCDLIB/LCD.c" path="../../../uTasker/uGLCDLIB/LCD.c" type="1"/>
+    <File name="uTasker/USB_drv.c" path="../../../uTasker/USB_drv.c" type="1"/>
+    <File name="stack/telnet.c" path="../../../stack/telnet.c" type="1"/>
+    <File name="uTasker/time_keeper.c" path="../../../uTasker/time_keeper.c" type="1"/>
+    <File name="uTasker/MODBUS/MODBUS.c" path="../../../uTasker/MODBUS/MODBUS.c" type="1"/>
+    <File name="uTasker/utFAT/mass_storage.h" path="../../../uTasker/utFAT/mass_storage.h" type="1"/>
+    <File name="Hardware/hardware.h" path="../../../Hardware/hardware.h" type="1"/>
+    <File name="Applications/uTaskerV1_4/app_hw_kinetis.h" path="../app_hw_kinetis.h" type="1"/>
+    <File name="stack" path="" type="2"/>
+    <File name="Applications/uTaskerV1_4/snmp_mib_handlers.c" path="../snmp_mib_handlers.c" type="1"/>
+    <File name="Applications/uTaskerV1_4/NetworkIndicator.c" path="../NetworkIndicator.c" type="1"/>
+    <File name="Applications/uTaskerV1_4/KeyScan.c" path="../KeyScan.c" type="1"/>
+    <File name="uTasker/SSC_drv.c" path="../../../uTasker/SSC_drv.c" type="1"/>
+    <File name="uTasker/Watchdog.c" path="../../../uTasker/Watchdog.c" type="1"/>
+    <File name="Applications/uTaskerV1_4/widgets.h" path="../widgets.h" type="1"/>
+    <File name="Applications" path="" type="2"/>
+    <File name="stack/tcp.c" path="../../../stack/tcp.c" type="1"/>
+    <File name="uTasker/uGLCDLIB/glcd_samsung.h" path="../../../uTasker/uGLCDLIB/glcd_samsung.h" type="1"/>
+    <File name="Applications/uTaskerV1_4/can_tests.h" path="../can_tests.h" type="1"/>
+    <File name="uTasker/uGLCDLIB/glcd_fonts.h" path="../../../uTasker/uGLCDLIB/glcd_fonts.h" type="1"/>
+    <File name="stack/Ethernet.c" path="../../../stack/Ethernet.c" type="1"/>
+    <File name="stack/udp.c" path="../../../stack/udp.c" type="1"/>
+    <File name="Applications/uTaskerV1_4/application_lcd.h" path="../application_lcd.h" type="1"/>
+    <File name="stack/dns.c" path="../../../stack/dns.c" type="1"/>
+    <File name="uTasker/uGLCDLIB/glcd.h" path="../../../uTasker/uGLCDLIB/glcd.h" type="1"/>
+    <File name="Hardware/spi_flash_kinetis_sst25.h" path="../../../Hardware/Kinetis/spi_flash_kinetis_sst25.h" type="1"/>
+    <File name="Hardware/kinetis.c" path="../../../Hardware/Kinetis/kinetis.c" type="1"/>
+    <File name="uTasker/Driver.c" path="../../../uTasker/Driver.c" type="1"/>
+    <File name="stack/arp.c" path="../../../stack/arp.c" type="1"/>
+    <File name="stack/pop3.c" path="../../../stack/pop3.c" type="1"/>
+    <File name="Applications/uTaskerV1_4/Port_Interrupts.h" path="../Port_Interrupts.h" type="1"/>
+    <File name="stack/icmp.c" path="../../../stack/icmp.c" type="1"/>
+    <File name="Applications/uTaskerV1_4/TaskConfig.h" path="../TaskConfig.h" type="1"/>
+    <File name="uTasker/MODBUS" path="" type="2"/>
+    <File name="stack/NetBIOS.c" path="../../../stack/NetBIOS.c" type="1"/>
+    <File name="Applications/uTaskerV1_4/modbus_app.c" path="../modbus_app.c" type="1"/>
+    <File name="uTasker/uMalloc.c" path="../../../uTasker/uMalloc.c" type="1"/>
+    <File name="Applications/uTaskerV1_4/types.h" path="../types.h" type="1"/>
+    <File name="Hardware" path="" type="2"/>
+    <File name="stack/ppp.c" path="../../../stack/ppp.c" type="1"/>
+    <File name="uTasker/uGLCDLIB/GLCD.c" path="../../../uTasker/uGLCDLIB/GLCD.c" type="1"/>
+    <File name="Applications/uTaskerV1_4/application.h" path="../application.h" type="1"/>
+    <File name="Applications/uTaskerV1_4/user_glcd_fonts.h" path="../user_glcd_fonts.h" type="1"/>
+    <File name="uTasker/can_drv.c" path="../../../uTasker/can_drv.c" type="1"/>
+    <File name="uTasker/Tty_drv.c" path="../../../uTasker/Tty_drv.c" type="1"/>
+    <File name="uTasker/GlobalTimer.c" path="../../../uTasker/GlobalTimer.c" type="1"/>
+    <File name="uTasker/uGLCDLIB/glcd_cglcd.h" path="../../../uTasker/uGLCDLIB/glcd_cglcd.h" type="1"/>
+    <File name="uTasker/uGLCDLIB" path="" type="2"/>
+    <File name="uTasker/uTasker.h" path="../../../uTasker/uTasker.h" type="1"/>
+    <File name="stack/tcpip.h" path="../../../stack/tcpip.h" type="1"/>
+    <File name="uTasker/uFile.c" path="../../../uTasker/uFile.c" type="1"/>
+    <File name="stack/snmp.c" path="../../../stack/snmp.c" type="1"/>
+    <File name="stack/http.c" path="../../../stack/http.c" type="1"/>
+    <File name="stack/igmp.c" path="../../../stack/igmp.c" type="1"/>
+    <File name="stack/ip_utils.c" path="../../../stack/ip_utils.c" type="1"/>
+    <File name="uTasker/utFAT/mass_storage.c" path="../../../uTasker/utFAT/mass_storage.c" type="1"/>
+    <File name="Applications/uTaskerV1_4/debug_hal.h" path="../debug_hal.h" type="1"/>
+    <File name="Applications/uTaskerV1_4/app_user_files.h" path="../app_user_files.h" type="1"/>
+    <File name="Hardware/spi_flash_kinetis_atmel.h" path="../../../Hardware/Kinetis/spi_flash_kinetis_atmel.h" type="1"/>
+    <File name="Applications/uTaskerV1_4/config.h" path="../config.h" type="1"/>
+    <File name="stack/ftp_client.c" path="../../../stack/ftp_client.c" type="1"/>
+    <File name="Hardware/spi_flash_kinetis_stmicro.h" path="../../../Hardware/Kinetis/spi_flash_kinetis_stmicro.h" type="1"/>
+    <File name="uTasker/utFAT" path="" type="2"/>
+    <File name="uTasker/uGLCDLIB/glcd_oled.h" path="../../../uTasker/uGLCDLIB/glcd_oled.h" type="1"/>
+    <File name="uTasker/iic_drv.c" path="../../../uTasker/iic_drv.c" type="1"/>
+    <File name="uTasker/uGLCDLIB/glcd_nokia.h" path="../../../uTasker/uGLCDLIB/glcd_nokia.h" type="1"/>
+    <File name="stack/webutils.c" path="../../../stack/webutils.c" type="1"/>
+    <File name="uTasker" path="" type="2"/>
+    <File name="uTasker/uTasker.c" path="../../../uTasker/uTasker.c" type="1"/>
+    <File name="uTasker/usb.h" path="../../../uTasker/usb.h" type="1"/>
+    <File name="Applications/uTaskerV1_4/iic_tests.h" path="../iic_tests.h" type="1"/>
+    <File name="uTasker/uNetwork.c" path="../../../uTasker/uNetwork.c" type="1"/>
+    <File name="uTasker/uGLCDLIB/glcd_toshiba.h" path="../../../uTasker/uGLCDLIB/glcd_toshiba.h" type="1"/>
+    <File name="Applications/uTaskerV1_4/application.c" path="../application.c" type="1"/>
+    <File name="uTasker/utFAT/NAND_driver.h" path="../../../uTasker/utFAT/NAND_driver.h" type="1"/>
+    <File name="Applications/uTaskerV1_4" path="" type="2"/>
+    <File name="stack/tftp.c" path="../../../stack/tftp.c" type="1"/>
+    <File name="Applications/uTaskerV1_4/debug.c" path="../debug.c" type="1"/>
+    <File name="uTasker/driver.h" path="../../../uTasker/driver.h" type="1"/>
+    <File name="stack/ip.c" path="../../../stack/ip.c" type="1"/>
+    <File name="uTasker/eth_drv.c" path="../../../uTasker/eth_drv.c" type="1"/>
+    <File name="stack/ftp.c" path="../../../stack/ftp.c" type="1"/>
+    <File name="uTasker/uGLCDLIB/glcd_st7565s.h" path="../../../uTasker/uGLCDLIB/glcd_st7565s.h" type="1"/>
+    <File name="Hardware/spi_flash_kinetis_s25fl1-k.h" path="../../../Hardware/Kinetis/spi_flash_kinetis_s25fl1-k.h" type="1"/>
+    <File name="uTasker/MODBUS/modbus.h" path="../../../uTasker/MODBUS/modbus.h" type="1"/>
+    <File name="Hardware/kinetis.h" path="../../../Hardware/Kinetis/kinetis.h" type="1"/>
+    <File name="stack/dhcp.c" path="../../../stack/dhcp.c" type="1"/>
+    <File name="uTasker/low_power.c" path="../../../uTasker/low_power.c" type="1"/>
+  </Files>
+  <Bookmarks/>
+</Project>

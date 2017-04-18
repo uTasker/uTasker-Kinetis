@@ -1,0 +1,66 @@
+<!DOCTYPE CrossStudio_Session_File>
+<session>
+ <Bookmarks/>
+ <Breakpoints/>
+ <ExecutionProfileWindow/>
+ <FrameBufferWindow>
+  <FrameBufferWindow addressText="" bufferWidth="-1" bufferHeight="-1" addressSpace="" />
+ </FrameBufferWindow>
+ <Memory1>
+  <MemoryWindow autoEvaluate="0" addressText="0x2000ff5c" numColumns="8" sizeText="100" dataSize="4" radix="16" name="uTaskerV1_4" addressSpace="" />
+ </Memory1>
+ <Memory2>
+  <MemoryWindow autoEvaluate="0" addressText="" numColumns="8" sizeText="" dataSize="1" radix="16" name="uTaskerV1_4" addressSpace="" />
+ </Memory2>
+ <Memory3>
+  <MemoryWindow autoEvaluate="0" addressText="" numColumns="8" sizeText="" dataSize="1" radix="16" name="uTaskerV1_4" addressSpace="" />
+ </Memory3>
+ <Memory4>
+  <MemoryWindow autoEvaluate="0" addressText="" numColumns="8" sizeText="" dataSize="1" radix="16" name="uTaskerV1_4" addressSpace="" />
+ </Memory4>
+ <Project>
+  <ProjectSessionItem path="uTaskerV1_4" name="unnamed" />
+  <ProjectSessionItem path="uTaskerV1_4;uTaskerV1_4" name="unnamed" />
+  <ProjectSessionItem path="uTaskerV1_4;uTaskerV1_4;Hardware" name="unnamed" />
+ </Project>
+ <Register1>
+  <RegisterWindow openNodes="MCG" binaryNodes="" unsignedNodes="" decimalNodes="" octalNodes="" asciiNodes="" visibleNodes="" name="uTaskerV1_4" />
+ </Register1>
+ <Register2>
+  <RegisterWindow openNodes="" binaryNodes="" unsignedNodes="" decimalNodes="" octalNodes="" asciiNodes="" visibleNodes="" name="uTaskerV1_4" />
+ </Register2>
+ <Register3>
+  <RegisterWindow openNodes="" binaryNodes="" unsignedNodes="" decimalNodes="" octalNodes="" asciiNodes="" visibleNodes="" name="uTaskerV1_4" />
+ </Register3>
+ <Register4>
+  <RegisterWindow openNodes="" binaryNodes="" unsignedNodes="" decimalNodes="" octalNodes="" asciiNodes="" visibleNodes="" name="uTaskerV1_4" />
+ </Register4>
+ <TargetWindow programAction="" uploadFileType="" programLoadAddress="" programSize="" uploadFileName="" uploadMemoryInterface="" programFileName="" uploadStartAddress="" programFileType="" uploadSize="" programMemoryInterface="" />
+ <TraceWindow>
+  <Trace enabled="Yes" />
+ </TraceWindow>
+ <Watch1>
+  <Watches active="1" update="Never" >
+   <Watchpoint evalMode="1" linenumber="4863" evalType="1" radix="16" name="ptrBuffer" expression="ptrBuffer" filename="c:/mjbc/internal/freescale/kinetis/workspace/utaskerv1.4/hardware/kinetis/kinetis.c" />
+   <Watchpoint evalMode="1" linenumber="1665" evalType="1" radix="-1" name="ptrTxBd" expression="ptrTxBd" filename="c:/mjbc/internal/freescale/kinetis/workspace/utaskerv1.4/hardware/kinetis/kinetis.c" />
+   <Watchpoint evalMode="1" linenumber="1527" evalType="1" radix="-1" name="ptrRxBd_start" expression="ptrRxBd_start" filename="c:/mjbc/internal/freescale/kinetis/workspace/utaskerv1.4/hardware/kinetis/kinetis.c" />
+   <Watchpoint evalMode="1" linenumber="1556" evalType="1" radix="-1" name="ptrBD" expression="ptrBD" filename="c:/mjbc/internal/freescale/kinetis/workspace/utaskerv1.4/hardware/kinetis/kinetis.c" />
+  </Watches>
+ </Watch1>
+ <Watch2>
+  <Watches active="0" update="Never" />
+ </Watch2>
+ <Watch3>
+  <Watches active="0" update="Never" />
+ </Watch3>
+ <Watch4>
+  <Watches active="0" update="Never" />
+ </Watch4>
+ <Files/>
+ <ARMCrossStudioWindow activeProject="uTaskerV1_4" autoConnectTarget="CMSIS-DAP" debugSearchFileMap="../Hardware/hardware.h
+C:/MJBC/Internal/Freescale/Kinetis/workspace/uTaskerV1.4/Hardware/hardware.h
+../stack/tcpip.h
+
+../uTasker/uTasker.h
+" fileDialogInitialDirectory="C:/uTasker/Kinetis_17-6-2015/Applications/uTaskerV1.4/GNU_Kinetis" fileDialogDefaultFilter="*.c" autoConnectCapabilities="266111" debugSearchPath="" buildConfiguration="THUMB Release" />
+</session>

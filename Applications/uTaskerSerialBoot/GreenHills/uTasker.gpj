@@ -1,0 +1,17 @@
+#!gbuild
+[Subproject]
+..\..\..\uTasker\utFAT\mass_storage.c
+..\..\..\uTasker\can_drv.c
+..\..\..\uTasker\Driver.c
+..\..\..\uTasker\eth_drv.c
+..\..\..\uTasker\GlobalTimer.c
+..\..\..\uTasker\iic_drv.c
+..\..\..\uTasker\low_power.c
+..\..\..\uTasker\SSC_drv.c
+..\..\..\uTasker\Tty_drv.c
+..\..\..\uTasker\uFile.c
+..\..\..\uTasker\uMalloc.c
+..\..\..\uTasker\uNetwork.c
+..\..\..\uTasker\USB_drv.c
+..\..\..\uTasker\uTasker.c
+..\..\..\uTasker\Watchdog.c

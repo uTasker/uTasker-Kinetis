@@ -1,0 +1,169 @@
+Host OS:	Windows
+ELXR: Copyright (C) 1983-2014 Green Hills Software.  All Rights Reversed.
+Release: Compiler v2014.1.6
+Build Directory: [Directory] COMP-VAL-WIN28:c:/autoval2/v2014.1-2014-08-25/win32-comp-ecom
+Revision: [VCInfo] http://toolsvc/branches/release-branch-2014-1-comp/src@515099 (built by auto-compiler)
+Revision Date: Tue Aug 26 06:01:12 2014
+
+
+
+
+Load Map Tue Jan 27 17:26:39 2015
+Image Summary
+
+  Section              Base      Size(hex)    Size(dec)  SecOffs
+  .vectors             00000000  00000008            8   0000180
+  .f_config            00000400  00000010           16   0000188
+  .text                00000410  000008e4         2276   0000198
+  .syscall             00000cf4  00000004            4   0000a7c
+  .intercall           00000cf8  00000000            0   0000000
+  .interfunc           00000cf8  00000000            0   0000000
+  .rodata              00000cf8  00000006            6   0000a80
+  .sdata2              00000cfe  00000000            0   0000000
+  .secinfo             00000d00  00000054           84   0000a88
+  .fixaddr             00000d54  00000000            0   0000000
+  .fixtype             00000d54  00000000            0   0000000
+  .CROM.sdata          00000d54  00000000            0   0000000
+  .CROM.data           00000d54  0000000e           14   0000adc
+  .sdabase             1fff00c0  00000000            0   0000000
+  .sbss                1fff00c0  00000000            0   0000000
+  .sdata               1fff00c0  00000000            0   0000000
+  .data                1fff00c0  0000000c           12   0000adc
+  .bss                 1fff00cc  00000058           88   0000000
+  .ghcovfz             1fff0124  00000000            0   0000000
+  .ghcovcz             1fff0124  00000000            0   0000000
+  .ghcovdz             1fff0124  00000000            0   0000000
+  .heap                1fff0130  00000800         2048   0000000
+  .stack               2000fff0  00000000            0   0000000
+  .UNCOMPRESSED.sdata  00000000  00000000            0   0000000
+  .UNCOMPRESSED.data   00000000  0000000c           12   0000aea
+  .linfix              00000000  00000140          320   0000af8
+  .gstackfix           00000000  00000000            0   0000000
+
+Load Map Tue Jan 27 17:26:39 2015
+Module Summary
+
+  Origin+Size    Section          Module
+00000410+00006c  .text            crt0.o
+0000047c+000254  .text            kinetis_boot.o
+1fff00c0+00000c  .data            kinetis_boot.o
+1fff00d4+00004c  .bss             kinetis_boot.o
+00000000+000008  .vectors         kinetis_boot.o
+00000400+000010  .f_config        kinetis_boot.o
+000006d0+0001a8  .text            uTaskerBootLoader.o
+00000cf8+000006  .rodata          uTaskerBootLoader.o
+00000878+000014  .text            libansi.a(ccexit.o)
+0000088c+000240  .text            libstartup.a(ind_crt0.o)
+00000acc+0000a6  .text            libstartup.a(ind_uzip.o)
+00000b72+00008a  .text            libstartup.a(ind_mset.o)
+00000bfc+00002a  .text            libstartup.a(ind_mcpy.o)
+00000c28+000030  .text            libsys.a(ind_exit.o)
+1fff0120+000004  .bss             libsys.a(ind_exit.o)
+00000cf4+000004  .syscall         libsys.a(ind_dots.o)
+00000c58+00001c  .text            libsys.a(ind_call.o)
+00000c74+000070  .text            libsys.a(ind_crt1.o)
+00000ce4+000002  .text            libsys.a(ind_lock.o)
+00000ce8+00000c  .text            libsys.a(ind_errn.o)
+00000000+000140  .linfix          <Linker supplemental debug info>
+00000000+00000c  .UNCOMPRESSED.data <UNCOMPRESSED>
+00000d00+000054  .secinfo         <section info>
+1fff00cc+000008  COMMON -> .bss   <commons>
+
+Load Map Tue Jan 27 17:26:39 2015
+Global Symbols (sorted alphabetically)
+
+ .text            00000868+000010 ..ghs.cf.sub.0
+ .text            000006d0+000014 ..ghs.cf.sub.1
+ .text            00000abc+000010 ..ghs.cf.sub.2
+ .text            00000c28+000028 _Exit
+                  00000000+000000 __atexit_cleanup_func
+                  1fff0124+000000 __bss_end__
+                  1fff00cc+000000 __bss_start__
+                  00000000+000000 __cpp_exception_cleanup
+                  00000000+000000 __cpp_exception_init
+                  1fff00cc+000000 __data_end__
+                  00000d54+000000 __data_load_start__
+                  1fff00c0+000000 __data_start__
+ .syscall         00000cf4+000004 __dotsyscall
+ .f_config        00000400+000010 __flash_config
+                  00000000+000004 __gh_errno_ptr
+                  00000000+000006 __gh_get_errno
+                  00000000+000000 __gh_iob_init
+ .text            00000ce4+000002 __gh_lock_init
+ .text            00000ce8+000006 __gh_set_errno
+                  00000000+000002 __ghsLock
+                  00000000+000002 __ghsUnlock
+                  00000000+00001a __ghs_at_exit
+                  00000000+000000 __ghs_board_cache_sync
+                  00000000+000000 __ghs_board_devices_init
+                  00000000+000000 __ghs_board_memory_init
+                  00000000+000000 __ghs_checksum
+                  00000000+000000 __ghs_coverage_init
+                  00000000+000000 __ghs_cpp_exception_cleanup
+                  00000000+000000 __ghs_cpp_exception_init
+ .text            00000acc+0000a6 __ghs_decompress
+                  00000000+000002 __ghs_enterblock_func
+ .text            0000088c+0001d2 __ghs_ind_crt0
+ .text            00000c74+00004c __ghs_ind_crt1
+ .syscall         00000cf4+000004 __ghs_initial_dotsyscall
+                  00000002+000000 __ghs_log_fee_level
+                  00000000+000000 __ghs_manprf_init
+                  00000000+000000 __ghs_rambootcodeend
+                  00000000+000000 __ghs_rambootcodestart
+                  2000fff0+000000 __ghs_ramend
+                  1fff00c0+000000 __ghs_ramstart
+                  00000d54+000000 __ghs_rombootcodeend
+                  00000410+000000 __ghs_rombootcodestart
+                  00080000+000000 __ghs_romend
+                  00000000+000000 __ghs_romstart
+                  00000000+000000 __ghs_set_stack_chk_guard
+ .text            00000c58+000018 __ghs_syscall
+                  00000000+00001a __ghs_syscall64
+                  00000000+000000 __ghs_validate_ghtws
+ .fixaddr         00000d54+000000 __ghsbegin_fixaddr
+ .fixtype         00000d54+000000 __ghsbegin_fixtype
+                  00000000+000000 __ghsbegin_picbase
+                  00000000+000000 __ghsbegin_pidbase
+                  00000000+000000 __ghsbegin_robase
+ .secinfo         00000d00+000000 __ghsbegin_secinfo
+ .secinfo         00000d3c+000000 __ghsbinfo_aclear
+ .secinfo         00000d3c+000000 __ghsbinfo_acopy
+ .secinfo         00000d00+00003c __ghsbinfo_clear
+ .secinfo         00000d54+000000 __ghsbinfo_comacopy
+ .secinfo         00000d3c+000018 __ghsbinfo_comcopy
+ .secinfo         00000d54+000000 __ghsbinfo_comtcopy
+ .secinfo         00000d3c+000000 __ghsbinfo_copy
+ .secinfo         00000d3c+000000 __ghsbinfo_tcopy
+ .secinfo         00000d3c+000000 __ghseinfo_clear
+ .secinfo         00000d54+000000 __ghseinfo_comcopy
+ .secinfo         00000d3c+000000 __ghseinfo_copy
+ .fixaddr         00000d54+000000 __ghsend_fixaddr
+ .stack           2000fff0+000000 __ghsend_stack
+                  00000000+000000 __ghssize_fixaddr
+                  1fff0124+000000 __heap_end__
+                  00000000+000000 __text_end__
+                  00000000+000000 __text_load_start__
+                  00000000+000000 __text_start__
+ .vectors         00000000+000008 __vector_table
+                  00000000+000000 _cleanup
+ .text            00000c28+000028 _exit
+                  00000000+000008 _start
+ .text            00000410+000040 _start_T
+ .bss             1fff00cc+000004 environ
+ .bss             1fff00d0+000004 errno
+ .text            00000878+00000c exit
+ .text            00000496+00002e fnCRC16
+                  00000000+00000e fnDelayLoop
+ .text            00000578+000030 fnEraseFlashSector
+ .text            0000062e+000008 fnGetPars
+ .text            00000636+000006 fnResetBoard
+ .text            000005a8+000086 fnWriteBytesFlash
+ .text            00000662+00005e main
+ .text            00000bfc+00002a memcpy
+ .text            00000b72+00008a memset
+ .text            0000063e+000024 start_application
+                  00000000+000004 uFileErase
+ .text            0000081c+00002a uGetFileLength
+ .text            000004d4+000014 uMemcpy
+ .text            000004c6+00000e uMemset
+ .text            000006e4+000138 uTaskerBoot

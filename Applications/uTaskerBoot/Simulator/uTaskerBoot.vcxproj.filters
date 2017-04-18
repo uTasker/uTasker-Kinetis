@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{246613e9-36f4-4742-b8f1-2fb16f8937cc}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{79f2255b-0bd9-472d-9b93-2cd7a2645d4a}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="WinSim">
+      <UniqueIdentifier>{34ee11fd-2259-4e8d-8936-af256fbc57cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hardware">
+      <UniqueIdentifier>{df3d5c52-580f-44a5-84b4-91adadc1591d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rescource Files">
+      <UniqueIdentifier>{efca69db-d03c-42cd-9246-2ddaf0b3c741}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WinSim\SIMKINETIS">
+      <UniqueIdentifier>{2de21588-5afb-430a-9590-c9c3751741cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hardware\KINETIS">
+      <UniqueIdentifier>{bafcd213-8054-4934-a4f6-02039dfb0e06}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\uTaskerBootLoader.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\WinSim\Ethereal.cpp">
+      <Filter>WinSim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\WinSim\FileToDisk.c">
+      <Filter>WinSim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Hardware\IIC_devices\IIC_dev.c">
+      <Filter>WinSim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\WinSim\LCD\KeyPadSim.cpp">
+      <Filter>WinSim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\WinSim\LCD\LCDSim.cpp">
+      <Filter>WinSim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\WinSim\WinPcap.cpp">
+      <Filter>WinSim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\WinSim\WinSim.c">
+      <Filter>WinSim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\WinSim\WinSimMain.cpp">
+      <Filter>WinSim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Hardware\Kinetis\kinetis_boot.c">
+      <Filter>Hardware\KINETIS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Hardware\Kinetis\kinetis_ports.cpp">
+      <Filter>WinSim\SIMKINETIS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Hardware\Kinetis\kinetisSim.c">
+      <Filter>WinSim\SIMKINETIS</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Hardware\hardware.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Hardware\Kinetis\kinetis.h">
+      <Filter>Hardware\KINETIS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Hardware\Kinetis\spi_flash_kinetis_atmel.h">
+      <Filter>Hardware\KINETIS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Hardware\Kinetis\spi_flash_kinetis_sst25.h">
+      <Filter>Hardware\KINETIS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Hardware\Kinetis\spi_flash_kinetis_stmicro.h">
+      <Filter>Hardware\KINETIS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Hardware\Kinetis\kinetis_port.h">
+      <Filter>WinSim\SIMKINETIS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Hardware\Kinetis\simkinetis.h">
+      <Filter>WinSim\SIMKINETIS</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cursor1.cur">
+      <Filter>Rescource Files</Filter>
+    </None>
+    <None Include="small.ico">
+      <Filter>Rescource Files</Filter>
+    </None>
+    <None Include="uTasker.ico">
+      <Filter>Rescource Files</Filter>
+    </None>
+    <None Include="..\GNU_Kinetis\make_uTaskerBoot_GNU_Kinetis" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="uTasker.rc">
+      <Filter>Rescource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

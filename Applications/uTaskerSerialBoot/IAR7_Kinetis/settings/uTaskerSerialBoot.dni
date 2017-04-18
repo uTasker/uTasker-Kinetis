@@ -1,0 +1,241 @@
+[DebugChecksum]
+Checksum=-95613800
+[DisAssemblyWindow]
+NumStates=_ 1
+State 1=_ 1
+[InstructionProfiling]
+Enabled=_ 0
+[CodeCoverage]
+Enabled=_ 0
+[Exceptions]
+StopOnUncaught=_ 0
+StopOnThrow=_ 0
+[StackPlugin]
+Enabled=1
+OverflowWarningsEnabled=1
+WarningThreshold=90
+SpWarningsEnabled=1
+WarnHow=0
+UseTrigger=1
+TriggerName=main
+LimitSize=0
+ByteLimit=50
+[Stack]
+FillEnabled=0
+OverflowWarningsEnabled=1
+WarningThreshold=90
+SpWarningsEnabled=1
+WarnLogOnly=1
+UseTrigger=1
+TriggerName=main
+LimitSize=0
+ByteLimit=50
+[CallStack]
+ShowArgs=0
+[Disassembly]
+MixedMode=1
+[JLinkDriver]
+TraceBufferSize=0x00010000
+TraceStallIfFIFOFull=0x00000000
+TracePortSize=0x00000004
+CStepIntDis=_ 0
+[PlDriver]
+MemConfigValue=C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.2_2\arm\CONFIG\debugger\Freescale\MK82FN256xxx15.ddf
+FirstRun=0
+[Jet]
+DisableInterrupts=0
+JetConnSerialNo=00289
+JetConnFoundProbes=
+MultiCoreRunAll=0
+OnlineReset=Software
+PrevWtdReset=Custom
+[ArmDriver]
+EnableCache=1
+[SWOManager]
+SamplingDivider=8192
+OverrideClock=0
+CpuClock=7471205
+SwoClock=2097267
+DataLogMode=0
+ItmPortsEnabled=63
+ItmTermIOPorts=1
+ItmLogPorts=0
+ItmLogFile=$PROJ_DIR$\ITM.log
+PowerForcePC=1
+PowerConnectPC=1
+[RecentFlashDownload]
+Path=C:\MJBC\Companies\Roth Kippe\WT03\Software\Programmer\Applications\uTaskerSerialBoot\IAR6_Kinetis\Release K40\Exe\uTaskerSerialBoot.out
+[PE_STARTUP]
+CPUTARGETTYPENAME=_ "ARM Processor - Autodetect"
+jtag_numbits_pre_ir=_ "0"
+jtag_tap_num=_ "0"
+jtag_use_daisy_chain=_ "0"
+user_specified_daisy_chain=_ "0"
+USE_CYCLONEPRO_RELAYS=_ "0"
+CyclonePro_poweroffonexit=_ "0"
+CyclonePro_currentvoltage=_ "128"
+CyclonePro_PowerDownDelay=_ "250"
+CyclonePro_PowerUpDelay=_ "250"
+Multilink_PowerDownDelay=_ "250"
+Multilink_PowerUpDelay=_ "1000"
+USE_SWD=_ "1"
+IO_DELAY_CNT=_ "0"
+FREQ_FX=_ "4"
+FREQ_NORMAL=_ "0"
+FREQ_OSJTAG=_ "0"
+FREQ_CYCLONE=_ "3"
+FREQ_TRACELINK=_ "3"
+FREQ_LIGHTNING=_ "1"
+FREQ_OPENSDA=_ "3"
+RESET_DELAY=_ "0"
+PORT=_ "181"
+PORT_NAME_STRING=_ "78D50E61"
+interface_selection=_ "7"
+SHOWDIALOG=_ "1"
+TraceLink_MaxBufferSize=_ "1"
+[PE_STORED_DEVICES]
+device0=_ "Freescale_K2x_K20DX128M5"
+device1=_ "Freescale_K2x_K22FN512M12"
+device2=_ "Freescale_K6x_K60FN1M0M15"
+device3=_ "Freescale_K6x_K64FN1M0M12"
+device4=_ "Freescale_KL4x_KL43Z256M4"
+[PE_PEDEBUG]
+CURRENTDEVICE=_ "Freescale_KL4x_KL43Z256M4"
+ERASE_PROGRAM_WITHOUT_ASKING=_ "1"
+CURRENTMODE=_ "4"
+[PE_DEVICE]
+CHIPMODE=_ "Freescale_KL4x_KL43Z256M4"
+[PE_SETTINGS]
+MEMORYSTART1=_ "0"
+MEMORYSTART2=_ "0"
+MEMORYSTART3=_ "0"
+DEFAULT_SOURCE_PATH=_ "C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.2_2\arm\bin\pemicro\P&E"
+[PE_STARTUP12]
+show_hstep_assembly_details=_ "0"
+[PE_ARM]
+FILE1=_ ""
+BINTORAM=_ "1"
+BINTOFLASH=_ "0"
+BINTOFLASHDEFAULT=_ "0"
+GOTILMAIN=_ "0"
+KEEPCPROGOPEN=_ "0"
+[struct_types]
+Fmt0=KINETIS_USB_BD-ulUSB_BDControl	4	0
+[array_types]
+Fmt0=unsigned long[2]	4	0
+[watch_formats]
+Fmt0={W}1:ptUSB_BD->ulUSB_BDControl	4	0
+[FlashMemory]
+FlashEraseSelection=0 1 
+[Interrupts]
+Enabled=1
+[MemConfig]
+Base=1
+Manual=0
+Ddf=1
+TypeViol=0
+Stop=1
+[Simulator]
+Freq=10000000
+MultiCoreRunAll=1
+[ETMTraceWindow]
+PortWidth=4
+PortMode=0
+CaptureDataValues=0
+CaptureDataAddresses=0
+CaptureDataRange=0
+DataFirst=0
+DataLast=-1
+StopWhen=0
+StallCPU=0
+NoPCCapture=0
+[SWOTraceHWSettings]
+OverrideDefaultClocks=0
+CpuClock=72000000
+ClockAutoDetect=0
+ClockWanted=2000000
+JtagSpeed=2000000
+Prescaler=36
+TimeStampPrescIndex=0
+TimeStampPrescData=0
+PcSampCYCTAP=1
+PcSampPOSTCNT=15
+PcSampIndex=0
+DataLogMode=0
+ITMportsEnable=0
+ITMportsTermIO=0
+ITMportsLogFile=0
+ITMlogFile=$PROJ_DIR$\ITM.log
+[SfrWindow]
+Show=1 1
+Sort=4 0
+[Trace1]
+Enabled=0
+ShowSource=1
+[Trace2]
+Enabled=0
+ShowSource=0
+[SWOTraceWindow]
+PcSampling=0
+InterruptLogs=0
+ForcedTimeStamps=0
+EventCPI=0
+EventEXC=0
+EventFOLD=0
+EventLSU=0
+EventSLEEP=0
+[DataLog]
+LogEnabled=0
+GraphEnabled=0
+ShowTimeLog=1
+SumEnabled=0
+ShowTimeSum=1
+[EventLog]
+Title_0=Ch3
+Symbol_0=0 4 1
+Title_1=Ch2
+Symbol_1=0 4 1
+Title_2=Ch1
+Symbol_2=0 4 1
+Title_3=Ch0
+Symbol_3=0 4 1
+LogEnabled=0
+GraphEnabled=0
+ShowTimeLog=1
+SumEnabled=0
+ShowTimeSum=1
+SumSortOrder=0
+[InterruptLog]
+LogEnabled=0
+GraphEnabled=0
+ShowTimeLog=1
+SumEnabled=0
+ShowTimeSum=1
+SumSortOrder=0
+[DriverProfiling]
+Enabled=0
+Mode=1
+Graph=0
+Symbiont=0
+Exclusions=
+[CallStackLog]
+Enabled=0
+[CallStackStripe]
+ShowTiming=1
+[Log file]
+LoggingEnabled=_ 0
+LogFile=_ ""
+Category=_ 0
+[TermIOLog]
+LoggingEnabled=_ 0
+LogFile=_ ""
+[Breakpoints2]
+Bp0=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\disk_loader.c}.256.22" 0 0 1 "" 0 "" 0
+Count=1
+[Disassemble mode]
+mode=1
+[Breakpoints]
+Count=0
+[Aliases]
+Count=0
+SuppressDialog=0

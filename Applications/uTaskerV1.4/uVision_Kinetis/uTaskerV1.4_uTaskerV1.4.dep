@@ -1,0 +1,664 @@
+Dependencies for Project 'uTaskerV1.4', Target 'uTaskerV1.4': (DO NOT MODIFY !)
+F (..\..\..\uTasker\can_drv.c)(0x52CB3396)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\can_drv.o" --omf_browse ".\Objects\can_drv.crf" --depend ".\Objects\can_drv.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\uTasker\Driver.c)(0x53E14405)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\driver.o" --omf_browse ".\Objects\driver.crf" --depend ".\Objects\driver.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\uTasker\eth_drv.c)(0x53F7B884)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\eth_drv.o" --omf_browse ".\Objects\eth_drv.crf" --depend ".\Objects\eth_drv.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\uTasker\GlobalTimer.c)(0x534D7DB1)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\globaltimer.o" --omf_browse ".\Objects\globaltimer.crf" --depend ".\Objects\globaltimer.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\uTasker\iic_drv.c)(0x52CB3396)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\iic_drv.o" --omf_browse ".\Objects\iic_drv.crf" --depend ".\Objects\iic_drv.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\uTasker\low_power.c)(0x53C4922B)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\low_power.o" --omf_browse ".\Objects\low_power.crf" --depend ".\Objects\low_power.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\uTasker\SSC_drv.c)(0x52CB3396)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\ssc_drv.o" --omf_browse ".\Objects\ssc_drv.crf" --depend ".\Objects\ssc_drv.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\uTasker\Tty_drv.c)(0x53DC1893)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\tty_drv.o" --omf_browse ".\Objects\tty_drv.crf" --depend ".\Objects\tty_drv.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\uTasker\uFile.c)(0x534C7DE9)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\ufile.o" --omf_browse ".\Objects\ufile.crf" --depend ".\Objects\ufile.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\uTasker\uMalloc.c)(0x53A20E9B)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\umalloc.o" --omf_browse ".\Objects\umalloc.crf" --depend ".\Objects\umalloc.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\uTasker\uNetwork.c)(0x52CB3396)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\unetwork.o" --omf_browse ".\Objects\unetwork.crf" --depend ".\Objects\unetwork.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\uTasker\USB_drv.c)(0x53F50D09)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\usb_drv.o" --omf_browse ".\Objects\usb_drv.crf" --depend ".\Objects\usb_drv.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\uTasker\uTasker.c)(0x53CDAD36)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\utasker.o" --omf_browse ".\Objects\utasker.crf" --depend ".\Objects\utasker.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\uTasker\Watchdog.c)(0x53B9D6EE)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\watchdog.o" --omf_browse ".\Objects\watchdog.crf" --depend ".\Objects\watchdog.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\stack\arp.c)(0x5380977F)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\arp.o" --omf_browse ".\Objects\arp.crf" --depend ".\Objects\arp.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\stack\dhcp.c)(0x534C53A4)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\dhcp.o" --omf_browse ".\Objects\dhcp.crf" --depend ".\Objects\dhcp.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\stack\dns.c)(0x52CB3396)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\dns.o" --omf_browse ".\Objects\dns.crf" --depend ".\Objects\dns.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\stack\Ethernet.c)(0x5380985A)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\ethernet.o" --omf_browse ".\Objects\ethernet.crf" --depend ".\Objects\ethernet.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\stack\ftp.c)(0x5307762C)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\ftp.o" --omf_browse ".\Objects\ftp.crf" --depend ".\Objects\ftp.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\stack\http.c)(0x5408E540)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\http.o" --omf_browse ".\Objects\http.crf" --depend ".\Objects\http.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\stack\icmp.c)(0x54087375)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\icmp.o" --omf_browse ".\Objects\icmp.crf" --depend ".\Objects\icmp.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\stack\ip.c)(0x54087213)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\ip.o" --omf_browse ".\Objects\ip.crf" --depend ".\Objects\ip.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\stack\ip_utils.c)(0x53F4EE4C)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\ip_utils.o" --omf_browse ".\Objects\ip_utils.crf" --depend ".\Objects\ip_utils.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\stack\NetBIOS.c)(0x52CB3396)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\netbios.o" --omf_browse ".\Objects\netbios.crf" --depend ".\Objects\netbios.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\stack\pop3.c)(0x52CB3396)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\pop3.o" --omf_browse ".\Objects\pop3.crf" --depend ".\Objects\pop3.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\stack\ppp.c)(0x52CB3396)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\ppp.o" --omf_browse ".\Objects\ppp.crf" --depend ".\Objects\ppp.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\stack\smtp.c)(0x52CB3396)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\smtp.o" --omf_browse ".\Objects\smtp.crf" --depend ".\Objects\smtp.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\stack\snmp.c)(0x53CEEC8A)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\snmp.o" --omf_browse ".\Objects\snmp.crf" --depend ".\Objects\snmp.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\stack\tcp.c)(0x5393E0EE)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\tcp.o" --omf_browse ".\Objects\tcp.crf" --depend ".\Objects\tcp.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\stack\telnet.c)(0x5373D95B)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\telnet.o" --omf_browse ".\Objects\telnet.crf" --depend ".\Objects\telnet.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\stack\tftp.c)(0x52CB3396)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\tftp.o" --omf_browse ".\Objects\tftp.crf" --depend ".\Objects\tftp.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\stack\udp.c)(0x534E8B52)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\udp.o" --omf_browse ".\Objects\udp.crf" --depend ".\Objects\udp.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\stack\webutils.c)(0x530135C7)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\webutils.o" --omf_browse ".\Objects\webutils.crf" --depend ".\Objects\webutils.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\stack\zero_config.c)(0x534C5396)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\zero_config.o" --omf_browse ".\Objects\zero_config.crf" --depend ".\Objects\zero_config.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\stack\ftp_client.c)(0x52CB3396)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\ftp_client.o" --omf_browse ".\Objects\ftp_client.crf" --depend ".\Objects\ftp_client.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\stack\igmp.c)(0x53932B71)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\igmp.o" --omf_browse ".\Objects\igmp.crf" --depend ".\Objects\igmp.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\application.c)(0x5411BDAE)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\application.o" --omf_browse ".\Objects\application.crf" --depend ".\Objects\application.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+I (..\application_lcd.h)(0x52CB3397)
+I (..\ADC_Timers.h)(0x5411BEA1)
+I (..\iic_tests.h)(0x53C42A54)
+I (..\Port_Interrupts.h)(0x53ECC071)
+I (..\can_tests.h)(0x5411CC80)
+I (..\app_user_files.h)(0x52CB3397)
+F (..\debug.c)(0x54006B03)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\debug.o" --omf_browse ".\Objects\debug.crf" --depend ".\Objects\debug.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+I (..\debug_hal.h)(0x53DBB90D)
+F (..\KeyScan.c)(0x53741791)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\keyscan.o" --omf_browse ".\Objects\keyscan.crf" --depend ".\Objects\keyscan.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\modbus_app.c)(0x52E1544E)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\modbus_app.o" --omf_browse ".\Objects\modbus_app.crf" --depend ".\Objects\modbus_app.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\NetworkIndicator.c)(0x538BF16E)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\networkindicator.o" --omf_browse ".\Objects\networkindicator.crf" --depend ".\Objects\networkindicator.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\usb_application.c)(0x53F52BC5)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\usb_application.o" --omf_browse ".\Objects\usb_application.crf" --depend ".\Objects\usb_application.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\webInterface.c)(0x5356C6C2)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\webinterface.o" --omf_browse ".\Objects\webinterface.crf" --depend ".\Objects\webinterface.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\snmp_mib_handlers.c)(0x534EB89F)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\snmp_mib_handlers.o" --omf_browse ".\Objects\snmp_mib_handlers.crf" --depend ".\Objects\snmp_mib_handlers.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\ADC_Timers.h)(0x5411BEA1)()
+F (..\app_hw_kinetis.h)(0x5410CAE1)()
+F (..\app_user_files.h)(0x52CB3397)()
+F (..\application.h)(0x53CDAAB5)()
+F (..\application_lcd.h)(0x52CB3397)()
+F (..\can_tests.h)(0x5411CC80)()
+F (..\config.h)(0x5412ED15)()
+F (..\iic_tests.h)(0x53C42A54)()
+F (..\Port_Interrupts.h)(0x53ECC071)()
+F (..\TaskConfig.h)(0x54065A06)()
+F (..\types.h)(0x5408FDA5)()
+F (..\user_glcd_fonts.h)(0x52CB3397)()
+F (..\widgets.h)(0x52CB3397)()
+F (..\..\..\stack\tcpip.h)(0x540AE436)()
+F (..\..\..\Hardware\Kinetis\kinetis.c)(0x5412EB9E)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\kinetis.o" --omf_browse ".\Objects\kinetis.crf" --depend ".\Objects\kinetis.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+I (..\..\..\Hardware\Kinetis\spi_flash_kinetis_atmel.h)(0x53CD73F7)
+I (..\..\..\Hardware\Kinetis\spi_flash_kinetis_stmicro.h)(0x53ECBE6D)
+I (..\..\..\Hardware\Kinetis\spi_flash_kinetis_sst25.h)(0x53ECBCB6)
+F (..\..\..\Hardware\Kinetis\kinetis.h)(0x53F7B884)()
+F (..\..\..\Hardware\Kinetis\kinetis_asm.s)(0x5412D7E5)(--cpu Cortex-M4 --pd "__EVAL SETA 1" -g --apcs=interwork -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" --list ".\Listings\kinetis_asm.lst" --xref -o ".\Objects\kinetis_asm.o" --depend ".\Objects\kinetis_asm.d")
+F (..\..\..\uTasker\utFAT\mass_storage.c)(0x54065451)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\mass_storage.o" --omf_browse ".\Objects\mass_storage.crf" --depend ".\Objects\mass_storage.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+F (..\..\..\uTasker\utFAT\mass_storage.h)(0x540F7CD7)()
+F (..\..\..\uTasker\utFAT\NAND_driver.h)(0x52CB3398)()
+F (..\..\..\uTasker\MODBUS\MODBUS.c)(0x52CB3396)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\modbus.o" --omf_browse ".\Objects\modbus.crf" --depend ".\Objects\modbus.d")
+F (..\..\..\uTasker\MODBUS\modbus.h)(0x52CB3397)()
+F (..\..\..\uTasker\uGLCDLIB\GLCD.c)(0x53556F69)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\glcd.o" --omf_browse ".\Objects\glcd.crf" --depend ".\Objects\glcd.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)
+I (..\..\..\uTasker\uGLCDLIB\glcd_tft.h)(0x5340295C)
+F (..\..\..\uTasker\uGLCDLIB\glcd.h)(0x52CB3396)()
+F (..\..\..\uTasker\uGLCDLIB\glcd_cglcd.h)(0x52CB3396)()
+F (..\..\..\uTasker\uGLCDLIB\glcd_fonts.h)(0x52CB3396)()
+F (..\..\..\uTasker\uGLCDLIB\glcd_nokia.h)(0x52CB3396)()
+F (..\..\..\uTasker\uGLCDLIB\glcd_oled.h)(0x52CB3396)()
+F (..\..\..\uTasker\uGLCDLIB\glcd_samsung.h)(0x52CB3396)()
+F (..\..\..\uTasker\uGLCDLIB\glcd_tft.h)(0x5340295C)()
+F (..\..\..\uTasker\uGLCDLIB\glcd_toshiba.h)(0x52CB3396)()
+F (..\..\..\uTasker\uGLCDLIB\LCD.c)(0x52CB3396)(-c --cpu Cortex-M4 -D__EVAL -g -O3 --apcs=interwork --signed_chars -I.. -I "C:\Program Files\Keil\ARM\RV31\INC" -I "C:\Program Files\Keil\ARM\CMSIS\Include" -I "C:\Program Files\Keil\ARM\Inc\Freescale\Kinetis" -D_COMPILE_KEIL -D_KINETIS -o ".\Objects\lcd.o" --omf_browse ".\Objects\lcd.crf" --depend ".\Objects\lcd.d")
+I (..\config.h)(0x5412ED15)
+I (..\types.h)(0x5408FDA5)
+I (..\app_hw_kinetis.h)(0x5410CAE1)
+I (..\../../Hardware/Kinetis/kinetis.h)(0x53F7B884)
+I (..\../../uTasker/driver.h)(0x53F78250)
+I (..\../../uTasker/utFAT/mass_storage.h)(0x540F7CD7)
+I (..\../../stack/tcpip.h)(0x540AE436)
+I (..\../../Hardware/hardware.h)(0x53F78250)
+I (..\../../uTasker/uTasker.h)(0x53CDAD36)
+I (..\TaskConfig.h)(0x54065A06)
+I (..\application.h)(0x53CDAAB5)
+I (..\../../uTasker/uGLCDLIB/glcd.h)(0x52CB3396)

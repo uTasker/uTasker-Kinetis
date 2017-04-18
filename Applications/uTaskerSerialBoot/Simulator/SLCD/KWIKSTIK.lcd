@@ -1,0 +1,369 @@
+// SLCD definition for the KWIKSTIK (720 x 260 pixels used as base)
+// 21.01.2012 - Corrected Pounce bit and added missing 8 dots on right hand side
+//
+
+// bit map defines (these should be monochrome bitmaps) - BMP0 to BMP99 possible
+//
+BMP0  "freescale2.bmp"
+BMP1  "connect.bmp"
+BMP2  "usb.bmp"
+BMP3  "clock.bmp"
+BMP4  "JLINK.bmp"
+BMP5  "battery.bmp"
+BMP6  "charge.bmp"
+BMP7  "pixel.bmp"
+BMP8  "pounce.bmp"
+
+
+// backplane bits
+//
+b0 x
+
+// front plane bits
+// segment number, BMP number, x-coordinate, y-coordinate
+f12 0  8 210              // freescale logo
+f8  1  323 10             // connection symbol
+f9  2  5 5                // USB symbol
+f11 3  5 100              // clock symbol
+f13 4  630 5              // J-LINK
+f317 8  580 200           // pounce logo
+
+f14 5  640 100            // battery
+f15 6  649 110            // battery charge 3
+f318 6  649 125           // battery charge 2
+f319 6  649 140           // battery charge 1
+
+f16 7  80 70              // pixels - column 1
+f17 7  80 85              // pixels
+f18 7  80 100             // pixels
+f19 7  80 115             // pixels
+f20 7  80 130             // pixels
+f21 7  80 145             // pixels
+f22 7  80 160             // pixels
+f23 7  80 175             // pixels
+
+f24 7  95 70              // pixels - column 2
+f25 7  95 85              // pixels
+f26 7  95 100             // pixels
+f27 7  95 115             // pixels
+f28 7  95 130             // pixels
+f29 7  95 145             // pixels
+f30 7  95 160             // pixels
+f31 7  95 175             // pixels
+
+f32 7  110 70             // pixels - column 3
+f33 7  110 85             // pixels
+f34 7  110 100            // pixels
+f35 7  110 115            // pixels
+f36 7  110 130            // pixels
+f37 7  110 145            // pixels
+f38 7  110 160            // pixels
+f39 7  110 175            // pixels
+
+f40 7  125 70             // pixels - column 4
+f41 7  125 85             // pixels
+f42 7  125 100            // pixels
+f43 7  125 115            // pixels
+f44 7  125 130            // pixels
+f45 7  125 145            // pixels
+f46 7  125 160            // pixels
+f47 7  125 175            // pixels
+
+f48 7  140 70             // pixels - column 5
+f49 7  140 85             // pixels
+f50 7  140 100            // pixels
+f51 7  140 115            // pixels
+f52 7  140 130            // pixels
+f53 7  140 145            // pixels
+f54 7  140 160            // pixels
+f55 7  140 175            // pixels
+
+f56 7  155 70             // pixels - column 6
+f57 7  155 85             // pixels
+f58 7  155 100            // pixels
+f59 7  155 115            // pixels
+f60 7  155 130            // pixels
+f61 7  155 145            // pixels
+f62 7  155 160            // pixels
+f63 7  155 175            // pixels
+
+f64 7  170 70             // pixels - column 7
+f65 7  170 85             // pixels
+f66 7  170 100            // pixels
+f67 7  170 115            // pixels
+f68 7  170 130            // pixels
+f69 7  170 145            // pixels
+f70 7  170 160            // pixels
+f71 7  170 175            // pixels
+
+f72 7  185 70             // pixels - column 8
+f73 7  185 85             // pixels
+f74 7  185 100            // pixels
+f75 7  185 115            // pixels
+f76 7  185 130            // pixels
+f77 7  185 145            // pixels
+f78 7  185 160            // pixels
+f79 7  185 175            // pixels
+
+f80 7  200 70             // pixels - column 9
+f81 7  200 85             // pixels
+f82 7  200 100            // pixels
+f83 7  200 115            // pixels
+f84 7  200 130            // pixels
+f85 7  200 145            // pixels
+f86 7  200 160            // pixels
+f87 7  200 175            // pixels
+
+f88 7  215 70             // pixels - column 10
+f89 7  215 85             // pixels
+f90 7  215 100            // pixels
+f91 7  215 115            // pixels
+f92 7  215 130            // pixels
+f93 7  215 145            // pixels
+f94 7  215 160            // pixels
+f95 7  215 175            // pixels
+
+f96 7  230 70             // pixels - column 11
+f97 7  230 85             // pixels
+f98 7  230 100            // pixels
+f99 7  230 115            // pixels
+f100 7  230 130           // pixels
+f101 7  230 145           // pixels
+f102 7  230 160           // pixels
+f103 7  230 175           // pixels
+
+f104 7  245 70            // pixels - column 12
+f105 7  245 85            // pixels
+f106 7  245 100           // pixels
+f107 7  245 115           // pixels
+f108 7  245 130           // pixels
+f109 7  245 145           // pixels
+f110 7  245 160           // pixels
+f111 7  245 175           // pixels
+
+f112 7  260 70            // pixels - column 13
+f113 7  260 85            // pixels
+f114 7  260 100           // pixels
+f115 7  260 115           // pixels
+f116 7  260 130           // pixels
+f117 7  260 145           // pixels
+f118 7  260 160           // pixels
+f119 7  260 175           // pixels
+
+f120 7  275 70            // pixels - column 14
+f121 7  275 85            // pixels
+f122 7  275 100           // pixels
+f123 7  275 115           // pixels
+f124 7  275 130           // pixels
+f125 7  275 145           // pixels
+f126 7  275 160           // pixels
+f127 7  275 175           // pixels
+
+f128 7  290 70            // pixels - column 15
+f129 7  290 85            // pixels
+f130 7  290 100           // pixels
+f131 7  290 115           // pixels
+f132 7  290 130           // pixels
+f133 7  290 145           // pixels
+f134 7  290 160           // pixels
+f135 7  290 175           // pixels
+
+f136 7  305 70            // pixels - column 16
+f137 7  305 85            // pixels
+f138 7  305 100           // pixels
+f139 7  305 115           // pixels
+f140 7  305 130           // pixels
+f141 7  305 145           // pixels
+f142 7  305 160           // pixels
+f143 7  305 175           // pixels
+
+f144 7  320 70            // pixels - column 17
+f145 7  320 85            // pixels
+f146 7  320 100           // pixels
+f147 7  320 115           // pixels
+f148 7  320 130           // pixels
+f149 7  320 145           // pixels
+f150 7  320 160           // pixels
+f151 7  320 175           // pixels
+
+f152 7  335 70            // pixels - column 18
+f153 7  335 85            // pixels
+f154 7  335 100           // pixels
+f155 7  335 115           // pixels
+f156 7  335 130           // pixels
+f157 7  335 145           // pixels
+f158 7  335 160           // pixels
+f159 7  335 175           // pixels
+
+f160 7  350 70            // pixels - column 19
+f161 7  350 85            // pixels
+f162 7  350 100           // pixels
+f163 7  350 115           // pixels
+f164 7  350 130           // pixels
+f165 7  350 145           // pixels
+f166 7  350 160           // pixels
+f167 7  350 175           // pixels
+
+f168 7  365 70            // pixels - column 20
+f169 7  365 85            // pixels
+f170 7  365 100           // pixels
+f171 7  365 115           // pixels
+f172 7  365 130           // pixels
+f173 7  365 145           // pixels
+f174 7  365 160           // pixels
+f175 7  365 175           // pixels
+
+f176 7  380 70            // pixels - column 21
+f177 7  380 85            // pixels
+f178 7  380 100           // pixels
+f179 7  380 115           // pixels
+f180 7  380 130           // pixels
+f181 7  380 145           // pixels
+f182 7  380 160           // pixels
+f183 7  380 175           // pixels
+
+f184 7  395 70            // pixels - column 22
+f185 7  395 85            // pixels
+f186 7  395 100           // pixels
+f187 7  395 115           // pixels
+f188 7  395 130           // pixels
+f189 7  395 145           // pixels
+f190 7  395 160           // pixels
+f191 7  395 175           // pixels
+
+f192 7  410 70            // pixels - column 23
+f193 7  410 85            // pixels
+f194 7  410 100           // pixels
+f195 7  410 115           // pixels
+f196 7  410 130           // pixels
+f197 7  410 145           // pixels
+f198 7  410 160           // pixels
+f199 7  410 175           // pixels
+
+f200 7  425 70            // pixels - column 24
+f201 7  425 85            // pixels
+f202 7  425 100           // pixels
+f203 7  425 115           // pixels
+f204 7  425 130           // pixels
+f205 7  425 145           // pixels
+f206 7  425 160           // pixels
+f207 7  425 175           // pixels
+
+f208 7  440 70            // pixels - column 25
+f209 7  440 85            // pixels
+f210 7  440 100           // pixels
+f211 7  440 115           // pixels
+f212 7  440 130           // pixels
+f213 7  440 145           // pixels
+f214 7  440 160           // pixels
+f215 7  440 175           // pixels
+
+f216 7  455 70            // pixels - column 26
+f217 7  455 85            // pixels
+f218 7  455 100           // pixels
+f219 7  455 115           // pixels
+f220 7  455 130           // pixels
+f221 7  455 145           // pixels
+f222 7  455 160           // pixels
+f223 7  455 175           // pixels
+
+f224 7  470 70            // pixels - column 27
+f225 7  470 85            // pixels
+f226 7  470 100           // pixels
+f227 7  470 115           // pixels
+f228 7  470 130           // pixels
+f229 7  470 145           // pixels
+f230 7  470 160           // pixels
+f231 7  470 175           // pixels
+
+f232 7  485 70            // pixels - column 28
+f233 7  485 85            // pixels
+f234 7  485 100           // pixels
+f235 7  485 115           // pixels
+f236 7  485 130           // pixels
+f237 7  485 145           // pixels
+f238 7  485 160           // pixels
+f239 7  485 175           // pixels
+
+f240 7  500 70            // pixels - column 29
+f241 7  500 85            // pixels
+f242 7  500 100           // pixels
+f243 7  500 115           // pixels
+f244 7  500 130           // pixels
+f245 7  500 145           // pixels
+f246 7  500 160           // pixels
+f247 7  500 175           // pixels
+
+f248 7  515 70            // pixels - column 30
+f249 7  515 85            // pixels
+f250 7  515 100           // pixels
+f251 7  515 115           // pixels
+f252 7  515 130           // pixels
+f253 7  515 145           // pixels
+f254 7  515 160           // pixels
+f255 7  515 175           // pixels
+
+f256 7  530 70            // pixels - column 31
+f257 7  530 85            // pixels
+f258 7  530 100           // pixels
+f259 7  530 115           // pixels
+f260 7  530 130           // pixels
+f261 7  530 145           // pixels
+f262 7  530 160           // pixels
+f263 7  530 175           // pixels
+
+f264 7  545 70            // pixels - column 32
+f265 7  545 85            // pixels
+f266 7  545 100           // pixels
+f267 7  545 115           // pixels
+f268 7  545 130           // pixels
+f269 7  545 145           // pixels
+f270 7  545 160           // pixels
+f271 7  545 175           // pixels
+
+f272 7  560 70            // pixels - column 33
+f273 7  560 85            // pixels
+f274 7  560 100           // pixels
+f275 7  560 115           // pixels
+f276 7  560 130           // pixels
+f277 7  560 145           // pixels
+f278 7  560 160           // pixels
+f279 7  560 175           // pixels
+
+f280 7  575 70            // pixels - column 34
+f281 7  575 85            // pixels
+f282 7  575 100           // pixels
+f283 7  575 115           // pixels
+f284 7  575 130           // pixels
+f285 7  575 145           // pixels
+f286 7  575 160           // pixels
+f287 7  575 175           // pixels
+
+f288 7  590 70            // pixels - column 35
+f289 7  590 85            // pixels
+f290 7  590 100           // pixels
+f291 7  590 115           // pixels
+f292 7  590 130           // pixels
+f293 7  590 145           // pixels
+f294 7  590 160           // pixels
+f295 7  590 175           // pixels
+
+f296 7  605 70            // pixels - column 36
+f297 7  605 85            // pixels
+f298 7  605 100           // pixels
+f299 7  605 115           // pixels
+f300 7  605 130           // pixels
+f301 7  605 145           // pixels
+f302 7  605 160           // pixels
+f303 7  605 175           // pixels
+
+f304 7  620 70            // pixels - column 37
+f305 7  620 85            // pixels
+f306 7  620 100           // pixels
+f307 7  620 115           // pixels
+f308 7  620 130           // pixels
+f309 7  620 145           // pixels
+f310 7  620 160           // pixels
+f311 7  620 175           // pixels
+
+// end of file

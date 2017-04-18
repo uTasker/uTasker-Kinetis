@@ -1,0 +1,7 @@
+// This file is used as input to which bit maps are to be added to the graphic widgets code (bmp should be 24 bit color or mono-chrome)
+
+images\waving_girls.bmp -i uTaskerPic3   // input waving_girlsbmp. It should be inverted (top/bottom) and the uTasker bitmap array is called uTaskerPic3
+images\uTasker.bmp -i      uTaskerPic1   // input uTasker.bmp. It should be inverted (top/bottom) and the uTasker bitmap array is called uTaskerPic1
+images\uTasker.bmp -i -n   uTaskerPic2   // input uTasker.bmp. Inverted (top/bottom), display negative and the uTasker bitmap array is called uTaskerPic2
+
+// end

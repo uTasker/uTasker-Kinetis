@@ -1,0 +1,20 @@
+#!gbuild
+primaryTarget=arm_standalone.tgt
+#component top_level_project
+[Project]
+	-object_dir=objs
+	:sourceDir=.
+	-D_KINETIS
+	-D_COMPILE_GHS
+	-I../
+	-locatedprogram
+	-Osize
+	-Olink	
+	-align8
+	-thumb
+	-nominlib
+	-littleendian
+	#-cpu=cortexm4
+	-cpu=cortexm0plus
+src\uTaskerSerialBoot.gpj		[Program]
+tgt\resources.gpj		[Project]

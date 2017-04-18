@@ -1,0 +1,89 @@
+<html>
+<body>
+<pre>
+<h1>Erstellungsprotokoll</h1>
+<h3>
+--------------------Konfiguration: uTasker - Win32 Kinetis plus GCC build--------------------
+</h3>
+<h3>Befehlszeilen</h3>
+Erstellen der temporären Datei  "C:\Users\Mark\AppData\Local\Temp\RSPAC6C.tmp" mit Inhalten
+[
+/nologo /MLd /W3 /Gm /GX /ZI /Od /I ".\..\." /I ".\..\..\..\WinSim\WpdPack_3_1\WpdPack\Include" /I "." /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_KINETIS" /D "ETHEREAL" /FR"uTasker___Win32_Kinetis_plus_GCC_build/" /Fp"uTasker___Win32_Kinetis_plus_GCC_build/uTaskerBoot.pch" /YX /Fo"uTasker___Win32_Kinetis_plus_GCC_build/" /Fd"uTasker___Win32_Kinetis_plus_GCC_build/" /FD /GZ /c 
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Applications\uTaskerBoot\uTaskerBootLoader.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Hardware\Kinetis\kinetis_ports.cpp"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Hardware\Kinetis\kinetisSim.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\WinSim\Ethereal.cpp"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\WinSim\FileToDisk.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Hardware\IIC_devices\IIC_dev.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\WinSim\LCD\KeyPadSim.cpp"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\WinSim\LCD\LCDSim.cpp"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\WinSim\WinPcap.cpp"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\WinSim\WinSim.c"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\WinSim\WinSimMain.cpp"
+"C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Hardware\Kinetis\kinetis_boot.c"
+]
+Creating command line "cl.exe @C:\Users\Mark\AppData\Local\Temp\RSPAC6C.tmp" 
+Erstellen der temporären Datei  "C:\Users\Mark\AppData\Local\Temp\RSPAC6D.tmp" mit Inhalten
+[
+kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib wpcap.lib /nologo /subsystem:windows /incremental:yes /pdb:"uTasker___Win32_Kinetis_plus_GCC_build/uTaskerBoot.pdb" /debug /machine:I386 /out:"uTasker___Win32_Kinetis_plus_GCC_build/uTaskerBoot.exe" /pdbtype:sept /libpath:".\..\..\..\WinSim\WpdPack_3_1\WpdPack\Lib" 
+.\uTasker___Win32_Kinetis_plus_GCC_build\uTaskerBootLoader.obj
+.\uTasker___Win32_Kinetis_plus_GCC_build\kinetis_ports.obj
+.\uTasker___Win32_Kinetis_plus_GCC_build\kinetisSim.obj
+.\uTasker___Win32_Kinetis_plus_GCC_build\Ethereal.obj
+.\uTasker___Win32_Kinetis_plus_GCC_build\FileToDisk.obj
+.\uTasker___Win32_Kinetis_plus_GCC_build\IIC_dev.obj
+.\uTasker___Win32_Kinetis_plus_GCC_build\KeyPadSim.obj
+.\uTasker___Win32_Kinetis_plus_GCC_build\LCDSim.obj
+.\uTasker___Win32_Kinetis_plus_GCC_build\WinPcap.obj
+.\uTasker___Win32_Kinetis_plus_GCC_build\WinSim.obj
+.\uTasker___Win32_Kinetis_plus_GCC_build\WinSimMain.obj
+.\uTasker___Win32_Kinetis_plus_GCC_build\kinetis_boot.obj
+.\uTasker___Win32_Kinetis_plus_GCC_build\uTasker.res
+]
+Erstellen der Befehlzeile "link.exe @C:\Users\Mark\AppData\Local\Temp\RSPAC6D.tmp"
+<h3>Ausgabefenster</h3>
+Kompilierung läuft...
+uTaskerBootLoader.c
+kinetisSim.c
+FileToDisk.c
+IIC_dev.c
+WinSim.c
+kinetis_boot.c
+kinetis_ports.cpp
+Ethereal.cpp
+KeyPadSim.cpp
+LCDSim.cpp
+WinPcap.cpp
+WinSimMain.cpp
+Linker-Vorgang läuft...
+Erstellen der temporären Datei  "C:\Users\Mark\AppData\Local\Temp\RSPBB3D.bat" mit Inhalten
+[
+@echo off
+cd ..\GNU_Kinetis
+Build_Kinetis.bat
+]
+Erstellen der Befehlzeile "C:\Users\Mark\AppData\Local\Temp\RSPBB3D.bat"
+
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../../uTaskerBoot -D _GNU -D _KINETIS -g -c -Os ../uTaskerBootLoader.c -o Build/uTaskerBootLoader.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -I../../uTaskerBoot -D _GNU -D _KINETIS -g -c -Os ../../../Hardware/Kinetis/kinetis_boot.c -o Build/kinetis_boot.o
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections  -Os -g -TKL_32_4.ld -nostartfiles -Xlinker --gc-sections -Wl,-Map,"uTaskerBoot.map" -o "uTaskerBoot.elf" Build/uTaskerBootLoader.o Build/kinetis_boot.o
+arm-none-eabi-objcopy --output-target=binary uTaskerBoot.elf uTaskerBoot.bin
+arm-none-eabi-size   uTaskerBoot.elf
+   text    data     bss     dec     hex filename
+   2338      12      92    2442     98a uTaskerBoot.elf
+arm-none-eabi-gcc -v
+Using built-in specs.
+COLLECT_GCC=arm-none-eabi-gcc
+COLLECT_LTO_WRAPPER=c:/freescale/kds_1.1.0/toolchain/bin/../libexec/gcc/arm-none-eabi/4.8.0/lto-wrapper.exe
+Target: arm-none-eabi
+Configured with: /work/joes/kds-releases/1.1.0/src/gcc-4.8-kiln/configure --build=i686-unknown-linux-gnu --disable-libssp --disable-nls --disable-plugin --enable-languages=c,c++ --host=i686-w64-mingw32 --htmldir=/opt/Freescale/KDS_1.1.0/doc/html/gcc --infodir=/opt/Freescale/KDS_1.1.0/doc/info/gcc --mandir=/opt/Freescale/KDS_1.1.0/doc/man/gcc --pdfdir=/opt/Freescale/KDS_1.1.0/doc/pdf/gcc --prefix=/opt/Freescale/KDS_1.1.0/toolchain --target=arm-none-eabi --with-bugurl='Freescale Support <support@freescale.com>' --with-cpu=cortex-m0 --with-gmp=/work/joes/kds-releases/1.1.0/obj/host_i686-w64-mingw32/gmp/somn_install --with-mode=thumb --with-mpc=/work/joes/kds-releases/1.1.0/obj/host_i686-w64-mingw32/mpc/somn_install --with-mpfr=/work/joes/kds-releases/1.1.0/obj/host_i686-w64-mingw32/mpfr/somn_install --with-newlib --with-pkgversion='Kinetis Design Studio v1.1.0' --with-sysroot=/work/joes/kds-releases/1.1.0/install/i686-w64-mingw32/arm-none-eabi
+Thread model: single
+gcc version 4.8.0 (Kinetis Design Studio v1.1.0) 
+
+
+
+<h3>Ergebnisse</h3>
+uTaskerBoot.exe - 0 Fehler, 0 Warnung(en)
+</pre>
+</body>
+</html>

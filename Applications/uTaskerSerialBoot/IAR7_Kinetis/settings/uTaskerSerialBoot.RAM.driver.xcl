@@ -1,0 +1,17 @@
+"--endian=little" 
+
+"--cpu=Cortex-M4" 
+
+"--fpu=VFPv4_SP" 
+
+"-p" 
+
+"C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.2_2\arm\CONFIG\debugger\Freescale\MK64FN1M0xxx12.ddf" 
+
+"--semihosting=none" 
+
+"--device=MK64FN1M0xxx12" 
+
+
+
+

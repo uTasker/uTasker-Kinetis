@@ -1,0 +1,12 @@
+// USB CDC class test
+
++50 USB-2     = 30
+
++0 SUSB-0     = a1 21 00 00 00 00 07 00             // CDC class request IN (request present settings)
++100 USB-0                                          // zero data token to terminate (required since the previous answer is sent later from task)
+
++50 SUSB-0    = 21 20 00 00 00 00 07 00             // CDC class request OUT
++50 USB-0     = 80 25 00 00 00 00 08                // CDC class following data
+
++50 SUSB-0    = 21 22 00 00 00 00 00 00             // CDC class request OUT (set RTS, DTR)
+// End of test

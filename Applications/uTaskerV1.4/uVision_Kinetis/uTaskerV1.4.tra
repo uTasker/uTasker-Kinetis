@@ -1,0 +1,64 @@
+*** Creating Trace Output File 'uTaskerV1.4.tra' Ok.
+### Preparing for ADS-LD.
+### Creating ADS-LD Command Line
+### List of Objects: adding '"can_drv.o"'
+### List of Objects: adding '"driver.o"'
+### List of Objects: adding '"eth_drv.o"'
+### List of Objects: adding '"globaltimer.o"'
+### List of Objects: adding '"iic_drv.o"'
+### List of Objects: adding '"low_power.o"'
+### List of Objects: adding '"ssc_drv.o"'
+### List of Objects: adding '"tty_drv.o"'
+### List of Objects: adding '"ufile.o"'
+### List of Objects: adding '"umalloc.o"'
+### List of Objects: adding '"unetwork.o"'
+### List of Objects: adding '"usb_drv.o"'
+### List of Objects: adding '"utasker.o"'
+### List of Objects: adding '"watchdog.o"'
+### List of Objects: adding '"arp.o"'
+### List of Objects: adding '"dhcp.o"'
+### List of Objects: adding '"dns.o"'
+### List of Objects: adding '"ethernet.o"'
+### List of Objects: adding '"ftp.o"'
+### List of Objects: adding '"http.o"'
+### List of Objects: adding '"icmp.o"'
+### List of Objects: adding '"ip.o"'
+### List of Objects: adding '"ip_utils.o"'
+### List of Objects: adding '"netbios.o"'
+### List of Objects: adding '"pop3.o"'
+### List of Objects: adding '"ppp.o"'
+### List of Objects: adding '"smtp.o"'
+### List of Objects: adding '"snmp.o"'
+### List of Objects: adding '"tcp.o"'
+### List of Objects: adding '"telnet.o"'
+### List of Objects: adding '"tftp.o"'
+### List of Objects: adding '"udp.o"'
+### List of Objects: adding '"webutils.o"'
+### List of Objects: adding '"application.o"'
+### List of Objects: adding '"debug.o"'
+### List of Objects: adding '"keyscan.o"'
+### List of Objects: adding '"modbus_app.o"'
+### List of Objects: adding '"networkindicator.o"'
+### List of Objects: adding '"usb_application.o"'
+### List of Objects: adding '"webinterface.o"'
+### List of Objects: adding '"kinetis.o"'
+### List of Objects: adding '"mass_storage.o"'
+### List of Objects: adding '"modbus.o"'
+### List of Objects: adding '"glcd.o"'
+### List of Objects: adding '"lcd.o"'
+### ADS-LD Command completed:
+--cpu Cortex-M4 "can_drv.o" "driver.o" "eth_drv.o" "globaltimer.o" "iic_drv.o" "low_power.o" "ssc_drv.o" "tty_drv.o" "ufile.o" "umalloc.o" "unetwork.o" "usb_drv.o" "utasker.o" "watchdog.o" "arp.o" "dhcp.o" "dns.o" "ethernet.o" "ftp.o" "http.o" "icmp.o" "ip.o" "ip_utils.o" "netbios.o" "pop3.o" "ppp.o" "smtp.o" "snmp.o" "tcp.o" "telnet.o" "tftp.o" "udp.o" "webutils.o" "application.o" "debug.o" "keyscan.o" "modbus_app.o" "networkindicator.o" "usb_application.o" "webinterface.o" "kinetis.o" "mass_storage.o" "modbus.o" "glcd.o" "lcd.o" --library_type=microlib --strict --scatter "uTaskerV1.4.sct" 
+--entry main
+--first reset_vect --autoat --summary_stderr --info summarysizes --map --xref --callgraph --symbols 
+--info sizes --info totals --info unused --info veneers 
+ --list ".\uTaskerV1.map" -o "uTaskerV1.4.axf"### Preparing Environment (PrepEnvAds)
+### ADS-LD Output File: 'uTaskerV1.4.axf'
+### ADS-LD Command File: 'uTaskerV1.4.lnp'
+### Checking for dirty Components...
+### Creating CmdFile 'uTaskerV1.4.lnp', Handle=0x000007A8
+### Writing '.lnp' file
+### ADS-LD Command file 'uTaskerV1.4.lnp' is ready.
+### ADS-LD: About to start ADS-LD Thread.
+### ADS-LD: executed with 0 errors
+### Updating obj list
+### LDADS_file() completed.

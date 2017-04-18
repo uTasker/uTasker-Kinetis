@@ -1,0 +1,7 @@
+// USB MSD stall test
++50  USB-1   = 55 53 42 43 10 FC 74 CE C0 00 00 00 80 00 06 1A 00 1C 00 C0 00 00 00 00 00 00 00 00 00 00 00 A1 C1 // OUT that caues a stall
+
++50  SUSB-0  = 02 01 00 00 82 00 00 00 06 95  // clear endpoint on IN 2
+
+
+// End of test

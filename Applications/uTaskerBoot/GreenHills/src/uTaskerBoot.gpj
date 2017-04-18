@@ -1,0 +1,6 @@
+#!gbuild
+[Program]
+	-object_dir=objs\uTaskerBoot
+LinkerScripts\GHS_K_512_128.ld
+Hardware.gpj
+Source.gpj

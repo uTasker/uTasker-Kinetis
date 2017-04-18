@@ -1,0 +1,16 @@
+// USB Audio class speker test
+
+
++0 SUSB-0     = 21 01 00 01 00 02 01 00             // host to device - mute control
++50 USB-0     = 01                                  // mute off
+
++50 SUSB-0    = 21 01 00 01 00 02 01 00             // host to device - mute control
++50 USB-0     = 00                                  // mute on
+
++50 SUSB-0    = 21 01 00 02 00 02 02 00             // host to device - volume control
++50 USB-0     = 88 0a                               // setting value
+
++50 SUSB-0    = 21 01 00 02 00 02 02 00             // host to device - volume control
++50 USB-0     = f1 01                               // setting value
+
+// End of test

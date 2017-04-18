@@ -1,0 +1,7 @@
+#!gbuild
+#component target_resources
+[Project]
+default.con
+resource_readme.txt
+probe.cfg
+mpserv_standard.mbs

@@ -1,0 +1,17 @@
+.settings/com.freescale.core.ide.cdt.toolchain.prefs
+.settings/com.freescale.core.ide.newprojectwizard.prefs
+.settings/com.processorexpert.core.ide.newprojectwizard.prefs
+.settings/language.settings.xml
+.cproject
+.cwGeneratedFileSetLog
+.project
+*.ini
+Applications/uTaskerV1.4/Simulator/uTasker___Win32_uTasker_Kinetis_build/
+*.opendb
+*.db
+Applications/uTaskerSerialBoot/Simulator/UART2.txt
+Applications/uTaskerSerialBoot/Simulator/USB_Endpoint_00.txt
+*.suo
+Applications/uTaskerSerialBoot/Simulator/Debug/
+Applications/uTaskerV1.4/Simulator/UART2.txt
+Applications/uTaskerV1.4/Simulator/USB_Endpoint_00.txt

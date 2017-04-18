@@ -1,0 +1,21 @@
+;/* K_1M_256.ld                                                              */
+;/* uVision memory file for the Kinetis K - for use with the uTasker project */
+;/* Use when running in FLASH (1M FLASH / 256k CPU SRAM)                     */
+
+LR_IROM1 0x00000000 0x00000400  {    ; load region size_region
+  ER_IROM1 0x00000000 0x00000400  {  ; load address = execution address
+   *.o (VECT, + FIRST)
+   *(InRoot$$Sections)
+   .ANY (+RO)
+  }
+  RW_IRAM1 0x1fff01f0 0x00040000-0x1f0  {  ; RW data
+   .ANY (+RW +ZI)
+  }
+}
+
+LR_IROM2 0x00000400 0x100000-0x400  {
+  ER_IROM2 0x00000400 0x100000-0x400  {  ; load address = execution address
+   *.o (F_INIT, +FIRST)
+   .ANY (+RO)
+  }
+}

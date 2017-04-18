@@ -1,0 +1,18 @@
+#	Group File Created by IDEA 
+#	Project: uTaskerSerialBoot
+#	Thu Jan 29 05:35:45 2015
+#
+"..\..\..\utasker\can_drv.o"
+"..\..\..\utasker\driver.o"
+"..\..\..\utasker\eth_drv.o"
+"..\..\..\utasker\globaltimer.o"
+"..\..\..\utasker\iic_drv.o"
+"..\..\..\utasker\low_power.o"
+"..\..\..\utasker\ssc_drv.o"
+"..\..\..\utasker\tty_drv.o"
+"..\..\..\utasker\ufile.o"
+"..\..\..\utasker\umalloc.o"
+"..\..\..\utasker\unetwork.o"
+"..\..\..\utasker\usb_drv.o"
+"..\..\..\utasker\utasker.o"
+"..\..\..\utasker\watchdog.o"

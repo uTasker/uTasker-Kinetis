@@ -1,0 +1,44 @@
+Version V1.1 14-10-2009
+=======================
+
+"uTaskerCombine -v" to get the version number.
+
+Utility used to combine two binary files into a single file - often used to combine a boot loader with application
+code to result in a single downloadable file.
+
+Use "uTaskerCombine file1.bin file2.bin 0x1000 file3.bin"
+
+Adds the content of file 2 at an offset of 0x1000 to the content of file2 (filling and space between the two with 0xff)
+and saves the result to file3.bin.
+
+Option = "uTaskerCombine file1.bin file2.bin 0x1000 file3.bin file4.ihex"
+
+Adding a further file causes the resulting binary to be also saved in file4.ihex in Intel hex format. This is mainly
+used for NXP projects where the program FlashMagic is used to program the combined binary file, but requires the code
+to be in this format.
+
+
+Version V1.2 20-09-2012
+=======================
+
+Option = "uTaskerCombine file1.bin file2.bin 0x1000 file3.bin file4.srec"
+
+If the optional hex file has an extension .srec or .out it is considered as requiring Motorola S-REC instead.
+
+Option = "uTaskerCombine file1.bin file2.bin 0x1000 file3.bin file4.srec 0x80000000"
+
+An address following the hex file output is interpreted as an offset to be added to the content of the hex file - for example
+the AVR32 has its code in internal flash starting at 0x80000000 and so requires this offset to load to the correct address.
+
+If the exact format of the srec file is to be controlled it can be done so by specifying S1, S2 or S3 after the file name
+(before any optional offset) eg. "uTaskerCombine file1.bin file2.bin 0x1000 file3.bin file4.srec S3 0x80000000"
+
+Version V1.3 21-01-2016
+=======================
+
+Allow concatenating two binary files by defining 0 offset.
+
+Option = "uTaskerCombine file1.bin file2.bin 0 file3.bin file4.srec"
+
+
+

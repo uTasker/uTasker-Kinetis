@@ -1,0 +1,9 @@
+// USB HID keyboard - turn on CAPS lock LED and then turn it off again
+
++0 SUSB-0    = 21 09 00 02 00 00 01 00              // CDC class request OUT
++50 USB-0    = 02                                   // CDC class following data (LED on)
+
++500 SUSB-0  = 21 09 00 02 00 00 01 00              // CDC class request OUT
++50 USB-0    = 00                                   // CDC class following data (LEDs off)
+
+// End of test

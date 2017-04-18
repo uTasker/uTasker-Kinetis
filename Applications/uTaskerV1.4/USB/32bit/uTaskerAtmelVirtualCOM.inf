@@ -1,0 +1,42 @@
+; uTasker - virtual COM : V1.0 11.02.2009 - official ATMEL version
+
+[Version]
+Signature="$Chicago$"                                           ; all Windows versions
+Class=Ports                                                     ; this is a serial port driver
+ClassGuid={4D36E978-E325-11CE-BFC1-08002BE10318}                ; associated GUID
+Provider=%UTASKER%                                              ; provided by UTASKER
+DriverVer=09/08/2008,1.0                                        ;
+
+[DestinationDirs]
+DefaultDestDir=12                                               ; default install directory is \drivers or \IOSubSys
+
+[Manufacturer]
+%UTASKER%=uTaskerMfg                                            ; manufacturer
+
+[uTaskerMfg]
+%USB_serial_conv%=USBVirtCOM.Install,USB\VID_03eb&PID_21fd      ; identifies a device with Vendor ID (03ebh from ATMEL Corp.) and
+                                                                ; product ID equal to 21fdh (kindly allocated to uTasker development project by ATMEL). Install section is USBVirtCOM
+[USBVirtCOM.Install]
+include=mdmcpq.inf
+CopyFiles=FakeModemCopyFileSection
+AddReg=USBVirtCOM.AddReg                                        ; registry keys to add are listed in USBVirtCOM.AddReg
+
+[USBVirtCOM.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,usbser.sys                                     ; the driver to be worked with
+HKR,,EnumPropPages32,,"MsPorts.dll,SerialPortPropPageProvider"
+
+[USBVirtCOM.Install.Services]
+AddService=usbser,0x00000002,USBVirtCOM.AddService              ; assign usbser as the PnP driver for the device
+
+[USBVirtCOM.AddService]
+DisplayName=%USBSer%                                            ; name of the serial driver
+ServiceType=1                                                   ; service kernel driver
+StartType=3                                                     ; driver is started by the PnP manager
+ErrorControl=1                                                  ; do warn about errors
+ServiceBinary=%12%\usbser.sys                                   ; driver filename
+
+[Strings]
+UTASKER="uTasker.com"                                           ; string value for the UTASKER symbol
+USB_serial_conv="uTasker driven ATMEL device"                   ; string value for the USB_serial_conv symbol
+USBSer="USB Serial Driver"                                      ; string value for the USBSer symbol
