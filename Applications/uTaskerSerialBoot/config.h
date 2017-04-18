@@ -13,23 +13,7 @@
     ---------------------------------------------------------------------
     Copyright (C) M.J.Butcher Consulting 2004..2016
     *********************************************************************
-    20.04.2012 Add TWR_K20D50M
-    14.08.2013 Add USB-HS configuration
-    16.01.2014 Add FRDM_K20D50M
-    25.01.2014 Add FRDM_KL46Z
-    28.01.2014 Add TWR_KL46Z48M
-    29.01.2014 Add FRDM_KL25Z, FRDM_KL26Z and TWR_KL25Z48M
-    01.02.2014 Add FRDM_KL02Z, FRDM_KL05Z and FRDM_KE02Z
-    15.02.2014 Add TWR_K40D100M, TWR_K20D72M, TWR_K21F120M and TWR_K21D50M
-    15.04.2014 Add FRDM_K64F and TWR_K64F120M and add Ethernet loader support
-    15.04.2014 Add web server based software upload support
-    11.06.2014 Add KBOOT HID loader mode
-    12.07.2014 Add FRDM_KE02Z40M, FRDM_KE04Z and FRDM_KE06Z
-    04.11.2014 Add FRDM_KL43Z, TWR_KL43Z48M, FRDM_K22F, TWR_K22F120M and TWR_K24F120M
-    05.11.2014 Add FRDM_KL03Z, TWR_KM34Z50M, TWR_KW24D512 and TWR_KW21D256
-    03.03.2015 Add TWR_KV10Z32 and TWR_KV31F120M
-    18.03.2015 Add FRDM_KL27Z
-    02.05.2015 Add K02F100M
+    02.02.2017 Adapt for us tick resolution (_TICK_RESOLUTION)
 
 */
 
@@ -39,9 +23,7 @@
 
 #if !defined _ASSEMBLER_CONFIG                                           // remove all following when used for assembler configuration
 
-#if defined _CODE_WARRIOR_CF
-    #pragma const_strings on                                             // ensure strings are of const type when compiling with CodeWarrior
-#endif
+#define _TICK_RESOLUTION     TICK_UNIT_MS(50)                            // 50ms system tick period - max possible at 50MHz SYSTICK would be about 335ms !
 
 #if defined _WINDOWS
     #define MEM_FACTOR 1.0                                               // Windows tends to use more memory so expand heap slightly
@@ -525,7 +507,6 @@
     #define OUR_HEAP_SIZE        (HEAP_REQUIREMENTS)((30 * 1024) * MEM_FACTOR)
 #endif
 
-#define TICK_RESOLUTION     50                                           // 50 ms system time period - max possible at 50MHz SYSTICK would be about 335ms !
 
 
 //#define NO_FLASH_SUPPORT                                               // neither parameter nor file system

@@ -73,7 +73,7 @@
         #define STATE_PAUSE               0x03
     #endif
     #if defined TEST_MMA8451Q                                            // {1}
-        #if defined FRDM_K22F || defined TWR_K21F120M || defined TWR_K24F120M || defined TWR_K64F120M || defined TWR_K21D50M || defined TWR_K65F180M
+        #if defined FRDM_K22F || defined TWR_K21F120M || defined TWR_K24F120M || defined TWR_K64F120M || defined TWR_K21D50M || defined TWR_K65F180M || defined FRDM_K66F
             #define MMA8451Q_READ_ADDRESS     0x39                       // read address of MMA8451Q [SA0 is '0']
             #define MMA8451Q_WRITE_ADDRESS    0x38                       // write address of MMA8451
         #elif defined TWR_K22F120M

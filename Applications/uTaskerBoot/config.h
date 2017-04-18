@@ -13,31 +13,7 @@
     ---------------------------------------------------------------------
     Copyright (C) M.J.Butcher Consulting 2004..2016
     *********************************************************************
-    11.08.2007 Add M5223X SPI FLASH support                              {1}
-    16.12.2007 Add SAM7X SPI FLASH support                               {2}
-    16.12.2007 FLASH and SRAM size set up added                          {3}
-    16.12.2007 Add BOOT_LOADER define                                    {4}
-    16.12.2007 Add SPI_CS0_PORT define                                   {5}
-    02.04.2008 Add LPC23XX support                                       {6}
-    02.04.2008 Add new M5223X clock and PLL details                      {7}
-    04.04.2008 Add LM3SXXXX support                                      {8}
-    31.05.2008 Clean out all non-bootloader defines (M5223X)
-    26.06.2008 Add ST SPI FLASH support                                  {9}
-    19.08.2008 Add M5222X and M5221X support (USB boot loader)           {10}
-    07.01.2009 Change setting to distinguish between M5221x and M5222x   {11}
-    17.01.2009 Add various LM3S derivatives                              {12}
-    17.01.2009 Add LM3S SPI FLASH support                                {13}
-    19.01.2009 Add M5225X support                                        {14}
-    25.01.2009 Add SST SPI FLASH                                         {15}
-    07.06.2009 Add AVR32 support                                         {16}
-    04.04.2010 Add LPC17XX support                                       {17}
-    30.07.2010 Add dummy SET_SPI_FLASH_MODE() and REMOVE_SPI_FLASH_MODE() for compatibility and correct CONFIGURE_CS_LINES() for Luminary {18}
-    29.11.2010 Add RX6XX support                                         {19}
-    03.03.2011 Correct SPI_FLASH_AT45DB161, SPI_FLASH_AT45DB321 and SPI_FLASH_AT45DB642 sizes
-    29.03.2011 Add Kinetis support                                       {20}
-    26.10.2012 Make READ_SPI_FLASH_DATA() access volatile                {21}
-    24.08.2013 Add option for multiple intermediate locations            {22}
-    25.08.2013 Add NET_KBED and NET_K60                                  {23}
+    02.02.2017 Adapt for us tick resolution (_TICK_RESOLUTION)
 
 */
 
@@ -72,7 +48,7 @@
     #endif
 
     #define OUR_HEAP_SIZE (unsigned short)((25 * 1024))                  // for simulator compatibility only
-    #define TICK_RESOLUTION        50                                    // for simulator compatibility only
+    #define _TICK_RESOLUTION     TICK_UNIT_MS(50)                        // 50ms system tick period - max possible at 50MHz SYSTICK would be about 335ms !
 
     #if defined _KINETIS                                                 // {20}
       //#define KINETIS_K40

@@ -11,7 +11,7 @@
     File:      driver.h
     Project:   Single Chip Embedded Internet
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2017
     *********************************************************************
     01.03.2007 Added uCompareFile()
     19.05.2007 Add FLASH protection functions fnProtectFile(), fnUnprotectFile()
@@ -85,6 +85,12 @@
     05.11.2015 Change DISPLAY_NEGATIVE to avoid conflict with NO_TERMINATOR {66}
     23.12.2015 Add USB zero copy options                                 {67}
     14.01.2016 Add LITTLE_SHORT_24BIT_BYTES()                            {68}
+    09.07.2016 Move network interrupt events to Ethernet events          {69}
+    10.07.2016 Add fnFloatStrFloat()                                     {70}
+    05.01.2017 Add optional midi baud rate                               {71}
+    07.01.2017 Add UART_TIMED_TRANSMISSION_MODE                          {72}
+    16.02.2017 Add crypography AES defines                               {73}
+    17.01.2017 Add DSP FFT defines                                       {74}
 
 */
 
@@ -106,7 +112,7 @@
 #define TYPE_USB          (unsigned char)5
 #define TYPE_CAN          (unsigned char)6
 #define TYPE_SPI          (unsigned char)7
-#define TYPE_IIC          (unsigned char)8
+#define TYPE_I2C          (unsigned char)8
 #define TYPE_SSC          (unsigned char)9                               // {22}
 #define TYPE_FIFO         (unsigned char)10                              // {61}
 
@@ -248,6 +254,7 @@
 #define MSG_BREAK_MODE               0x8000                              // message framing using break
 #define MULTIDROP_MODE_RX            0x00010000                          // {23} extended mode - also known as 9-bit mode (reception)
 #define MULTIDROP_MODE_TX            0x00020000                          // {38} extended mode - also known as 9-bit mode (transmission)
+#define UART_TIMED_TRANSMISSION_MODE 0x00040000                          // {72}
 
 #define UART_TX_DMA                  0x01                                // UART uses DMA for transmission
 #define UART_RX_DMA                  0x02                                // UART uses DMA for reception
@@ -268,11 +275,21 @@
 #define SERIAL_BAUD_9600     5
 #define SERIAL_BAUD_14400    6
 #define SERIAL_BAUD_19200    7
-#define SERIAL_BAUD_38400    8
-#define SERIAL_BAUD_57600    9
-#define SERIAL_BAUD_115200   10
-#define SERIAL_BAUD_230400   11
-#define SERIAL_BAUD_250K     12
+#if defined SUPPORT_MIDI_BAUD_RATE                                       // {71}
+    #define SERIAL_BAUD_31250    8                                       // midi baud rate
+    #define SERIAL_BAUD_38400    9
+    #define SERIAL_BAUD_57600    10
+    #define SERIAL_BAUD_115200   11
+    #define SERIAL_BAUD_230400   12
+    #define SERIAL_BAUD_250K     13
+#else
+    #define SERIAL_BAUD_38400    8
+    #define SERIAL_BAUD_57600    9
+    #define SERIAL_BAUD_115200   10
+    #define SERIAL_BAUD_230400   11
+    #define SERIAL_BAUD_250K     12
+#endif
+
 
 // Serial states
 //
@@ -297,20 +314,20 @@
 #define USB_ENDPOINT_ZERO_COPY_OUT   0x0080                              // {67}
 #define USB_ENDPOINT_IN_MESSAGE_MODE 0x0100
 
-// IIC shared states
+// I2C shared states
 //
-#define RX_ACTIVE_FIRST_READ SEND_XON
-#define IIC_RX_MESSAGE_MODE  SEND_XOFF                                   // {65}
+#define I2C_SLAVE_TX_BUFFER_MODE    SEND_XOFF
+#define I2C_SLAVE_RX_MESSAGE_MODE   SEND_XOFF                            // {65}
 
-// IIC speeds
+// I2C speeds
 //
-#define IIC_SLAVE_SPEED   0x00
-#define IIC_100K          0x01
+#define I2C_SLAVE_SPEED   0x00
+#define I2C_100K          0x01
 
 
-// IIC modes
+// I2C modes
 //
-#define IIC_MASTER        0x08
+#define I2C_MASTER        0x08
 
 // SPI interface defines
 //
@@ -411,23 +428,6 @@
 
 
 /* =================================================================== */
-/*                           struct packing control {25}               */
-/* =================================================================== */
-
-#if defined _GNU
-    #define _PACK      __attribute__((__packed__))
-#else
-    #define _PACK               
-#endif
-#if defined _COMPILE_GHS
-    #define __PACK_ON  //#pragma pack(1) 
-    #define __PACK_OFF //#pragma pack(0) 
-#else
-    #define __PACK_ON 
-    #define __PACK_OFF 
-#endif
-
-/* =================================================================== */
 /*                   little-/big-endian access macros {25}             */
 /* =================================================================== */
 
@@ -490,6 +490,9 @@ typedef struct stTTYtable {
     UTASK_TASK     Task_to_wake;                                         // 0 = don't wake any, else task to wake when receive message available
     #if defined SERIAL_SUPPORT_DMA
     unsigned char  ucDMAConfig;                                          // DMA configuration
+        #if defined UART_TIMED_TRANSMISSION                              // {72}
+    unsigned short usMicroDelay;                                         // the time base (us) between each character transmission
+        #endif
     #endif
     #if defined SUPPORT_FLOW_HIGH_LOW
     unsigned char  ucFlowHighWater;                                      // % of buffer full to stall flow
@@ -571,18 +574,18 @@ typedef struct stUSBtable {                                              // {1}
 #define USB_IN_FIFO_MASK         0xf000
 #define USB_IN_FIFO_SHIFT        12
 
-// IIC table structure used to configure an IIC interface
+// I2C table structure used to configure an I2C interface
 //
-typedef struct stIICTABLE {
-    unsigned short usSpeed;                                              // IIC speed (in kHz) - 0 for slave
+typedef struct stI2CTABLE {
+    unsigned short usSpeed;                                              // I2C speed (in kHz) - 0 for slave
     QUEUE_DIMENSIONS Rx_tx_sizes;                                        // the desired rx and tx queue sizes
     UTASK_TASK     Task_to_wake;                                         // default task to wake when receive message available
     QUEUE_HANDLE   Channel;                                              // physical channel number 1,2,3...
-#if defined IIC_SLAVE_MODE                                               // {65}
+#if defined I2C_SLAVE_MODE                                               // {65}
     unsigned char  ucSlaveAddress;                                       // address to be used by slave
     int (*fnI2C_SlaveCallback)(int iChannel, unsigned char *ptrDataByte, int iType); // optional callback to prepare a byte to transmit
 #endif
-} IICTABLE;
+} I2CTABLE;
 
 #define I2C_SLAVE_BUFFER              0                                  // the next byte is to be taken from the I2C output buffer
 #define I2C_SLAVE_TX_PREPARED         1                                  // the next byte has been prepared by the application callback
@@ -593,7 +596,7 @@ typedef struct stIICTABLE {
 #define I2C_SLAVE_READ                2                                  // the next data to return to the master is to be prepared
 #define I2C_SLAVE_WRITE               3                                  // a byte of data for the slave has just been received from the master
 #define I2C_SLAVE_READ_COMPLETE       4                                  // the master has completed a read (from the slave) transaction
-#define I2C_SLAVE_WRITE_COMPLETE      5                                  // teh master has completed a write (to the slave) transaction
+#define I2C_SLAVE_WRITE_COMPLETE      5                                  // the master has completed a write (to the slave) transaction
 
 // SPI table structure used to configure an SPI interface
 //
@@ -672,14 +675,14 @@ typedef struct stQUEQue
 
 // I2C queue
 //
-typedef struct stIICQue
+typedef struct stI2CQue
 {
-    QUEQUE         IIC_queue;
+    QUEQUE         I2C_queue;
     QUEUE_TRANSFER msgs;
     volatile unsigned char  ucPresentLen;
     unsigned char  ucState;
     UTASK_TASK     wake_task;
-} IICQue;
+} I2CQue;
 
 #define SERIAL_COUNTERS    2
 #define SERIAL_TX_STATS    0
@@ -720,6 +723,9 @@ typedef struct stTTYQue
     UTASK_TASK     wake_task;                                            // the task to be woken on character or message reception (depending on mode)
     #if defined SERIAL_SUPPORT_DMA
     unsigned char  ucDMA_mode;                                           // DMA operating mode details of the TTY
+        #if defined UART_TIMED_TRANSMISSION                              // {72}
+    unsigned short usMicroDelay;                                         // the time base (us) between each character transmission
+        #endif
     #endif
 } TTYQUE;
 
@@ -852,6 +858,7 @@ extern void           fnDebugHex(unsigned long ulValue, unsigned char ucLen); //
     extern CHAR *fnBufferDec(signed long slNumberToConvert, unsigned char ucStyle, CHAR *ptrBuf); // take a value and convert it to a string in a buffer
     extern void  fnDebugDec(signed long slNumberToConvert, unsigned char ucStyle); // take a (signed) long value and send it as decimal string over the debug interface
     extern void  fnDebugFloat(float floatToConvert, unsigned char ucStyle); // {64} take a single precision float value and it as a decimal string over the debug interface
+    extern float fnFloatStrFloat(CHAR *cNewAdd);                         // {70} extract a float from a string input
 #else
     extern CHAR *fnDebugDec(signed long slNumberToConvert, unsigned char ucStyle, CHAR *ptrBuf); // take a value and send it as decimal string over the debug interface or put in buffer
 #endif
@@ -917,7 +924,7 @@ extern QUEUE_HANDLE   fnOpenCAN(CANTABLE *pars, unsigned char driver_mode);
 #endif
 extern QUEUE_HANDLE   fnOpenETHERNET(ETHTABLE *pars, unsigned short driver_mode);
 extern QUEUE_HANDLE   fnOpenSPI(SPITABLE *pars, unsigned char driver_mode);
-extern QUEUE_HANDLE   fnOpenIIC(IICTABLE *pars);
+extern QUEUE_HANDLE   fnOpenI2C(I2CTABLE *pars);
 extern QUEUE_HANDLE   fnOpenSSC(SSCTABLE *pars, unsigned char driver_mode); // {22}
 extern QUEUE_HANDLE   fnOpen(unsigned char type_of_driver, unsigned char driver_mode, void *pars);
 extern QUEUE_TRANSFER fnDriver(QUEUE_HANDLE driver_id, unsigned short state , unsigned short rx_or_tx);
@@ -1086,14 +1093,68 @@ extern void fnEnterUserFiles(USER_FILE *ptrUserFileList);
     extern unsigned char fnUserFileProperties(unsigned char *ptrfile);
 #endif
 extern USER_FILE *fnActivateEmbeddedUserFiles(CHAR *cFile, int iType);
-  #define USER_FILE_IN_INTERNAL_FLASH  0
-  #define USER_FILE_IN_EXTERNAL_SPACE  1
+    #define USER_FILE_IN_INTERNAL_FLASH  0
+    #define USER_FILE_IN_EXTERNAL_SPACE  1
 
 #if defined _WINDOWS
     extern int iFetchingInternalMemory;                                  // {48}
     #define _ACCESS_NOT_IN_CODE        0
     #define _ACCESS_IN_CODE            1
     #define _ACCESS_FROM_EXT_FLASH     2
+#endif
+
+// Cryptography                                                          {73}
+//
+extern int fnAES_Init(int iInstanceCommand, const unsigned char *ptrKey, int iKeyLength);
+extern int fnAES_Cipher(int iInstanceCommand, const unsigned char *ptrTextIn, unsigned char *ptrTextOut, unsigned long ulDataLength);
+
+#define AES_BLOCK_LENGTH               16
+#define AES_INVALID_INSTANCE_REFERENCE -1
+#define AES_INSTANCE_NOT_INITIALISED   -2
+#define AES_ENCRYPT_BAD_LENGTH         -3
+#define AES_ENCRYPT_BAD_ALIGNMENT      -4
+#define AES_INVALID_KEY_LENGTH         -5
+
+#define AES_INSTANCE_MASK               0x00ff
+#define AES_COMMAND_AES_ENCRYPT         0x0100
+#define AES_COMMAND_AES_DECRYPT         0x0200
+#define AES_COMMAND_AES_SET_KEY_ENCRYPT 0x0400
+#define AES_COMMAND_AES_SET_KEY_DECRYPT 0x0800
+#define AES_COMMAND_AES_RESET_IV        0x1000
+#define AES_COMMAND_AES_PRIME_IV        0x2000
+
+// DSP                                                                   {74}
+//
+extern float fnGenerateWindowFloat(float *ptrWindowBuffer, int iInputSamples, int iWindowType);
+    #define BLACKMANN_HARRIS_WINDOW        0
+extern int fnFFT(void *ptrInputBuffer, void *ptrOutputBuffer, int iInputSamples, int iSampleOffset, int iInputBufferSize, float *ptrWindowingBuffer, float window_conversionFactor, int iInputOutputType);
+    #define FFT_INPUT_MASK                 0x00f
+    #define FFT_INPUT_BYTES_UNSIGNED       0x000
+    #define FFT_INPUT_BYTES_SIGNED         0x001
+    #define FFT_INPUT_HALF_WORDS_UNSIGNED  0x002
+    #define FFT_INPUT_HALF_WORDS_SIGNED    0x003
+    #define FFT_INPUT_LONG_WORDS_UNSIGNED  0x004
+    #define FFT_INPUT_LONG_WORDS_SIGNED    0x005
+    #define FFT_INPUT_FLOATS               0x006
+    #define FFT_OUTPUT_MASK                0x0f0
+    #define FFT_OUTPUT_BYTES_UNSIGNED      0x000
+    #define FFT_OUTPUT_BYTES_SIGNED        0x010
+    #define FFT_OUTPUT_HALF_WORDS_UNSIGNED 0x020
+    #define FFT_OUTPUT_HALF_WORDS_SIGNED   0x030
+    #define FFT_OUTPUT_LONG_WORDS_UNSIGNED 0x040
+    #define FFT_OUTPUT_LONG_WORDS_SIGNED   0x050
+    #define FFT_OUTPUT_FLOATS              0x060
+    #define FFT_COMPLEX_RESULT             0x000
+    #define FFT_MAGNITUDE_RESULT           0x100
+#if defined _WINDOWS
+extern void fnInjectSine(int instance, int iType, void *ptrData, unsigned short usLength);
+    #define INJECT_SINE_BYTES_UNSIGNED      0
+    #define INJECT_SINE_BYTES_SIGNED        1
+    #define INJECT_SINE_HALF_WORDS_UNSIGNED 2
+    #define INJECT_SINE_HALF_WORDS_SIGNED   3
+    #define INJECT_SINE_LONG_WORDS_UNSIGNED 4
+    #define INJECT_SINE_LONG_WORDS_SIGNED   5
+    #define INJECT_SINE_FLOATS              6
 #endif
 
 // Driver Interrupt Events
@@ -1133,11 +1194,7 @@ extern USER_FILE *fnActivateEmbeddedUserFiles(CHAR *cFile, int iType);
 #define CTS_CHANGE_INACTIVE_1       0xe0
 #define CTS_CHANGE_ACTIVE_2         0xdf
 #define CST_CHANGE_INACTIVE_2       0xde
-#define TX_FREE                     0xdd                                 // Interrupt event informing of free serial / TCP buffer
-#define DHCP_SUCCESSFUL             0xdc                                 // DHCP was successful - the system can use TCP/IP
-#define DHCP_COLLISION              0xdb                                 // DHCP received infomation but there is an IP conflict - retry?
-#define DHCP_LEASE_TERMINATED       0xda                                 // DHCP lease has terminated without being able to estalish new lease - presently no network capability
-#define DHCP_MISSING_SERVER         0xd9                                 // DHCP repetition timer has been increase to a level indicating no server present
+#define TX_FREE                     0xdd                                 // interrupt event informing of free serial / TCP buffer
 
 #define UNETWORK_FRAME_LOSS         0xd8
 #define UNETWORK_SYNC_LOSS          0xd7
@@ -1169,6 +1226,13 @@ extern USER_FILE *fnActivateEmbeddedUserFiles(CHAR *cFile, int iType);
 #define ZERO_CONFIG_COLLISION       0xb8                                 // {39}
 
 #define RTC_ALARM_INTERRUPT_EVENT   0xb7
+
+// Networking events (from Ethernet)                                     // {69}
+//
+#define DHCP_SUCCESSFUL             0x01                                 // DHCP was successful - the system can use TCP/IP
+#define DHCP_COLLISION              0x02                                 // DHCP received infomation but there is an IP conflict - retry?
+#define DHCP_LEASE_TERMINATED       0x03                                 // DHCP lease has terminated without being able to establish new lease - presently no network capability
+#define DHCP_MISSING_SERVER         0x04                                 // DHCP repetition timer has been increased to a level indicating no server present
 
 
 // Time keeping                                                          // {60}

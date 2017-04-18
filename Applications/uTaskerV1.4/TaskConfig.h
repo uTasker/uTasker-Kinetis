@@ -11,7 +11,7 @@
     File:      TaskConfig.h
     Project:   Single Chip Embedded Internet
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2017
     *********************************************************************
     28.04.2007 Add SNMP task
     13.05.2007 Add PPP task
@@ -31,6 +31,7 @@
     02.06.2014 Allow task TASK_NETWORK_INDICATOR to be used with define INTERRUPT_TASK_PHY {11}
     11.02.2015 Added task TASK_TIME_KEEPER                               {12}
     18.11.2015 Add USB host task                                         {13}
+    18.04.2017 Add BLINKEY configuration
 
 */
  
@@ -72,6 +73,8 @@
 #define TASK_DEV_3              '3'
 #define TASK_DEV_4              '4'
 #undef  OWN_TASK
+
+extern void fnHTTP_task(TTASKTABLE *ptrTaskTable);
 
 #if defined LAN_REPORT_ACTIVITY
    #define INTERRUPT_TASK_PHY         TASK_NETWORK_INDICATOR             // this task is woken on PHY changes (set 0 for none)
@@ -159,16 +162,18 @@ const UTASK_TASK ctNodes[] = {                                           // we u
 #if defined USE_MODBUS
     TASK_MODBUS,                                                         // MODBUS task
 #endif
+#if !defined BLINKEY
     TASK_APPLICATION,                                                    // application task
     TASK_DEBUG,                                                          // maintenance task
+#endif
 #if defined SDCARD_SUPPORT || defined SPI_FLASH_FAT || defined FLASH_FAT || defined MANAGED_FILES || defined USB_MSD_HOST
     TASK_MASS_STORAGE,                                                   // {5} mass storage task
 #endif
-#if defined USE_DHCP
+#if defined USE_DHCP_CLIENT
     TASK_DHCP,                                                           // DHCP task
 #endif
 #if defined USE_DNS
-    TASK_DNS,                                                            // DNS task
+    TASK_DNS,                                                            // DNS client task
 #endif
 #if defined USE_POP3
     TASK_POP3,                                                           // POP 3 task
@@ -203,10 +208,10 @@ const UTASK_TASK ctNodes[] = {                                           // we u
 #if defined USE_IGMP
     TASK_IGMP,                                                           // {10} IGMP task
 #endif
-#if defined LAN_REPORT_ACTIVITY || defined PHY_POLL_LINK || defined INTERRUPT_TASK_PHY // {11}
+#if (defined LAN_REPORT_ACTIVITY || defined PHY_POLL_LINK || defined INTERRUPT_TASK_PHY) && !defined BLINKEY // {11}
     TASK_NETWORK_INDICATOR,                                              // network activity indicator task
 #endif
-#if defined USE_SNTP || defined USE_TIME_SERVER || defined USE_TIME_SERVER || defined SUPPORT_RTC || defined SUPPORT_SW_RTC // {12}
+#if (defined USE_SNTP || defined USE_TIME_SERVER || defined USE_TIME_SERVER || defined SUPPORT_RTC || defined SUPPORT_SW_RTC) && !defined BLINKEY // {12}
     TASK_TIME_KEEPER,
 #endif
 #if defined QUICK_DEV_TASKS
@@ -250,15 +255,15 @@ const UTASKTABLEINIT ctTaskTable[] = {
 #if defined USE_MODBUS
     {"O-MOD",     fnMODBUS,     MEDIUM_QUE,  (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP}, // MODBUS task  
 #endif
-#if defined _EXE && defined ETH_INTERFACE
+#if defined _EXE && defined ETH_INTERFACE && !defined BLINKEY
     {"app",       fnApplication,  MEDIUM_QUE,  (DELAY_LIMIT)((0.5 * SEC) + (PHY_POWERUP_DELAY)), 0, UTASKER_STOP}, // application - start after Ethernet to be sure we have Ethernet handle
-#else
+#elif !defined BLINKEY
     {"app",       fnApplication,  MEDIUM_QUE,  (DELAY_LIMIT)((0.10 * SEC) + (PHY_POWERUP_DELAY)), 0, UTASKER_STOP}, // application - start after Ethernet to be sure we have Ethernet handle
 #endif
 #if defined SDCARD_SUPPORT || defined SPI_FLASH_FAT || defined FLASH_FAT || defined MANAGED_FILES || defined USB_MSD_HOST
     {"MassSt",    fnMassStorage,  MEDIUM_QUE,  (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP}, // mass storage task
 #endif
-#if defined USE_DHCP
+#if defined USE_DHCP_CLIENT
     {"DHCP",      fnDHCP,       SMALL_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP}, // delay only for timer queue space
 #endif
 #if defined USE_DNS
@@ -303,13 +308,13 @@ const UTASKTABLEINIT ctTaskTable[] = {
 #if defined USE_MAINTENANCE
     {"maintenace",fnDebug,      SMALL_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP}, // task used for debug messages (started by application)
 #endif
-#if defined LAN_REPORT_ACTIVITY || defined PHY_POLL_LINK || defined INTERRUPT_TASK_PHY // {9}{11}
+#if (defined LAN_REPORT_ACTIVITY || defined PHY_POLL_LINK || defined INTERRUPT_TASK_PHY) && !defined BLINKEY // {9}{11}
     {"NetInd",    fnNetworkIndicator,LARGE_QUE,   (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP}, // network activity task
 #endif
 #if defined USB_INTERFACE
     {"usb",       fnTaskUSB,    SMALL_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP}, // USB (application) task
 #endif
-#if defined USE_SNTP || defined USE_TIME_SERVER || defined USE_TIME_SERVER || defined SUPPORT_RTC || defined SUPPORT_SW_RTC // {12}
+#if (defined USE_SNTP || defined USE_TIME_SERVER || defined USE_TIME_SERVER || defined SUPPORT_RTC || defined SUPPORT_SW_RTC) && !defined BLINKEY // {12}
     {"keeper",    fnTimeKeeper, SMALL_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP}, // time keeper task
 #endif
 #if defined QUICK_DEV_TASKS

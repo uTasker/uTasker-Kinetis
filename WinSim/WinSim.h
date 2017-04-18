@@ -11,7 +11,7 @@
     File:      WinSim.h
     Project:   uTasker project
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2017
     *********************************************************************
     28.04.2007 Add function fnGetEEPROMSize(void)                        {1}
     11.08.2007 Add fnInitSPI_DataFlash(), fnGetDataFlashStart(), fnGetDataFlashSize() and fnSimAT45DBXXX() {2}
@@ -23,7 +23,7 @@
     14.11.2007 Add fnInjectSerial(), fnInjectPortValue() and fnInjectSPI() {6}
     14.11.2007 Add RX_SPI0 and RX_SPI1 defines plus fnSimulateSPIIn()    {7}
     17.11.2007 Add fnSimFPGAPeriod()                                     {8}
-    15.12.2007 Add fnConfigSimIIC()                                      {9}
+    15.12.2007 Add fnConfigSimI2C()                                      {9}
     23.12.2007 Extended DMA channel support                              {10}
     25.12.2007 Extended UART support to 4 channels                       {11}
     26.12.2007 Add LPC21XX support                                       {12}
@@ -41,7 +41,7 @@
     17.12.2008 Remove PORTS_AVAILABLE and PORT_WIDTH defines to processor files
     18.01.2009 Add WAIT_WHILE_BUSY                                       {24}
     27.01.2009 Add parameter to fnGetFileSystemStart() and fnGetFlashSize() {25}
-    30.01.2009 Add IIC_INT2                                              {26}
+    30.01.2009 Add I2C_INT2                                              {26}
     10.02.2009 Add iForce parameter to fnSimulateEthernetIn()            {27}
     03.03.2009 Add iForce parameter to fnPortChanges()                   {28}
     03.03.2009 Add pseudo interrupt                                      {29}
@@ -65,6 +65,9 @@
     24.02.2014 Add USB_SIM_SOF                                           {47}
     28.02.2014 Add token parameter to fnLogUSB()                         {48}
     21.11.2015 Add fnGetSimDiskData()                                    {49}
+    02.09.2016 Add TOGGLE_INPUT_POS, TOGGLE_INPUT_ANALOG and INPUT_TOGGLE_POS {50}
+    24.12.2016 Add SIM_I2C_OUT and fnInjectI2C()                         {51}
+    28.02.2017 Add UARTs 6 and 7                                         {52}
 
 */
  
@@ -107,6 +110,9 @@
 #define SIM_TEST_EXT_RX_2    58
 #define SIM_TEST_EXT_RX_3    59
 
+#define SIM_I2C_OUT          65                                          // {51}
+#define SIM_I2C_OUT_REPEATED 66
+
 #define SIM_TEST_ENUM        80
 #define SIM_TEST_DISCONNECT  81
 #define SIM_USB_OUT          82
@@ -119,15 +125,26 @@
 #define MODEM_COM_3          103                                         // {11}
 #define MODEM_COM_4          104
 #define MODEM_COM_5          105
-#define MODEM_EXT_COM_0      106                                         // {4}
-#define MODEM_EXT_COM_1      107
-#define MODEM_EXT_COM_2      108
-#define MODEM_EXT_COM_3      109 
+#define MODEM_COM_6          106                                         // {52}
+#define MODEM_COM_7          107
+#define MODEM_EXT_COM_0      108                                         // {4}
+#define MODEM_EXT_COM_1      109
+#define MODEM_EXT_COM_2      110
+#define MODEM_EXT_COM_3      111 
 
-#define SIM_UART_BREAK       110                                         // {20}
-#define SIM_UART_CTS         111
+#define SIM_UART_BREAK       112                                         // {20}
+#define SIM_UART_CTS         113
+
+#define INPUT_TOGGLE_POS     200                                         // {50}
+#define INPUT_TOGGLE_NEG_ANALOG  201
+#define INPUT_TOGGLE_POS_ANALOG  202
+#define INPUT_TOGGLE_ANALOG      203
 
 #define USB_SETUP_FLAG       0x80000000                                  // {22}
+
+#define ANALOGUE_SWITCH_INPUT 0x80000000
+#define POSITIVE_SWITCH_INPUT 0x40000000
+#define SWITCH_PORT_REF_MASK  ~(ANALOGUE_SWITCH_INPUT | POSITIVE_SWITCH_INPUT)
 
 // Throughput parameters                                                 {38}
 //
@@ -137,14 +154,16 @@
 #define THROUGHPUT_UART3     3
 #define THROUGHPUT_UART4     4
 #define THROUGHPUT_UART5     5
-#define THROUGHPUT_I2C0      6
-#define THROUGHPUT_I2C1      7
-#define THROUGHPUT_I2C2      8
-#define THROUGHPUT_I2C3      9
-#define THROUGHPUT_EXT_UART0 10
-#define THROUGHPUT_EXT_UART1 11
-#define THROUGHPUT_EXT_UART2 12
-#define THROUGHPUT_EXT_UART3 13
+#define THROUGHPUT_UART6     6                                           // {52}
+#define THROUGHPUT_UART7     7
+#define THROUGHPUT_I2C0      8
+#define THROUGHPUT_I2C1      9
+#define THROUGHPUT_I2C2      10
+#define THROUGHPUT_I2C3      11
+#define THROUGHPUT_EXT_UART0 12
+#define THROUGHPUT_EXT_UART1 13
+#define THROUGHPUT_EXT_UART2 14
+#define THROUGHPUT_EXT_UART3 15
 
 // Do defines
 //
@@ -160,29 +179,33 @@
 #define SEND_PC_COM4         10
 #define OPEN_PC_COM5         11
 #define SEND_PC_COM5         12
-#define DISPLAY_PORT_CHANGE  13
-#define SET_COM_BREAK_0      14
-#define CLR_COM_BREAK_0      15
-#define SET_COM_BREAK_1      16
-#define CLR_COM_BREAK_1      17
-#define SET_COM_BREAK_2      18
-#define CLR_COM_BREAK_2      19
-#define SET_COM_BREAK_3      20                                          // {11}
-#define CLR_COM_BREAK_3      21
-#define SET_COM_BREAK_4      22
-#define CLR_COM_BREAK_4      23
-#define SET_COM_BREAK_5      24
-#define CLR_COM_BREAK_5      25
-#define IP_CHANGE            26
-#define MODEM_SIGNAL_CHANGE  27                                          // {4}
-#define OPEN_PC_EXT_COM0     28
-#define OPEN_PC_EXT_COM1     29
-#define OPEN_PC_EXT_COM2     30
-#define OPEN_PC_EXT_COM3     31
-#define SEND_PC_EXT_COM0     32
-#define SEND_PC_EXT_COM1     33
-#define SEND_PC_EXT_COM2     34
-#define SEND_PC_EXT_COM3     35
+#define OPEN_PC_COM6         13                                          // {52}
+#define SEND_PC_COM6         14
+#define OPEN_PC_COM7         15
+#define SEND_PC_COM7         16
+#define DISPLAY_PORT_CHANGE  17
+#define SET_COM_BREAK_0      18
+#define CLR_COM_BREAK_0      19
+#define SET_COM_BREAK_1      20
+#define CLR_COM_BREAK_1      21
+#define SET_COM_BREAK_2      22
+#define CLR_COM_BREAK_2      23
+#define SET_COM_BREAK_3      24                                          // {11}
+#define CLR_COM_BREAK_3      25
+#define SET_COM_BREAK_4      26
+#define CLR_COM_BREAK_4      27
+#define SET_COM_BREAK_5      28
+#define CLR_COM_BREAK_5      29
+#define IP_CHANGE            30
+#define MODEM_SIGNAL_CHANGE  31                                          // {4}
+#define OPEN_PC_EXT_COM0     32
+#define OPEN_PC_EXT_COM1     33
+#define OPEN_PC_EXT_COM2     34
+#define OPEN_PC_EXT_COM3     35
+#define SEND_PC_EXT_COM0     36
+#define SEND_PC_EXT_COM1     37
+#define SEND_PC_EXT_COM2     38
+#define SEND_PC_EXT_COM3     39
 
 #define CHANNEL_0_SERIAL_INT 0x00000001
 #define CHANNEL_1_SERIAL_INT 0x00000002
@@ -190,14 +213,16 @@
 #define CHANNEL_3_SERIAL_INT 0x00000008                                  // {11}
 #define CHANNEL_4_SERIAL_INT 0x00000010                                  // {38}
 #define CHANNEL_5_SERIAL_INT 0x00000020
-#define IIC_INT0             0x00000040
-#define IIC_INT1             0x00000080
-#define IIC_INT2             0x00000100                                  // {26}
-#define IIC_INT3             0x00000200
-#define USB_INT              0x00000400                                  // {17}
-#define PSEUDO_INT           0x00000800                                  // {29}
-#define CHANNEL_0_SSC_INT    0x00001000                                  // {31}
-#define CHANNEL_1_SSC_INT    0x00002000
+#define CHANNEL_6_SERIAL_INT 0x00000040                                  // {52}
+#define CHANNEL_7_SERIAL_INT 0x00000080
+#define I2C_INT0             0x00000100
+#define I2C_INT1             0x00000200
+#define I2C_INT2             0x00000400                                  // {26}
+#define I2C_INT3             0x00000800
+#define USB_INT              0x00001000                                  // {17}
+#define PSEUDO_INT           0x00002000                                  // {29}
+#define CHANNEL_0_SSC_INT    0x00004000                                  // {31}
+#define CHANNEL_1_SSC_INT    0x00008000
 
 #define CHANNEL_0_EXT_SERIAL_INT 0x00040000                              // {33}
 #define CHANNEL_1_EXT_SERIAL_INT 0x00080000
@@ -244,30 +269,32 @@
 #define SEND_COM_3           0x00000008
 #define SEND_COM_4           0x00000010                                  // {38}
 #define SEND_COM_5           0x00000020
-#define SET_BREAK_COM_0      0x00000040
-#define CLR_BREAK_COM_0      0x00000080
-#define SET_BREAK_COM_1      0x00000100
-#define CLR_BREAK_COM_1      0x00000200
-#define SET_BREAK_COM_2      0x00000400
-#define CLR_BREAK_COM_2      0x00000800
-#define SET_BREAK_COM_3      0x00001000                                 // {11}
-#define CLR_BREAK_COM_3      0x00002000
-#define SET_BREAK_COM_4      0x00004000                                 // {38}
-#define CLR_BREAK_COM_4      0x00008000
-#define SET_BREAK_COM_5      0x00010000
-#define CLR_BREAK_COM_5      0x00020000
-#define ASSERT_RTS_COM_0     0x00040000                                 // {4}
-#define NEGATE_RTS_COM_0     0x00080000
-#define ASSERT_RTS_COM_1     0x00100000
-#define NEGATE_RTS_COM_1     0x00200000
-#define ASSERT_RTS_COM_2     0x00400000
-#define NEGATE_RTS_COM_2     0x00800000
-#define ASSERT_RTS_COM_3     0x01000000                                 // {11}
-#define NEGATE_RTS_COM_3     0x02000000
-#define ASSERT_RTS_COM_4     0x04000000                                 // {38}
-#define NEGATE_RTS_COM_4     0x08000000
-#define ASSERT_RTS_COM_5     0x10000000
-#define NEGATE_RTS_COM_5     0x20000000
+#define SEND_COM_6           0x00000040                                  // {52}
+#define SEND_COM_7           0x00000080
+#define SET_BREAK_COM_0      0x00000100
+#define CLR_BREAK_COM_0      0x00000200
+#define SET_BREAK_COM_1      0x00000400
+#define CLR_BREAK_COM_1      0x00000800
+#define SET_BREAK_COM_2      0x00001000
+#define CLR_BREAK_COM_2      0x00002000
+#define SET_BREAK_COM_3      0x00004000                                 // {11}
+#define CLR_BREAK_COM_3      0x00008000
+#define SET_BREAK_COM_4      0x00010000                                 // {38}
+#define CLR_BREAK_COM_4      0x00020000
+#define SET_BREAK_COM_5      0x00040000
+#define CLR_BREAK_COM_5      0x00080000
+#define ASSERT_RTS_COM_0     0x00100000                                 // {4}
+#define NEGATE_RTS_COM_0     0x00200000
+#define ASSERT_RTS_COM_1     0x00400000
+#define NEGATE_RTS_COM_1     0x00800000
+#define ASSERT_RTS_COM_2     0x01000000
+#define NEGATE_RTS_COM_2     0x02000000
+#define ASSERT_RTS_COM_3     0x04000000                                 // {11}
+#define NEGATE_RTS_COM_3     0x08000000
+#define ASSERT_RTS_COM_4     0x10000000                                 // {38}
+#define NEGATE_RTS_COM_4     0x20000000
+#define ASSERT_RTS_COM_5     0x40000000
+#define NEGATE_RTS_COM_5     0x80000000
 
 #define OPEN_COM_0           0x00000001
 #define OPEN_COM_1           0x00000002
@@ -275,14 +302,16 @@
 #define OPEN_COM_3           0x00000008                                  // {38}
 #define OPEN_COM_4           0x00000010
 #define OPEN_COM_5           0x00000020
-#define OPEN_EXT_COM_0       0x00000040                                  // {34}
-#define OPEN_EXT_COM_1       0x00000080
-#define OPEN_EXT_COM_2       0x00000100
-#define OPEN_EXT_COM_3       0x00000200
-#define SEND_EXT_COM_0       0x00000400                                  // {38} - moved to ulActions_2
-#define SEND_EXT_COM_1       0x00000800
-#define SEND_EXT_COM_2       0x00001000
-#define SEND_EXT_COM_3       0x00002000
+#define OPEN_COM_6           0x00000040                                  // {52}
+#define OPEN_COM_7           0x00000080
+#define OPEN_EXT_COM_0       0x00000100                                  // {34}
+#define OPEN_EXT_COM_1       0x00000200
+#define OPEN_EXT_COM_2       0x00000400
+#define OPEN_EXT_COM_3       0x00000800
+#define SEND_EXT_COM_0       0x00001000                                  // {38} - moved to ulActions_2
+#define SEND_EXT_COM_1       0x00002000
+#define SEND_EXT_COM_2       0x00004000
+#define SEND_EXT_COM_3       0x00008000
 
 #define PORT_CHANGE          0x10000000
 #define IP_CONFIG_CHANGED    0x20000000
@@ -305,8 +334,9 @@ extern void fnInjectSerial(unsigned char *ptrInputData, unsigned short usLength,
 extern void fnInjectPortValue(int iPort, unsigned long ulMask, unsigned long ulValue); // {6}
 extern void fnInjectSPI(unsigned char *ptrInputData, unsigned short usLength, int iPortNumber); // {6}
 extern void fnInjectUSB(unsigned char *ptrInputData, unsigned short usLength, int iPortNumber); // {19}
+extern void fnInjectI2C(unsigned char *ptrInputData, unsigned short usLength, int iPortNumber, int iRepeatedStart); // {51}
 
-extern void fnConfigSimIIC(QUEUE_HANDLE Channel, unsigned long ulSpeed); // {9}
+extern void fnConfigSimI2C(QUEUE_HANDLE Channel, unsigned long ulSpeed); // {9}
 
 extern void fnSetProjectDetails(signed char **);
 
@@ -334,6 +364,8 @@ extern void fnLogTx2(unsigned char ucTxByte);
 extern void fnLogTx3(unsigned char ucTxByte);                            // {11}
 extern void fnLogTx4(unsigned char ucTxByte);                            // {38}
 extern void fnLogTx5(unsigned char ucTxByte);
+extern void fnLogTx6(unsigned char ucTxByte);                            // {52}
+extern void fnLogTx7(unsigned char ucTxByte);
 extern int  fnLogExtTx0(void);                                           // {32}
 extern int  fnLogExtTx1(void);
 extern int  fnLogExtTx2(void);
@@ -362,9 +394,10 @@ extern void SCI3_Interrupt(void);                                        // {11}
 //
 extern void fnSimulateSPIIn(int iPort, unsigned char *ptrDebugIn, unsigned short usLen); // simulation routine {7}
 
-// IIC interface
+// I2C interface
 //
-extern void IIC_Interrupt(void);                                         // interrupt routine
+extern void I2C_Interrupt(void);                                         // interrupt routine
+extern void fnSimulateI2C(int iPort, unsigned char *ptrDebugIn, unsigned short usLen, int iRepeatedStart);
 
 // UART
 //
@@ -386,10 +419,12 @@ extern void fnSimulateKeyChange(int *intTable);
 #else
     extern void fnSimulateInputChange(unsigned char ucPort, unsigned char ucPortBit, int iChange);
 #endif
-    #define CLEAR_INPUT      0x0
-    #define SET_INPUT        0x1
-    #define TOGGLE_INPUT     0x2
-    #define TOGGLE_INPUT_NEG 0x4                                         // {15}
+    #define CLEAR_INPUT         0x00
+    #define SET_INPUT           0x01
+    #define TOGGLE_INPUT        0x02
+    #define TOGGLE_INPUT_NEG    0x04                                     // {15}
+    #define TOGGLE_INPUT_POS    0x08                                     // {50}
+    #define TOGGLE_INPUT_ANALOG 0x10                                     // {50}
 
 extern void fnSimMatrixKB(void);
 
@@ -472,12 +507,12 @@ extern int fnPutSimDiskData(unsigned char *ptrBuffer, unsigned char ucLUN, unsig
 
 // I2C devices
 //
-unsigned char fnSimIIC_devices(unsigned char ucType, unsigned char ucData);
-    #define IIC_ADDRESS     0
-    #define IIC_TX_DATA     1
-    #define IIC_RX_DATA     2
-    #define IIC_RX_COMPLETE 3
-    #define IIC_TX_COMPLETE 4
+unsigned char fnSimI2C_devices(unsigned char ucType, unsigned char ucData);
+    #define I2C_ADDRESS     0
+    #define I2C_TX_DATA     1
+    #define I2C_RX_DATA     2
+    #define I2C_RX_COMPLETE 3
+    #define I2C_TX_COMPLETE 4
 
 extern void fnInitI2C_EEPROM(void);                                      // {39}
 extern unsigned char *fnGetI2CEEPROMStart(void);

@@ -8,10 +8,10 @@
     www.uTasker.com    Skype: M_J_Butcher
 
     ---------------------------------------------------------------------
-    File:      IIC_dev.c
+    File:      serial_dev.c
     Project:   Single Chip Embedded Internet
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2017
     *********************************************************************
     14.03.2007 Added MAX543X Digital Potentiometer (L,M,N,P suffixes)
     29.09.2007 Added LM80 (microprocessor system hardware monitor) and PCF8574 port expander
@@ -30,7 +30,7 @@
 
 */                            
 
-// IIC Device simulation when communicating over IIC bus
+// I2C Device simulation when communicating over I2C bus
 
 /* =================================================================== */
 /*                           include files                             */
@@ -402,7 +402,7 @@ typedef struct stMAX3353_MEMORY
     unsigned char  res3[233];
 } MAX3353_MEMORY;
 
-// Address 0x58/59 (OTG_CHARGE_PUMP_IIC_ADD)
+// Address 0x58/59 (OTG_CHARGE_PUMP_I2C_ADD)
 
 typedef struct stMAX3353
 {     
@@ -414,7 +414,7 @@ typedef struct stMAX3353
     MAX3353_MEMORY memory;
 } MAX3353;
 
-static MAX3353 simMAX3353 = {OTG_CHARGE_PUMP_IIC_ADD, 0, 0, 0,
+static MAX3353 simMAX3353 = {OTG_CHARGE_PUMP_I2C_ADD, 0, 0, 0,
                              0x6a, 0x0b, 0x53, 0x33,                     // manufacturer regs
                              0x48, 0x5a, 0x42, 0x01,                     // manufaturer id
                              0,0,0,0,0,0,0,0,                            // res 1
@@ -1368,22 +1368,22 @@ extern void fnInitTime(char *argv[])
 
 extern int fnCheckRTC(void)
 {
-    if ((!(simDS1307.bTime.ucSeconds & 0x80)) && (simDS1307.bTime.ucControl & 0x10)) {
-        if (simDS1307.bTime.ucControl & 0x03) {
+    if (((simDS1307.bTime.ucSeconds & 0x80) == 0) && ((simDS1307.bTime.ucControl & 0x10) != 0)) {
+        if ((simDS1307.bTime.ucControl & 0x03) != 0) {
             return 1;                                                    // fastest rate possible
         }
         else {
             static unsigned char ucRTC_Output = 0;
-            if (++ucRTC_Output >= (500/TICK_RESOLUTION)) {
+            if (++ucRTC_Output >= (500000/(TICK_RESOLUTION))) {
                 ucRTC_Output = 0;
                 return 1;                                                // 1 Hz TICK rate
             }
         }
     }
-    if (!(simPCF2129A.bTime.ucControl1 & 0x20)) {                        // {9} if the RTC is not stopped
+    if ((simPCF2129A.bTime.ucControl1 & 0x20) == 0) {                    // {9} if the RTC is not stopped
         if (simPCF2129A.bTime.ucControl1 & 0x01) {                       // if seconds interrupt is enabled
             static unsigned char ucRTC_Output = 0;
-            if (++ucRTC_Output >= (500/TICK_RESOLUTION)) {
+            if (++ucRTC_Output >= (500000/(TICK_RESOLUTION))) {
                 ucRTC_Output = 0;
                 return 1;                                                // 1 Hz TICK rate
             }
@@ -1392,10 +1392,10 @@ extern int fnCheckRTC(void)
     return 0;
 }
 
-unsigned char fnSimIIC_devices(unsigned char ucType, unsigned char ucData)
+unsigned char fnSimI2C_devices(unsigned char ucType, unsigned char ucData)
 {
     switch (ucType) {
-    case IIC_ADDRESS:
+    case I2C_ADDRESS:
         if ((ucData & ~0x01) == simDS1307.address) {                     // DS1307 is being addressed
             simDS1307.ucState = 1;
             simDS1307.ucRW = (ucData & 0x01);
@@ -1523,7 +1523,7 @@ unsigned char fnSimIIC_devices(unsigned char ucType, unsigned char ucData)
         fnResetOthers((unsigned char)(ucData & ~0x01));
         break;
 
-    case IIC_TX_DATA:
+    case I2C_TX_DATA:
         if (simDS1307.ucState == 1) {                                    // DS1307 is being written to
             simDS1307.ucInternalPointer = ucData;
             simDS1307.ucState++;
@@ -1822,7 +1822,7 @@ unsigned char fnSimIIC_devices(unsigned char ucType, unsigned char ucData)
         }
         break;
 
-    case IIC_RX_DATA:
+    case I2C_RX_DATA:
         if (simDS1307.ucRW && (simDS1307.ucState == 1)) {
             unsigned char *ptr = (unsigned char *)&simDS1307.bTime;
             ptr += simDS1307.ucInternalPointer++;
@@ -2035,8 +2035,8 @@ unsigned char fnSimIIC_devices(unsigned char ucType, unsigned char ucData)
         }
         break;
 
-    case IIC_RX_COMPLETE:
-    case IIC_TX_COMPLETE:
+    case I2C_RX_COMPLETE:
+    case I2C_TX_COMPLETE:
         fnResetOthers(0);
         break;
     }

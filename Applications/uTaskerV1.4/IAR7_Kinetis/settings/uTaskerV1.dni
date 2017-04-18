@@ -1,5 +1,5 @@
 [DebugChecksum]
-Checksum=1567166440
+Checksum=148078236
 [DisAssemblyWindow]
 NumStates=_ 1
 State 1=_ 1
@@ -42,6 +42,7 @@ TraceBufferSize=0x00010000
 TraceStallIfFIFOFull=0x00000000
 TracePortSize=0x00000004
 CStepIntDis=_ 0
+LeaveTargetRunning=_ 0
 [InterruptLog]
 LogEnabled=0
 SumEnabled=0
@@ -76,14 +77,6 @@ MemConfigValue=C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.2_2\arm\C
 FirstRun=0
 [ArmDriver]
 EnableCache=1
-[CallStackLog]
-Enabled=0
-[DriverProfiling]
-Enabled=0
-Mode=1
-Graph=0
-Symbiont=0
-Exclusions=
 [PE_STARTUP]
 CPUTARGETTYPENAME=_ "ARM Processor - Autodetect"
 jtag_numbits_pre_ir=_ "0"
@@ -161,9 +154,6 @@ ItmLogPorts=0
 ItmLogFile=$PROJ_DIR$\ITM.log
 PowerForcePC=1
 PowerConnectPC=1
-[Trace1]
-Enabled=0
-ShowSource=1
 [ETMTraceWindow]
 PortWidth=4
 PortMode=0
@@ -187,17 +177,8 @@ EventEXC=0
 EventFOLD=0
 EventLSU=0
 EventSLEEP=0
-[Log file]
-LoggingEnabled=_ 0
-LogFile=_ ""
-Category=_ 0
-[TermIOLog]
-LoggingEnabled=_ 0
-LogFile=_ ""
-[Breakpoints2]
-Count=0
-[Disassemble mode]
-mode=3
+[PEMICRODriver]
+PEM_LeaveTargetRunning=0x00000000
 [Breakpoints]
 Bp0=_ "STD_CODE" "{C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Hardware\Kinetis\kinetis_USB_OTG.h}.711.1" 0 0 0 0 "" 0 "" 0
 Bp1=_ "STD_CODE" "{C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Applications\uTaskerV1.4\usb_application.c}.2375.5" 0 0 0 0 "" 0 "" 0
@@ -214,6 +195,31 @@ Bp11=_ "STD_CODE" "{C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Har
 Bp12=_ "STD_CODE" "0x000038E6" 0 0 0 0 "" 0 "" 0
 Bp13=_ "STD_CODE" "{C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Hardware\Kinetis\kinetis_ADC.h}.502.1" 1 0 0 0 "" 0 "" 0
 Count=14
+[Trace1]
+Enabled=0
+ShowSource=1
+[Disassemble mode]
+mode=3
+[Breakpoints2]
+Bp0=_ 0 "EMUL_CODE" "0x000005AC" 0 0 1 "" 0 "" 0
+Count=1
+[Log file]
+LoggingEnabled=_ 0
+LogFile=_ ""
+Category=_ 0
+[TermIOLog]
+LoggingEnabled=_ 0
+LogFile=_ ""
 [Aliases]
 Count=0
 SuppressDialog=0
+[DriverProfiling]
+Enabled=0
+Mode=1
+Graph=0
+Symbiont=0
+Exclusions=
+[CallStackLog]
+Enabled=0
+[CallStackStripe]
+ShowTiming=1

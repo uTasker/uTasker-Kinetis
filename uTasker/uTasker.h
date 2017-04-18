@@ -11,7 +11,7 @@
     File:      uTasker.h
     Project:   Single Chip Embedded Internet
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2017
     *********************************************************************
     11.05.2007 UTASK_TASK used consistently for node ids
     23.08.2007 enabled flag added to Timer table                         {1}
@@ -22,14 +22,26 @@
     02.02.2014 Add UTASKER_POLLING                                       {4}
     22.07.2014 Add UTASKER_ERROR and uGetTaskState()                     {5}
     06.11.2015 Modify fnStackFree() to allow worst-case used stack to be returned {6}
+    31.01.2017 Add TICK_UNIT_MS() and TICK_UNIT_US()                     {7}
 
 */
 
 #if !defined __UTASKER__
 #define __UTASKER__
 
+#define TICK_UNIT_MS(T) (T * 1000)                                       // {7} tick is defined in ms
+#define TICK_UNIT_US(T) (T)                                              // {7} tick is defined in us
+#if defined _WINDOWS
+    #if _TICK_RESOLUTION < 1000                                          // limit tick to 1ms when simulating
+        #define TICK_RESOLUTION (1000)
+    #else
+        #define TICK_RESOLUTION (_TICK_RESOLUTION)
+    #endif
+#else
+    #define TICK_RESOLUTION (_TICK_RESOLUTION)
+#endif
 
-#define SEC     (1000 / TICK_RESOLUTION)                                 // used for sec conversions
+#define SEC     (1000000 / TICK_RESOLUTION)                              // {7} used for sec conversions
 
 
 /*********************************** uTaster states *************************************/

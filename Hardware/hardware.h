@@ -11,7 +11,7 @@
     File:      hardware.h
     Project:   Single Chip Embedded Internet
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2017
     *********************************************************************
     01.03.2007 fnGetFlashAdd() added
     30.03.2007 fnPutFlashAdd() added
@@ -28,7 +28,7 @@
     23.05.2008 Add fnGetDMACount()
     02.06.2008 Add fnUpdateADC()
     28.06.2008 Add SST SPI FLASH parts                                   {2}
-    27.08.2008 Modify fnTxIIC Channel parameter to QUEUE_HANDLE          {3}
+    27.08.2008 Modify fnTxI2C Channel parameter to QUEUE_HANDLE          {3}
     06.10.2008 Move USB simulator defines to this file                   {4}
     18.10.2008 Add USB FIFO routines                                     {5}
     13.02.2009 Add fnDelayLoop() for simple but accurate us delay loops  {6}
@@ -72,6 +72,8 @@
     04.10.2015 Change fnGetUSB_HW() parameter                            {44}
     23.12.2015 Add parameter to fnActivateHWEndpoint()                   {45}
     12.01.2016 Add fnSetFragmentMode()                                   {46}
+    15.02.2016 Add fnDMA_BufferReset()                                   {47}
+    31.01.2017 Add fnVirtualWakeupInterruptHandler()                     {48}
 
 */
 
@@ -167,8 +169,8 @@ extern void fnConfigUSB(QUEUE_HANDLE Channel, USBTABLE *pars);           // conf
 
 // I2C interface support
 //
-extern void fnConfigIIC(IICTABLE *pars);                                 // configure IIC interface
-extern void fnTxIIC(IICQue *ptIICQue, QUEUE_HANDLE Channel);             // start transmission of an IIC buffer {3}
+extern void fnConfigI2C(I2CTABLE *pars);                                 // configure I2C interface
+extern void fnTxI2C(I2CQue *ptI2CQue, QUEUE_HANDLE Channel);             // start transmission of an I2C buffer {3}
 
 // I2C device simulation                                                 {32}
 //
@@ -244,10 +246,24 @@ extern void fnUpdateADC(int iChannel);
 extern DELAY_LIMIT fnSetHardwareTimer(DELAY_LIMIT *hw_delay);            // start the hardware timer with this ms delay value
 extern DELAY_LIMIT fnStopHW_Timer(void);                                 // stop the hardware timer
 
+// Buffer DMA                             
+//
+extern void fnDMA_BufferReset(int iChannel, int iAction);                // {47}
+    #define DMA_BUFFER_RESET     0                                       // disable DMA and reset the buffer (but don't re-enable yet)
+    #define DMA_BUFFER_START     1                                       // start DMA operation (must have been configured previously)
+    #define DMA_BUFFER_RESTART   2                                       // reset buffer and restart immediately
+
 // Low power
 //
 extern int  fnGetLowPowerMode(void);                                     // {43}
 extern void fnSetLowPowerMode(int);
+#if defined LOW_POWER_CYCLING_MODE
+    extern int fnVirtualWakeupInterruptHandler(int iDeepSleep);          // {48}
+    extern int iLowPowerLoopMode;
+    #define LOW_POWER_CYCLING_DISABLED 0
+    #define LOW_POWER_CYCLING_PAUSED   1
+    #define LOW_POWER_CYCLING_ENABLED  2
+#endif
 
 extern void fnResetBoard(void);
 #if !defined start_application

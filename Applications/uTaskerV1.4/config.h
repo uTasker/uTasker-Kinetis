@@ -11,8 +11,9 @@
     File:      config.h
     Project:   uTaskerV1.4 project
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2017
     **********************************************************************
+    02.02.2017 Adapt for us tick resolution (_TICK_RESOLUTION)
     
 */
 
@@ -22,9 +23,13 @@
 
 #if !defined _ASSEMBLER_CONFIG                                           // remove all following when used for assembler configuration
 
-#if defined _CODE_WARRIOR_CF
-    #pragma const_strings on                                             // ensure strings are of const type when compiling with CodeWarrior
-#endif
+/////////////////////////////////////////////////////////////////////////
+//                                                                       // new users who would like to see just a blinking LED before enabling the project's many powerful features can set this
+//#define BLINKEY                                                        // it give simplest scheduling of a single task called at 200ms rate that retriggers the watchdog and toggles respective the board's heartbeat LED
+//                                                                       // 
+/////////////////////////////////////////////////////////////////////////
+
+#define _TICK_RESOLUTION     TICK_UNIT_MS(50)                            // 50ms system tick period - max possible at 50MHz SYSTICK would be about 335ms !
 
 #if defined _WINDOWS
     #define MEM_FACTOR 1.0                                               // Windows tends to use more memory so expand heap slightly
@@ -114,11 +119,12 @@
 
 //#define EMCRAFT_K61F150M                                               // K processors Cortex M4 with Ethernet, USB, encryption, tamper, key storage protection area
 
-//#define FRDM_K64F                                                      // next generation K processors Cortex M4 with Ethernet, USB, encryption, tamper, key storage protection area
-//#define TWR_K64F120M
+//#define FRDM_K64F                                                      // next generation K processors Cortex M4 with Ethernet, USB, encryption, tamper, key storage protection area - freedom board http://www.utasker.com/kinetis/FRDM-K64F.html
+//#define TWR_K64F120M                                                   // tower board http://www.utasker.com/kinetis/TWR-K64F120M.html
 //#define TEENSY_3_5                                                     // USB development board with K64FX512 - http://www.utasker.com/kinetis/TEENSY_3.5.html
 //#define FreeLON                                                        // K64 based with integrated LON
-//#define TWR_K65F180M
+//#define TWR_K65F180M                                                   // tower board http://www.utasker.com/kinetis/TWR-K65F180M.html
+//#define FRDM_K66F                                                      // freedom board http://www.utasker.com/kinetis/FRDM-K66F.html
 #define TEENSY_3_6                                                       // USB development board with K66FX1M0 - http://www.utasker.com/kinetis/TEENSY_3.6.html
 
 //#define TWR_K70F120M                                                   // K processors Cortex M4 with graphical LCD, Ethernet, USB, encryption, tamper
@@ -547,6 +553,15 @@
     #define KINETIS_K60                                                  // specify the sub-family
     #define KINETIS_REVISION_2
     #define KINETIS_K64                                                  // extra sub-family type precision
+#elif defined FRDM_K66F
+    #define TARGET_HW            "FRDM-K66F"
+    #define OUR_HEAP_SIZE        (HEAP_REQUIREMENTS)((48 * 1024) * MEM_FACTOR) // large SRAM parts
+    #define KINETIS_MAX_SPEED    180000000
+    #define KINETIS_K_FPU                                                // part with floating point unit
+    #define KINETIS_K60                                                  // specify the sub-family
+    #define KINETIS_REVISION_2
+    #define KINETIS_K66                                                  // extra sub-family type precision
+    #define USB_HS_INTERFACE                                             // use HS interface rather than FS interface
 #elif defined TEENSY_3_6
     #define TARGET_HW            "Teensy 3.6 (K66FX1M0)"
     #define OUR_HEAP_SIZE        (HEAP_REQUIREMENTS)((48 * 1024) * MEM_FACTOR) // large SRAM parts
@@ -631,11 +646,6 @@
     #define OUR_HEAP_SIZE        (HEAP_REQUIREMENTS)((30 * 1024) * MEM_FACTOR)
 #endif
 
-#if defined KL43Z_256_32_CL
-    #define TICK_RESOLUTION      10                                      // 0 ms system time period - max possible at 50MHz SYSTICK would be about 335ms !
-#else
-    #define TICK_RESOLUTION      50                                      // 50 ms system time period - max possible at 50MHz SYSTICK would be about 335ms !
-#endif
 
 
 // Specify the parameter system and a file for use by FTP, HTML and such functions
@@ -811,7 +821,7 @@
 #endif
 
 #define SERIAL_INTERFACE                                                 // enable serial interface driver
-#if defined SERIAL_INTERFACE
+#if !defined BLINKEY && defined SERIAL_INTERFACE
   //#define FREEMASTER_UART                                              // UART for run-time debugging use
   //#define UART_EXTENDED_MODE                                           // required for 9-bit mode
   //    #define SERIAL_MULTIDROP_TX                                      // enable 9-bit support in the transmission direction
@@ -1098,14 +1108,14 @@
 #endif
 
 #if !defined DEVICE_WITHOUT_ETHERNET && !defined K70F150M_12M && !defined TEENSY_3_5 && !defined TEENSY_3_6
-    #define ETH_INTERFACE                                                // enable Ethernet interface driver
+  //#define ETH_INTERFACE                                                // enable Ethernet interface driver
 #elif defined TEENSY_3_1 || defined TEENSY_LC
   //#define ETH_INTERFACE                                                // enable external Ethernet interface driver
     #if defined ETH_INTERFACE
         #define ENC424J600_INTERFACE                                     // using ENC424J600
     #endif
 #endif
-#if defined ETH_INTERFACE || defined USB_CDC_RNDIS
+#if (defined ETH_INTERFACE || defined USB_CDC_RNDIS) && !defined BLINKEY
     #define MAC_DELIMITER  '-'                                           // used for display and entry of mac addresses
     #define IPV6_DELIMITER ':'                                           // used for display and entry of IPV6 addresses
     #define NUMBER_LAN     1                                             // one physical interface needed for LAN
@@ -1750,6 +1760,41 @@
 #define SUPPORT_DOUBLE_QUEUE_WRITES                                      // allow double queue writes to improve efficiency of long queue copies
 //#define MULTISTART                                                     // enable a board to user multiple task configurations
 //#define PERIODIC_TIMER_EVENT                                           // delayed and periodic tasks are schedule with timer events if enabled (otherwise they are simply scheduled)
+
+
+#if defined BLINKEY                                                      // if the BLINKEY operation is defined we ensure that the following are disabled to give simplest configuration
+    #undef USE_MAINTENANCE
+    #undef USB_INTERFACE
+    #undef USB_HOST_SUPPORT
+    #undef SERIAL_INTERFACE
+    #undef IIC_INTERFACE
+    #undef CAN_INTERFACE
+    #undef SUPPORT_KEY_SCAN
+    #undef ETH_INTERFACE
+    #undef SUPPORT_GLCD
+    #undef SUPPORT_OLED
+    #undef SUPPORT_GLCD
+    #undef CMSIS_DSP_CFFT
+    #undef CRYPTOGRAPHY
+    #undef SDCARD_SUPPORT
+    #undef USB_MSD_HOST
+    #undef UTFAT_LFN_READ
+    #undef UTFAT_WRITE
+    #undef UTFAT_EXPERT_FUNCTIONS
+    #undef FLASH_FAT
+    #undef SPI_FLASH_FAT
+    #undef FLASH_FILE_SYSTEM
+    #undef SPI_FILE_SYSTEM
+    #undef USE_PARAMETER_BLOCK
+    #undef INTERNAL_USER_FILES
+    #undef ACTIVE_FILE_SYSTEM
+    #undef MANAGED_FILES
+    #undef UTMANAGED_FILE_COUNT
+    #undef GLOBAL_TIMER_TASK
+    #undef USE_MODBUS
+    #undef QUICK_DEV_TASKS
+    #define NO_FLASH_SUPPORT
+#endif
 
 // Project includes are set here for all files in the correct order
 //

@@ -11,12 +11,16 @@
     File:      kinetis_ADC.h
     Project:   Single Chip Embedded Internet
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2017
     *********************************************************************
+    03.06.2013 Add ADC result to interrupt call-back                     {41}
+    30.09.2013 Add ADC A/B input multiplexer control                     {54}
+    27.10.2013 Add ADC DMA configuration                                 {57}
     13.05.2015 Add low/high threshold single shot interrupt mode         {1}
     04.12.2015 Add Kinetis KE ADC mode                                   {2}
     23.12.2015 Add automatic ADC DMA buffer repetition                   {3}
     04.01.2016 Allow free-run ADC with DMA                               {4}
+    06.03.2017 Allow alternative DMA trigger sources                     {5}
 
 */
 
@@ -142,11 +146,16 @@ static unsigned char fnSetADC_channel(unsigned char ucADC_channel, int iDiffMode
         _EXCEPTION("Selecting invalid ADC channel!");                    // invalid channels                                     
     }
         #endif
-    if (iDiffMode && ((ucADC_channel <= ADC_SC1A_ADCH_D3) || ((ucADC_channel >= ADC_SC1A_ADCH_TEMP_SENS) && (ucADC_channel <= ADC_SC1A_ADCH_VREFSH)))) { // set up channel in differential mode (channels 0..3, temperature, bandgap and VREFSH)
+    if ((iDiffMode != 0) && ((ucADC_channel <= ADC_SC1A_ADCH_D3) || ((ucADC_channel >= ADC_SC1A_ADCH_TEMP_SENS) && (ucADC_channel <= ADC_SC1A_ADCH_VREFSH)))) { // set up channel in differential mode (channels 0..3, temperature, bandgap and VREFSH)
         return (ucADC_channel | ADC_SC1A_DIFF);
     }
     else {                                                               // single ended (channels 0..23, temperature, bandgap and VREFSH and VREFSL)
         switch (ucADC_channel) {
+        case ADC_SE23_SINGLE:
+        #if defined KINETIS_KL43
+            _CONFIG_PERIPHERAL(E, 30, PE_30_ADC0_SE23);                  // ensure that the ADC pin is configured
+        #endif
+            break;
         case ADC_SE4_SINGLE:
         #if defined KINETIS_KL43
             _CONFIG_PERIPHERAL(E, 21, PE_21_ADC0_SE4);                   // ensure that the ADC pin is configured
@@ -423,7 +432,7 @@ static unsigned short fnConvertADCvalue(KINETIS_ADC_REGS *ptrADC, unsigned short
                 }
                 if ((ptrADC_settings->int_adc_mode & ADC_CONFIGURE_CHANNEL) != 0) { // if a channel is to be configured
     #if !defined KINETIS_KE
-                    ucChannelConfig = fnSetADC_channel(ucADC_channel, ((ptrADC_settings->int_adc_mode & ADC_DIFFERENTIAL) != 0)); // check that the ADC channel is valid and prepare configuration value
+                    ucChannelConfig = fnSetADC_channel(ucADC_channel, ((ptrADC_settings->int_adc_mode & ADC_DIFFERENTIAL_INPUT) != 0)); // check that the ADC channel is valid and prepare configuration value
                     if ((ptrADC_settings->int_adc_mode & ADC_HW_TRIGGERED) != 0) { // channel B is only valid in hardware triggered mode
                         ptrADC->ADC_SC1B = fnSetADC_channel(ptrADC_settings->int_adc_bit_b, (ptrADC_settings->int_adc_mode & ADC_DIFFERENTIAL_B));
                     }
@@ -432,8 +441,20 @@ static unsigned short fnConvertADCvalue(KINETIS_ADC_REGS *ptrADC, unsigned short
     #if !defined DEVICE_WITHOUT_DMA
                         if ((ptrADC_settings->int_adc_mode & (ADC_FULL_BUFFER_DMA | ADC_HALF_BUFFER_DMA)) != 0) { // {57} if DMA operation is being specified
                             unsigned long *ptrADC_result = (unsigned long *)((unsigned long)ptrADC + 0x010); // ADC channel as result register
+                            unsigned long ulDMA_rules = (DMA_DIRECTION_INPUT | DMA_HALF_WORDS);
+                            unsigned char ucTriggerSource = ptrADC_settings->ucDmaTriggerSource; // {5}
                             ptrADC->ADC_SC2 |= ADC_SC2_DMAEN;            // enable DMA trigger on ADC conversion end
-                            fnConfigDMA_buffer(ptrADC_settings->ucDmaChannel, (DMAMUX_CHCFG_SOURCE_ADC0 + ptrADC_settings->int_adc_controller), ptrADC_settings->ulADC_buffer_length, ptrADC_result, ptrADC_settings->ptrADC_Buffer, ((ptrADC_settings->int_adc_mode & ADC_FULL_BUFFER_DMA_AUTO_REPEAT) != 0), ((ptrADC_settings->int_adc_mode & ADC_HALF_BUFFER_DMA) != 0), ptrADC_settings->dma_int_handler, ptrADC_settings->dma_int_priority, 0); // source is the ADC result register and destination is the ADC buffer
+                            if ((ptrADC_settings->int_adc_mode & ADC_FULL_BUFFER_DMA_AUTO_REPEAT) != 0) {
+                                ulDMA_rules |= DMA_AUTOREPEAT;
+                            }
+                            if ((ptrADC_settings->int_adc_mode & ADC_HALF_BUFFER_DMA) != 0) {
+                                ulDMA_rules |= DMA_HALF_BUFFER_INTERRUPT;
+                            }
+                            if (ucTriggerSource == 0) {                  // {5} if the default is defined
+                                ucTriggerSource = (DMAMUX_CHCFG_SOURCE_ADC0 + ptrADC_settings->int_adc_controller);
+                            }
+                            fnConfigDMA_buffer(ptrADC_settings->ucDmaChannel, ucTriggerSource, ptrADC_settings->ulADC_buffer_length, ptrADC_result, ptrADC_settings->ptrADC_Buffer, ulDMA_rules, ptrADC_settings->dma_int_handler, ptrADC_settings->dma_int_priority); // source is the ADC result register and destination is the ADC buffer
+                            fnDMA_BufferReset(ptrADC_settings->ucDmaChannel, DMA_BUFFER_START);
                         }
                         else if ((ptrADC_settings->int_adc_mode & ADC_LOOP_MODE) == 0) { // single shot mode {4}
     #endif
@@ -489,6 +510,36 @@ static unsigned short fnConvertADCvalue(KINETIS_ADC_REGS *ptrADC, unsigned short
     #endif
             }
             if (((ptrADC_settings->int_adc_mode & (ADC_GET_RESULT)) != 0) && (ptrADC_settings->int_adc_result != 0)) { // if there is a result structure
+    #if defined _WINDOWS
+                switch (ptrADC_settings->int_adc_controller) {
+                case 0:
+                    if (IS_POWERED_UP(6, SIM_SCGC6_ADC0) == 0) {
+                        _EXCEPTION("Trying to read from ADC0 that is not powered up!");
+                    }
+                    break;
+        #if ADC_CONTROLLERS > 1
+                case 1:
+                    if (IS_POWERED_UP(3, SIM_SCGC3_ADC1) == 0) {
+                        _EXCEPTION("Trying to read from ADC1 that is not powered up!");
+                    }
+                    break;
+        #endif
+        #if ADC_CONTROLLERS > 2
+                case 2:
+                    if (IS_POWERED_UP(6, SIM_SCGC6_ADC2) == 0) {
+                        _EXCEPTION("Trying to read from ADC2 that is not powered up!");
+                    }
+                    break;
+        #endif
+        #if ADC_CONTROLLERS > 3
+                case 3:
+                    if (IS_POWERED_UP(3, SIM_SCGC3_ADC3) == 0) {
+                        _EXCEPTION("Trying to read from ADC3 that is not powered up!");
+                    }
+                    break;
+        #endif
+                }
+    #endif
                 if (((ptrADC_settings->int_adc_mode & ADC_READ_ONLY) == 0) && ((ptrADC->ADC_SC1A & ADC_SC1A_AIEN) == 0)) { // no interrupt and not simple read
                     while ((ptrADC->ADC_SC1A & ADC_SC1A_COCO) == 0) {    // wait for conversion to complete
     #if defined _WINDOWS

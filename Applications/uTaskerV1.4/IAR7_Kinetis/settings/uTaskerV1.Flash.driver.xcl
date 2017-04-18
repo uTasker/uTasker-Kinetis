@@ -6,13 +6,27 @@
 
 "-p" 
 
-"C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.2_2\arm\CONFIG\debugger\Freescale\MK64FN1M0xxx12.ddf" 
+"D:\Programs\IAR Systems\Embedded Workbench 7.5\arm\CONFIG\debugger\NXP\MK66FN2M0xxx18.ddf" 
 
 "--drv_verify_download" 
 
 "--semihosting=none" 
 
-"--device=MK64FN1M0xxx12" 
+"--device=MK66FN2M0xxx18" 
+
+"--drv_communication=USB0" 
+
+"--drv_interface_speed=auto" 
+
+"--jlink_initial_speed=32" 
+
+"--jlink_reset_strategy=0,0" 
+
+"--drv_interface=SWD" 
+
+"--drv_catch_exceptions=0x000" 
+
+"--drv_swo_clock_setup=120000000,0,2000000" 
 
 
 

@@ -11,7 +11,7 @@
     File:      simkinetis.h
     Project:   Single Chip Embedded Internet
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2017
     *********************************************************************
     04.03.2012 Add NAND Flash controller                                 {1}
     17.03.2012 Add ADC                                                   {2}
@@ -42,6 +42,10 @@
     22.03.2015 Add MSCAN                                                 {27}
     14.12.2015 Add I2S                                                   {28}
     09.01.2016 Add QSPI and USB PHY                                      {29}
+    02.06.2016 Add ACMP and CMP                                          {30}
+    09.12.2016 Add PWT                                                   {31}
+    11.02.2017 Add system clock generator                                {32}
+    14.02.2017 Add LTC                                                   {33}
 
 */  
 
@@ -1058,7 +1062,7 @@ unsigned long SPI_RXFR3;
 #if defined KINETIS_KE
 typedef struct stKINETIS_KBI                                             // {22}
 {
-    #if defined KINETIS_KE04 || defined KINETIS_KE06 || defined KINETIS_KEA128
+    #if defined KINETIS_KE04 || defined KINETIS_KE06 || defined KINETIS_KEA64 || defined KINETIS_KEA128
     unsigned long KBI_PE;
     unsigned long KBI_ES;
     unsigned long KBI_SC;
@@ -1322,7 +1326,7 @@ unsigned long USBPHY_TRIM_OVERRIDE_EN_TOG;
 typedef struct stKINETIS_FTFL
 {
 #if defined KINETIS_KE
-    #if defined KINETIS_KE04 || defined KINETIS_KE06 || defined KINETIS_KEA128
+    #if defined KINETIS_KE04 || defined KINETIS_KE06 || defined KINETIS_KEA64 || defined KINETIS_KEA128
         unsigned char ucRes0;
         unsigned char FTMRH_FCCOBIX;
         unsigned char FTMRH_FSEC;
@@ -1431,6 +1435,13 @@ unsigned long I2S_MCR;
 } KINETIS_I2S;
 #endif
 
+#if defined PWT_AVAILABLE
+typedef struct st_KINETIS_PWT                                            // {31}
+{
+    unsigned long PWT_R1;
+    unsigned long PWT_R2;
+} KINETIS_PWT;
+#endif
 
 typedef struct stKINETIS_PDB                                             // {12}
 {
@@ -1632,6 +1643,7 @@ unsigned long LPTMR_CNR;
 } KINETIS_LPTMR;
 #endif
 
+#if !defined CROSSBAR_SWITCH_LITE
 typedef struct stKINETIS_AXBS                                            // {18}
 {
 unsigned long AXBS_PRS0;
@@ -1682,6 +1694,7 @@ unsigned long AXBS_MGPCR6;
 unsigned long ulResm6[63];
 unsigned long AXBS_MGPCR7;
 } KINETIS_AXBS;
+#endif
 
 typedef struct stKINETIS_TSI
 {
@@ -1729,16 +1742,16 @@ typedef struct stKINETIS_SIM
 #if defined KINETIS_KE
     unsigned long SIM_SRSID;
     unsigned long SIM_SOPT0;
-    #if defined KINETIS_KE04 || defined KINETIS_KE06 || defined KINETIS_KEA128
+    #if defined KINETIS_KE04 || defined KINETIS_KE06 || defined KINETIS_KEA64 || defined KINETIS_KEA128
         unsigned long SIM_SOPT1;
     #endif
     unsigned long SIM_PINSEL0;
-    #if defined KINETIS_KE04 || defined KINETIS_KE06 || defined KINETIS_KEA128
+    #if defined KINETIS_KE04 || defined KINETIS_KE06 || defined KINETIS_KEA64 || defined KINETIS_KEA128
         unsigned long SIM_PINSEL1;
     #endif
     unsigned long SIM_SCGC;
     unsigned long SIM_UUIDL;
-    #if defined KINETIS_KE04 || defined KINETIS_KE06 || defined KINETIS_KEA128
+    #if defined KINETIS_KE04 || defined KINETIS_KE06 || defined KINETIS_KEA64 || defined KINETIS_KEA128
         unsigned long SIM_UUIDML;
         unsigned long SIM_UUIDMH;
         unsigned long SIM_CLKDIV;
@@ -1780,7 +1793,7 @@ typedef struct stKINETIS_SIM
     unsigned long SIM_SCGC6;
     unsigned long SIM_SCGC7;
     unsigned long SIM_CLKDIV1;
-    #if defined KINETIS_KL
+    #if defined KINETIS_KL && !defined KINETIS_KL82
         unsigned long ulRes2b;
     #else
         unsigned long SIM_CLKDIV2;
@@ -1795,7 +1808,7 @@ typedef struct stKINETIS_SIM
     unsigned long SIM_UIDMH;
     unsigned long SIM_UIDML;
     unsigned long SIM_UIDL;
-    #if defined KINETIS_KL                                               // {15}
+    #if defined KINETIS_KL && !defined KINETIS_KL82                      // {15}
         unsigned long ulRes3[39];
         unsigned long SIM_COPC;
         unsigned long SIM_SRVCOPC;
@@ -1875,7 +1888,7 @@ typedef struct stKINETIS_SIM
     } KINETIS_PORT;
 #endif
 
-#if !defined KINETIS_KL
+#if !defined KINETIS_KL || defined KINETIS_KL82
     typedef struct stKINETIS_WDOG
     {
     #if defined KINETIS_KE
@@ -1923,33 +1936,75 @@ unsigned char EWM_CMPH;
     unsigned char ICS_C4;
     unsigned char ICS_S;
     } KINETIS_ICS;
+#elif defined KINETIS_WITH_SCG                                           // {32}
+    typedef struct stKINETIS_SCG
+    {
+    unsigned long SCG_VERID;
+    unsigned long SCG_PARAM;
+    unsigned long ulRes0;
+    unsigned long SCG_CSR;
+    unsigned long SCG_RCCR;
+    unsigned long SCG_VCCR;
+    unsigned long SCG_HCCR;
+    unsigned long SCG_CLKOUTCNFG;
+    unsigned long ulRes1[56];
+    unsigned long SCG_SOSCCSR;
+    unsigned long SCG_SOSCDIV;
+    unsigned long SCG_SOSCCFG;
+    unsigned long ulRes2[62];
+    unsigned long SCG_SIRCCSR;
+    unsigned long SCG_SIRCDIV;
+    unsigned long SCG_SIRCCFG;
+    unsigned long ulRes3[62];
+    unsigned long SCG_FIRCCSR;
+    unsigned long SCG_FIRCDIV;
+    unsigned long SCG_FIRCCFG;
+    unsigned long ulRes4;
+    unsigned long SCG_FIRCTCFG;
+    unsigned long SCG_FIRCSTAT;
+    unsigned long ulRes5[186];
+    unsigned long SCG_SPPLCCSR;
+    unsigned long SCG_SPPLCDIV;
+    unsigned long SCG_SPPLCFG;
+    } KINETIS_SCG;
 #else
     typedef struct stKINETIS_MCG
     {
     unsigned char MCG_C1;
     unsigned char MCG_C2;
+    #if defined KINETIS_WITH_MCG_LITE
+    unsigned char ucRes0[4];
+    #else
     unsigned char MCG_C3;
     unsigned char MCG_C4;
     unsigned char MCG_C5;
     unsigned char MCG_C6;
+    #endif
     unsigned char MCG_S;
-    unsigned char ucRes0;
-    #if defined KINETIS_K_FPU || (KINETIS_MAX_SPEED > 100000000)
+    unsigned char ucRes1;
+    #if defined KINETIS_WITH_MCG_LITE
         unsigned char MCG_SC;
-        unsigned char ucRes1;
+        unsigned char ucRes2[0x10];
+        unsigned char MCG_MC;
+    #else
+        #if defined KINETIS_K_FPU || (KINETIS_MAX_SPEED > 100000000)
+        unsigned char MCG_SC;
+        unsigned char ucRes2;
         unsigned char MCG_ATCVH;
         unsigned char MCG_ATCVL;
         unsigned char MCG_C7;
         unsigned char MCG_C8;
+        unsigned char ucRes3;
         unsigned char MCG_C10;
         unsigned char MCG_C11;
         unsigned char MCG_C12;
         unsigned char MCG_S2;
-    #else
+        #else
         unsigned char MCG_ATCM;
-        unsigned char ucRes1;
+        unsigned char ucRes2;
         unsigned char MCG_ATCVH;
         unsigned char MCG_ATCVL;
+        #endif
     #endif
     } KINETIS_MCG;
 #endif
@@ -2299,13 +2354,6 @@ unsigned char USB_USBTRC0;
 } KINETIS_USB;
 
 
-typedef struct stKINETIS_VREF
-{
-unsigned char VREF_TRM;      
-unsigned char VREF_SC;
-} KINETIS_VREF;
-
-
 typedef struct stKINETIS_MC
 {
 unsigned char MC_SRSH;      
@@ -2320,7 +2368,7 @@ unsigned char MC_PMCTRL;
     {
     unsigned char SMC_PMPROT;
     unsigned char SMC_PMCTRL;
-    #if defined KINETIS_KL
+    #if defined KINETIS_KL || defined KINETIS_K22
         unsigned char SMC_STOPCTRL;
     #else
         unsigned char SMC_VLLSCTRL;
@@ -2335,9 +2383,41 @@ unsigned char MC_PMCTRL;
     unsigned char ucRes0[2];
     unsigned char RCM_RPFC;
     unsigned char RCM_RPFW;
+    #if defined ROM_BOOTLOADER
+    unsigned char RCM_FM;
+    #else
     unsigned char ucRes1;
+    #endif
     unsigned char RCM_MR;
     } KINETIS_RCM;
+#endif
+
+#if defined KINETIS_KE                                                   // {30}
+    typedef struct stKINETIS_ACMP                                        // analogue comparator
+    {
+    unsigned char ACMP_CS;
+    unsigned char ACMP_C0;
+    unsigned char ACMP_C1;
+    unsigned char ACMP_C2;
+    } KINETIS_ACMP;
+#else
+    typedef struct stKINETIS_CMP                                         // comparator
+    {
+    unsigned char CMP_CR0;
+    unsigned char CMP_CR1;
+    unsigned char CMP_FPR;
+    unsigned char CMP_SCR;
+    unsigned char CMP_DACCR;
+    unsigned char CMP_MUXCR;
+    } KINETIS_CMP;
+#endif
+
+#if !defined KINETIS_KL
+    typedef struct stKINETIS_VREF                                        // VREF
+    {
+    unsigned char VREF_TRM;
+    unsigned char VREF_SC;
+    } KINETIS_VREF;
 #endif
 
 #if defined RNG_AVAILABLE
@@ -2529,16 +2609,23 @@ typedef struct stKINETIS_MCM                                             // {11}
 unsigned long ulRes0[2];
 unsigned short MCM_PLASC;
 unsigned short MCM_PLAMC;
-unsigned long MCM_CR;
-unsigned long MCM_ISR;
-unsigned long MCM_ETBCC;
-unsigned long MCM_ETBRL;
-unsigned long MCM_ETBCNT;
-unsigned long ulRes1[4];
-unsigned long MCM_PID;
+#if defined KINETIS_K02
+    unsigned long MCM_PLACR;
+    unsigned long MCM_ISCR;
+    unsigned long ulRes1[12];
+    unsigned long MCM_CPO;
+#else
+    unsigned long MCM_CR;
+    unsigned long MCM_ISR;
+    unsigned long MCM_ETBCC;
+    unsigned long MCM_ETBRL;
+    unsigned long MCM_ETBCNT;
+    unsigned long ulRes1[4];
+    unsigned long MCM_PID;
+#endif
 } KINETIS_MCM;
 
-#if defined KINETIS_K60 || defined KINETIS_K61 || defined KINETIS_K70
+#if defined CAU_V1_AVAILABLE || defined CAU_V2_AVAILABLE
 typedef struct stKINETIS_MMCAU                                           // {17}
 {
 unsigned long CAU_CASR;
@@ -2549,9 +2636,11 @@ unsigned long CAU_CA2;
 unsigned long CAU_CA3;
 unsigned long CAU_CA4;
 unsigned long CAU_CA5;
-unsigned long CAU_CA6;
-unsigned long CAU_CA7;
-unsigned long CAU_CA8;
+    #if defined CAU_V2_AVAILABLE
+    unsigned long CAU_CA6;
+    unsigned long CAU_CA7;
+    unsigned long CAU_CA8;
+    #endif
 } KINETIS_MMCAU;
 #endif
 
@@ -2675,6 +2764,72 @@ unsigned long FLEXIO_TIMCMP1;
 unsigned long FLEXIO_TIMCMP2;
 unsigned long FLEXIO_TIMCMP3;
 } KINETIS_FLEXIO;
+#endif
+
+#if defined LTC_AVAILABLE                                                // {33}
+typedef struct stKINETIS_LTC
+{
+unsigned long LTC0_MD_MDPK;
+unsigned long ulRes0;
+unsigned long LTC0_KS;
+unsigned long LTC0_DS;
+unsigned long ulRes1;
+unsigned long LTC0_ICVS;
+unsigned long ulRes2[5];
+unsigned long LTC0_COM;
+unsigned long LTC0_CTL;
+unsigned long ulRes3[2];
+unsigned long LTC0_CW;
+unsigned long ulRes4;
+unsigned long LTC0_STA;
+unsigned long LTC0_ESTA;
+unsigned long ulRes5[2];
+unsigned long LTC0_AADSZ;
+unsigned long ulRes6;
+unsigned long LTC0_IVS;
+unsigned long ulRes7;
+unsigned long LTC0_DPAMS;
+unsigned long ulRes8[5];
+unsigned long LTC0_PKASZ;
+unsigned long ulRes9;
+unsigned long LTC0_PKBSZ;
+unsigned long ulRes10;
+unsigned long LTC0_PKNSZ;
+unsigned long ulRes11;
+unsigned long LTC0_PKESZ;
+unsigned long ulRes12[26];
+unsigned long LTC0_CTX_0;
+unsigned long LTC0_CTX_1;
+unsigned long LTC0_CTX_2;
+unsigned long LTC0_CTX_3;
+unsigned long LTC0_CTX_4;
+unsigned long LTC0_CTX_5;
+unsigned long LTC0_CTX_6;
+unsigned long LTC0_CTX_7;
+unsigned long LTC0_CTX_8;
+unsigned long LTC0_CTX_9;
+unsigned long LTC0_CTX_10;
+unsigned long LTC0_CTX_11;
+unsigned long LTC0_CTX_12;
+unsigned long LTC0_CTX_13;
+unsigned long LTC0_CTX_14;
+unsigned long LTC0_CTX_15;
+unsigned long ulRes13[49];
+unsigned long LTC0_KEY_0;
+unsigned long LTC0_KEY_1;
+unsigned long LTC0_KEY_2;
+unsigned long LTC0_KEY_3;
+unsigned long LTC0_KEY_4;
+unsigned long LTC0_KEY_5;
+unsigned long LTC0_KEY_6;
+unsigned long LTC0_KEY_7;
+unsigned long ulRes14[361];
+unsigned long LTC0_FIFOSTA;
+unsigned long ulRes15[8];
+unsigned long LTC0_IFIFO;
+unsigned long ulRes16[4];
+unsigned long LTC0_OFIFO;
+} KINETIS_LTC;
 #endif
 
 #if defined KINETIS_K80
@@ -2859,6 +3014,9 @@ typedef struct stKINETIS_PERIPH
 #if I2S_AVAILABLE > 0
     KINETIS_I2S        I2S_SAI[I2S_AVAILABLE];                           // {28}
 #endif
+#if defined PWT_AVAILABLE
+    KINETIS_PWT        PWT;                                              // {31}
+#endif
 #if !defined KINETIS_KL                                                  // {15}
     KINETIS_PDB        PDB;                                              // {12}
 #endif
@@ -2876,7 +3034,7 @@ typedef struct stKINETIS_PERIPH
 #if !defined KINETIS_KE
     KINETIS_LPTMR      LPTMR;                                            // {20}
 #endif
-#if !defined KINETIS_KE && !defined KINETIS_KL
+#if !defined KINETIS_KE && !defined KINETIS_KL && !defined CROSSBAR_SWITCH_LITE
     KINETIS_AXBS       AXBS;                                             // {19}
 #endif
     KINETIS_TSI        TSI;
@@ -2886,11 +3044,14 @@ typedef struct stKINETIS_PERIPH
 #else
     KINETIS_PORT       PORT[PORTS_AVAILABLE];
 #endif
-#if !defined KINETIS_KL
+#if !defined KINETIS_KL || defined KINETIS_KL82
     KINETIS_WDOG       WDOG;
 #endif
 #if defined CHIP_HAS_FLEXIO                                              // {23}
     KINETIS_FLEXIO     FLEXIO;
+#endif
+#if defined LTC_AVAILABLE
+    KINETIS_LTC        LTC;                                              // {33}
 #endif
 #if defined KINETIS_K80
     KINETIS_QSPI       QSPI;                                             // {29}
@@ -2900,11 +3061,13 @@ typedef struct stKINETIS_PERIPH
 #endif
 #if defined KINETIS_KE
     KINETIS_ICS        ICS;
+#elif defined KINETIS_WITH_SCG                                           // {32}
+    KINETIS_SCG        SCG;
 #else
     KINETIS_MCG        MCG;
 #endif
     KINETIS_OSC        OSC[2];
-    KINETIS_I2C        I2C[IIC_AVAILABLE];
+    KINETIS_I2C        I2C[I2C_AVAILABLE];
 #if UARTS_AVAILABLE > 0
     KINETIS_UART       UART[UARTS_AVAILABLE];
 #endif
@@ -2912,12 +3075,19 @@ typedef struct stKINETIS_PERIPH
     KINETIS_LPUART     LPUART[LPUARTS_AVAILABLE];
 #endif
     KINETIS_USB        USB;
-    KINETIS_VREF       VREF;
 #if defined KINETIS_K_FPU || defined KINETIS_KL || defined KINETIS_REVISION_2 || (KINETIS_MAX_SPEED > 100000000) // {16}
     KINETIS_SMC        SMC;                                              // {21}
     KINETIS_RCM        RCM;                                              // {5}
 #elif !defined KINETIS_KE && !defined KINETIS_KEA
     KINETIS_MC         MC;
+#endif
+#if defined KINETIS_KE                                                   // {30}
+    KINETIS_ACMP       ACMP[2];
+#else
+    KINETIS_CMP        CMP[4];
+#endif
+#if !defined KINETIS_KL
+    KINETIS_VREF       VREF;
 #endif
 #if defined RNG_AVAILABLE
     #if !defined RANDOM_NUMBER_GENERATOR_B                               // {13}
@@ -2952,7 +3122,7 @@ typedef struct stKINETIS_PERIPH
 #endif
     KINETIS_GPIO       GPIO[PORTS_AVAILABLE];
     KINETIS_MCM        MCM;                                              // {11}
-#if defined KINETIS_K60 || defined KINETIS_K61 || defined KINETIS_K70
+#if defined CAU_V1_AVAILABLE || defined CAU_V2_AVAILABLE
     KINETIS_MMCAU      MMCAU;                                            // {17}
 #endif
 
@@ -2981,6 +3151,8 @@ extern KINETIS_PERIPH kinetis;
 #define _PORTH                  7
 #define _PORTI                  8
 
+#define _GPIO_ADC               (_PORTS_AVAILABLE_)                      // dedicated ADC pins
+
 #define _PORT_EXP_0             (_PORTS_AVAILABLE_ + 1)                  // {7}
 #define _PORT_EXP_1             (_PORTS_AVAILABLE_ + 2)                  // these port numbers should be in order following the internal ports and a fictive ADC port
 #define _PORT_EXP_2             (_PORTS_AVAILABLE_ + 3)
@@ -2990,7 +3162,6 @@ extern KINETIS_PERIPH kinetis;
 #define _PORT_EXP_6             (_PORTS_AVAILABLE_ + 7)
 #define _PORT_EXP_7             (_PORTS_AVAILABLE_ + 8)
 
-#define _GPIO_ADC               20                                       // dedicated ADC pins
 
 #define _TOUCH_PORTA            30                                       // {3} touch senor input references on ports
 #define _TOUCH_PORTB            31

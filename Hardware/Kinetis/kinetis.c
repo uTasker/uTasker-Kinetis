@@ -1008,8 +1008,8 @@ extern void fnStartTick(void)
     }
     #endif
 #else                                                                    // use systick to derive the tick interrupt from
-    #define REQUIRED_MS ((1000/TICK_RESOLUTION))                         // the TICK frequency we require in kHz
-    #define TICK_DIVIDE (((CORE_CLOCK + REQUIRED_MS/2)/REQUIRED_MS) - 1) // the divide ratio required (for systick)
+    #define REQUIRED_US ((1000000/(TICK_RESOLUTION)))                    // the TICK frequency we require in MHz
+    #define TICK_DIVIDE (((CORE_CLOCK + REQUIRED_US/2)/REQUIRED_US) - 1) // the divide ratio required (for systick)
 
     #if TICK_DIVIDE > 0x00ffffff
         #error "TICK value cannot be achieved with SYSTICK at this core frequency!!"

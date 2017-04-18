@@ -11,7 +11,7 @@
     File:      WinSim.c
     Project:   uTasker project
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2017
     *********************************************************************
     28.04.2007 Added function fnGetEEPROMSize()                          {1}
     11.08.2007 Added SPI Data FLASH to support the AT45DBXXX             {2}
@@ -21,7 +21,7 @@
     21.10.2007 Add test sequence for USB enumeration                     {6}
     02.11.2007 Add RTS control support                                   {7}
     17.11.2007 Allow SPI and FLASH files system to work together         {8}
-    15.12.2007 Add IIC speed support for improved simulation accuracy    {9}
+    15.12.2007 Add I2C speed support for improved simulation accuracy    {9}
     15.12.2007 Simplified UART speed limitiation                         {10}
     23.12.2007 Extend UART speed limitiation to DMA                      {11}
     25.12.2007 Extend UART support to 4 UARTS                            {12}
@@ -84,6 +84,10 @@
     14.04.2014 Display multiple network IP/MAC addresses                 {68}
     16.05.2015 USB-CDC line coding test performed for each CDC interface {69}
     15.01.2016 Add SPI_FLASH_W25Q128 IDs                                 {70}
+    24.12.2016 Add I2C data injection                                    {71}
+    02.02.2017 Adapt for us tick resolution
+    13.02.2017 Get endpoint size of Host from endpoint 0 (kinetis)       {72}
+    28.02.2017 Increase UARTs from 6 to 8                                {73}
  
 */   
 #include <windows.h>
@@ -92,7 +96,7 @@
 #include "io.h"
 #include <sys/stat.h>
 #if _VC80_UPGRADE>=0x0600
-  #include <share.h>
+    #include <share.h>
 #endif
 
 
@@ -149,17 +153,23 @@ static unsigned long  ulChannel4Speed;                                   // {56}
 static UART_MODE_CONFIG Channel4Config;
 static unsigned long  ulChannel5Speed;
 static UART_MODE_CONFIG Channel5Config;
+static unsigned long  ulChannel6Speed;                                   // {73}
+static UART_MODE_CONFIG Channel6Config;
+static unsigned long  ulChannel7Speed;
+static UART_MODE_CONFIG Channel7Config;
 static int iChannel0Speed = 0;                                           // {10}
 static int iChannel1Speed = 0;
 static int iChannel2Speed = 0;
 static int iChannel3Speed = 0;                                           // {12}
 static int iChannel4Speed = 0;                                           // {56}
 static int iChannel5Speed = 0;
+static int iChannel6Speed = 0;                                           // {73}
+static int iChannel7Speed = 0;
                                                  
-static int iIIC_Channel0Speed = 0;                                       // {9}
-static int iIIC_Channel1Speed = 0;
-static int iIIC_Channel2Speed = 0;                                       // {28}
-static int iIIC_Channel3Speed = 0;
+static int iI2C_Channel0Speed = 0;                                       // {9}
+static int iI2C_Channel1Speed = 0;
+static int iI2C_Channel2Speed = 0;                                       // {28}
+static int iI2C_Channel3Speed = 0;
 
 #if NUMBER_EXTERNAL_SERIAL > 0                                           // {49}
     static unsigned long  ulExtChannel0Speed;
@@ -203,6 +213,10 @@ static unsigned long  ulCom4Len = 0;                                     // {56}
 static unsigned char  ucCom4Data[UART_BUFFER_LENGTH];
 static unsigned long  ulCom5Len = 0;                                     // {56}
 static unsigned char  ucCom5Data[UART_BUFFER_LENGTH];
+static unsigned long  ulCom6Len = 0;                                     // {73}
+static unsigned char  ucCom6Data[UART_BUFFER_LENGTH];
+static unsigned long  ulCom7Len = 0;
+static unsigned char  ucCom7Data[UART_BUFFER_LENGTH];
 
 #if NUMBER_EXTERNAL_SERIAL > 0                                           // {49}
     static unsigned long  ulExtCom0Len = 0;
@@ -330,26 +344,34 @@ _abort_multi:
         break;
 #endif
 
+    case INPUT_TOGGLE_NEG_ANALOG:
+        fnSimulateInputChange((unsigned char)*argv[0], (unsigned char)*argv[1], (TOGGLE_INPUT_NEG | TOGGLE_INPUT_ANALOG));
+        break;
+    case INPUT_TOGGLE_POS_ANALOG:
+        fnSimulateInputChange((unsigned char)*argv[0], (unsigned char)*argv[1], (TOGGLE_INPUT_POS | TOGGLE_INPUT_ANALOG));
+        break;
+    case INPUT_TOGGLE_POS:
+        fnSimulateInputChange((unsigned char)*argv[0], (unsigned char)*argv[1], TOGGLE_INPUT_POS);
+        break;
     case INPUT_TOGGLE_NEG:                                               // {19}
         fnSimulateInputChange((unsigned char)*argv[0], (unsigned char)*argv[1], TOGGLE_INPUT_NEG);
         break;
-
+    case INPUT_TOGGLE_ANALOG:
+        fnSimulateInputChange((unsigned char)*argv[0], (unsigned char)*argv[1], (TOGGLE_INPUT | TOGGLE_INPUT_ANALOG));
+        break;
     case INPUT_TOGGLE:
         fnSimulateInputChange((unsigned char)*argv[0], (unsigned char)*argv[1], TOGGLE_INPUT);
         break;
 
-    case RX_COM0:                                                        // the first 4 UART inputs are assigned to internal UARTs (there may be less available)
+    case RX_COM0:                                                        // the first 6 UART inputs are assigned to internal UARTs (there may be less available)
         fnSimulateSerialIn(0, (unsigned char *)argv[1], *(unsigned short *)argv[0]);
         break;
-
     case RX_COM1:
         fnSimulateSerialIn(1, (unsigned char*)argv[1], *(unsigned short *)argv[0]);
         break;
-
     case RX_COM2:
         fnSimulateSerialIn(2, (unsigned char*)argv[1], *(unsigned short *)argv[0]);
         break;
-
     case RX_COM3:                                                        // {44}
         fnSimulateSerialIn(3, (unsigned char*)argv[1], *(unsigned short *)argv[0]);
         break;
@@ -402,7 +424,13 @@ _abort_multi:
         fnSimulateModemChange(4, *(unsigned long *)argv[0], *(unsigned long *)argv[1]);
         break;
     case MODEM_COM_5:                                                    // {56}
-        fnSimulateModemChange(4, *(unsigned long *)argv[0], *(unsigned long *)argv[1]);
+        fnSimulateModemChange(5, *(unsigned long *)argv[0], *(unsigned long *)argv[1]);
+        break;
+    case MODEM_COM_6:                                                    // {73}
+        fnSimulateModemChange(6, *(unsigned long *)argv[0], *(unsigned long *)argv[1]);
+        break;
+    case MODEM_COM_7:                                                    // {73}
+        fnSimulateModemChange(7, *(unsigned long *)argv[0], *(unsigned long *)argv[1]);
         break;
     #if NUMBER_EXTERNAL_SERIAL > 0                                       //  {49}
     case MODEM_EXT_COM_0:
@@ -489,7 +517,12 @@ _abort_multi:
     case SIM_UART_CTS:
         fnSimulateModemChange((int)argv[0], (int)argv[1], ((~(int)argv[1]) & MS_CTS_ON));
         break;
-
+#if defined I2C_INTERFACE
+    case SIM_I2C_OUT_REPEATED:
+    case SIM_I2C_OUT:                                                    // {71}
+        fnSimulateI2C((int)argv[0], (unsigned char *)argv[2], (unsigned short)argv[1], (argc == SIM_I2C_OUT_REPEATED));
+        break;
+#endif
 #if defined USB_INTERFACE
     case SIM_TEST_DISCONNECT:                                            // {26}
     #if defined USB_HOST_SUPPORT
@@ -518,15 +551,24 @@ _abort_multi:
                     break;;
                 }
             }
-            if (iEndpoint & USB_SETUP_FLAG) {                            // {30} identify that a setup frame is being simulated
+            if ((iEndpoint & USB_SETUP_FLAG) != 0) {                     // {30} identify that a setup frame is being simulated
                 iEndpoint &= ~(USB_SETUP_FLAG);                          // remove the identifier
                 ucPID = SETUP_PID;                                       // change from default OUT to SETUP PID
             }
+    #if defined USB_HOST_SUPPORT && defined _KINETIS
+            if (iHostMode != 0) {                                        // {72}
+                usEndpointSize = fnGetEndpointInfo(0);                   // the host mode always receives on its 0 endpoint
+            }
+            else {
+                usEndpointSize = fnGetEndpointInfo(iEndpoint);           // get the endpoint buffer length     
+            }
+    #else
             usEndpointSize = fnGetEndpointInfo(iEndpoint);               // get the endpoint buffer length            
+    #endif
             if (usEndpointSize != 0) {                                   // if the endpoint can accept data
                 static void fnQueueUSB(int iEndpoint, unsigned char *ptrData, unsigned short usLength);
                 unsigned short usFrameLength;
-                while (1) {                                              // {43}
+                while (1 != 0) {                                         // {43}
                     if (usLength < usEndpointSize) {
                         usFrameLength = usLength;
                     }
@@ -557,8 +599,12 @@ _abort_multi:
             unsigned char ucGetDescriptorDevice[]            = {0x80, 0x06, 0x00, 0x01, 0x00, 0x00, 0x40, 0x00}; // {60} 
             unsigned char ucGetDescriptorConfiguration[]     = {0x80, 0x06, 0x00, 0x02, 0x00, 0x00, 0x09, 0x00}; // partial
             unsigned char ucGetDescriptorStrLang[]           = {0x80, 0x06, 0x00, 0x03, 0x00, 0x00, 0x02, 0x00};
-            unsigned char ucGetDescriptorStrProd[]           = {0x80, 0x06, 0x02, 0x03, 0x09, 0x04, 0xff, 0x00};       
-            unsigned char ucGetDescriptorStrSN[]             = {0x80, 0x06, 0x03, 0x03, 0x09, 0x04, 0xff, 0x00}; 
+            unsigned char ucGetDescriptorStrProd[]           = {0x80, 0x06, 0x02, 0x03, 0x09, 0x04, 0xff, 0x00};
+            unsigned char ucGetDescriptorStrSN[]             = {0x80, 0x06, 0x03, 0x03, 0x09, 0x04, 0xff, 0x00};
+    #if defined MICROSOFT_OS_STRING_DESCRIPTOR
+            unsigned char ucGetDescriptorStrMOS[]            = {0x80, 0x06, 0xee, 0x03, 0x00, 0x00, 0x12, 0x00};
+            unsigned char ucGetMSextended[]                  = {0xc0, 0x01, 0x00, 0x00, 0x04, 0x00, 0x28, 0x00}; // MOS vendor code 1
+    #endif
             unsigned char ucGetDescriptorConfigurationFull[] = {0x80, 0x06, 0x00, 0x02, 0x00, 0x00, 0xff, 0x00}; // full
             unsigned char ucRequestVendor[]                  = {0x40, 0x02, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00}; // vendor request IN
             unsigned char ucGetDeviceQualifier[]             = {0x80, 0x06, 0x00, 0x06, 0x00, 0x00, 0x0a, 0x00}; // a USB2.0 mode device which is operating at full speed (rather than high speed), receives this request
@@ -636,6 +682,14 @@ _abort_multi:
             fnSimulateUSB(1, 0, SETUP_PID, ucGetInterface, sizeof(ucGetInterface)); // inject SETUP packet
             fnCheckUSBOut(1, 0);                                         // get any returned data 
             fnSimulateUSB(1, 0, OUT_PID,  ZERO_FRAME, 0);                // inject zero terminator
+    #if defined MICROSOFT_OS_STRING_DESCRIPTOR
+            fnSimulateUSB(1, 0, SETUP_PID, ucGetDescriptorStrMOS, sizeof(ucGetDescriptorStrMOS)); // inject SETUP packet
+            fnCheckUSBOut(1, 0);                                         // get any returned data 
+            fnSimulateUSB(1, 0, OUT_PID,  ZERO_FRAME, 0);                // inject zero terminator
+            fnSimulateUSB(1, 0, SETUP_PID, ucGetMSextended, sizeof(ucGetMSextended)); // inject SETUP packet
+            fnCheckUSBOut(1, 0);                                         // get any returned data 
+            fnSimulateUSB(1, 0, OUT_PID,  ZERO_FRAME, 0);                // inject zero terminator
+    #endif
     #if defined USE_USB_HID_MOUSE || defined USE_USB_HID_RAW             // {61}
             fnSimulateUSB(1, 0, SETUP_PID, ucSetIdleMouse, sizeof(ucSetIdleMouse)); // inject SETUP packet
             fnCheckUSBOut(1, 0);                                         // get any returned data
@@ -781,7 +835,7 @@ extern void fnUpdateIPConfig(void)
 }
 
 #if defined USE_IP
-    #if defined USE_DHCP
+    #if defined USE_DHCP_CLIENT
     extern unsigned char fnGetDHCP_State(int iNetwork);
     #endif
     #if defined USE_ZERO_CONFIG
@@ -792,7 +846,7 @@ extern unsigned char fnAddIPData(unsigned char *ucDataBuffer)
     int i;
     unsigned char *ptrLen = ucDataBuffer++;
     unsigned char ucLength;
-    #if defined USE_DHCP
+    #if defined USE_DHCP_CLIENT
     unsigned char ucDHCP_state;
     #endif
     #if defined USE_ZERO_CONFIG                                          // {57}
@@ -800,7 +854,7 @@ extern unsigned char fnAddIPData(unsigned char *ucDataBuffer)
     #endif
 
     for (i = 0; i < IP_NETWORK_COUNT; i++) {                             // {68}
-    #if defined USE_DHCP
+    #if defined USE_DHCP_CLIENT
         ucDHCP_state = fnGetDHCP_State(i);
     #endif
     #if defined USE_ZERO_CONFIG                                          // {57}
@@ -817,7 +871,7 @@ extern unsigned char fnAddIPData(unsigned char *ucDataBuffer)
         ucDataBuffer--;                                                  // for compatibility
     #endif
 
-        #if defined USE_DHCP                                             // if we are using DHCP, display the state of resolution
+        #if defined USE_DHCP_CLIENT                                      // if we are using DHCP, display the state of resolution
         switch (ucDHCP_state) {
         case DHCP_INIT:
             break;
@@ -884,25 +938,37 @@ extern void fnConfigSimSCI(QUEUE_HANDLE Channel, unsigned long ulSpeed, TTYTABLE
             ulActions_2 |= OPEN_EXT_COM_0;                               // signal we want a COM port mapped to this UART
             ulExtChannel0Speed = ulSpeed;
             ExtChannel0Config = pars->Config;
-            iExtChannel0Speed = (ulSpeed/10/(1000/TICK_RESOLUTION));     // approx. max. characters capable of transmitting in a tick period {10}
+            iExtChannel0Speed = ((ulSpeed * TICK_RESOLUTION)/10000000);  // approx. max. characters capable of transmitting in a tick period {10}
+            if (iExtChannel0Speed == 0) {
+                iExtChannel0Speed = 1;
+            }
             break;
         case 1:
             ulActions_2 |= OPEN_EXT_COM_1;                               // signal we want a COM port mapped to this UART
             ulExtChannel1Speed = ulSpeed;
             ExtChannel1Config = pars->Config;
-            iExtChannel1Speed = (ulSpeed/10/(1000/TICK_RESOLUTION));     // approx. max. characters capable of transmitting in a tick period {10}
+            iExtChannel1Speed = ((ulSpeed * TICK_RESOLUTION)/10000000);  // approx. max. characters capable of transmitting in a tick period {10}
+            if (iExtChannel1Speed == 0) {
+                iExtChannel1Speed = 1;
+            }
             break;
         case 2:
             ulActions_2 |= OPEN_EXT_COM_2;                               // signal we want a COM port mapped to this UART
             ulExtChannel2Speed = ulSpeed;
             ExtChannel2Config = pars->Config;
-            iExtChannel2Speed = (ulSpeed/10/(1000/TICK_RESOLUTION));     // approx. max. characters capable of transmitting in a tick period {10}
+            iExtChannel2Speed = ((ulSpeed * TICK_RESOLUTION)/10000000);  // approx. max. characters capable of transmitting in a tick period {10}
+            if (iExtChannel2Speed == 0) {
+                iExtChannel2Speed = 1;
+            }
             break;
         case 3:
             ulActions_2 |= OPEN_EXT_COM_3;                               // signal we want a COM port mapped to this UART
             ulExtChannel3Speed = ulSpeed;
             ExtChannel3Config = pars->Config;
-            iExtChannel3Speed = (ulSpeed/10/(1000/TICK_RESOLUTION));     // approx. max. characters capable of transmitting in a tick period {10}
+            iExtChannel3Speed = ((ulSpeed * TICK_RESOLUTION)/10000000);  // approx. max. characters capable of transmitting in a tick period {10}
+            if (iExtChannel3Speed == 0) {
+                iExtChannel3Speed = 1;
+            }
             break;
         }
         return;
@@ -913,63 +979,81 @@ extern void fnConfigSimSCI(QUEUE_HANDLE Channel, unsigned long ulSpeed, TTYTABLE
         ulActions_2 |= OPEN_COM_0;                                       // signal we want a COM port mapped to this UART
         ulChannel0Speed = ulSpeed;
         Channel0Config = pars->Config;                                   // {45}
-        iChannel0Speed = (ulSpeed/10/(1000/TICK_RESOLUTION));            // approx. max. characters capable of transmitting in a tick period {10}
+        iChannel0Speed = ((ulSpeed * TICK_RESOLUTION)/10000000);         // approx. max. characters capable of transmitting in a tick period {10}
+        if (iChannel0Speed == 0) {
+            iChannel0Speed = 1;
+        }
         break;
 
     case 1:
         ulActions_2 |= OPEN_COM_1;                                       // signal we want a COM port mapped to this UART
         ulChannel1Speed = ulSpeed;
         Channel1Config = pars->Config;                                   // {45}
-        iChannel1Speed = (ulSpeed/10/(1000/TICK_RESOLUTION));            // approx. max. characters capable of transmitting in a tick period {10}
+        iChannel1Speed = ((ulSpeed * TICK_RESOLUTION)/10000000);         // approx. max. characters capable of transmitting in a tick period {10}
+        if (iChannel1Speed == 0) {
+            iChannel1Speed = 1;
+        }
         break;
 
     case 2:
         ulActions_2 |= OPEN_COM_2;                                       // signal we want a COM port mapped to this UART
         ulChannel2Speed = ulSpeed;
         Channel2Config = pars->Config;                                   // {45}
-        iChannel2Speed = (ulSpeed/10/(1000/TICK_RESOLUTION));            // approx. max. characters capable of transmitting in a tick period {10}
+        iChannel2Speed = ((ulSpeed * TICK_RESOLUTION)/10000000);         // approx. max. characters capable of transmitting in a tick period {10}
+        if (iChannel2Speed == 0) {
+            iChannel2Speed = 1;
+        }
         break;
 
     case 3:                                                              // {12}
         ulActions_2 |= OPEN_COM_3;                                       // signal we want a COM port mapped to this UART
         ulChannel3Speed = ulSpeed;
         Channel3Config = pars->Config;                                   // {45}
-        iChannel3Speed = (ulSpeed/10/(1000/TICK_RESOLUTION));            // approx. max. characters capable of transmitting in a tick period {10}
+        iChannel3Speed = ((ulSpeed * TICK_RESOLUTION)/10000000);         // approx. max. characters capable of transmitting in a tick period {10}
+        if (iChannel3Speed == 0) {
+            iChannel3Speed = 1;
+        }
         break;
 
     case 4:                                                              // {56}
         ulActions_2 |= OPEN_COM_4;                                       // signal we want a COM port mapped to this UART
         ulChannel4Speed = ulSpeed;
         Channel4Config = pars->Config;
-        iChannel4Speed = (ulSpeed/10/(1000/TICK_RESOLUTION));            // approx. max. characters capable of transmitting in a tick period {10}
+        iChannel4Speed = ((ulSpeed * TICK_RESOLUTION)/10000000);         // approx. max. characters capable of transmitting in a tick period {10}
+        if (iChannel4Speed == 0) {
+            iChannel4Speed = 1;
+        }
         break;
 
     case 5:                                                              // {56}
         ulActions_2 |= OPEN_COM_5;                                       // signal we want a COM port mapped to this UART
         ulChannel5Speed = ulSpeed;
         Channel5Config = pars->Config;
-        iChannel5Speed = (ulSpeed/10/(1000/TICK_RESOLUTION));            // approx. max. characters capable of transmitting in a tick period {10}
+        iChannel5Speed = ((ulSpeed * TICK_RESOLUTION)/10000000);         // approx. max. characters capable of transmitting in a tick period {10}
+        if (iChannel5Speed == 0) {
+            iChannel5Speed = 1;
+        }
         break;
     }
 }
 
-#if defined IIC_INTERFACE                                                // {9}
-// Open or reconfigure an IIC interface
+#if defined I2C_INTERFACE                                                // {9}
+// Open or reconfigure an I2C interface
 //
-extern void fnConfigSimIIC(QUEUE_HANDLE Channel, unsigned long ulSpeed)
+extern void fnConfigSimI2C(QUEUE_HANDLE Channel, unsigned long ulSpeed)
 {
     switch (Channel) {
     case 0:
-        iIIC_Channel0Speed = ulSpeed/9/(1000/TICK_RESOLUTION);           // approx. max. IIC bytes capable of transmitting/receiving in a tick period;
+        iI2C_Channel0Speed = ulSpeed/9/(10000000/TICK_RESOLUTION);       // approx. max. I2C bytes capable of transmitting/receiving in a tick period;
         break;
     case 1:
-        iIIC_Channel1Speed = ulSpeed/9/(1000/TICK_RESOLUTION);           // approx. max. IIC bytes capable of transmitting/receiving in a tick period;;
+        iI2C_Channel1Speed = ulSpeed/9/(1000000/TICK_RESOLUTION);        // approx. max. I2C bytes capable of transmitting/receiving in a tick period;;
         break;
     case 2:                                                              // {28}
-        iIIC_Channel2Speed = ulSpeed/9/(1000/TICK_RESOLUTION);           // approx. max. IIC bytes capable of transmitting/receiving in a tick period;;
+        iI2C_Channel2Speed = ulSpeed/9/(1000000/TICK_RESOLUTION);        // approx. max. I2C bytes capable of transmitting/receiving in a tick period;;
         break;
     case 3:
-        iIIC_Channel3Speed = ulSpeed/9/(1000/TICK_RESOLUTION);           // approx. max. IIC bytes capable of transmitting/receiving in a tick period;;
+        iI2C_Channel3Speed = ulSpeed/9/(1000000/TICK_RESOLUTION);        // approx. max. I2C bytes capable of transmitting/receiving in a tick period;;
         break;
     }
 }
@@ -1006,51 +1090,55 @@ static int fnSimulateActions(char *argv[])
     int iReturn = 0;
     unsigned char *ucDo;
     char *argv2[13];
-    int iThroughPut[13];
+    int iThroughPut[16];
 
-    iThroughPut[0] = (iChannel0Speed + 1);                                   // start with internal UARTs 0..5
-    iThroughPut[1] = (iChannel1Speed + 1);
-    iThroughPut[2] = (iChannel2Speed + 1);
-    iThroughPut[3] = (iChannel3Speed + 1);
-    iThroughPut[4] = (iChannel4Speed + 1);
-    iThroughPut[5] = (iChannel5Speed + 1);
+    iThroughPut[THROUGHPUT_UART0] = (iChannel0Speed + 1);                // start with internal UARTs 0..5
+    iThroughPut[THROUGHPUT_UART1] = (iChannel1Speed + 1);
+    iThroughPut[THROUGHPUT_UART2] = (iChannel2Speed + 1);
+    iThroughPut[THROUGHPUT_UART3] = (iChannel3Speed + 1);
+    iThroughPut[THROUGHPUT_UART4] = (iChannel4Speed + 1);
+    iThroughPut[THROUGHPUT_UART5] = (iChannel5Speed + 1);
+    iThroughPut[THROUGHPUT_UART6] = (iChannel6Speed + 1);                // {73}
+    iThroughPut[THROUGHPUT_UART7] = (iChannel7Speed + 1);
 
-    iThroughPut[6] = iIIC_Channel0Speed;                                 // {9} - followed by 3 I2C interfaces
-    iThroughPut[7] = iIIC_Channel1Speed;
-    iThroughPut[8] = iIIC_Channel2Speed;                                 // {28}
-    iThroughPut[9] = iIIC_Channel3Speed;
+    iThroughPut[THROUGHPUT_I2C0] = iI2C_Channel0Speed;                   // {9} - followed by 4 I2C interfaces
+    iThroughPut[THROUGHPUT_I2C1] = iI2C_Channel1Speed;
+    iThroughPut[THROUGHPUT_I2C2] = iI2C_Channel2Speed;                   // {28}
+    iThroughPut[THROUGHPUT_I2C3] = iI2C_Channel3Speed;
 
 #if NUMBER_EXTERNAL_SERIAL > 0                                           // {49} - then 4 external UARTs
-    iThroughPut[10] = iExtChannel0Speed+1;
-    iThroughPut[11] = iExtChannel1Speed+1;
-    iThroughPut[12] = iExtChannel2Speed+1;
-    iThroughPut[13] = iExtChannel3Speed+1;
+    iThroughPut[THROUGHPUT_EXT_UART0] = iExtChannel0Speed+1;
+    iThroughPut[THROUGHPUT_EXT_UART1] = iExtChannel1Speed+1;
+    iThroughPut[THROUGHPUT_EXT_UART2] = iExtChannel2Speed+1;
+    iThroughPut[THROUGHPUT_EXT_UART3] = iExtChannel3Speed+1;
 #endif
                                                                          // limit the number of serial tx interrupts to that which is possible in the TICK period
-    argv2[0] = (char *)&iThroughPut[0];                                  // {10}
-    argv2[1] = (char *)&iThroughPut[1];
-    argv2[2] = (char *)&iThroughPut[2];
-    argv2[3] = (char *)&iThroughPut[3];
-    argv2[4] = (char *)&iThroughPut[4];
-    argv2[5] = (char *)&iThroughPut[5];
-    argv2[6] = (char *)&iThroughPut[6];                                  // {28}
-    argv2[7] = (char *)&iThroughPut[7];
-    argv2[8] = (char *)&iThroughPut[8];
-    argv2[9] = (char *)&iThroughPut[9];
+    argv2[THROUGHPUT_UART0] = (char *)&iThroughPut[THROUGHPUT_UART0];    // {10}
+    argv2[THROUGHPUT_UART1] = (char *)&iThroughPut[THROUGHPUT_UART1];
+    argv2[THROUGHPUT_UART2] = (char *)&iThroughPut[THROUGHPUT_UART2];
+    argv2[THROUGHPUT_UART3] = (char *)&iThroughPut[THROUGHPUT_UART3];
+    argv2[THROUGHPUT_UART4] = (char *)&iThroughPut[THROUGHPUT_UART4];
+    argv2[THROUGHPUT_UART5] = (char *)&iThroughPut[THROUGHPUT_UART5];
+    argv2[THROUGHPUT_UART6] = (char *)&iThroughPut[THROUGHPUT_UART6];
+    argv2[THROUGHPUT_UART7] = (char *)&iThroughPut[THROUGHPUT_UART7];
+    argv2[THROUGHPUT_I2C0] = (char *)&iThroughPut[THROUGHPUT_I2C0];      // {28}
+    argv2[THROUGHPUT_I2C1] = (char *)&iThroughPut[THROUGHPUT_I2C1];
+    argv2[THROUGHPUT_I2C2] = (char *)&iThroughPut[THROUGHPUT_I2C2];
+    argv2[THROUGHPUT_I2C3] = (char *)&iThroughPut[THROUGHPUT_I2C3];
 #if NUMBER_EXTERNAL_SERIAL > 0                                           // {49}
-    argv2[10] = (char *)&iThroughPut[9];
-    argv2[11] = (char *)&iThroughPut[10];
-    argv2[12] = (char *)&iThroughPut[11];
-    argv2[13] = (char *)&iThroughPut[12];
+    argv2[THROUGHPUT_EXT_UART0] = (char *)&iThroughPut[THROUGHPUT_EXT_UART0];
+    argv2[THROUGHPUT_EXT_UART1] = (char *)&iThroughPut[THROUGHPUT_EXT_UART1];
+    argv2[THROUGHPUT_EXT_UART2] = (char *)&iThroughPut[THROUGHPUT_EXT_UART2];
+    argv2[THROUGHPUT_EXT_UART3] = (char *)&iThroughPut[THROUGHPUT_EXT_UART3];
 #endif
 
-    while (iInts & ~iMasks) {                                            // process any interrupts which we want to simulate here
+    while ((iInts & ~iMasks) != 0) {                                     // process any interrupts which we want to simulate here
         ulActions |= fnSimInts(argv2);
     }
     iMasks = 0;
 
 #if defined SERIAL_INTERFACE || defined SSC_INTERFACE                    // {47}
-    while (iDMA & ~iMasks) {                                             // {11}
+    while ((iDMA & ~iMasks) != 0) {                                      // {11} process DMA transfers we want to simulate here
         ulActions |= fnSimDMA(argv2);
     }
     iMasks = 0;
@@ -1067,7 +1155,7 @@ static int fnSimulateActions(char *argv[])
             ucDo = fnInsertValue(ucDo, Channel0Config, sizeof(Channel0Config));
             iReturn = 1;
         }
-        if (ulActions_2 & OPEN_COM_1) {
+        if ((ulActions_2 & OPEN_COM_1) != 0) {
             ucDo = fnGetNextDoPlace(argv);
             *ucDo++ = OPEN_PC_COM1;                                      // we inform that we want UART 1 COM to be opened for us
             *ucDo++ = (unsigned char)(1 + sizeof(ulChannel1Speed) + sizeof(Channel1Config)); // length of command and data
@@ -1075,7 +1163,7 @@ static int fnSimulateActions(char *argv[])
             ucDo = fnInsertValue(ucDo, Channel1Config, sizeof(Channel1Config));
             iReturn = 1;
         }
-        if (ulActions_2 & OPEN_COM_2) {
+        if ((ulActions_2 & OPEN_COM_2) != 0) {
             ucDo = fnGetNextDoPlace(argv);
             *ucDo++ = OPEN_PC_COM2;                                      // we inform that we want UART 2 COM to be opened for us
             *ucDo++ = (unsigned char)(1 + sizeof(ulChannel2Speed) + sizeof(Channel2Config)); // length of command and data
@@ -1083,7 +1171,7 @@ static int fnSimulateActions(char *argv[])
             ucDo = fnInsertValue(ucDo, Channel2Config, sizeof(Channel2Config));
             iReturn = 1;
         }
-        if (ulActions_2 & OPEN_COM_3) {                                  // {12}
+        if ((ulActions_2 & OPEN_COM_3) != 0) {                           // {12}
             ucDo = fnGetNextDoPlace(argv);
             *ucDo++ = OPEN_PC_COM3;                                      // we inform that we want UART 3 COM to be opened for us
             *ucDo++ = (unsigned char)(1 + sizeof(ulChannel3Speed) + sizeof(Channel3Config)); // length of command and data
@@ -1091,7 +1179,7 @@ static int fnSimulateActions(char *argv[])
             ucDo = fnInsertValue(ucDo, Channel3Config, sizeof(Channel3Config));
             iReturn = 1;
         }
-        if (ulActions_2 & OPEN_COM_4) {                                  // {56}
+        if ((ulActions_2 & OPEN_COM_4) != 0) {                           // {56}
             ucDo = fnGetNextDoPlace(argv);
             *ucDo++ = OPEN_PC_COM4;                                      // we inform that we want UART 4 COM to be opened for us
             *ucDo++ = (unsigned char)(1 + sizeof(ulChannel4Speed) + sizeof(Channel4Config)); // length of command and data
@@ -1099,12 +1187,28 @@ static int fnSimulateActions(char *argv[])
             ucDo = fnInsertValue(ucDo, Channel4Config, sizeof(Channel4Config));
             iReturn = 1;
         }
-        if (ulActions_2 & OPEN_COM_5) {                                  // {56}
+        if ((ulActions_2 & OPEN_COM_5) != 0) {                           // {56}
             ucDo = fnGetNextDoPlace(argv);
             *ucDo++ = OPEN_PC_COM5;                                      // we inform that we want UART 5 COM to be opened for us
             *ucDo++ = (unsigned char)(1 + sizeof(ulChannel5Speed) + sizeof(Channel5Config)); // length of command and data
             ucDo = fnInsertValue(ucDo, ulChannel5Speed, sizeof(ulChannel5Speed));
             ucDo = fnInsertValue(ucDo, Channel5Config, sizeof(Channel5Config));
+            iReturn = 1;
+        }
+        if ((ulActions_2 & OPEN_COM_6) != 0) {                           // {73}
+            ucDo = fnGetNextDoPlace(argv);
+            *ucDo++ = OPEN_PC_COM6;                                      // we inform that we want UART 6 COM to be opened for us
+            *ucDo++ = (unsigned char)(1 + sizeof(ulChannel6Speed) + sizeof(Channel6Config)); // length of command and data
+            ucDo = fnInsertValue(ucDo, ulChannel6Speed, sizeof(ulChannel6Speed));
+            ucDo = fnInsertValue(ucDo, Channel6Config, sizeof(Channel6Config));
+            iReturn = 1;
+        }
+        if ((ulActions_2 & OPEN_COM_7) != 0) {                           // {73}
+            ucDo = fnGetNextDoPlace(argv);
+            *ucDo++ = OPEN_PC_COM7;                                      // we inform that we want UART 7 COM to be opened for us
+            *ucDo++ = (unsigned char)(1 + sizeof(ulChannel7Speed) + sizeof(Channel7Config)); // length of command and data
+            ucDo = fnInsertValue(ucDo, ulChannel7Speed, sizeof(ulChannel7Speed));
+            ucDo = fnInsertValue(ucDo, Channel7Config, sizeof(Channel7Config));
             iReturn = 1;
         }
 #if NUMBER_EXTERNAL_SERIAL > 0                                           // {49}
@@ -1275,7 +1379,7 @@ static int fnSimulateActions(char *argv[])
                 iReturn = 1;
             }
         }
-        if (ulActions & SEND_COM_0) {
+        if ((ulActions & SEND_COM_0) != 0) {
             ucDo = fnGetNextDoPlace(argv);
             *ucDo++ = SEND_PC_COM0;                                      // we inform that we want to send a message over UART 0 COM
             *ucDo++ = (unsigned char)(sizeof(ulCom0Len) + sizeof(unsigned char *) + 1);
@@ -1284,7 +1388,7 @@ static int fnSimulateActions(char *argv[])
             iReturn = 1;
             ulCom0Len = 0;
         }
-        if (ulActions & SEND_COM_1) {
+        if ((ulActions & SEND_COM_1) != 0) {
             ucDo = fnGetNextDoPlace(argv);
             *ucDo++ = SEND_PC_COM1;                                      // we inform that we want to send a message over UART 1 COM
             *ucDo++ = (unsigned char)(sizeof(ulCom1Len) + sizeof(unsigned char *) + 1);
@@ -1302,7 +1406,7 @@ static int fnSimulateActions(char *argv[])
             iReturn = 1;
             ulCom2Len = 0;
         }
-        if (ulActions & SEND_COM_3) {                                    // {12}
+        if ((ulActions & SEND_COM_3) != 0) {                             // {12}
             ucDo = fnGetNextDoPlace(argv);
             *ucDo++ = SEND_PC_COM3;                                      // we inform that we want to send a message over UART 2 COM
             *ucDo++ = (unsigned char)(sizeof(ulCom3Len) + sizeof(unsigned char *) + 1);
@@ -1311,7 +1415,7 @@ static int fnSimulateActions(char *argv[])
             iReturn = 1;
             ulCom3Len = 0;
         }
-        if (ulActions & SEND_COM_4) {                                    // {56}
+        if ((ulActions & SEND_COM_4) != 0) {                             // {56}
             ucDo = fnGetNextDoPlace(argv);
             *ucDo++ = SEND_PC_COM4;                                      // we inform that we want to send a message over UART 2 COM
             *ucDo++ = (unsigned char)(sizeof(ulCom4Len) + sizeof(unsigned char *) + 1);
@@ -1320,7 +1424,7 @@ static int fnSimulateActions(char *argv[])
             iReturn = 1;
             ulCom4Len = 0;
         }
-        if (ulActions & SEND_COM_5) {                                    // {56}
+        if ((ulActions & SEND_COM_5) != 0) {                             // {56}
             ucDo = fnGetNextDoPlace(argv);
             *ucDo++ = SEND_PC_COM5;                                      // we inform that we want to send a message over UART 2 COM
             *ucDo++ = (unsigned char)(sizeof(ulCom5Len) + sizeof(unsigned char *) + 1);
@@ -1328,6 +1432,24 @@ static int fnSimulateActions(char *argv[])
             ucDo = fnInsertValue(ucDo, (unsigned long)&ucCom5Data, sizeof(unsigned char *));
             iReturn = 1;
             ulCom5Len = 0;
+        }
+        if ((ulActions & SEND_COM_6) != 0) {                             // {73}
+            ucDo = fnGetNextDoPlace(argv);
+            *ucDo++ = SEND_PC_COM6;                                      // we inform that we want to send a message over UART 2 COM
+            *ucDo++ = (unsigned char)(sizeof(ulCom6Len) + sizeof(unsigned char *) + 1);
+            ucDo = fnInsertValue(ucDo, ulCom6Len, sizeof(ulCom6Len));
+            ucDo = fnInsertValue(ucDo, (unsigned long)&ucCom6Data, sizeof(unsigned char *));
+            iReturn = 1;
+            ulCom6Len = 0;
+        }
+        if ((ulActions & SEND_COM_7) != 0) {
+            ucDo = fnGetNextDoPlace(argv);
+            *ucDo++ = SEND_PC_COM7;                                      // we inform that we want to send a message over UART 2 COM
+            *ucDo++ = (unsigned char)(sizeof(ulCom7Len) + sizeof(unsigned char *) + 1);
+            ucDo = fnInsertValue(ucDo, ulCom7Len, sizeof(ulCom7Len));
+            ucDo = fnInsertValue(ucDo, (unsigned long)&ucCom7Data, sizeof(unsigned char *));
+            iReturn = 1;
+            ulCom7Len = 0;
         }
         if (ulActions & SET_BREAK_COM_0) {
             ucDo = fnGetNextDoPlace(argv);
@@ -1551,6 +1673,68 @@ extern void fnLogTx5(unsigned char ucTxByte)                             // {56}
     }
     else {
         _write(iUART_File5, &ucTxByte, 1);
+    }
+#endif
+}
+
+static int iUART_File6 = 0;
+extern void fnLogTx6(unsigned char ucTxByte)                             // {73}
+{
+#if defined LOG_UART6
+	if (iUART_File6 == 0) {
+    #if _VC80_UPGRADE<0x0600
+	    iUART_File6 = _open("UART6.txt", (_O_TRUNC  | _O_CREAT | _O_WRONLY), _S_IWRITE);
+    #else
+	    _sopen_s(&iUART_File6, "UART6.txt", (_O_TRUNC  | _O_CREAT | _O_WRONLY), _SH_DENYWR, _S_IWRITE);
+    #endif
+	}
+#endif
+
+    if (ulCom6Len >= UART_BUFFER_LENGTH) {
+        return;
+    }
+
+    ucCom6Data[ulCom6Len++] = ucTxByte;
+
+#if defined LOG_UART6
+    if ((((ucTxByte < 0x20) && (ucTxByte != 0x0d) && (ucTxByte != 0x0a)) || (ucTxByte > 0x7f))) {
+        signed char buf[] = "[0xXX]";
+        fnBufferHex(ucTxByte, (CODE_CAPITALS | NO_TERMINATOR| 1), &buf[3]);
+        _write(iUART_File6, buf, 6);
+    }
+    else {
+        _write(iUART_File6, &ucTxByte, 1);
+    }
+#endif
+}
+
+static int iUART_File7 = 0;
+extern void fnLogTx7(unsigned char ucTxByte)
+{
+#if defined LOG_UART7
+	if (iUART_File7 == 0) {
+    #if _VC80_UPGRADE<0x0600
+	    iUART_File7 = _open("UART7.txt", (_O_TRUNC  | _O_CREAT | _O_WRONLY), _S_IWRITE);
+    #else
+	    _sopen_s(&iUART_File7, "UART7.txt", (_O_TRUNC  | _O_CREAT | _O_WRONLY), _SH_DENYWR, _S_IWRITE);
+    #endif
+	}
+#endif
+
+    if (ulCom7Len >= UART_BUFFER_LENGTH) {
+        return;
+    }
+
+    ucCom7Data[ulCom7Len++] = ucTxByte;
+
+#if defined LOG_UART7
+    if ((((ucTxByte < 0x20) && (ucTxByte != 0x0d) && (ucTxByte != 0x0a)) || (ucTxByte > 0x7f))) {
+        signed char buf[] = "[0xXX]";
+        fnBufferHex(ucTxByte, (CODE_CAPITALS | NO_TERMINATOR| 1), &buf[3]);
+        _write(iUART_File7, buf, 6);
+    }
+    else {
+        _write(iUART_File7, &ucTxByte, 1);
     }
 #endif
 }
@@ -3314,35 +3498,35 @@ extern unsigned char fnSimS25FL1_K(int iSimType, unsigned char ucTxByte)
         #if defined SPI_FLASH_MULTIPLE_CHIPS
     int iCntCS = 0;
     unsigned long ulDeviceOffset = 0;
-    if (SPI_CS0_PORT & CS0_LINE) {
-        fnActionSST25(0, 0);
+    if ((SPI_CS0_PORT & CS0_LINE) != 0) {                                // CS0 is negated
+        fnActionS25FL1_K(0, 0);
     }
-    else {
+    else {                                                               // CS0 is asserted
         iCntCS++;
     }
-    if (SPI_CS1_PORT & CS1_LINE) {
-        fnActionSST25(1, SPI_DATA_FLASH_0_SIZE);
+    if ((SPI_CS1_PORT & CS1_LINE) != 0) {                                // CS1 is negated
+        fnActionS25FL1_K(1, SPI_DATA_FLASH_0_SIZE);
     }
-    else {
+    else {                                                               // CS1 is asserted
         iCntCS++;
         iSel = 1;
         ulDeviceOffset = SPI_DATA_FLASH_0_SIZE;
     }
             #if defined QSPI_CS2_LINE || defined CS2_LINE
-    if (SPI_CS2_PORT & CS2_LINE) {
-        fnActionSST25(2, (SPI_DATA_FLASH_0_SIZE + SPI_DATA_FLASH_1_SIZE));
+    if ((SPI_CS2_PORT & CS2_LINE) != 0) {                                // CS2 is negated
+        fnActionS25FL1_K(2, (SPI_DATA_FLASH_0_SIZE + SPI_DATA_FLASH_1_SIZE));
     }
-    else {
+    else {                                                               // CS2 is asserted
         iCntCS++;
         iSel = 2;
         ulDeviceOffset = (SPI_DATA_FLASH_0_SIZE + SPI_DATA_FLASH_1_SIZE);
     }
             #endif
             #if defined QSPI_CS3_LINE || defined CS3_LINE
-    if (SPI_CS3_PORT & CS3_LINE) {
-        fnActionSST25(3, (SPI_DATA_FLASH_0_SIZE + SPI_DATA_FLASH_1_SIZE + SPI_DATA_FLASH_2_SIZE));
+    if ((SPI_CS3_PORT & CS3_LINE) != 0) {                                // CS3 is negated
+        fnActionS25FL1_K(3, (SPI_DATA_FLASH_0_SIZE + SPI_DATA_FLASH_1_SIZE + SPI_DATA_FLASH_2_SIZE));
     }
-    else {
+    else {                                                               // CS is asserted
         iCntCS++;
         iSel = 3;
         ulDeviceOffset = (SPI_DATA_FLASH_0_SIZE + SPI_DATA_FLASH_1_SIZE + SPI_DATA_FLASH_2_SIZE);

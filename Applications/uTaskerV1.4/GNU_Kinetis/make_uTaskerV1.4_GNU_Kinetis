@@ -269,14 +269,14 @@ Build/modbus_app.o: ../modbus_app.c $(DEPENDS)
 # Create output file and show its size
 # $(LINKER) $(C_FLAGS) -I../../uTaskerV1.4 -D _GNU -D _KINETIS -g -Os -Wl,-Map=uTaskerV1.4.map -nostartfiles -TK_1M_256.ld -o uTaskerV1.4.elf $(OBJS) $(OBJS2)
 uTaskerV1.4.elf: $(OBJS) $(OBJS2) K_1M_256.ld K_1M_128.ld K_512_64.ld K_256_256.ld K_256_64.ld K_256_32.ld KL_256_32.ld KL_128_16.ld KL_64_8.ld KL_32_4.ld KV_32_8.ld KV_512_96.ld KE_64_4.ld KE_128_16.ld KE_8_1.ld KEA_128_16.ld
-	$(CC) $(C_FLAGS) -Os -g -TK_1M_256.ld -nostartfiles -Xlinker --gc-sections -Wl,-Map,"uTaskerV1.4.map" -o "uTaskerV1.4.elf" $(OBJS) $(OBJS2)
+	$(CC) $(C_FLAGS) -Os -g -TK_2M_256.ld -nostartfiles -Xlinker --gc-sections -Wl,-Map,"uTaskerV1.4.map" -o "uTaskerV1.4.elf" $(OBJS) $(OBJS2)
 	$(CC_OBJ) --only-section=.data --only-section=.init --only-section=.text --only-section=.rodata --only-section=.vectors --only-section=.f_config --output-target=srec uTaskerV1.4.elf uTaskerV1.4.srec
 	$(CC_OBJ) --only-section=.data --only-section=.init --only-section=.text --only-section=.rodata --only-section=.vectors --only-section=.f_config --output-target=ihex uTaskerV1.4.elf uTaskerV1.4.hex
 	$(CC_OBJ) --only-section=.data --only-section=.init --only-section=.text --only-section=.rodata --only-section=.vectors --only-section=.f_config --output-target=binary uTaskerV1.4.elf uTaskerV1.4.bin
 	$(CC_SIZE) uTaskerV1.4.elf
 
 uTaskerV1.4_BM.elf: $(OBJS) $(OBJS2_BM) K_1M_256_BM.ld K_1M_128_BM.ld K_512_64_BM.ld K_256_256_BM.ld K_256_64_BM.ld K_128_16_BM.ld KL_256_32_BM.ld KL_128_16_BM.ld KL_64_8_BM.ld KL_32_4_BM.ld KV_32_8_BM.ld KV_512_96_BM.ld KE_128_16_BM.ld KE_64_4_BM.ld KEA_128_16_BM.ld
-	$(CC) $(C_FLAGS) -Os -g -TK_1M_256_BM.ld -nostartfiles -Xlinker --gc-sections -Wl,-Map=uTaskerV1.4_BM.map -o uTaskerV1.4_BM.elf $(OBJS) $(OBJS2_BM)
+	$(CC) $(C_FLAGS) -Os -g -TK_2M_256_BM.ld -nostartfiles -Xlinker --gc-sections -Wl,-Map=uTaskerV1.4_BM.map -o uTaskerV1.4_BM.elf $(OBJS) $(OBJS2_BM)
 	$(CC_OBJ) --only-section=.data --only-section=.init --only-section=.text --only-section=.rodata --only-section=.vectors --output-target=srec uTaskerV1.4_BM.elf uTaskerV1.4_BM.srec
 	$(CC_OBJ) --only-section=.data --only-section=.init --only-section=.text --only-section=.rodata --only-section=.vectors --output-target=ihex uTaskerV1.4_BM.elf uTaskerV1.4_BM.hex
 	$(CC_OBJ) --only-section=.data --only-section=.init --only-section=.text --only-section=.rodata --only-section=.vectors --output-target=binary uTaskerV1.4_BM.elf uTaskerV1.4_BM.bin
