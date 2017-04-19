@@ -109,6 +109,7 @@
     14.02.2017 Add LTC                                                   {92}
     08.03.2017 Add PWM_NO_OUTPUT and PWM_DMA_CHANNEL_ENABLE PWM options  {93}
     08.03.2017 Add ucDmaTriggerSource to ADC setup                       {94}
+    19.04.017 Adjust USB FS crossbar master setting for K65 and K66      {95}
 
 */
 
@@ -4396,7 +4397,16 @@ extern void fnConfigDMA_buffer(unsigned char ucDMA_channel, unsigned char ucDmaT
     #define FMC_FPAPR_USB_FS            FMC_PFAPR_M3AP_RD                // USB FS is bus master 3
     #define CROSSBAR_MASTER_USB_FS      MASTER_M3
 #else
-    #if defined KINETIS_K_FPU && !(defined KINETIS_K21 || defined KINETIS_K22 || (defined KINETIS_K24 && (SIZE_OF_FLASH == (1024 * 1024))) || defined KINETIS_K64)
+    #if defined KINETIS_K65 || defined KINETIS_K66                       // {95}
+        #define FMC_FPAPR_ETHERNET              FMC_PFAPR_M3AP_RD        // Ethernet is bus master 3
+        #define FMC_FPAPR_USB_FS                FMC_PFAPR_M4AP_RD        // USB FS is bus master 4
+        #define FMC_FPAPR_SDHC                  FMC_PFAPR_M5AP_RD        // SDHC is bus master 5
+        #define FMC_FPAPR_USB_HS                FMC_PFAPR_M6AP_RD        // USB HS is bus master 6
+        #define CROSSBAR_MASTER_ETHERNET        MASTER_M3
+        #define CROSSBAR_MASTER_USB_FS          MASTER_M4
+        #define CROSSBAR_MASTER_SDHC            MASTER_M5
+        #define CROSSBAR_MASTER_USB_HS          MASTER_M6
+    #elif defined KINETIS_K_FPU && !(defined KINETIS_K21 || defined KINETIS_K22 || (defined KINETIS_K24 && (SIZE_OF_FLASH == (1024 * 1024))) || defined KINETIS_K64)
         #define FMC_FPAPR_SDHC_NFC_USB_FS       FMC_PFAPR_M3AP_RD
         #define FMC_FPAPR_USB_FS                FMC_PFAPR_M3AP_RD        // USB FS is bus master 3
         #define FMC_FPAPR_LCD_BACKGROUND_PLANE  FMC_PFAPR_M4AP_RD
