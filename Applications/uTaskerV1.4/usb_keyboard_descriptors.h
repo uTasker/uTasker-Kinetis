@@ -11,11 +11,10 @@
     File:      usb_keyboard_descriptors.h
     Project:   uTasker project
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2017
     *********************************************************************
 
 */
-
 
 #if defined INCLUDE_USB_DEFINES
     #define USB_PRODUCT_RELEASE_NUMBER          0x0100                   // V1.0 (binary coded decimal)
@@ -23,6 +22,8 @@
     #define NUMBER_OF_ENDPOINTS                 1                        // uses 1 interrupt IN endpoint in addition to the default control endpoint 0
     #define USB_VENDOR_ID                       0x15a2                   // Freescale vendor ID
     #define USB_PRODUCT_ID                      0xff00                   // unofficial test value for PID
+
+    #define USB_KEYBOARD_INTERFACE_NUMBER       0
 
     #if defined USB_STRING_OPTION                                        // if our project supports strings
         #define MANUFACTURER_STRING_INDEX       1                        // index must match with order in the string list
@@ -50,7 +51,6 @@
         static const unsigned char *ucStringTable[]        = {usb_language_string, manufacturer_str, product_str, serial_number_str, config_str, interface_str};
     #endif
 #endif
-
 
 #if defined INCLUDE_USB_CONFIG_DESCRIPTOR
 typedef struct _PACK stUSB_CONFIGURATION_DESCRIPTOR_COLLECTION
@@ -103,11 +103,16 @@ typedef struct _PACK stUSB_CONFIGURATION_DESCRIPTOR_COLLECTION
 
     // To classify
     //
-0x05, 0x07, 0x19, 0xE0, 0x29, 0xE7, 0x15, 0x00, 0x25, 0x01, 0x75, 0x01, 0x95, 0x08,
-0x81, 0x02, 0x95, 0x01, 0x75, 0x08, 0x81, 0x01, 0x95, 0x03, 0x75, 0x01, 0x05, 0x08,
-0x19, 0x01, 0x29, 0x03, 0x91, 0x02, 0x95, 0x05, 0x75, 0x01, 0x91, 0x01, 0x95, 0x06,
-0x75, 0x08, 0x15, 0x00, 0x26, 0xFF, 0x00, 0x05, 0x07, 0x19, 0x00, 0x2A, 0xFF, 0x00,
-0x81, 0x00, 
+    0x05, 0x07, 0x19, 0xe0, 0x29, 0xe7, 0x15, 0x00, 0x25, 0x01, 0x75, 0x01, 0x95, 0x08,
+    0x81, 0x02, 0x95, 0x01, 0x75, 0x08, 0x81, 0x01,
+    0x95, 0x03,                                                          // report count
+    0x75, 0x01,                                                          // report size
+    0x05, 0x08,                                                          // usage page - page number for LEDs
+    0x19, 0x01,                                                          // usage minimum
+    0x29, 0x03,                                                          // usage maximum
+    0x91, 0x02, 0x95, 0x05, 0x75, 0x01, 0x91, 0x01, 0x95, 0x06,
+    0x75, 0x08, 0x15, 0x00, 0x26, 0xff, 0x00, 0x05, 0x07, 0x19, 0x00, 0x2a, 0xff, 0x00,
+    0x81, 0x00, 
 
     0xc0                                                                 // end collection
 };
@@ -150,7 +155,7 @@ static const USB_CONFIGURATION_DESCRIPTOR_COLLECTION config_descriptor = {
     {                                                                    // interface descriptor
     DESCRIPTOR_TYPE_INTERFACE_LENGTH,                                    // length (0x09)
     DESCRIPTOR_TYPE_INTERFACE,                                           // 0x04
-    0,                                                                   // interface number 0
+    USB_KEYBOARD_INTERFACE_NUMBER,                                       // interface number 0
     0,                                                                   // alternative setting 0
     1,                                                                   // number of endpoints in addition to EP0
     USB_CLASS_HID,                                                       // interface class (0x03)
@@ -183,7 +188,11 @@ static const USB_CONFIGURATION_DESCRIPTOR_COLLECTION config_descriptor = {
     #endif
     ENDPOINT_INTERRUPT,                                                  // endpoint attributes
     {LITTLE_SHORT_WORD_BYTES(8)},                                        // endpoint FIFO size (little-endian - 8 bytes)
+    #if defined USB_KEYBOARD_DELAY
+    1                                                                    // polling interval in ms
+    #else
     10                                                                   // polling interval in ms
+    #endif
     }
 };
 #endif
