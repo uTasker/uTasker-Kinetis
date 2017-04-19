@@ -11,11 +11,16 @@
     File:      kinetis_USB_HS_Device.h
     Project:   Single Chip Embedded Internet
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2017
     *********************************************************************
+    28.03.2013 Add USB HS support                                        {33}
+    04.06.2013 Added USB_FS_MALLOC(), USB_FS_MALLOC_ALIGN(), USB_HS_MALLOC(), USB_HS_MALLOC_ALIGN() defaults {42}
+    05.03.2014 Add USB error counters and clear errors in the USB interrupt routine {71}
+    28.05.2014 Move re-enable of USB SIE token processing to after input handling to avoid sporadic SETUP frame loss {83}
     18.07.2015 Add USB_SIMPLEX_ENDPOINTS suport to HS device             {1}
     05.10.2015 fnGetUSB_HW() modification for compatibility with host mode
     23.12.2015 Add zero copy OUT endpoint buffer option                  {2}
+    07.02.2016 Set length to 8 when receiving setup frames (to avoid old lengths from OUTs on the endpoint from being kept) {3}
 
 */
 #if defined USB_HS_INTERFACE
@@ -87,7 +92,7 @@ static int fnProcessInput(int iEndpoint_ref, USB_HW *usb_hardware, unsigned char
         return MAINTAIN_OWNERSHIP;
     case STALL_ENDPOINT:                                                 // send stall
         if (iEndpoint_ref == 0) {                                        // check whether control 0 endpoint
-            ptEndpointBD->usb_bd_tx_even.ulUSB_BDControl = (OWN | BDT_STALL);// force stall handshake on both control 0 buffers
+            ptEndpointBD->usb_bd_tx_even.ulUSB_BDControl = (OWN | BDT_STALL); // force stall handshake on both control 0 buffers
             ptEndpointBD->usb_bd_tx_odd.ulUSB_BDControl  = (OWN | BDT_STALL);
             fnSetUSBEndpointState(iEndpoint_ref, USB_ENDPOINT_STALLED);       
             _SIM_USB(USB_SIM_STALL, iEndpoint_ref, usb_hardware);
@@ -245,7 +250,7 @@ extern void fnTxUSBHS(unsigned char *pData, unsigned short usLen, int iEndpoint,
 
     ptrTxQueueHeader->dTD.ulBufferPointerPage[0] = (unsigned long)pData; // enter the buffer pointers on incremented 4k page boundaries
     ptrTxQueueHeader->dTD.ulBufferPointerPage[1] = ((unsigned long)(pData + (4 * 1024)) & ENDPOINT_QUEUE_HEADER_BUFFER_POINTER_MASK);
-  //ptrTxQueueHeader->dTD.ulBufferPointerPage[2] = (ptrTxQueueHeader->dTD.ulBufferPointerPage[1] + (4 * 1024)); // further page buffers coudl be used for handling large transmissions of more than 4k
+  //ptrTxQueueHeader->dTD.ulBufferPointerPage[2] = (ptrTxQueueHeader->dTD.ulBufferPointerPage[1] + (4 * 1024)); // further page buffers could be used for handling large transmissions of more than 4k
   //ptrTxQueueHeader->dTD.ulBufferPointerPage[3] = (ptrTxQueueHeader->dTD.ulBufferPointerPage[2] + (4 * 1024));
   //ptrTxQueueHeader->dTD.ulBufferPointerPage[4] = (ptrTxQueueHeader->dTD.ulBufferPointerPage[3] + (4 * 1024));
 
@@ -366,7 +371,8 @@ static __interrupt void _usb_hs_otg_isr(void)
                             uMemcpy(ucSetupBuffer, usb_hardware.ptrQueueHeader->ucSetupBuffer, 8); // copy the fixed length setup content locally
                         } while ((USBHS_USBCMD & USBHS_USBCMD_SUTW) == 0); // if the hardware has cleared the semaphone we need to repeat to be sure of correct data
                         USBHS_USBCMD &= ~USBHS_USBCMD_SUTW;              // remove tripwire semaphore
-                        while (USBHS_EPSETUPSR & ulEndpointBitReference) {
+                        usb_hardware.usLength = 8;                       // {3}
+                        while ((USBHS_EPSETUPSR & ulEndpointBitReference) != 0) {
     #if defined _WINDOWS
                             USBHS_EPSETUPSR &= ~ulEndpointBitReference;
     #endif
@@ -780,6 +786,11 @@ extern void fnConfigUSB(QUEUE_HANDLE Channel, USBTABLE *pars)
         #else
             #error "USB PLL requires an external reference of 12MHz, 16MHz or 24MHz!"
         #endif
+        #if defined ERRATA_ID_9712 && defined EXTERNAL_CLOCK
+        // Error 9712 workaround is being enabled - advise use of crystal rather than external clock!
+        //
+        MCG_C2 |= MCG_C2_EREFS;                                          // pretend that crystal is being used so that the PLL will lock
+        #endif
         USBPHY_PLL_SIC &= ~(USBPHY_PLL_SIC_PLL_BYPASS);                  // cear the bypass
         USBPHY_PLL_SIC |= (USBPHY_PLL_SIC_PLL_EN_USB_CLKS);              // enable USB clock output from PHY PLL
         while ((USBPHY_PLL_SIC & USBPHY_PLL_SIC_PLL_LOCK) == 0) {        // wait for the PLL to lock
@@ -787,14 +798,19 @@ extern void fnConfigUSB(QUEUE_HANDLE Channel, USBTABLE *pars)
             USBPHY_PLL_SIC |= USBPHY_PLL_SIC_PLL_LOCK;
         #endif
         }
-        USBPHY_PWD = 0; // for normal operation
-        USBPHY_ANACTRL = ((24 << 4) | 4); // frac = 24 and  Clk /4
+        #if defined ERRATA_ID_9712 && defined EXTERNAL_CLOCK
+        // Error 9712 workaround is being enabled - advise use of crystal rather than external clock!
+        //
+      //MCG_C2 &= ~MCG_C2_EREFS;                                         // remove the external reference from oscillator requested flag
+        #endif
+        USBPHY_PWD = 0;                                                  // for normal operation
+        USBPHY_ANACTRL = ((24 << 4) | 4);                                // frac = 24 and  Clk /4
         while ((USBPHY_ANACTRL & 0x80000000) == 0) {
         #if defined _WINDOWS
             USBPHY_ANACTRL |= 0x80000000;
         #endif
         }
-        USBPHY_TX |= (1 << 24); // reserved??
+        USBPHY_TX |= (1 << 24);                                          // reserved??
     #else
         POWER_UP(6, SIM_SCGC6_USBHS);                                    // power up the USB HS controller module
         _CONFIG_PERIPHERAL(A, 7,  PA_7_ULPI_DIR);                        // ULPI_DIR on PA.7    (alt. function 2)
