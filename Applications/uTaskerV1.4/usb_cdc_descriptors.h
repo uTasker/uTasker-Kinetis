@@ -11,10 +11,11 @@
     File:      usb_cdc_descriptors.h
     Project:   uTasker project
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2017
     *********************************************************************
     01.12.2015 Add RNDIS support
     23.12.2015 Add RAW HID and Audio support
+    20.12.2016 Correct spelling of USB_MSB_OUT_ENDPOINT_NUMBER to USB_MSD_OUT_ENDPOINT_NUMBER {1}
 
 */
 
@@ -57,6 +58,7 @@
     #if defined USE_USB_HID_MOUSE                                        // CDC with HID mouse
         #define USB_HID_MOUSE_INTERFACE_COUNT 1
         #define USB_HID_MOUSE_ENDPOINT_COUNT  1
+        #define USB_MOUSE_INTERFACE_NUMBER    ((USB_CDC_COUNT * 2) + 1  + USB_MSD_INTERFACE_COUNT)
     #else
         #define USB_HID_MOUSE_INTERFACE_COUNT 0
         #define USB_HID_MOUSE_ENDPOINT_COUNT  0
@@ -65,6 +67,7 @@
     #if defined USE_USB_HID_KEYBOARD                                     // CDC with HID keyboard
         #define USB_HID_KB_INTERFACE_COUNT  1
         #define USB_HID_KB_ENDPOINT_COUNT   1
+        #define USB_KEYBOARD_INTERFACE_NUMBER  ((USB_CDC_COUNT * 2) + 1 + USB_MSD_INTERFACE_COUNT + USB_HID_MOUSE_INTERFACE_COUNT)
     #else
         #define USB_HID_KB_INTERFACE_COUNT  0
         #define USB_HID_KB_ENDPOINT_COUNT   0
@@ -109,7 +112,7 @@
         #elif defined USE_USB_MSD || defined USE_USB_HID_MOUSE || defined USE_USB_HID_KEYBOARD || defined USE_USB_AUDIO // composite
             #define USB_PRODUCT_ID          (0xff42 + USB_CDC_COUNT)     // unofficial test value
         #elif defined USB_CDC_RNDIS
-            #define USB_PRODUCT_ID          0xf045                       // unofficial test value
+            #define USB_PRODUCT_ID          (0xf045 - 0x1235)            // unofficial test value
         #else
             #define USB_PRODUCT_ID          0x0044                       // uTasker Freescale development CDC product ID
         #endif
@@ -166,9 +169,11 @@
         #if (USB_CDC_VCOM_COUNT > 0)
             static const unsigned char interface_str_cdc[] = {10,  DESCRIPTOR_TYPE_STRING, 'V',0, 'C',0, 'o',0, 'm',0};
         #endif
-        static const unsigned char interface_str[]         = {8,  DESCRIPTOR_TYPE_STRING, 'I',0, 'n',0, 't',0};
         #if defined USE_USB_MSD
-        static const unsigned char usb_msd_str[]           = {8,  DESCRIPTOR_TYPE_STRING, 'M',0, 'S',0, 'D',0};
+            static const unsigned char usb_msd_str[]       = {8,  DESCRIPTOR_TYPE_STRING, 'M',0, 'S',0, 'D',0};
+        #endif
+        #if defined USE_USB_AUDIO
+            static const unsigned char interface_str_audio[] = {12,  DESCRIPTOR_TYPE_STRING, 'A',0, 'u',0, 'd',0, 'i',0, 'o',0};
         #endif
 
         static const unsigned char *ucStringTable[]        = {usb_language_string, manufacturer_str, product_str, serial_number_str, config_str,
@@ -177,11 +182,12 @@
         #endif
         #if (USB_CDC_VCOM_COUNT > 0)
                                                               interface_str_cdc,
-        #else
-                                                              interface_str,
         #endif
         #if defined USE_USB_MSD
                                                               usb_msd_str,
+        #endif
+        #if defined USE_USB_AUDIO
+                                                              interface_str_audio,
         #endif
                                                              };
     #endif
@@ -192,7 +198,7 @@
     #if defined USB_CDC_RNDIS
 static const REMOTE_NDIS_RESPONSE_AVAILABLE ResponseAvailable = {
     TYPE_NOTIFICATION_REQUEST,
-    RESONSE_NOTIFICATION_AVAILABLE,
+    RESPONSE_NOTIFICATION_AVAILABLE,
     {LITTLE_SHORT_WORD_BYTES(0)},
     {LITTLE_SHORT_WORD_BYTES(0)},
     {LITTLE_SHORT_WORD_BYTES(0)}
@@ -322,18 +328,18 @@ typedef struct _PACK stUSB_CONFIGURATION_DESCRIPTOR_COLLECTION
     USB_INTERFACE_DESCRIPTOR                   interface_desc_audio_0;   // first interface descriptor
     USB_AUDIO_CONTROL_INTERFACE_HEADER_DESCRIPTOR_2 audio_control_header1; // audio control interface header descriptor
     USB_AUDIO_INPUT_TERMINAL_DESCRIPTOR        in_terminal_0;            // input terminal descriptor - loud-speaker
-    USB_AUDIO_FEATURE_UNIT_DESCRIPTOR          feature_0;                // feature unit decriptor
+    USB_AUDIO_FEATURE_UNIT_DESCRIPTOR          feature_0;                // feature unit descriptor
     USB_AUDIO_OUTPUT_TERMINAL_DESCRIPTOR       out_terminal_0;           // output terminal descriptor - loud-speaker
     USB_AUDIO_INPUT_TERMINAL_DESCRIPTOR        in_terminal_1;            // input terminal descriptor - microphone
     USB_AUDIO_OUTPUT_TERMINAL_DESCRIPTOR       out_terminal_1;           // output terminal descriptor - microphone
     USB_INTERFACE_DESCRIPTOR                   interface_desc_audio_1;   // second interface descriptor (zero bandwidth)
-    USB_INTERFACE_DESCRIPTOR                   interface_desc_2;         // second interface descriptor (alternative - streaming)
+    USB_INTERFACE_DESCRIPTOR                   interface_desc_audio_2;   // second interface descriptor (alternative - streaming)
     USB_AUDIO_STREAMING_GENERAL_INTERFACE_DESCRIPTOR streaming_desc1;    // streaming descriptor
     USB_AUDIO_TYPE_I_FORMAT_TYPE_DESCRIPTOR    format_1;                 // format type I descriptor
     USB_AUDIO_CONTROL_ENDPOINT_DESCRIPTOR      endpoint_audio_0;         // first audio endpoint
     USB_ISO_AUDIO_DATA_ENDPOINT_DESCRIPTOR     iso_audio_desc1;          // isochronous audio data endpoint descriptor
-    USB_INTERFACE_DESCRIPTOR                   interface_desc_3;         // third interface  (zero bandwidth)
-    USB_INTERFACE_DESCRIPTOR                   interface_desc_4;         // third interface descriptor (aternative - streaming)
+    USB_INTERFACE_DESCRIPTOR                   interface_desc_audio_3;   // third interface  (zero bandwidth)
+    USB_INTERFACE_DESCRIPTOR                   interface_desc_audio_4;   // third interface descriptor (aternative - streaming)
     USB_AUDIO_STREAMING_GENERAL_INTERFACE_DESCRIPTOR streaming_desc2;    // streaming descriptor
     USB_AUDIO_TYPE_I_FORMAT_TYPE_DESCRIPTOR    format_2;                 // format type I descriptor
     USB_AUDIO_CONTROL_ENDPOINT_DESCRIPTOR      endpoint_audio_1;         // second audio endpoint
@@ -385,7 +391,7 @@ static const USB_CONFIGURATION_DESCRIPTOR_COLLECTION config_descriptor = {
     0,                                                                   // first interface number
     2,                                                                   // interface count
     #if defined USB_CDC_RNDIS
-    DEVICE_CLASS_COMMUNICATION_ABSTRACT_VENDOR,                          // 0x02, 0x02, 0xff
+    DEVICE_CLASS_COMMUNICATION_AND_CONTROL_MANUAL,                       // 0x02, 0x00, 0x00
     #else
     DEVICE_CLASS_COMMUNICATION_AND_CONTROL,                              // 0x02, 0x02, 0x00
     #endif
@@ -596,7 +602,7 @@ static const USB_CONFIGURATION_DESCRIPTOR_COLLECTION config_descriptor = {
     1                                                                    // subordinate interface
     },                                                                   // end of function descriptors
 
-    // Interrupt endpoint descriptor for seconf CDC - control interface
+    // Interrupt endpoint descriptor for second CDC - control interface
     //
     {                                                                    // interrupt endpoint descriptor for first interface
     DESCRIPTOR_TYPE_ENDPOINT_LENGTH,                                     // descriptor size in bytes (0x07)
@@ -1109,7 +1115,7 @@ static const USB_CONFIGURATION_DESCRIPTOR_COLLECTION config_descriptor = {
     {                                                                    // bulk out endpoint descriptor for the second interface
     DESCRIPTOR_TYPE_ENDPOINT_LENGTH,                                     // descriptor size in bytes (0x07)
     DESCRIPTOR_TYPE_ENDPOINT,                                            // endpoint descriptor (0x05)
-    (OUT_ENDPOINT | USB_MSB_OUT_ENDPOINT_NUMBER),                        // direction and address of endpoint
+    (OUT_ENDPOINT | USB_MSD_OUT_ENDPOINT_NUMBER),                        // {} direction and address of endpoint
     ENDPOINT_BULK,                                                       // endpoint attributes
     {LITTLE_SHORT_WORD_BYTES(64)},                                       // endpoint FIFO size (little-endian - 64 bytes)
     0                                                                    // polling interval in ms - ignored for bulk
@@ -1128,7 +1134,7 @@ static const USB_CONFIGURATION_DESCRIPTOR_COLLECTION config_descriptor = {
     {                                                                    // interface descriptor
     DESCRIPTOR_TYPE_INTERFACE_LENGTH,                                    // length (0x09)
     DESCRIPTOR_TYPE_INTERFACE,                                           // 0x04
-    ((USB_CDC_COUNT * 2) + 1 + USB_MSD_INTERFACE_COUNT),                 // interface number
+    (USB_MOUSE_INTERFACE_NUMBER),                                        // interface number
     0,                                                                   // alternative setting 0
     1,                                                                   // number of endpoints in addition to EP0
     USB_CLASS_HID,                                                       // interface class (0x03)
@@ -1164,7 +1170,7 @@ static const USB_CONFIGURATION_DESCRIPTOR_COLLECTION config_descriptor = {
     {                                                                    // interface descriptor
     DESCRIPTOR_TYPE_INTERFACE_LENGTH,                                    // length (0x09)
     DESCRIPTOR_TYPE_INTERFACE,                                           // 0x04
-    ((USB_CDC_COUNT * 2) + 1 + USB_MSD_INTERFACE_COUNT + USB_HID_MOUSE_INTERFACE_COUNT), // interface number
+    USB_KEYBOARD_INTERFACE_NUMBER,                                       // interface number
     0,                                                                   // alternative setting 0
     1,                                                                   // number of endpoints in addition to EP0
     USB_CLASS_HID,                                                       // interface class (0x03)
