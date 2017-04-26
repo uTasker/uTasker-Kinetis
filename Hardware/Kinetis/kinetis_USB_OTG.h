@@ -15,6 +15,7 @@
     *********************************************************************
     01.12.2015 Allow control endpoint to operate with reversed data toggle (required to receive fast multi-frame OUTs belonging to a SETUP block) {1}
     23.12.2015 Add zero copy OUT endpoint buffer option                  {2}
+    12.02.2017 Add KL82 support and allow USB host operation with shared endpoints {3}
 
 */
 
@@ -98,7 +99,11 @@ static int fnSendToken(unsigned char ucPID)
     }
     if ((ucPID >> 4) == IN_PID) {                                        // if an IN PID is to be sent
         unsigned char ucEndpoint = (ucPID & 0x0f);                       // the endpoint
-        if (ucEndpoint != usb_hardware.ucHostEndpointActive) {           // change of endpoint detected
+        if ((ucEndpoint != usb_hardware.ucHostEndpointActive)            // change of endpoint detected
+    #if defined SUPPORT_USB_SIMPLEX_HOST_ENDPOINTS                       // {3} always synchronise the reception buffer characteristics on application endpoints since they may be shared and this don't change the value bwteeen tx and rx usage
+        || (ucEndpoint != 0))
+    #endif
+        {
             usb_hardware.ptrEndpoint = &usb_endpoints[ucEndpoint];       // the endpoint's characteristics
             usb_hardware.ucHostEndpointActive = ucEndpoint;              // the newly active endpoint
             if (usb_endpoints[ucEndpoint].ulNextRxData0 & DATA_1) {      // ensure that the receive buffer has the endpoints data flags set correctly
@@ -968,8 +973,10 @@ extern void fnConfigUSB(QUEUE_HANDLE Channel, USBTABLE *pars)
     #if !defined KINETIS_KL
     FMC_PFAPR |= FMC_FPAPR_USB_FS;                                       // allow USB controller to read from Flash
     #endif
+    #if !defined KINETIS_KL82                                            // {3} KL82 doesn't have regulator control
     SIM_SOPT1_SET(SIM_SOPT1_USBREGEN, SIM_SOPT1CFG_URWE);                // ensure USB regulator is enabled
     SIM_SOPT1_CLR(SIM_SOPT1_USBSTBY, SIM_SOPT1CFG_UVSWE);                // and not in standby
+    #endif
     switch (pars->ucClockSource) {                                       // set USB clock source
     case INTERNAL_USB_CLOCK:
     #if (defined KINETIS_K_FPU || (KINETIS_MAX_SPEED > 100000000)) && !defined KINETIS_K21 && !defined KINETIS_K22 && !defined KINETIS_K24 && !defined KINETIS_K26 && !defined KINETIS_K64 && !defined KINETIS_K65 && !defined KINETIS_K66 && !defined KINETIS_K80

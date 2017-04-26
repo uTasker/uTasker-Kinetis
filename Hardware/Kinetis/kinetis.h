@@ -109,7 +109,7 @@
     14.02.2017 Add LTC                                                   {92}
     08.03.2017 Add PWM_NO_OUTPUT and PWM_DMA_CHANNEL_ENABLE PWM options  {93}
     08.03.2017 Add ucDmaTriggerSource to ADC setup                       {94}
-    19.04.017 Adjust USB FS crossbar master setting for K65 and K66      {95}
+    19.04.2017 Adjust USB FS crossbar master setting for K65 and K66     {95}
 
 */
 
@@ -8414,8 +8414,11 @@ typedef struct stKINETIS_ADMA2_BD
     #if defined KINETIS_K66
         #define SIM_SOPT8                    *(unsigned long*)(SIM_BLOCK + 0x101c) // System Options Register 8
     #endif
-    #if defined KINETIS_KL82 || defined KINETIS_K66
+    #if defined KINETIS_KL82 || defined KINETIS_K65 || defined KINETIS_K66
         #define SIM_SOPT9                    *(unsigned long*)(SIM_BLOCK + 0x1020) // System Options Register 9
+        #if defined KINETIS_KL82
+            #define SIM_SOPT9_TPM0CLKSEL     0x01000000                  // TPM0 external clock pin selection
+        #endif
             #define SIM_SOPT9_TPM1CLKSEL     0x02000000                  // TPM1 external clock pin selection
             #define SIM_SOPT9_TPM2CLKSEL     0x04000000                  // TPM2 external clock pin selection
     #endif

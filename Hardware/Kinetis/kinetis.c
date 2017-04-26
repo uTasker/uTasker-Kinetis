@@ -415,7 +415,7 @@ static void disable_watchdog(void)
         ACTIVATE_WATCHDOG();                                             // allow user configuration of internal watch dog timer
     }
     else {
-        #if defined KINETIS_KL                                           // {67}
+        #if defined KINETIS_KL && !defined KINETIS_KL82                  // {67}
         SIM_COPC = SIM_COPC_COPT_DISABLED;                               // disable the COP
         #else
         UNLOCK_WDOG();                                                   // open a windows to write to watchdog
@@ -1045,7 +1045,7 @@ extern void fnStartTick(void)
 //
 extern void fnRetriggerWatchdog(void)
 {
-#if defined KINETIS_KL                                                   // {67}
+#if defined KINETIS_KL && !defined KINETIS_KL82                          // {67}
     if (SIM_COPC & SIM_COPC_COPT_LONGEST) {                              // if the COP is enabled
         SIM_SRVCOP = SIM_SRVCOP_1;                                       // issue COP service sequency
         SIM_SRVCOP = SIM_SRVCOP_2;
@@ -1380,7 +1380,7 @@ extern int fnClkout(int iClockSource)                                    // {120
         ulSIM_SOPT2 |= SIM_SOPT2_CLKOUTSEL_MCGIRCLK;
         break;
     case EXTERNAL_OSCILLATOR_CLOCK_OUT:
-        ulSIM_SOPT2 |= SIM_SOPT2_CLKOUTSEL_OSCERCLK;
+        ulSIM_SOPT2 |= SIM_SOPT2_CLKOUTSEL_OSCERCLK0;
         break;
     #if defined KINETIS_HAS_IRC48M
     case INTERNAL_IRC48M_CLOCK_OUT:
@@ -1685,7 +1685,7 @@ static void _LowLevelInit(void)
         ACTIVATE_WATCHDOG();                                             // allow user configuration of internal watchdog timer
     }
     else {                                                               // disable the watchdog
-    #if defined KINETIS_KL                                               // {67}
+    #if defined KINETIS_KL && !defined KINETIS_KL82                      // {67}
         SIM_COPC = SIM_COPC_COPT_DISABLED;                               // disable the COP
     #else
         UNLOCK_WDOG();                                                   // open a window to write to watchdog

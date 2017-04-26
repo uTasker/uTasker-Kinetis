@@ -45,7 +45,7 @@
         </option>
         <option>
           <name>MemFile</name>
-          <state>$TOOLKIT_DIR$\CONFIG\debugger\NXP\MK66FN2M0xxx18.ddf</state>
+          <state>$TOOLKIT_DIR$\CONFIG\debugger\NXP\MKL27Z256xxx4.ddf</state>
         </option>
         <option>
           <name>RunToEnable</name>
@@ -85,7 +85,7 @@
         </option>
         <option>
           <name>OCDynDriverList</name>
-          <state>JLINK_ID</state>
+          <state>PEMICRO_ID</state>
         </option>
         <option>
           <name>OCLastSavedByProductVersion</name>
@@ -113,7 +113,7 @@
         </option>
         <option>
           <name>FlashLoadersV3</name>
-          <state>$TOOLKIT_DIR$\config\flashloader\NXP\FlashK65Fxxx256K.board</state>
+          <state>$TOOLKIT_DIR$\config\flashloader\NXP\FlashKLxx256KROM.board</state>
         </option>
         <option>
           <name>OCImagesSuppressCheck1</name>

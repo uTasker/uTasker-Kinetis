@@ -1,5 +1,5 @@
 [DebugChecksum]
-Checksum=148078236
+Checksum=346956947
 [DisAssemblyWindow]
 NumStates=_ 1
 State 1=_ 1
@@ -179,6 +179,32 @@ EventLSU=0
 EventSLEEP=0
 [PEMICRODriver]
 PEM_LeaveTargetRunning=0x00000000
+[Trace1]
+Enabled=0
+ShowSource=1
+[Log file]
+LoggingEnabled=_ 0
+LogFile=_ ""
+Category=_ 0
+[TermIOLog]
+LoggingEnabled=_ 0
+LogFile=_ ""
+[DriverProfiling]
+Enabled=0
+Mode=1
+Graph=0
+Symbiont=0
+Exclusions=
+[CallStackLog]
+Enabled=0
+[CallStackStripe]
+ShowTiming=1
+[Breakpoints2]
+Bp0=_ 0 "EMUL_CODE" "0x000005AC" 0 0 1 "" 0 "" 0
+Bp1=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\uTasker\uTasker.c}.133.16" 0 0 1 "" 0 "" 0
+Count=2
+[Disassemble mode]
+mode=3
 [Breakpoints]
 Bp0=_ "STD_CODE" "{C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Hardware\Kinetis\kinetis_USB_OTG.h}.711.1" 0 0 0 0 "" 0 "" 0
 Bp1=_ "STD_CODE" "{C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Applications\uTaskerV1.4\usb_application.c}.2375.5" 0 0 0 0 "" 0 "" 0
@@ -195,31 +221,6 @@ Bp11=_ "STD_CODE" "{C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Har
 Bp12=_ "STD_CODE" "0x000038E6" 0 0 0 0 "" 0 "" 0
 Bp13=_ "STD_CODE" "{C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Hardware\Kinetis\kinetis_ADC.h}.502.1" 1 0 0 0 "" 0 "" 0
 Count=14
-[Trace1]
-Enabled=0
-ShowSource=1
-[Disassemble mode]
-mode=3
-[Breakpoints2]
-Bp0=_ 0 "EMUL_CODE" "0x000005AC" 0 0 1 "" 0 "" 0
-Count=1
-[Log file]
-LoggingEnabled=_ 0
-LogFile=_ ""
-Category=_ 0
-[TermIOLog]
-LoggingEnabled=_ 0
-LogFile=_ ""
 [Aliases]
 Count=0
 SuppressDialog=0
-[DriverProfiling]
-Enabled=0
-Mode=1
-Graph=0
-Symbiont=0
-Exclusions=
-[CallStackLog]
-Enabled=0
-[CallStackStripe]
-ShowTiming=1

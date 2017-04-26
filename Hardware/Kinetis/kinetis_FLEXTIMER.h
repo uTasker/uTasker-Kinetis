@@ -11,8 +11,13 @@
     File:      kinetis_FLEXTIMER.h
     Project:   Single Chip Embedded Internet
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2017
     *********************************************************************
+    21.06.2014 Adjust FlexTimer/TPM use of FTM_SC_TOF to clear interrupt correctly {1}
+    22.07.2014 Add clock source selection to TPM                         {2}
+    04.01.2017 Don't adjust the RC clock setting when the processor is running from it {3}
+    26.01.2017 Add external clock selection for KL parts                 {4}
+    26.04.2017 Add KL82 TPM clock input selection                        {5}
 
 */
 
@@ -62,7 +67,7 @@ static void (*_flexTimerInterrupt[FLEX_TIMERS_AVAILABLE])(void) = {
 //
 static void fnHandleFlexTimer(FLEX_TIMER_MODULE *ptrFlexTimer, int iFlexTimerReference)
 {
-    if (ptrFlexTimer->FTM_SC & FTM_SC_TOF) {                             // flag will always be set but it has to be read at '1' before it can be reset
+    if ((ptrFlexTimer->FTM_SC & FTM_SC_TOF) != 0) {                      // flag will always be set but it has to be read at '1' before it can be reset
         if (usFlexTimerMode[iFlexTimerReference] & FLEX_TIMER_PERIODIC) {// if the timer is being used in periodic mode
             ptrFlexTimer->FTM_SC = (usFlexTimerMode[iFlexTimerReference] & FTM_SC_USED_MASK); // reset interrupt and allow the FlexTimer to continue running for periodic interrupts
         }
@@ -144,13 +149,16 @@ static __interrupt void _flexTimerInterrupt_3(void)
             register int iPrescaler = 0;
             FLEX_TIMER_MODULE *ptrFlexTimer;
     #if defined KINETIS_KL
-        #if defined TPM_CLOCKED_FROM_MCGIRCLK                            // {99}
+            unsigned long ulExtSelect;
+        #if defined TPM_CLOCKED_FROM_MCGIRCLK                            // {2}
+            #if !defined RUN_FROM_LIRC                                   // {3} if the processor is running from the the internal clock we don't adjust settings here
             MCG_C1 |= (MCG_C1_IRCLKEN | MCG_C1_IREFSTEN);                // enable internal reference clock and allow it to continue running in stop modes
-            #if defined USE_FAST_INTERNAL_CLOCK
+                #if defined USE_FAST_INTERNAL_CLOCK
             MCG_SC = 0;                                                  // remove fast IRC divider
             MCG_C2 |= MCG_C2_IRCS;                                       // select fast internal reference clock (4MHz)
-            #else
+                #else
             MCG_C2 &= ~MCG_C2_IRCS;                                      // select slow internal reference clock (32kHz)
+                #endif
             #endif
             SIM_SOPT2 |= SIM_SOPT2_TPMSRC_MCGIRCLK;                      // use MCGIRCLK as timer clock source
         #elif defined TPM_CLOCKED_FROM_OSCERCLK
@@ -162,7 +170,7 @@ static __interrupt void _flexTimerInterrupt_3(void)
     #endif
             switch (iTimerReference) {                                   // FlexTimer to be used
             case 0:
-                if (ptrTimerSetup->timer_mode & TIMER_STOP) {
+                if ((ptrTimerSetup->timer_mode & TIMER_STOP) != 0) {
                     POWER_DOWN(6, SIM_SCGC6_FTM0);
                     return;
                 }
@@ -170,13 +178,18 @@ static __interrupt void _flexTimerInterrupt_3(void)
                 ptrFlexTimer = (FLEX_TIMER_MODULE *)FTM_BLOCK_0;         // KL and KE parts actually use the TPM which is however very similar to the FlexTimer
     #if defined KINETIS_KL
                 iInterruptID = irq_TPM0_ID;
+        #if defined KINETIS_KL82                                         // {5}
+                ulExtSelect = SIM_SOPT9_TPM0CLKSEL;
+        #else
+                ulExtSelect = SIM_SOPT4_FTM0CLKSEL;
+        #endif
     #else
                 iInterruptID = irq_FTM0_ID;
     #endif
                 break;
     #if FLEX_TIMERS_AVAILABLE > 1
             case 1:
-                if (ptrTimerSetup->timer_mode & TIMER_STOP) {
+                if ((ptrTimerSetup->timer_mode & TIMER_STOP) != 0) {
                     POWER_DOWN(6, SIM_SCGC6_FTM1);
                     return;
                 }
@@ -184,6 +197,11 @@ static __interrupt void _flexTimerInterrupt_3(void)
                 ptrFlexTimer = (FLEX_TIMER_MODULE *)FTM_BLOCK_1;         // KL and KE parts actually use the TPM which is however very similar to the FlexTimer
         #if defined KINETIS_KL
                 iInterruptID = irq_TPM1_ID;
+            #if defined KINETIS_KL82                                     // {5}
+                ulExtSelect = SIM_SOPT9_TPM1CLKSEL;
+            #else
+                ulExtSelect = SIM_SOPT4_FTM1CLKSEL;
+            #endif
         #else
                 iInterruptID = irq_FTM1_ID;
         #endif
@@ -191,7 +209,7 @@ static __interrupt void _flexTimerInterrupt_3(void)
     #endif
     #if FLEX_TIMERS_AVAILABLE > 2
             case 2:
-                if (ptrTimerSetup->timer_mode & TIMER_STOP) {
+                if ((ptrTimerSetup->timer_mode & TIMER_STOP) != 0) {
         #if defined KINETIS_KL
                     POWER_DOWN(6, SIM_SCGC6_FTM2);
         #else
@@ -207,6 +225,11 @@ static __interrupt void _flexTimerInterrupt_3(void)
                 ptrFlexTimer = (FLEX_TIMER_MODULE *)FTM_BLOCK_2;         // KL and KE parts actually use the TPM which is however very similar to the FlexTimer
         #if defined KINETIS_KL
                 iInterruptID = irq_TPM2_ID;
+            #if defined KINETIS_KL82                                     // {5}
+                ulExtSelect = SIM_SOPT9_TPM2CLKSEL;
+            #else
+                ulExtSelect = SIM_SOPT4_FTM2CLKSEL;
+            #endif
         #else
                 iInterruptID = irq_FTM2_ID;
         #endif
@@ -214,7 +237,7 @@ static __interrupt void _flexTimerInterrupt_3(void)
     #endif
     #if FLEX_TIMERS_AVAILABLE > 3
             case 3:
-                if (ptrTimerSetup->timer_mode & TIMER_STOP) {
+                if ((ptrTimerSetup->timer_mode & TIMER_STOP) != 0) {
                     POWER_DOWN(3, SIM_SCGC3_FTM3); 
                     return;
                 }
@@ -228,7 +251,7 @@ static __interrupt void _flexTimerInterrupt_3(void)
                 return;
             }
             ptrFlexTimer->FTM_SC = 0;                                    // ensure not operating
-            if (ptrFlexTimer->FTM_SC & FTM_SC_TOF) {                     // ensure no pending interrupt
+            if ((ptrFlexTimer->FTM_SC & FTM_SC_TOF) != 0) {              // ensure no pending interrupt
                 ptrFlexTimer->FTM_SC = 0;                                // clear pending interrupt (requires a read of the interrupt bit at '1' beforehand)
             }
             ptrFlexTimer->FTM_CONF = FTM_DEBUG_BEHAVIOUR;                // set the debugging behaviour (whether the counter runs in debug mode and how the outputs react)
@@ -244,25 +267,55 @@ static __interrupt void _flexTimerInterrupt_3(void)
                 ulDelay /= 2;
             }
             usFlexTimerMode[iTimerReference] = (unsigned short)iPrescaler;
-            if (ptrTimerSetup->timer_mode & TIMER_PERIODIC) {            // if periodic operation required
+            if ((ptrTimerSetup->timer_mode & TIMER_PERIODIC) != 0) {     // if periodic operation required
                 usFlexTimerMode[iTimerReference] |= FLEX_TIMER_PERIODIC; // mark that periodic mode is being used
             }
             ptrFlexTimer->FTM_MOD = ulDelay;                             // set upper count value
-            if ((_flexTimerHandler[iTimerReference] = ptrTimerSetup->int_handler) != 0) { // enter the user interrupt handler
-                fnEnterInterrupt(iInterruptID, ptrTimerSetup->int_priority, _flexTimerInterrupt[iTimerReference]); // enter flex timer interrupt handler
     #if defined KINETIS_KL
-                usFlexTimerMode[iTimerReference] |= (FTM_SC_CLKS_SYS | FTM_SC_TOIE | FTM_SC_TOF); // set mode to start (shared by all channels) - system clock with overflow interrupt enabled [FTM_SC_TOF must be written with 1 to clear]
-    #else
-                usFlexTimerMode[iTimerReference] |= (FTM_SC_CLKS_SYS | FTM_SC_TOIE); // {89} set mode to start (shared by all channels) - system clock with overflow interrupt enabled [FTM_SC_TOF must be written with 0 to clear]
-    #endif
+            if ((ptrTimerSetup->timer_mode & (TIMER_EXT_CLK_0 | TIMER_EXT_CLK_1)) != 0) { // {4} the external clock source is to be used
+                usFlexTimerMode[iTimerReference] |= (FTM_SC_CLKS_EXT | FTM_SC_TOIE | FTM_SC_TOF); // select external clock (which should be half the speed of the module's clock due to synchronisation requirements)
+                if ((ptrTimerSetup->timer_mode & (TIMER_EXT_CLK_1)) != 0) {
+        #if defined KINETIS_KL82                                         // {5}
+                    SIM_SOPT9 |= ulExtSelect;                            // select CLKIN1 source to this timer
+        #else
+                    SIM_SOPT4 |= ulExtSelect;                            // select CLKIN1 source to this timer
+        #endif
+        #if defined KINETIS_KL03
+                    _CONFIG_PERIPHERAL(B, 6, (PB_6_TPM_CLKIN1 | PORT_PS_UP_ENABLE)); // TPM_CLKIN1 on PB.6 (alt. function 3)
+        #else
+                    _CONFIG_PERIPHERAL(E, 30, (PE_30_TPM_CLKIN1 | PORT_PS_UP_ENABLE)); // TPM_CLKIN1 on PE.30 (alt. function 4)
+        #endif
+                }
+                else {
+        #if defined KINETIS_KL82                                         // {5}
+                    SIM_SOPT9 &= ~(ulExtSelect);                         // select CLKIN0 source to this timer
+        #else
+                    SIM_SOPT4 &= ~(ulExtSelect);                         // select CLKIN0 source to this timer
+        #endif
+        #if defined KINETIS_KL03
+                    _CONFIG_PERIPHERAL(A, 12, (PA_12_TPM_CLKIN0 | PORT_PS_UP_ENABLE)); // TPM_CLKIN0 on PA.12 (alt. function 3)
+                  //_CONFIG_PERIPHERAL(A, 1, (PA_1_TPM_CLKIN0 | PORT_PS_UP_ENABLE)); // TPM_CLKIN0 on PA.1 (alt. function 2)
+        #else
+                    _CONFIG_PERIPHERAL(E, 29, (PE_29_TPM_CLKIN0 | PORT_PS_UP_ENABLE)); // TPM_CLKIN0 on PE.29 (alt. function 4)
+        #endif
+                }
             }
             else {
-    #if defined KINETIS_KL
-                usFlexTimerMode[iTimerReference] |= (FTM_SC_CLKS_SYS | FTM_SC_TOF); // set mode to start (shared by all channels) - system clock without interrupt [FTM_SC_TOF must be written with 1 to clear]
-    #else
-                usFlexTimerMode[iTimerReference] |= (FTM_SC_CLKS_SYS);   // {89} set mode to start (shared by all channels) - system clock without interrupt [FTM_SC_TOF must be written with 0 to clear]
-    #endif
+                usFlexTimerMode[iTimerReference] |= (FTM_SC_CLKS_SYS | FTM_SC_TOF); // set mode to start (shared by all channels) - system clock with overflow interrupt enabled [FTM_SC_TOF must be written with 1 to clear]
             }
+    #else
+            usFlexTimerMode[iTimerReference] |= (FTM_SC_CLKS_SYS);       // {1} set mode to start (shared by all channels) - system clock with overflow interrupt enabled [FTM_SC_TOF must be written with 0 to clear]
+    #endif
+            if ((_flexTimerHandler[iTimerReference] = ptrTimerSetup->int_handler) != 0) { // enter the user interrupt handler
+                fnEnterInterrupt(iInterruptID, ptrTimerSetup->int_priority, _flexTimerInterrupt[iTimerReference]); // enter flex timer interrupt handler
+                usFlexTimerMode[iTimerReference] |= FTM_SC_TOIE;         // enable interrupt
+            }
+    #if !defined DEVICE_WITHOUT_DMA
+            if ((ptrTimerSetup->timer_mode & TIMER_DMA_TRIGGER) != 0) {  // when DMA required
+                ptrFlexTimer->FTM_channel[0].FTM_CV = 0;                 // set the match value for channel 0
+                ptrFlexTimer->FTM_channel[0].FTM_CSC = FTM_CSC_DMA;      // enable DMA trigger on match
+            }
+    #endif
             ptrFlexTimer->FTM_SC = (usFlexTimerMode[iTimerReference] & FTM_SC_USED_MASK); // start timer
         }
 #endif

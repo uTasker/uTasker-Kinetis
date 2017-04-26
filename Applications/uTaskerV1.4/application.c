@@ -534,7 +534,6 @@ TEMPPARS *temp_pars = 0;                                                 // work
 static QUEUE_HANDLE save_handle = NETWORK_HANDLE;                        // temporary debug handle backup
 static int iAppState = STATE_INIT;                                       // task state
 
-
 // Application task
 //
 extern void fnApplication(TTASKTABLE *ptrTaskTable)

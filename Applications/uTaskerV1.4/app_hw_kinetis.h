@@ -994,6 +994,16 @@
     #define PACKAGE_TYPE        PACKAGE_QFN                              // QFN
     #define SIZE_OF_FLASH       (64 * 1024)                              // 64k program Flash
     #define SIZE_OF_RAM         (8 * 1024)                               // 8k SRAM
+#elif defined FRDM_KL82Z
+    #define MASK_0N51R                                                   // enable errata workarounds for this mask
+  //#define PIN_COUNT           PIN_COUNT_64_PIN
+    #define PIN_COUNT           PIN_COUNT_80_PIN                         // 80 pin package
+  //#define PIN_COUNT           PIN_COUNT_100_PIN
+  //#define PIN_COUNT           PIN_COUNT_121_PIN
+    #define PACKAGE_TYPE        PACKAGE_LQFP                             // LQFP
+  //#define PACKAGE_TYPE        PACKAGE_BGA
+    #define SIZE_OF_FLASH       (128 * 1024)                             // 128k program Flash
+    #define SIZE_OF_RAM         (96 * 1024)                              // 96k SRAM
 #elif defined TRK_KEA8
   //#define PIN_COUNT           PIN_COUNT_16_PIN                         // 16 pin TSSOP
     #define PIN_COUNT           PIN_COUNT_24_PIN                         // 24 pin QFN
@@ -1999,7 +2009,7 @@ static inline void QSPI_HAL_ClearSeqId(QuadSPI_Type * base, qspi_command_seq_t s
             #define uFILE_START      (FLASH_START_ADDRESS + (63 * 1024)) // FLASH location at 62k start
             #define FILE_GRANULARITY (1 * FLASH_GRANULARITY)             // each file a multiple of 1k
             #define FILE_SYSTEM_SIZE (2 * 1024)                          // 4k reserved for file system
-        #elif defined FRDM_KL25Z || defined FRDM_KL26Z || defined TWR_KL25Z48M || defined FRDM_KE06Z || defined TRK_KEA128 || defined rcARM_KL26 // {21}{24}{30}
+        #elif defined FRDM_KL25Z || defined FRDM_KL26Z || defined FRDM_KL82Z || defined TWR_KL25Z48M || defined FRDM_KE06Z || defined TRK_KEA128 || defined rcARM_KL26 || defined FRDM_KEAZ128Q80 // {21}{24}{30}
             #define uFILE_START      (FLASH_START_ADDRESS + (100 * 1024))// FLASH location at 100k start
             #define FILE_GRANULARITY (2 * FLASH_GRANULARITY)             // each file a multiple of 2k
             #define FILE_SYSTEM_SIZE (28 * 1024)                         // 28k reserved for file system
@@ -2086,12 +2096,14 @@ static inline void QSPI_HAL_ClearSeqId(QuadSPI_Type * base, qspi_command_seq_t s
     #define KINETIS_FLASH_CONFIGURATION_PROGRAM_PROTECTION (0xffffffff)  // PROT[24:31]:PROT[23:16]:PROT[15:8]:PROT[7:0] - no protection when all are '1'
     #define KINETIS_FLASH_CONFIGURATION_SECURITY           (FTFL_FSEC_SEC_UNSECURE | FTFL_FSEC_FSLACC_GRANTED | FTFL_FSEC_MEEN_ENABLED | FTFL_FSEC_KEYEN_ENABLED)
     #if defined KINETIS_KL || defined KINETIS_KV
-        #if defined KINETIS_KL03 || defined KINETIS_KL43 || defined KINETIS_KL27
-            #if defined TWR_KL43Z48M || defined FRDM_KL43Z || defined FRDM_KL03Z || defined FRDM_KL27Z || defined CAPUCCINO_KL27
-                #define KINETIS_FLASH_CONFIGURATION_NONVOL_OPTION  (FTFL_FOPT_LPBOOT_CLK_DIV_0 | FTFL_FOPT_RESET_PIN_ENABLED | FTFL_FOPT_BOOTSRC_SEL_FLASH | FTFL_FOPT_BOOTPIN_OPT | FTFL_FOPT_NMI_DISABLED)
-              //#define KINETIS_FLASH_CONFIGURATION_NONVOL_OPTION (FTFL_FOPT_BOOTSRC_SEL_ROM | FTFL_FOPT_BOOTPIN_OPT | FTFL_FOPT_FAST_INIT | FTFL_FOPT_LPBOOT_CLK_DIV_0 | FTFL_FOPT_RESET_PIN_ENABLED | FTFL_FOPT_NMI_ENABLED) // select ROM
+        #if defined ROM_BOOTLOADER
+            #define BOOTLOADER_ERRATA
+            #if defined TWR_KL43Z48M || defined FRDM_KL43Z || defined FRDM_KL03Z || defined FRDM_KL27Z || defined FRDM_KL82Z || defined CAPUCCINO_KL27
+                #define KINETIS_FLASH_CONFIGURATION_NONVOL_OPTION  (FTFL_FOPT_LPBOOT_CLK_DIV_0 | FTFL_FOPT_RESET_PIN_ENABLED | FTFL_FOPT_BOOTSRC_SEL_FLASH | FTFL_FOPT_BOOTPIN_OPT_DISABLE | FTFL_FOPT_NMI_DISABLED) // never use boot ROM
+              //#define KINETIS_FLASH_CONFIGURATION_NONVOL_OPTION  (FTFL_FOPT_LPBOOT_CLK_DIV_0 | FTFL_FOPT_RESET_PIN_ENABLED | FTFL_FOPT_BOOTSRC_SEL_FLASH | FTFL_FOPT_BOOTPIN_OPT_ENABLE | FTFL_FOPT_NMI_DISABLED) // use boot ROM if NMI is held low at reset
+              //#define KINETIS_FLASH_CONFIGURATION_NONVOL_OPTION (FTFL_FOPT_BOOTSRC_SEL_ROM | FTFL_FOPT_BOOTPIN_OPT_DISABLE | FTFL_FOPT_FAST_INIT | FTFL_FOPT_LPBOOT_CLK_DIV_0 | FTFL_FOPT_RESET_PIN_ENABLED | FTFL_FOPT_NMI_DISABLED) // always use boot ROM
             #else
-                #define KINETIS_FLASH_CONFIGURATION_NONVOL_OPTION  (FTFL_FOPT_LPBOOT_CLK_DIV_0 | FTFL_FOPT_RESET_PIN_ENABLED | FTFL_FOPT_BOOTSRC_SEL_FLASH | FTFL_FOPT_BOOTPIN_OPT | FTFL_FOPT_NMI_ENABLED)
+                #define KINETIS_FLASH_CONFIGURATION_NONVOL_OPTION  (FTFL_FOPT_LPBOOT_CLK_DIV_0 | FTFL_FOPT_RESET_PIN_ENABLED | FTFL_FOPT_BOOTSRC_SEL_FLASH | FTFL_FOPT_BOOTPIN_OPT_DISABLE | FTFL_FOPT_NMI_ENABLED)
             #endif
         #else
             #define KINETIS_FLASH_CONFIGURATION_NONVOL_OPTION  (FTFL_FOPT_LPBOOT_CLK_DIV_8 | FTFL_FOPT_RESET_PIN_ENABLED)
@@ -2137,7 +2149,7 @@ static inline void QSPI_HAL_ClearSeqId(QuadSPI_Type * base, qspi_command_seq_t s
         #define DEMO_UART    2                                           // use UART 2
     #elif defined TWR_K20D50M || defined TWR_K80F150M || defined tinyK20 || defined TWR_K20D72M || defined NET_K60 || defined FRDM_KE02Z || defined FRDM_KE02Z40M || defined FRDM_KE06Z || defined FRDM_K22F || defined TWR_K22F120M || defined TWR_K24F120M || defined TWR_K64F120M || defined TWR_KW21D256 || defined TWR_KW24D512 || defined rcARM_KL26 || defined BLAZE_K22 // {2}{16}{25}{30}
         #define DEMO_UART    1                                           // use UART 1
-    #elif defined K02F100M || defined FRDM_K20D50M || defined FRDM_KL46Z || defined FRDM_KL43Z || defined FRDM_KL25Z || defined FRDM_KL26Z || defined FRDM_KL27Z || defined CAPUCCINO_KL27 || defined KL43Z_256_32_CL || defined TEENSY_LC || defined TWR_KL25Z48M || defined FRDM_KL02Z || defined FRDM_KL03Z || defined FRDM_KL05Z || defined TRK_KEA8 || defined TEENSY_3_1 || defined FRDM_KE04Z || defined FRDM_K64F || defined FRDM_K66F || defined TWR_KV10Z32  || defined TWR_KV31F120M || ((defined TWR_K40X256 || defined TWR_K40D100M) && defined DEBUG_ON_VIRT_COM) || defined FreeLON // {21}{22}{24}{25}
+    #elif defined K02F100M || defined FRDM_K20D50M || defined FRDM_KL46Z || defined FRDM_KL43Z || defined FRDM_KL25Z || defined FRDM_KL26Z || defined FRDM_KL27Z || defined FRDM_KL82Z || defined CAPUCCINO_KL27 || defined TEENSY_LC || defined TWR_KL25Z48M || defined FRDM_KL02Z || defined FRDM_KL03Z || defined FRDM_KL05Z || defined TRK_KEA8 || defined TEENSY_3_1 || defined FRDM_KE04Z || defined FRDM_K64F || defined FRDM_K66F || defined TWR_KV10Z32  || defined TWR_KV31F120M || ((defined TWR_K40X256 || defined TWR_K40D100M) && defined DEBUG_ON_VIRT_COM) || defined FreeLON // {21}{22}{24}{25}
         #define DEMO_UART    0                                           // use UART 0
     #elif defined NET_KBED                                               // {16}
         #if defined KBEDM_BOARD
@@ -2156,7 +2168,7 @@ static inline void QSPI_HAL_ClearSeqId(QuadSPI_Type * base, qspi_command_seq_t s
     #else
         #define DEMO_UART        3                                       // use UART 3
     #endif
-    #if defined FRDM_KL03Z || defined FRDM_KL43Z || defined KL43Z_256_32_CL || defined FRDM_KL27Z || defined CAPUCCINO_KL27 || defined TWR_KL43Z48M || defined FRDM_K22F || defined TWR_KV31F120M || defined TWR_K80F150M || defined FRDM_K82F
+    #if defined FRDM_KL03Z || defined FRDM_KL43Z || defined FRDM_KL27Z || defined FRDM_KL82Z || defined CAPUCCINO_KL27 || defined TWR_KL43Z48M || defined FRDM_K22F || defined TWR_KV31F120M || defined TWR_K80F150M || defined FRDM_K82F
         #define LPUART_IRC48M                                            // if the 48MHz clock is available clock the LPUART from it
       //#define LPUART_OSCERCLK                                          // clock the LPUART from the external clock
       //#define LPUART_MCGIRCLK                                          // clock the LPUART from MCGIRCLK (IRC8M/FCRDIV/LIRC_DIV2) - default if others are not defined
@@ -2257,6 +2269,8 @@ static inline void QSPI_HAL_ClearSeqId(QuadSPI_Type * base, qspi_command_seq_t s
         #define UART1_ON_C
     #elif defined TWR_K20D50M
         #define UART0_ON_B                                               // alternative UART0 pin mapping
+    #elif defined FRDM_KL82Z
+        #define LPUART0_ON_B                                             // alternative LPUART0 pin mapping
     #elif defined TWR_K20D72M
         #define UART3_ON_B                                               // alternative UART3 pin mapping
     #else
@@ -5748,6 +5762,81 @@ static inline void QSPI_HAL_ClearSeqId(QuadSPI_Type * base, qspi_command_seq_t s
     #define WAVE_DISK_START_STOP_INT_PORT        PORTC
     #define WAVE_DISK_START_STOP_INT_BIT         SWITCH_2
     #define RECORDER_WAVE_FILE_NAME              "FRDM_KL27Z.wav"
+#elif defined FRDM_KL82Z
+    #define DEMO_LED_1             (PORTC_BIT2)                          // (green LED) if the port is changed (eg. A to B) the port macros will require appropriate adjustment too
+    #define DEMO_LED_2             (PORTC_BIT1)                          // (red LED) if the port is changed (eg. A to B) the port macros will require appropriate adjustment too
+    #define DEMO_LED_3             (PORTC_BIT0)                          // (blue LED) if the port is changed (eg. A to B) the port macros will require appropriate adjustment too
+    #define DEMO_LED_4             (0)                                   // if the port is changed (eg. A to B) the port macros will require appropriate adjustment too
+    #define BLINK_LED              (DEMO_LED_1)
+    #define SWITCH_2               (PORTA_BIT4)                          // if the port is changed (eg. A to B) the port macros will require appropriate adjustment too
+    #define SWITCH_3               (PORTD_BIT0)                          // if the port is changed (eg. A to B) the port macros will require appropriate adjustment too
+
+    #define SWITCH_2_PORT          _PORTA
+    #define SWITCH_3_PORT          _PORTD
+
+    #if defined USE_MAINTENANCE
+        #define INIT_WATCHDOG_LED()                                      // let the port set up do this (the user can disable blinking)
+    #else
+        #define INIT_WATCHDOG_LED() _CONFIG_DRIVE_PORT_OUTPUT_VALUE(C, (BLINK_LED), (BLINK_LED), (PORT_SRE_SLOW | PORT_DSE_HIGH))
+    #endif
+
+    #define SHIFT_DEMO_LED_1        2                                   // since the port bits are spread out shift each to the lowest 4 bits
+    #define SHIFT_DEMO_LED_2        0
+    #define SHIFT_DEMO_LED_3        2
+    #define SHIFT_DEMO_LED_4        0
+
+    #define MAPPED_DEMO_LED_1       (DEMO_LED_1 >> SHIFT_DEMO_LED_1)
+    #define MAPPED_DEMO_LED_2       (DEMO_LED_2 >> SHIFT_DEMO_LED_2)
+    #define MAPPED_DEMO_LED_3       (DEMO_LED_3 << SHIFT_DEMO_LED_3)
+    #define MAPPED_DEMO_LED_4       (DEMO_LED_4 >> SHIFT_DEMO_LED_4)
+
+    #define INIT_WATCHDOG_DISABLE() _CONFIG_PORT_INPUT_FAST_LOW(A, (SWITCH_2), PORT_PS_UP_ENABLE) // configure as input
+    #define WATCHDOG_DISABLE()      (_READ_PORT_MASK(A, SWITCH_2) == 0) // pull this input down at reset to disable watchdog [J1 pin 8]
+    #define ACTIVATE_WATCHDOG()     UNLOCK_WDOG(); WDOG_TOVALL = (2000/5); WDOG_TOVALH = 0; WDOG_STCTRLH = (WDOG_STCTRLH_STNDBYEN | WDOG_STCTRLH_WAITEN | WDOG_STCTRLH_STOPEN | WDOG_STCTRLH_WDOGEN) // 1.024s watchdog timeout
+    #define TOGGLE_WATCHDOG_LED()  _TOGGLE_PORT(C, BLINK_LED)
+
+    #if defined USE_MAINTENANCE
+        #define CONFIG_TEST_OUTPUT()                                     // we use DEMO_LED_2 which is configured by the user code (and can be disabled in parameters if required)
+    #else
+        #define CONFIG_TEST_OUTPUT() _CONFIG_DRIVE_PORT_OUTPUT_VALUE(B, (DEMO_LED_2), (DEMO_LED_2), (PORT_SRE_FAST | PORT_DSE_HIGH))
+    #endif
+    #define TOGGLE_TEST_OUTPUT()    _TOGGLE_PORT(C, DEMO_LED_2)
+    #define SET_TEST_OUTPUT()       _SETBITS(C, DEMO_LED_2)
+    #define CLEAR_TEST_OUTPUT()     _CLEARBITS(C, DEMO_LED_2)
+
+    #define CONFIGURE_MOUSE_INPUTS() 
+    #define MOUSE_LEFT_CLICK()     0
+    #define MOUSE_UP()             0
+    #define MOUSE_DOWN()           0
+    #define MOUSE_LEFT()           (_READ_PORT_MASK(A, SWITCH_2) == 0)   // SW2 used as mouse movement left
+    #define MOUSE_RIGHT()          (_READ_PORT_MASK(D, SWITCH_3) == 0)   // SW3 used as right mouse movement right
+
+    #define BUTTON_KEY_DEFINITIONS {SWITCH_2_PORT,  SWITCH_2,  {328, 204, 345, 215}}, \
+                                   {SWITCH_3_PORT,  SWITCH_3,  {330, 16,  343, 30 }},
+                                    
+    #define MULTICOLOUR_LEDS       {0, 2}                               // single LED made up of entries 0, 1 and 2 [green/red/blue]
+
+        // '0'          '1'       input state   center (x,   y)   0 = circle, radius, controlling port, controlling pin 
+    #define KEYPAD_LED_DEFINITIONS  \
+        {RGB(0,255,0), RGB(0,0,0),     1, {251, 65, 0,   6   }, _PORTC, BLINK_LED}, \
+        {RGB(255,0,0), RGB(0,0,0),     1, {251, 65, 0,   6   }, _PORTC, DEMO_LED_2}, \
+        {RGB(0,0,255), RGB(0,0,0),     1, {251, 65, 0,   6   }, _PORTC, DEMO_LED_3}
+
+    #define KEYPAD "KeyPads/FRDM_KL82Z.bmp"
+
+    // Accelerometer interrupt configuration
+    //
+    #define ACC_INT_PRIORITY       PRIORITY_PORT_C_INT
+    #define ACC_INT_PORT           PORTC
+    #define ACC_INT_BIT            PORTC_BIT3
+    #define ACC_INT_ASSERTED()     (_READ_PORT_MASK(C, PORTC_BIT3) == 0)
+
+    // Defines for the WAVE file recording start/stop button
+    //
+    #define WAVE_DISK_START_STOP_INT_PRIORITY    PRIORITY_PORT_C_INT
+    #define WAVE_DISK_START_STOP_INT_PORT        PORTC
+    #define WAVE_DISK_START_STOP_INT_BIT         SWITCH_2
+    #define RECORDER_WAVE_FILE_NAME              "FRDM_KL28Z.wav"
 #elif defined rcARM_KL26
     #define DEMO_LED_1             (PORTD_BIT0)                          // if the port is changed (eg. A to B) the port macros will require appropriate adjustment too
     #define DEMO_LED_2             (PORTD_BIT5)                          // if the port is changed (eg. A to B) the port macros will require appropriate adjustment too

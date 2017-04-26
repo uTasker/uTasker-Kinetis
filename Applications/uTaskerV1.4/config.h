@@ -82,6 +82,9 @@
 //#define FRDM_KL46Z
 //#define TWR_KL46Z48M
 
+//#define TWR_KL82Z72M                                                   // tower board http://www.utasker.com/kinetis/FRDM-KL82Z72M
+//#define FRDM_KL82Z                                                     // freedom board http://www.utasker.com/kinetis/FRDM-KL82Z.html
+
 //#define TWR_KM34Z50M                                                   // M processors Cortex M0+ (metrology)
 
 //#define TWR_KV10Z32                                                    // V processors Cortex M0+/M4 (M0+ - motor control and power conversion - low dynamic control)
@@ -119,13 +122,13 @@
 
 //#define EMCRAFT_K61F150M                                               // K processors Cortex M4 with Ethernet, USB, encryption, tamper, key storage protection area
 
-//#define FRDM_K64F                                                      // next generation K processors Cortex M4 with Ethernet, USB, encryption, tamper, key storage protection area - freedom board http://www.utasker.com/kinetis/FRDM-K64F.html
+#define FRDM_K64F                                                        // next generation K processors Cortex M4 with Ethernet, USB, encryption, tamper, key storage protection area - freedom board http://www.utasker.com/kinetis/FRDM-K64F.html
 //#define TWR_K64F120M                                                   // tower board http://www.utasker.com/kinetis/TWR-K64F120M.html
 //#define TEENSY_3_5                                                     // USB development board with K64FX512 - http://www.utasker.com/kinetis/TEENSY_3.5.html
 //#define FreeLON                                                        // K64 based with integrated LON
 //#define TWR_K65F180M                                                   // tower board http://www.utasker.com/kinetis/TWR-K65F180M.html
 //#define FRDM_K66F                                                      // freedom board http://www.utasker.com/kinetis/FRDM-K66F.html
-#define TEENSY_3_6                                                       // USB development board with K66FX1M0 - http://www.utasker.com/kinetis/TEENSY_3.6.html
+//#define TEENSY_3_6                                                     // USB development board with K66FX1M0 - http://www.utasker.com/kinetis/TEENSY_3.6.html
 
 //#define TWR_K70F120M                                                   // K processors Cortex M4 with graphical LCD, Ethernet, USB, encryption, tamper
 //#define EMCRAFT_K70F120M
@@ -289,6 +292,13 @@
     #define KINETIS_KL46
     #define DEVICE_WITHOUT_CAN                                           // KL doesn't have CAN controller
     #define DEVICE_WITHOUT_ETHERNET
+#elif defined FRDM_KL82Z
+    #define KINETIS_KL
+    #define KINETIS_KL82
+    #define TARGET_HW       "FRDM-KL82Z"
+    #define OUR_HEAP_SIZE   (HEAP_REQUIREMENTS)((12 * 1024) * MEM_FACTOR)
+    #define DEVICE_WITHOUT_CAN                                           // KL doesn't have CAN controller
+    #define DEVICE_WITHOUT_ETHERNET                                      // KL doesn't have Ethernet controller
 #elif defined TWR_KV10Z32
     #define TARGET_HW            "TWR-KV10Z32"
     #define OUR_HEAP_SIZE        (HEAP_REQUIREMENTS)((5 * 1024) * MEM_FACTOR)
@@ -570,7 +580,7 @@
     #define KINETIS_K60                                                  // specify the sub-family
     #define KINETIS_REVISION_2
     #define KINETIS_K66                                                  // extra sub-family type precision
-  //#define USB_HS_INTERFACE                                             // use HS interface rather than FS interface
+    #define USB_HS_INTERFACE                                             // use HS interface rather than FS interface
 #elif defined FRDM_K64F
     #define TARGET_HW            "FRDM-K64F"
     #define OUR_HEAP_SIZE        (HEAP_REQUIREMENTS)((48 * 1024) * MEM_FACTOR) // large SRAM parts
@@ -894,8 +904,8 @@
         #if defined USB_HOST_SUPPORT
             #define NUMBER_USB     (5 + 1)                               // physical queues (control plus 5 endpoints)
         #else                                                            // define one or more device classes (multiple classes creates a composite device)
-          //#define USE_USB_CDC                                          // USB-CDC (use also for Modbus over USB)
-            #define USE_USB_MSD                                          // needs SD card to compile (or alternatives FLASH_FAT / SPI_FLASH_FAT / FAT_EMULATION)
+            #define USE_USB_CDC                                          // USB-CDC (use also for Modbus over USB)
+          //#define USE_USB_MSD                                          // needs SD card to compile (or alternatives FLASH_FAT / SPI_FLASH_FAT / FAT_EMULATION)
           //#define USE_USB_HID_MOUSE                                    // human interface device (mouse)
           //#define USE_USB_HID_KEYBOARD                                 // human interface device (keyboard)
           //#define USE_USB_HID_RAW                                      // human interface device (raw)
@@ -1038,7 +1048,7 @@
         #define VERIFY_NAND                                              // development help functions
 #endif
 
-#define SDCARD_SUPPORT                                                   // SD-card interface
+//#define SDCARD_SUPPORT                                                 // SD-card interface
 //#define FLASH_FAT                                                      // FAT in internal flash interface
 //#define SPI_FLASH_FAT                                                  // SPI flash
     #define SIMPLE_FLASH                                                 // don't perform block management and wear-leveling
