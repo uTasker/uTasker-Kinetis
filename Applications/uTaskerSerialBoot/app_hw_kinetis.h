@@ -15,7 +15,7 @@
     *********************************************************************
     22.01.2012 Add SD card loader support to Kwikstik
     03.03.2012 Add TWR_K70F120M and TWR_K53N512 support
-    20.04.2012 Add TWR_K20N50M
+    20.04.2012 Add TWR_K20D50M
     26.10.2012 Change READ_SPI_DATA() to use volatile access (avoid loss due to optimisation) {1}
     18.12.2013 Use SD card detect input to force boot loader mode        {2}
     18.12.2013 Use UART for debug messages when SD card loader is used together with the UART loader {3}
@@ -41,7 +41,7 @@
 #if defined _KINETIS && !defined __APP_HW_KINETIS__
 #define __APP_HW_KINETIS__
 
-#if defined KINETIS_K_FPU || defined K02F100M || defined TWR_K20N50M || defined tinyK20 || defined FRDM_K20D50M || defined TWR_K21D50M || defined KINETIS_KL || defined KINETIS_KE || defined KINETIS_K64 || defined FRDM_K22F || defined KINETIS_KV || defined KINETIS_KW2X // newer devices have these errate solved
+#if defined KINETIS_K_FPU || defined K02F100M || defined TWR_K20D50M || defined tinyK20 || defined FRDM_K20D50M || defined TWR_K21D50M || defined KINETIS_KL || defined KINETIS_KE || defined KINETIS_K64 || defined FRDM_K22F || defined KINETIS_KV || defined KINETIS_KW2X // newer devices have these errate solved
     #define ERRATA_E2583_SOLVED                                          // in early silicon the CAN controllers only work when the OSC is enabled (enable if the chip revision used doesn't suffer from the problem)
     #define ERRATA_E2644_SOLVED                                          // early devices without flex memory doesn't support speculation logic and this should be disabled
     #define ERRATE_E2647_SOLVED                                          // early 512k and 384k flash-only devices don't support cache aliasing and this needs to be disabled
@@ -338,7 +338,7 @@
     #define RUN_FROM_HIRC                                                // clock from internal 48MHz RC clock
   //#define RUN_FROM_LIRC                                                // clock from internal 8MHz RC clock
     #define USB_CRYSTAL_LESS                                             // use 48MHz IRC as USB source (according to Freescale AN4905 - only possible in device mode) - rather than external pin
-#elif defined TWR_K20N50M || defined FRDM_K20D50M || defined TWR_K21D50M || defined tinyK20 || defined FRDM_KL46Z || defined TWR_KL46Z48M || defined FRDM_KL25Z || defined FRDM_KL26Z || defined TWR_KL25Z48M // {4}{5}{6}{7}
+#elif defined TWR_K20D50M || defined FRDM_K20D50M || defined TWR_K21D50M || defined tinyK20 || defined FRDM_KL46Z || defined TWR_KL46Z48M || defined FRDM_KL25Z || defined FRDM_KL26Z || defined TWR_KL25Z48M // {4}{5}{6}{7}
     #if defined FRDM_K20D50M || defined TWR_KL46Z48M || defined FRDM_KL25Z || defined FRDM_KL26Z || defined TWR_KL25Z48M || defined TWR_K21D50M || defined tinyK20
         #define OSC_LOW_GAIN_MODE                                        // oscillator without feedback resistor or load capacitors so use low gain mode
     #endif
@@ -647,7 +647,7 @@
     #define PIN_COUNT           PIN_COUNT_121_PIN                        // MAPBGA121
     #define SIZE_OF_FLASH       (512 * 1024)                             // 512k program Flash
     #define SIZE_OF_RAM         (64 * 1024)                              // 64k SRAM
-#elif defined TWR_K20N50M || defined FRDM_K20D50M                        // TWR_K20N50M and FRDM_K20D50M
+#elif defined TWR_K20D50M || defined FRDM_K20D50M                        // TWR_K20D50M and FRDM_K20D50M
     #define KINETIS_FLEX                                                 // X part with flex memory rather than N part with program Flash only
   //#define PIN_COUNT           PIN_COUNT_32_PIN
   //#define PIN_COUNT           PIN_COUNT_48_PIN
@@ -961,7 +961,7 @@
         #define LOADER_UART           4                                  // use UART 4
     #elif defined TWR_K70F120M || defined TWR_KL46Z48M || defined TWR_K21D50M || defined TWR_KL43Z48M || defined TRK_KEA128 || defined TRK_KEA64 || defined KL25_TEST_BOARD || defined TWR_K65F180M || defined K26FN2_180 || defined TEENSY_3_5 || defined TEENSY_3_6
         #define LOADER_UART           2                                  // the serial interface used by the serial loader
-    #elif defined TWR_K20N50M || defined TWR_K80F150M || defined tinyK20 || defined TWR_K20D72M || defined FRDM_KE02Z || defined FRDM_KE02Z40M || defined FRDM_KE06Z || defined FRDM_K22F || defined TWR_K22F120M || defined TWR_K24F120M || defined TWR_K64F120M || defined TWR_KW21D256 || defined TWR_KW24D512
+    #elif defined TWR_K20D50M || defined TWR_K80F150M || defined tinyK20 || defined TWR_K20D72M || defined FRDM_KE02Z || defined FRDM_KE02Z40M || defined FRDM_KE06Z || defined FRDM_K22F || defined TWR_K22F120M || defined TWR_K24F120M || defined TWR_K64F120M || defined TWR_KW21D256 || defined TWR_KW24D512
         #define LOADER_UART           1                                  // the serial interface used by the serial loader
     #elif defined K02F100M || defined FRDM_K20D50M || defined FRDM_KL46Z || defined FRDM_KL43Z || defined FRDM_KL25Z || defined FRDM_KL26Z || defined FRDM_KL27Z || defined TEENSY_LC || defined TWR_KL25Z48M || defined FRDM_KL02Z || defined FRDM_KL03Z || defined FRDM_KL05Z || defined TEENSY_3_1 || defined FRDM_K64F || defined FRDM_KE04Z || defined TWR_KV10Z32 || defined TWR_KV31F120M || ((defined TWR_K40X256 || defined TWR_K40D100M) && defined DEBUG_ON_VIRT_COM)
         #define LOADER_UART           0                                  // the serial interface used by the serial loader
@@ -1800,7 +1800,7 @@
         #endif
         #define NO_PORT_INTERRUPTS_PORTE                                 // remove port interrupt support from port E
     #endif
-#elif defined TWR_K20N50M || defined TWR_K20D72M
+#elif defined TWR_K20D50M || defined TWR_K20D72M
     #define DEMO_LED_1             (PORTC_BIT7)                          // if the port is changed (eg. A to B) the port macros will require appropriate adjustment too
     #define DEMO_LED_2             (PORTC_BIT8)                          // if the port is changed (eg. A to B) the port macros will require appropriate adjustment too
     #define DEMO_LED_3             (PORTC_BIT9)                          // if the port is changed (eg. A to B) the port macros will require appropriate adjustment too
