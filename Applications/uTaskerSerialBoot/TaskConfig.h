@@ -86,7 +86,7 @@ const UTASK_TASK ctNodes[] = {                                           // we u
     TASK_NETWORK_INDICATOR,                                              // network activity indicator task
     #endif
 #endif
-#if defined USE_DHCP
+#if defined USE_DHCP_CLIENT
     TASK_DHCP,                                                           // DHCP task
 #endif
 #if defined USE_TFTP
@@ -136,7 +136,7 @@ const UTASKTABLEINIT ctTaskTable[] = {
   {"NetInd",    fnNetworkIndicator, NO_QUE,   (DELAY_LIMIT)(2 * SEC), (DELAY_LIMIT)(2 * SEC), UTASKER_STOP}, // network activity task polling PHY state once every 2s (after initial 2s delay)
     #endif
 #endif
-#if defined USE_DHCP
+#if defined USE_DHCP_CLIENT
   {"DHCP",      fnDHCP,          SMALL_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP}, // delay only for timer queue space
 #endif
 #if defined USE_TFTP

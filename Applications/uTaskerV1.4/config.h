@@ -1048,7 +1048,7 @@
         #define VERIFY_NAND                                              // development help functions
 #endif
 
-//#define SDCARD_SUPPORT                                                 // SD-card interface
+#define SDCARD_SUPPORT                                                   // SD-card interface
 //#define FLASH_FAT                                                      // FAT in internal flash interface
 //#define SPI_FLASH_FAT                                                  // SPI flash
     #define SIMPLE_FLASH                                                 // don't perform block management and wear-leveling
@@ -1118,7 +1118,7 @@
 #endif
 
 #if !defined DEVICE_WITHOUT_ETHERNET && !defined K70F150M_12M && !defined TEENSY_3_5 && !defined TEENSY_3_6
-  //#define ETH_INTERFACE                                                // enable Ethernet interface driver
+    #define ETH_INTERFACE                                                // enable Ethernet interface driver
 #elif defined TEENSY_3_1 || defined TEENSY_LC
   //#define ETH_INTERFACE                                                // enable external Ethernet interface driver
     #if defined ETH_INTERFACE
@@ -1299,7 +1299,7 @@
                 #endif
             #endif
 
-            #define USE_DHCP                                             // enable DHCP  - needs UDP - IPCONFIG default zero. Needs 1k Ethernet RX Buffers!! (set random number also)
+            #define USE_DHCP_CLIENT                                      // enable DHCP  - needs UDP - IPCONFIG default zero. Needs 1k Ethernet RX Buffers!! (set random number also)
                 #define DHCP_HOST_NAME                                   // we send our host name as DHCP option - the application must supply fnGetDHCP_host_name()
           //#define USE_DNS                                              // enable DNS   - needs UDP
                 #define DNS_SERVER_OWN_ADDRESS                           // command line menu allows DNS server address to be set, otherwise it uses the default gateway
@@ -1313,7 +1313,7 @@
           //#define USE_SNTP                                             // simple network time protocol
                 #define SNTP_SERVERS              4                      // number of SNTP servers that are used
 
-            #if defined USE_DHCP
+            #if defined USE_DHCP_CLIENT
                 #define DHCP_SOCKET 1
             #else
                 #define DHCP_SOCKET 0

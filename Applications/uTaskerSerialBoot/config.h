@@ -71,7 +71,7 @@
 //#define TWR_KW24D512
 
 //#define K02F100M                                                       // development board with 100MHz K02F
-//#define FRDM_K20D50M                                                   // K processors Cortex M4 (performance and integration) with USB
+#define FRDM_K20D50M                                                     // K processors Cortex M4 (performance and integration) with USB
 //#define tinyK20                                                        // USB memory stick format board with SD card and 50MHz K20DX128
 //#define TWR_K20D50M
 //#define TWR_K20D72M
@@ -102,7 +102,7 @@
 //#define TEENSY_3_5                                                     // USB development board with K64FX512 - http://www.utasker.com/kinetis/TEENSY_3.5.html
 
 //#define TWR_K65F180M
-#define TEENSY_3_6                                                       // USB development board with K66FX1M0 - http://www.utasker.com/kinetis/TEENSY_3.6.html
+//#define TEENSY_3_6                                                     // USB development board with K66FX1M0 - http://www.utasker.com/kinetis/TEENSY_3.6.html
 
 //#define TWR_K70F120M                                                   // K processors Cortex M4 with graphical LCD, Ethernet, USB, encryption, tamper
 //#define K70F150M_12M                                                   // development board with 150MHz F70 and 12MHz oscillator
@@ -790,7 +790,7 @@
             #define USER_UDP_SOCKETS       1                             // we reserve  one non-standard UDP socket in case the UDP demo is required
 
           //#define USE_BOOTP                                            // enable BOOTP - needs UDP - IPCONFIG default zero.
-            #define USE_DHCP                                             // enable DHCP  - needs UDP - IPCONFIG default zero. Needs 1k Ethernet RX Buffers!! (set random number also)
+            #define USE_DHCP_CLIENT                                      // enable DHCP  - needs UDP - IPCONFIG default zero. Needs 1k Ethernet RX Buffers!! (set random number also)
           //#define USE_DNS                                              // enable DNS   - needs UDP
           //    #define DNS_SERVER_OWN_ADDRESS                           // command line menu allows DNS server address to be set, otherwise it uses the default gateway
           //#define USE_TFTP                                             // enable TFTP  - needs UDP
@@ -799,7 +799,7 @@
           //#define USE_SNMP
           //#define USE_SNTP                                             // simple network time protocol
 
-            #if defined USE_DHCP
+            #if defined USE_DHCP_CLIENT
                 #define DHCP_SOCKET 1
             #else
                 #define DHCP_SOCKET 0

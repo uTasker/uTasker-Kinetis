@@ -232,6 +232,8 @@ LogFile=_ ""
 [Breakpoints2]
 Bp0=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\disk_loader.c}.256.22" 0 0 1 "" 0 "" 0
 Count=1
+[PEMICRODriver]
+PEM_LeaveTargetRunning=0x00000000
 [Disassemble mode]
 mode=1
 [Breakpoints]

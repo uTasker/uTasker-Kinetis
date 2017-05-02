@@ -2,9 +2,6 @@
 
 <workspace>
   <project>
-    <path>$WS_DIR$\..\..\..\..\..\..\..\..\temporary\IAR\test.ewp</path>
-  </project>
-  <project>
     <path>$WS_DIR$\uTaskerSerialBoot.ewp</path>
   </project>
   <batchBuild>

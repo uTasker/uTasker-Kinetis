@@ -119,6 +119,8 @@
     25.10.2015 Add emulated FAT data files and their handling            {98}
     12.12.2015 Modify parameter of fnSetDefaultNetwork()                 {99}
 
+    02.05.2017 Change USE_DHCP to USE_DHCP_CLIENT
+
 */
 
 
@@ -206,7 +208,7 @@ static void fnValidatedInit(void);
     static void fnStartGlobalTimers(void);
     static void fnHandleGlobalTimers(unsigned char ucTimerEvent);
 #endif
-#if defined USE_DHCP || defined USE_ZERO_CONFIG
+#if defined USE_DHCP_CLIENT || defined USE_ZERO_CONFIG
     static void fnConfigureDHCP_ZERO(void);
 #endif
 #if defined TEST_DISTRIBUTED_TX
@@ -614,7 +616,7 @@ extern void fnApplication(TTASKTABLE *ptrTaskTable)
 #if defined TEST_IIC || defined IIC_SLAVE_MODE || defined TEST_DS1307 || defined TEST_SENSIRION || defined TEST_MMA8451Q || defined TEST_MMA7660F || defined TEST_FXOS8700 // {56}
         fnConfigIIC_Interface();
 #endif
-#if defined USE_DHCP || defined USE_ZERO_CONFIG
+#if defined USE_DHCP_CLIENT || defined USE_ZERO_CONFIG
         fnConfigureDHCP_ZERO();
 #endif
 #if defined USE_HTTP
@@ -778,7 +780,7 @@ extern void fnApplication(TTASKTABLE *ptrTaskTable)
     #include "can_tests.h"                                               // CAN interrupt event handling - specific
 #undef _CAN_INT_EVENTS
 
-#if defined USE_DHCP
+#if defined USE_DHCP_CLIENT
             case DHCP_SUCCESSFUL:                                        // we can now use the network connection
                 fnDebugMsg("DHCP successful: ");
     #if defined USE_MAINTENANCE && (defined USE_TELNET || defined SERIAL_INTERFACE || defined USE_USB_CDC)
@@ -929,12 +931,12 @@ extern void fnApplication(TTASKTABLE *ptrTaskTable)
 #undef _PORT_NMI_CHECK
 }
 
-#if defined USE_DHCP || defined USE_ZERO_CONFIG
+#if defined USE_DHCP_CLIENT || defined USE_ZERO_CONFIG
 static void fnConfigureDHCP_ZERO(void)
 {
     int iNetwork = 0;
     while (iNetwork < IP_NETWORK_COUNT) {
-    #if defined USE_DHCP
+    #if defined USE_DHCP_CLIENT
         if ((temp_pars->temp_parameters.usServers[iNetwork] & ACTIVE_DHCP) != 0) {
         #if defined USB_CDC_RNDIS && (IP_NETWORK_COUNT > 1)
             if (iNetwork == SECOND_NETWORK) {
@@ -995,10 +997,10 @@ extern void fnFlushSerialRx(void)
 }
 #endif
 
-#if defined USE_DHCP && defined DHCP_HOST_NAME                           // {88}
+#if defined USE_DHCP_CLIENT && defined DHCP_HOST_NAME                    // {88}
 // Supply a DHCP host name
 //
-extern CHAR *fnGetDHCP_host_name(unsigned char *ptr_ucHostNameLength)
+extern CHAR *fnGetDHCP_host_name(unsigned char *ptr_ucHostNameLength, int iNetwork)
 {
     *ptr_ucHostNameLength = uStrlen(temp_pars->temp_parameters.cDeviceIDName); // length of the name
     return (temp_pars->temp_parameters.cDeviceIDName);                   // return pointer to the name to use

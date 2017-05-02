@@ -2,17 +2,17 @@
 
 "--cpu=Cortex-M4" 
 
-"--fpu=VFPv4_SP" 
+"--fpu=None" 
 
 "-p" 
 
-"C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.2_2\arm\CONFIG\debugger\Freescale\MK64FN1M0xxx12.ddf" 
+"D:\Programs\IAR Systems\Embedded Workbench 7.5\arm\CONFIG\debugger\NXP\MK20DX128xxx5.ddf" 
 
 "--drv_verify_download" 
 
 "--semihosting=none" 
 
-"--device=MK64FN1M0xxx12" 
+"--device=MK20DX128xxx5" 
 
 
 

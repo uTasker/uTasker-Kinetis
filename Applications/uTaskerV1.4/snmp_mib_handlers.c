@@ -11,15 +11,16 @@
     File:        snmp_mib_handlers.c
     Project:     Single Chip Embedded Internet
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2017
     *********************************************************************
     This file contains standard SNMP MIB-II handlers for get and set requests
     - each function handler is preceded by its description from rfc 1213
     - since this file is included from snmp.c it should be excluded from the build
     - the MIB table mib_table[] is declared at the bottom of the file
 
-    16.04.2014 Modify SNMP_GET_VARIABLE_BINDING handling                 // {1}
+    16.04.2014 Modify SNMP_GET_VARIABLE_BINDING handling                 {1}
     31.01.2015 Updated callback to include community read and write checks as well as revised trap usage
+    02.02.2017 Adapt for us tick resolution                              {2}
 
 */
 
@@ -140,7 +141,11 @@ static int fn_sysObjectID(MIB_CONTROL *ptrMIB_control)
 static int fn_sysUpTime(MIB_CONTROL *ptrMIB_control)
 {
     unsigned long ulHundredths = uTaskerSystemTick;
-    ulHundredths *= TICK_RESOLUTION;
+    #if TICK_RESOLUTION >= 1000                                          // {2}
+    ulHundredths *= (TICK_RESOLUTION/1000);
+    #else
+    ulHundredths /= (1000/TICK_RESOLUTION);
+    #endif
     ulHundredths /= 100;                                                 // up time in 100th of second
     ptrMIB_control->ucObjectType = ASN1_TIME_STAMP_CODE;                 // time ticks type
     ptrMIB_control->ulInteger = ulHundredths;
@@ -181,7 +186,7 @@ static int fn_sysName(MIB_CONTROL *ptrMIB_control)
     if (ptrMIB_control->ucRequestType == ASN1_SNMP_SET_REQUEST) {        // setting a new name
         fnCopyASN1_string(temp_pars->temp_parameters.cDeviceIDName, ptrMIB_control->ptrContent, sizeof(temp_pars->temp_parameters.cDeviceIDName)); // copy the string received
     }
-    ptrMIB_control->ptrString = fnGetDHCP_host_name(&ucLength);          // fixed string to be returned (null terminated)
+    ptrMIB_control->ptrString = fnGetDHCP_host_name(&ucLength, 0);       // fixed string to be returned (null terminated)
     return 0;                                                            // could be handled
 }
 /*
