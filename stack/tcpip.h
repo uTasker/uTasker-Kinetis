@@ -1940,7 +1940,7 @@ extern void fnStartTimeServer(DELAY_LIMIT syncDelay);
 extern int  fnStartDHCP(UTASK_TASK OwnerTask, USOCKET uDetails);         // {99}
     #define FORCE_INIT 0x80
 #if defined DHCP_HOST_NAME
-    extern CHAR *fnGetDHCP_host_name(unsigned char *ptr_ucHostNameLength); // {77}
+    extern CHAR *fnGetDHCP_host_name(unsigned char *ptr_ucHostNameLength, int iNetwork); // {77}
 #endif
 extern void fnStartZeroConfig(UTASK_TASK Task);                          // {43}
 extern void fnStopZeroConfig(void);
