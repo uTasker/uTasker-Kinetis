@@ -55,7 +55,7 @@
 //#define TWR_KL25Z48M
 //#define FRDM_KL26Z
 //#define TEENSY_LC                                                      // USB development board with KL26Z64
-//#define FRDM_KL27Z
+#define FRDM_KL27Z
 
 //#define FRDM_KL43Z                                                     // L processors Cortex-M0+ (ultra-low power) with USB and segment LCD
 //#define TWR_KL43Z48M
@@ -71,7 +71,7 @@
 //#define TWR_KW24D512
 
 //#define K02F100M                                                       // development board with 100MHz K02F
-#define FRDM_K20D50M                                                     // K processors Cortex M4 (performance and integration) with USB
+//#define FRDM_K20D50M                                                   // K processors Cortex M4 (performance and integration) with USB
 //#define tinyK20                                                        // USB memory stick format board with SD card and 50MHz K20DX128
 //#define TWR_K20D50M
 //#define TWR_K20D72M

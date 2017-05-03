@@ -1357,6 +1357,7 @@ extern QUEUE_HANDLE fnSetNewSerialMode(unsigned char ucDriverMode)
     tInterfaceParameters.ucDMAConfig = 0;
   //tInterfaceParameters.ucDMAConfig = UART_TX_DMA;                      // activate DMA on transmission
   //tInterfaceParameters.ucDMAConfig = (UART_RX_DMA /*| UART_RX_DMA_HALF_BUFFER*/); // test half buffer DMA reception
+    tInterfaceParameters.ucDMAConfig = (UART_RX_DMA);                    // free-running RX DMA
         #endif
     #endif
     #if defined SUPPORT_HW_FLOW
