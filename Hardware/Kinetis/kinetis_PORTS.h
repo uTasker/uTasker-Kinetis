@@ -392,7 +392,7 @@ static __interrupt void _portC_D_isr(void)
 }
         #endif
     #endif
-    #if (PORTS_AVAILABLE > 3) && !defined NO_PORT_INTERRUPTS_PORTD && defined irq_PORTC_ID // if port D support has not been removed
+    #if (PORTS_AVAILABLE > 3) && !defined NO_PORT_INTERRUPTS_PORTD && defined irq_PORTD_ID // if port D support has not been removed
 // Interrupt routine called to handle port D input interrupts
 //
 static __interrupt void _port_D_isr(void)
