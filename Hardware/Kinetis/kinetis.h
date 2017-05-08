@@ -110,6 +110,7 @@
     08.03.2017 Add PWM_NO_OUTPUT and PWM_DMA_CHANNEL_ENABLE PWM options  {93}
     08.03.2017 Add ucDmaTriggerSource to ADC setup                       {94}
     19.04.2017 Adjust USB FS crossbar master setting for K65 and K66     {95}
+    08.05.2017 Correct K26, K65 and K66 HS USB base address              {96}
 
 */
 
@@ -2973,10 +2974,10 @@ typedef struct stVECTOR_TABLE
         #define CRC_BLOCK                      0x40032000                // CRC {8}
     #endif
     #if defined HS_USB_AVAILABLE
-        #if defined KINETIS_K60 || defined KINETIS_K61 || defined KINETIS_K70
-            #define USBHS_BASE_ADD             0x40034000                // USBHS {25}
-        #else
+        #if defined KINETIS_K26 || defined KINETIS_K65 || defined KINETIS_K66 // {96}
             #define USBHS_BASE_ADD             0x400a1000                // USBHS
+        #else
+            #define USBHS_BASE_ADD             0x40034000                // USBHS {25}
         #endif
         #if defined KINETIS_WITH_USBPHY
             #define USBHS_PHY_ADD              0x400a2000                // {77} integrated HS USB2.0 PHY

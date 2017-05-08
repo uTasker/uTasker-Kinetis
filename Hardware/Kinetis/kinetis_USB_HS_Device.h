@@ -21,6 +21,7 @@
     05.10.2015 fnGetUSB_HW() modification for compatibility with host mode
     23.12.2015 Add zero copy OUT endpoint buffer option                  {2}
     07.02.2016 Set length to 8 when receiving setup frames (to avoid old lengths from OUTs on the endpoint from being kept) {3}
+    08.05.2017 Correct internal HS USB 12MHz oscillator setting          {4}
 
 */
 #if defined USB_HS_INTERFACE
@@ -782,7 +783,7 @@ extern void fnConfigUSB(QUEUE_HANDLE Channel, USBTABLE *pars)
         #elif _EXTERNAL_CLOCK == 16000000
         USBPHY_PLL_SIC = (USBPHY_PLL_SIC_PLL_POWER | USBPHY_PLL_SIC_PLL_ENABLE | USBPHY_PLL_SIC_PLL_BYPASS | USBPHY_PLL_SIC_PLL_DIV_SEL_16MHz); // power up PLL to run at 480MHz from 16MHz clock input
         #elif _EXTERNAL_CLOCK == 12000000
-        USBPHY_PLL_SIC = (USBPHY_PLL_SIC_PLL_POWER | USBPHY_PLL_SIC_PLL_ENABLE | USBPHY_PLL_SIC_PLL_BYPASS | USBPHY_PLL_SIC_PLL_DIV_SEL_16MHz); // power up PLL to run at 480MHz from 12MHz clock input
+        USBPHY_PLL_SIC = (USBPHY_PLL_SIC_PLL_POWER | USBPHY_PLL_SIC_PLL_ENABLE | USBPHY_PLL_SIC_PLL_BYPASS | USBPHY_PLL_SIC_PLL_DIV_SEL_12MHz); // {4} power up PLL to run at 480MHz from 12MHz clock input
         #else
             #error "USB PLL requires an external reference of 12MHz, 16MHz or 24MHz!"
         #endif
