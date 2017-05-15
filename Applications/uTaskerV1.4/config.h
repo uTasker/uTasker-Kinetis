@@ -61,9 +61,12 @@
 //#define FRDM_KE04Z
 //#define FRDM_KE06Z
 
-//#define TRK_KEA8                                                       // EA ultra-reliable automotive processors Cortex-M0+
-//#define TRK_KEA64
-//#define TRK_KEA128
+//#define TRK_KEA8                                                       // EA ultra-reliable automotive processors Cortex-M0+ - starterTRAK board http://www.utasker.com/kinetis/TRK-KEA8.html
+//#define TRK_KEA64                                                      // starterTRAK board http://www.utasker.com/kinetis/TRK-KEA64.html
+//#define TRK_KEA128                                                     // starterTRAK board http://www.utasker.com/kinetis/TRK-KEA128.html
+//#define FRDM_KEAZN32Q64                                                // freedom board http://www.utasker.com/kinetis/FRDM-KEAZN32Q64.html
+//#define FRDM_KEAZ64Q64                                                 // freedom board http://www.utasker.com/kinetis/FRDM-KEAZ64Q64.html
+#define FRDM_KEAZ128Q80                                                  // freedom board http://www.utasker.com/kinetis/FRDM-KEAZ128Q80.html
 
 //#define FRDM_KL02Z                                                     // L processors Cortex-M0+ (ultra-low power) basic
 //#define FRDM_KL03Z
@@ -73,7 +76,7 @@
 //#define TWR_KL25Z48M
 //#define FRDM_KL26Z
 //#define rcARM_KL26                                                     // development board with KL26
-#define FRDM_KL27Z
+//#define FRDM_KL27Z
 //#define CAPUCCINO_KL27
 //#define TEENSY_LC                                                      // USB development board with KL26Z64
 //#define FRDM_KL43Z                                                     // L processors Cortex-M0+ (ultra-low power) with USB and segment LCD
@@ -197,6 +200,33 @@
     #define DEVICE_WITHOUT_USB                                           // KEA doesn't have USB
 #elif defined TRK_KEA128
     #define TARGET_HW            "TRK-KEA128"
+    #define KINETIS_MAX_SPEED    48000000
+    #define OUR_HEAP_SIZE        (HEAP_REQUIREMENTS)((8 * 1024) * MEM_FACTOR)
+    #define KINETIS_KE
+    #define KINETIS_KEA
+    #define KINETIS_KEA128
+    #define DEVICE_WITHOUT_ETHERNET                                      // KEA doesn't have Ethernet controller
+    #define DEVICE_WITHOUT_USB                                           // KEA doesn't have USB
+#elif defined FRDM_KEAZN32Q64
+    #define TARGET_HW            "FRDM-KEAZN32Q64"
+    #define KINETIS_MAX_SPEED    40000000                                // 40MHz version
+    #define OUR_HEAP_SIZE        (HEAP_REQUIREMENTS)((2 * 1024) * MEM_FACTOR)
+    #define KINETIS_KE
+    #define KINETIS_KEA
+    #define KINETIS_KEA32
+    #define DEVICE_WITHOUT_ETHERNET                                      // KEA doesn't have Ethernet controller
+    #define DEVICE_WITHOUT_USB                                           // KEA doesn't have USB
+#elif defined FRDM_KEAZ64Q64
+    #define TARGET_HW            "FRDM-KEAZ64Q64"
+    #define KINETIS_MAX_SPEED    48000000
+    #define OUR_HEAP_SIZE        (HEAP_REQUIREMENTS)((2 * 1024) * MEM_FACTOR)
+    #define KINETIS_KE
+    #define KINETIS_KEA
+    #define KINETIS_KEA64
+    #define DEVICE_WITHOUT_ETHERNET                                      // KEA doesn't have Ethernet controller
+    #define DEVICE_WITHOUT_USB                                           // KEA doesn't have USB
+#elif defined FRDM_KEAZ128Q80
+    #define TARGET_HW            "FRDM-KEAZ128Q80"
     #define KINETIS_MAX_SPEED    48000000
     #define OUR_HEAP_SIZE        (HEAP_REQUIREMENTS)((8 * 1024) * MEM_FACTOR)
     #define KINETIS_KE
@@ -1118,7 +1148,7 @@
 #endif
 
 #if !defined DEVICE_WITHOUT_ETHERNET && !defined K70F150M_12M && !defined TEENSY_3_5 && !defined TEENSY_3_6
-    #define ETH_INTERFACE                                                // enable Ethernet interface driver
+  //#define ETH_INTERFACE                                                // enable Ethernet interface driver
 #elif defined TEENSY_3_1 || defined TEENSY_LC
   //#define ETH_INTERFACE                                                // enable external Ethernet interface driver
     #if defined ETH_INTERFACE

@@ -896,7 +896,7 @@ extern void fnApplication(TTASKTABLE *ptrTaskTable)
                 continue;
             }
         #endif
-        #if defined USE_FTP_CLIENT                                       // {67}
+        #if defined USE_FTP_CLIENT && defined USE_MAINTENANCE            // {67}
             if ((iFTP_data_state & (FTP_DATA_STATE_GETTING | FTP_DATA_STATE_PUTTING)) == 0) {
                 fnEchoInput(ucInputMessage, Length);
             }
