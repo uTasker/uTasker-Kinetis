@@ -13411,6 +13411,9 @@ typedef struct stDAC_REGS                                                // {23}
     #define GPIOC_PTOR                   *(volatile unsigned long*)(GPIO_BLOCK + 0x08c)   // Port C Toggle Output Register (write-only - always reads 0)
     #define GPIOC_PDIR                   *(volatile unsigned long*)(GPIO_BLOCK + 0x090)   // Port C Data Input Register (read-only)
     #define GPIOC_PDDR                   *(volatile unsigned long*)(GPIO_BLOCK + 0x094)   // Port C Data Direction Register
+    #if defined KINETIS_KE
+        #define GPIOC_PIDR               *(volatile unsigned long*)(GPIO_BLOCK + 0x098)   // Port C Input Disable Register
+    #endif
 #endif
 #if PORTS_AVAILABLE > 3
     #define GPIOD_ADD                    (volatile unsigned long*)(GPIO_BLOCK + 0x0c0)
