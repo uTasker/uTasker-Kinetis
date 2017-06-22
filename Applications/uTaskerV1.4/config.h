@@ -66,7 +66,7 @@
 //#define TRK_KEA128                                                     // starterTRAK board http://www.utasker.com/kinetis/TRK-KEA128.html
 //#define FRDM_KEAZN32Q64                                                // freedom board http://www.utasker.com/kinetis/FRDM-KEAZN32Q64.html
 //#define FRDM_KEAZ64Q64                                                 // freedom board http://www.utasker.com/kinetis/FRDM-KEAZ64Q64.html
-#define FRDM_KEAZ128Q80                                                  // freedom board http://www.utasker.com/kinetis/FRDM-KEAZ128Q80.html
+//#define FRDM_KEAZ128Q80                                                // freedom board http://www.utasker.com/kinetis/FRDM-KEAZ128Q80.html
 
 //#define FRDM_KL02Z                                                     // L processors Cortex-M0+ (ultra-low power) basic
 //#define FRDM_KL03Z
@@ -106,6 +106,7 @@
 //#define TWR_K21D50M
 //#define TWR_K21F120M
 //#define FRDM_K22F
+//#define K22F128_100M
 //#define TWR_K22F120M
 //#define BLAZE_K22
 //#define TWR_K24F120M
@@ -125,7 +126,7 @@
 
 //#define EMCRAFT_K61F150M                                               // K processors Cortex M4 with Ethernet, USB, encryption, tamper, key storage protection area
 
-//#define FRDM_K64F                                                      // next generation K processors Cortex M4 with Ethernet, USB, encryption, tamper, key storage protection area - freedom board http://www.utasker.com/kinetis/FRDM-K64F.html
+#define FRDM_K64F                                                        // next generation K processors Cortex M4 with Ethernet, USB, encryption, tamper, key storage protection area - freedom board http://www.utasker.com/kinetis/FRDM-K64F.html
 //#define TWR_K64F120M                                                   // tower board http://www.utasker.com/kinetis/TWR-K64F120M.html
 //#define TEENSY_3_5                                                     // USB development board with K64FX512 - http://www.utasker.com/kinetis/TEENSY_3.5.html
 //#define FreeLON                                                        // K64 based with integrated LON
@@ -486,6 +487,15 @@
     #define KINETIS_REVISION_2
     #define DEVICE_WITHOUT_ETHERNET                                      // K20 doesn't have Ethernet controller
     #define OUR_HEAP_SIZE        (HEAP_REQUIREMENTS)((24 * 1024) * MEM_FACTOR)
+#elif defined K22F128_100M
+    #define TARGET_HW            "K22F128-100M"
+    #define KINETIS_K_FPU                                                // part with floating point unit
+    #define KINETIS_MAX_SPEED    100000000
+    #define KINETIS_K20                                                  // specify the sub-family
+    #define KINETIS_K22                                                  // extra sub-family type precision
+    #define KINETIS_REVISION_2
+    #define DEVICE_WITHOUT_ETHERNET                                      // K20 doesn't have Ethernet controller
+    #define OUR_HEAP_SIZE        (HEAP_REQUIREMENTS)((12 * 1024) * MEM_FACTOR)
 #elif defined BLAZE_K22
     #define TARGET_HW            "BLAZE"
     #define KINETIS_K_FPU                                                // part with floating point unit
@@ -782,7 +792,7 @@
 
 // Configure MODBUS extension package
 //
-//#define USE_MODBUS                                                     // activate MODBUS support in the project
+#define USE_MODBUS                                                       // activate MODBUS support in the project
 #if defined USE_MODBUS
     #define USE_MODBUS_SLAVE                                             // slave capability supported
     //#define NO_SLAVE_MODBUS_READ_COILS                                 // disable specific slave public function support
@@ -935,7 +945,7 @@
             #define NUMBER_USB     (5 + 1)                               // physical queues (control plus 5 endpoints)
         #else                                                            // define one or more device classes (multiple classes creates a composite device)
             #define USE_USB_CDC                                          // USB-CDC (use also for Modbus over USB)
-          //#define USE_USB_MSD                                          // needs SD card to compile (or alternatives FLASH_FAT / SPI_FLASH_FAT / FAT_EMULATION)
+            #define USE_USB_MSD                                          // needs SD card to compile (or alternatives FLASH_FAT / SPI_FLASH_FAT / FAT_EMULATION)
           //#define USE_USB_HID_MOUSE                                    // human interface device (mouse)
           //#define USE_USB_HID_KEYBOARD                                 // human interface device (keyboard)
           //#define USE_USB_HID_RAW                                      // human interface device (raw)
@@ -951,7 +961,7 @@
                 #define NUMBER_USB_HID 0
             #endif
             #if defined USE_USB_MSD
-              //#define FAT_EMULATION                                    // support FAT emulation (full mass-storage not required by USB-MSD)
+                #define FAT_EMULATION                                    // support FAT emulation (full mass-storage not required by USB-MSD)
                 #if defined FAT_EMULATION
                     #define NUMBER_USB_MSD 2                             // single MSD LUM (set to 2 for SD card and emulated drive)
                     #define EMULATED_FAT_LUMS         1                  // the number of logical units on emulated drive
@@ -1051,7 +1061,7 @@
         #define USB_RUN_TIME_DEFINABLE_STRINGS                           // enable USB string content to be defined at run time (variable)
       //#define USE_USB_OTG_CHARGE_PUMP                                  // enable charge pump control in the driver
         #if defined USE_USB_OTG_CHARGE_PUMP
-            #define IIC_INTERFACE                                        // activate IIC interface since it will be needed
+            #define I2C_INTERFACE                                        // activate I2C interface since it will be needed
         #endif
         #if defined USE_MODBUS && defined USE_MODBUS_SLAVE && !defined USB_HOST_SUPPORT
             #define MODBUS_USB_SLAVE                                     // MODBUS serial slave realised as USB
@@ -1062,15 +1072,15 @@
 #endif
 
 #if defined KL43Z_256_32_CL
-    #define IIC_INTERFACE                                                // enable IIC interface driver
-    #define SUPPORT_FLUSH_IIC
+    #define I2C_INTERFACE                                                // enable I2C interface driver
+    #define SUPPORT_FLUSH_I2C
 #else
-  //#define IIC_INTERFACE
+    #define I2C_INTERFACE
 #endif
-#if defined IIC_INTERFACE
-  //#define IIC_SLAVE_MODE                                               // support slave mode
+#if defined I2C_INTERFACE
+  //#define I2C_SLAVE_MODE                                               // support slave mode
 #else
-    #define NUMBER_IIC     0                                             // no physical queue needed
+    #define NUMBER_I2C     0                                             // no physical queue needed
 #endif
 
 #if defined TWR_K60F120M || defined TWR_K70F120M || defined EMCRAFT_K70F120M // NAND flash available so utFAT can be operated in it
@@ -1078,7 +1088,7 @@
         #define VERIFY_NAND                                              // development help functions
 #endif
 
-#define SDCARD_SUPPORT                                                   // SD-card interface
+//#define SDCARD_SUPPORT                                                 // SD-card interface
 //#define FLASH_FAT                                                      // FAT in internal flash interface
 //#define SPI_FLASH_FAT                                                  // SPI flash
     #define SIMPLE_FLASH                                                 // don't perform block management and wear-leveling
@@ -1577,7 +1587,7 @@
     #define NUMBER_FIFO_QUEUES    0
 #endif
 
-#define PHYSICAL_QUEUES   (NUMBER_SERIAL + NUMBER_EXTERNAL_SERIAL + NUMBER_LAN + NUMBER_IIC + NUMBER_CAN + NUMBER_USB + NUMBER_MODBUS_QUEUES + NUMBER_FIFO_QUEUES) // the number of physical queues in the system
+#define PHYSICAL_QUEUES   (NUMBER_SERIAL + NUMBER_EXTERNAL_SERIAL + NUMBER_LAN + NUMBER_I2C + NUMBER_CAN + NUMBER_USB + NUMBER_MODBUS_QUEUES + NUMBER_FIFO_QUEUES) // the number of physical queues in the system
 
 #define RANDOM_NUMBER_GENERATOR                                          // support a random number generator (useful for DHCP and possibly DNS)
 
@@ -1807,7 +1817,7 @@
     #undef USB_INTERFACE
     #undef USB_HOST_SUPPORT
     #undef SERIAL_INTERFACE
-    #undef IIC_INTERFACE
+    #undef I2C_INTERFACE
     #undef CAN_INTERFACE
     #undef SUPPORT_KEY_SCAN
     #undef ETH_INTERFACE

@@ -1115,7 +1115,7 @@ extern void fnRetriggerWatchdog(void)
 #endif
 
 
-#if defined IIC_INTERFACE
+#if defined I2C_INTERFACE
 /* =================================================================== */
 /*                                  I2C                                */
 /* =================================================================== */
@@ -2278,7 +2278,7 @@ const _RESET_VECTOR __vector_table
     #else
     irq_default,
     #endif
-    #if defined IIC_INTERFACE
+    #if defined I2C_INTERFACE
     _IIC_Interrupt_0,
     #else
     irq_default,

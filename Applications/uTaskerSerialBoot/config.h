@@ -53,9 +53,9 @@
 
 //#define FRDM_KL25Z                                                     // L processors Cortex-M0+ (ultra-low power) with USB
 //#define TWR_KL25Z48M
-//#define FRDM_KL26Z
+#define FRDM_KL26Z
 //#define TEENSY_LC                                                      // USB development board with KL26Z64
-#define FRDM_KL27Z
+//#define FRDM_KL27Z
 
 //#define FRDM_KL43Z                                                     // L processors Cortex-M0+ (ultra-low power) with USB and segment LCD
 //#define TWR_KL43Z48M
@@ -596,7 +596,7 @@
 #if defined DEVICE_WITHOUT_USB
     #define NUMBER_USB     0                                             // no physical queue needed
 #else
-    #define USB_INTERFACE                                                // enable USB driver interface
+  //#define USB_INTERFACE                                                // enable USB driver interface
     #if defined USB_INTERFACE
       //#define USE_USB_CDC                                              // allow SREC/iHex loading via virtual COM
         #define USB_MSD_DEVICE_LOADER                                    // USB-MSD device mode (the board appears as a hardware to the host)

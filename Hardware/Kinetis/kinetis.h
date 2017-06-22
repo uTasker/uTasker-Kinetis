@@ -985,7 +985,7 @@ typedef struct stRESET_VECTOR
     #define FLEXRAM_MAX_SECTION_COPY_SIZE (2 * 1024)
 #endif
 
-#if defined KINETIS_K26 || defined KINETIS_KL28 || defined KINETIS_K64 || defined KINETIS_K65 || defined KINETIS_K66 || defined KINETIS_K80 || defined KINETIS_K02 || defined KINETIS_K63 || (defined KINETIS_K22 && (SIZE_OF_FLASH == (512 * 1024))) || defined KINETIS_K24 || defined KINETIS_KL43 || defined KINETIS_KL03 || defined KINETIS_KL27 || defined KINETIS_KL82 || defined KINETIS_KV30
+#if defined KINETIS_K26 || defined KINETIS_KL28 || defined KINETIS_K64 || defined KINETIS_K65 || defined KINETIS_K66 || defined KINETIS_K80 || defined KINETIS_K02 || defined KINETIS_K63 || (defined KINETIS_K22 && ((SIZE_OF_FLASH == (512 * 1024)) || (SIZE_OF_FLASH == (128 * 1024)))) || defined KINETIS_K24 || defined KINETIS_KL43 || defined KINETIS_KL03 || defined KINETIS_KL27 || defined KINETIS_KL82 || defined KINETIS_KV30
     #define KINETIS_HAS_IRC48M                                           // device has IRC48M which can be used for crystal-less USB
 #endif
 
@@ -1001,6 +1001,12 @@ typedef struct stRESET_VECTOR
 #if (defined KINETIS_KL && !defined KINETIS_KL28) || defined KINETIS_KE || defined KINETIS_KV10 // {42}
     #define RAM_START_ADDRESS   (0x20000000 - (SIZE_OF_RAM/4))           // SRAM L is 1/4 of the RAM size and is anchored to end at 0x1ffffffff
                                                                          // SRAM H is 3/4 of the RAM size and is anchored to start at 0x20000000
+#elif defined KINETIS_K22 && defined KINETIS_K_FPU && (SIZE_OF_RAM == (48 * 1024))
+    #define RAM_START_ADDRESS   (0x20000000 - (16 * 1024))               // SRAM L is 16k and is anchored to end at 0x1ffffffff
+                                                                         // SRAM H is the remainder of RAM size and is anchored to start at 0x20000000
+#elif defined KINETIS_K22 && defined KINETIS_K_FPU && (SIZE_OF_RAM == (24 * 1024))
+    #define RAM_START_ADDRESS   (0x20000000 - (8 * 1024))                // SRAM L is 8k and is anchored to end at 0x1ffffffff
+                                                                         // SRAM H is the remainder of RAM size and is anchored to start at 0x20000000
 #elif defined KINETIS_K64 || defined KINETIS_K24 || defined KINETIS_K26 || defined KINETIS_K65 || defined KINETIS_K66 || defined KINETIS_K80
     #define RAM_START_ADDRESS   (0x20000000 - (64 * 1024))               // SRAM L is 64k and is anchored to end at 0x1ffffffff
                                                                          // SRAM H is the remainder of RAM size and is anchored to start at 0x20000000
@@ -1099,7 +1105,7 @@ typedef struct stRESET_VECTOR
 #elif defined KINETIS_K02
     #define UARTS_AVAILABLE         2
 #elif defined KINETIS_K22
-    #if ((SIZE_OF_FLASH == (512 * 1024)) || (SIZE_OF_FLASH == (256 * 1024)))
+    #if ((SIZE_OF_FLASH == (512 * 1024)) || (SIZE_OF_FLASH == (256 * 1024)) || (SIZE_OF_FLASH == (128 * 1024)))
         #define UARTS_AVAILABLE     3
     #else
         #define UARTS_AVAILABLE     6
@@ -1142,7 +1148,7 @@ typedef struct stRESET_VECTOR
 #elif defined KINETIS_KL43 || defined KINETIS_KL27
     #define LPUARTS_AVAILABLE       2
 #elif defined KINETIS_K22
-    #if ((SIZE_OF_FLASH == (512 * 1024)) || (SIZE_OF_FLASH == (256 * 1024)))
+    #if ((SIZE_OF_FLASH == (512 * 1024)) || (SIZE_OF_FLASH == (256 * 1024)) || (SIZE_OF_FLASH == (128 * 1024)))
         #define LPUARTS_AVAILABLE   1
         #define LPUARTS_PARALLEL                                         // LPUARTs and UARTs are counted from 0
     #else
@@ -1228,6 +1234,8 @@ typedef struct stRESET_VECTOR
 #if defined KINETIS_K66 || defined KINETIS_K80
     #define FLEX_TIMERS_AVAILABLE   6                                    // 4 flex timers plus 2 TPMs
     #define TPMS_AVAILABLE          2                                    // TPM in addition to flex timers
+#elif defined KINETIS_K22 && (SIZE_OF_FLASH == (128 * 1024))
+    #define FLEX_TIMERS_AVAILABLE   3
 #elif defined KINETIS_K61 || defined KINETIS_K64 || defined KINETIS_K70 || ((defined KINETIS_K10 || defined KINETIS_K60 || defined KINETIS_K21 || defined KINETIS_K22 || defined KINETIS_K24 || defined KINETIS_KV30) && (KINETIS_MAX_SPEED > 100000000))
     #define FLEX_TIMERS_AVAILABLE   4
 #elif defined KINETIS_KL05 || ((defined KINETIS_K10 || defined KINETIS_K20) && (KINETIS_MAX_SPEED <= 50000000))
@@ -1392,6 +1400,8 @@ typedef struct stRESET_VECTOR
         #else
             #define DMA_CHANNEL_COUNT    4
         #endif
+    #elif defined KINETIS_K22 && (SIZE_OF_FLASH == (128 * 1024))
+        #define DMA_CHANNEL_COUNT    4
     #else
         #define DMA_CHANNEL_COUNT    16
     #endif

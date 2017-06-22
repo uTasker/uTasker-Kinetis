@@ -223,9 +223,9 @@ extern QUEUE_HANDLE fnOpen(unsigned char type_of_driver, unsigned char driver_mo
         return (fnOpenSPI((SPITABLE*)pars, driver_mode));
 #endif
 
-#if defined IIC_INTERFACE
-    case TYPE_IIC:
-        return (fnOpenIIC((IICTABLE*)pars));
+#if defined I2C_INTERFACE
+    case TYPE_I2C:
+        return (fnOpenI2C((I2CTABLE*)pars));
 #endif
 
 #if defined USB_INTERFACE

@@ -251,11 +251,15 @@
     #define EXTERNAL_CLOCK       50000000                                // this must be 50MHz in order to use Ethernet in RMII mode
     #define _EXTERNAL_CLOCK      EXTERNAL_CLOCK
     #define CLOCK_DIV            5                                       // input must be divided to 8MHz..16MHz range (/1 to /8 for FPU parts)
-    #define CLOCK_MUL            24                                      // the PLL multiplication factor to achieve operating frequency of 120MHz (x16 to x47 possible - divided by 2 at VCC output)
+    #define CLOCK_MUL            30                                      // the PLL multiplication factor to achieve operating frequency of 120MHz (x16 to x47 possible - divided by 2 at VCC output)
     #define FLEX_CLOCK_DIVIDE    3                                       // 120/3 to give 40MHz
-    #define FLASH_CLOCK_DIVIDE   5                                       // 120/5 to give 24MHz
+    #define FLASH_CLOCK_DIVIDE   6                                       // 120/5 to give 24MHz
     #define USB_CLOCK_GENERATED_INTERNALLY                               // use USB clock from internal source rather than external pin - 120MHz is suitable
-    #define USB_CLOCK_SOURCE_MCGPLL0CLK                                  // the clock source for the USB clock
+ // #define USB_CLOCK_SOURCE_MCGPLL0CLK                                  // the clock source for the USB clock
+#define USB_CLOCK_SOURCE_MCGPLL1CLK                                  // the clock source for the USB clock is dedicated to the FS USB interface (48MHz)
+#define CLOCK_DIV_1          5                                       // input must be divided to 8MHz..16MHz range (/1 to /8 for FPU parts)
+#define CLOCK_MUL_1          24                                      // PLL1 multiplication factor to achieve operating frequency of 96MHz [suitable for FS USB] (x16 to x47 possible - divided by 2 at VCC output)
+
 #elif defined K60F150M_50M
     #define EXTERNAL_CLOCK       50000000                                // this must be 50MHz in order to use Ethernet in RMII mode
     #define _EXTERNAL_CLOCK      EXTERNAL_CLOCK
@@ -342,6 +346,7 @@
     #if defined FRDM_K20D50M || defined TWR_KL46Z48M || defined FRDM_KL25Z || defined FRDM_KL26Z || defined TWR_KL25Z48M || defined TWR_K21D50M || defined tinyK20
         #define OSC_LOW_GAIN_MODE                                        // oscillator without feedback resistor or load capacitors so use low gain mode
     #endif
+#define RUN_FROM_DEFAULT_CLOCK
     #define CRYSTAL_FREQUENCY    8000000                                 // 8 MHz crystal
     #define _EXTERNAL_CLOCK      CRYSTAL_FREQUENCY
     #define CLOCK_DIV            4                                       // input must be divided to 2MHz..4MHz range (/1 to /25 possible)

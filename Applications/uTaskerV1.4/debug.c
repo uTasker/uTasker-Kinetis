@@ -125,7 +125,7 @@
 /* =================================================================== */
 
 //#define TEST_SDCARD_SECTOR_WRITE                                       // {44} activate to allow sector writes to be tested
-//#define TEST_IIC_INTERFACE                                             // activate to enable special I2C tests via menu
+//#define TEST_I2C_INTERFACE                                             // activate to enable special I2C tests via menu
 //#define DEVELOP_PHY_CONTROL                                            // {33} activate to enable PHY register dump and writes to individual register addresses
                                                                          // note that STOP_MII_CLOCK should not be enabled when using this (kinetis)
 //#define _DEBUG_CAN                                                     // support dumping CAN register details for debugging purpose
@@ -860,10 +860,10 @@ static const DEBUG_COMMAND tUSBCommand[] = {
 
 static const DEBUG_COMMAND tI2CCommand[] = {
     {"up",                "go to main menu",                       DO_HELP,          DO_HELP_UP },
-#if defined IIC_INTERFACE
+#if defined I2C_INTERFACE
     {"acc_on",            "enable accelerometer output",           DO_I2C,           DO_ACC_ON }, // {68}
     {"acc_off",           "disable output",                        DO_I2C,           DO_ACC_OFF },
-    #if defined TEST_IIC_INTERFACE
+    #if defined TEST_I2C_INTERFACE
     {"wr",                "write [add] [value] {rep}",             DO_I2C,           DO_I2C_WRITE },
     {"rd",                "read  [add] [no. of bytes]",            DO_I2C,           DO_I2C_READ },
     {"srd",               "simple read [no. of bytes]",            DO_I2C,           DO_I2C_READ_NO_ADDRESS },
@@ -1061,7 +1061,7 @@ static const MENUS ucMenus[] = {
 /*                     global variable definitions                     */
 /* =================================================================== */
 
-#if defined IIC_INTERFACE                                                // {68}
+#if defined I2C_INTERFACE                                                // {68}
     int iAccelOutput = 0;                                                // flag to control whether accelerometer output should be printed to the debug output or not
 #endif
 #if defined USE_MAINTENANCE || defined SERIAL_INTERFACE
@@ -1133,7 +1133,7 @@ static unsigned char   ucDebugCnt = 0;
     static UTDIRECTORY *ptr_utDirectory[DISK_COUNT] = {0};               // pointer to a directory object
     static int iFATstalled = 0;                                          // stall flags when listing large directories and printing content
 #endif
-#if defined IIC_INTERFACE && defined TEST_IIC_INTERFACE
+#if defined I2C_INTERFACE && defined TEST_I2C_INTERFACE
     extern QUEUE_HANDLE IICPortID;
 #endif
 #if DISK_COUNT > 1
@@ -1438,7 +1438,7 @@ extern void fnDebug(TTASKTABLE *ptrTaskTable)
             break;
         }
     }
-#if defined IIC_INTERFACE && defined TEST_IIC_INTERFACE
+#if defined I2C_INTERFACE && defined TEST_I2C_INTERFACE
     if (fnMsgs(IICPortID) != 0) {                                        // if IIC message waiting
         QUEUE_TRANSFER iic_length = fnMsgs(IICPortID);
         int x = 0;
@@ -3759,7 +3759,7 @@ static void fnDoOLED(unsigned char ucType, CHAR *ptrInput)               // OLED
 }
 #endif
 
-#if defined IIC_INTERFACE
+#if defined I2C_INTERFACE
 static void fnDoI2C(unsigned char ucType, CHAR *ptrInput)                // I2C group
 {
     switch (ucType) {
@@ -3771,7 +3771,7 @@ static void fnDoI2C(unsigned char ucType, CHAR *ptrInput)                // I2C 
         iAccelOutput = 0;
         fnDebugMsg("Disabled\r\n");
         break;
-    #if defined TEST_IIC_INTERFACE
+    #if defined TEST_I2C_INTERFACE
     case DO_I2C_WRITE:                                                   // write a value to a specified I2C address
         {
             QUEUE_TRANSFER length;
@@ -5230,7 +5230,7 @@ static int fnDoCommand(unsigned char ucFunction, unsigned char ucType, CHAR *ptr
         break;
 #endif
 
-#if defined IIC_INTERFACE
+#if defined I2C_INTERFACE
     case DO_I2C:
         fnDoI2C(ucType, ptrInput);                                       // I2C group
         break;

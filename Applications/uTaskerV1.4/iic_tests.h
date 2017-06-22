@@ -11,7 +11,7 @@
     File:      iic_tests.h
     Project:   uTasker project
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2017
     *********************************************************************
     28.09.2010 Add TEST_SENSIRION
     09.04.2014 Add MMA8451Q, MMA7660F and FXOS8700 - 3/6-axis accelerometer/orientation/motion detection {1}
@@ -24,16 +24,16 @@
 
 */
 
-#if defined IIC_INTERFACE && !defined _IIC_CONFIG
-    #define _IIC_CONFIG
+#if defined I2C_INTERFACE && !defined _I2C_CONFIG
+    #define _I2C_CONFIG
 
-    #if defined IIC_SLAVE_MODE
-      //#define TEST_IIC_SLAVE                                           // test behaving as I2C slave
+    #if defined I2C_SLAVE_MODE
+        #define TEST_I2C_SLAVE                                           // test behaving as I2C slave
             #define OUR_SLAVE_ADDRESS   0xd0
     #endif
-  //#define TEST_IIC                                                     // test IIC EEPROM
-  //#define TEST_IIC_INTENSIVE                                           // intensive transmitter test
-  //#define TEST_DS1307                                                  // test DS1307 RTC via IIC bus
+  //#define TEST_I2C                                                     // test I2C EEPROM
+  //#define TEST_I2C_INTENSIVE                                           // intensive transmitter test
+  //#define TEST_DS1307                                                  // test DS1307 RTC via I2C bus
   //#define TEST_SENSIRION                                               // test reading temperature and humidity 
     #define TEST_MMA8451Q                                                // test monitoring the 3-axis accelerometer
     #if defined TEST_MMA8451Q
@@ -47,7 +47,7 @@
     #endif
   //#define DISPLAY_ACCELEROMETER_VALUES                                 // print values to debug output irrespective of debug setting
 
-    #if defined TEST_IIC
+    #if defined TEST_I2C
         #define ADD_EEPROM_READ           0xa5                           // read address of I2C EEPROM
         #define ADD_EEPROM_WRITE          0xa4                           // write address of I2C EEPROM
     #endif
@@ -73,7 +73,7 @@
         #define STATE_PAUSE               0x03
     #endif
     #if defined TEST_MMA8451Q                                            // {1}
-        #if defined FRDM_K22F || defined TWR_K21F120M || defined TWR_K24F120M || defined TWR_K64F120M || defined TWR_K21D50M || defined TWR_K65F180M || defined FRDM_K66F
+        #if defined FRDM_K22F || defined K22F128_100M || defined TWR_K21F120M || defined TWR_K24F120M || defined TWR_K64F120M || defined TWR_K21D50M || defined TWR_K65F180M || defined FRDM_K66F
             #define MMA8451Q_READ_ADDRESS     0x39                       // read address of MMA8451Q [SA0 is '0']
             #define MMA8451Q_WRITE_ADDRESS    0x38                       // write address of MMA8451
         #elif defined TWR_K22F120M
@@ -140,7 +140,7 @@
         #define ACC_START_ADDRESS         0                              // start at the XOUT register
         #define ACC_READ_LENGTH           11                             // read 11 registers from the start location
     #elif defined TEST_FXOS8700
-        #if defined FRDM_K22F || defined TWR_K22F120M
+        #if defined FRDM_K22F || defined K22F128_100M || defined TWR_K22F120M
             #define FXOS8700_READ_ADDRESS     0x3f                       // read address of FXOS8700 // assumes SA1 is '1' and SA0 is '1'
             #define FXOS8700_WRITE_ADDRESS    0x3e                       // write address of FXOS8700
         #elif defined KINETIS_K80
@@ -202,8 +202,8 @@
 /*                 local function prototype declarations               */
 /* =================================================================== */
 
-    #if defined TEST_IIC || defined IIC_SLAVE_MODE || defined TEST_DS1307 || defined TEST_SENSIRION || defined TEST_MMA8451Q || defined TEST_MMA7660F || defined TEST_FXOS8700
-        static void fnConfigIIC_Interface(void);
+    #if defined TEST_I2C || defined I2C_SLAVE_MODE || defined TEST_DS1307 || defined TEST_SENSIRION || defined TEST_MMA8451Q || defined TEST_MMA7660F || defined TEST_FXOS8700
+        static void fnConfigI2C_Interface(void);
     #endif
     #if defined TEST_MMA8451Q && defined INTERRUPT_ON_READY
         static void acc_data_ready(void);
@@ -222,8 +222,8 @@
 /*                     global variable definitions                     */
 /* =================================================================== */
 
-    #if defined TEST_IIC || defined IIC_SLAVE_MODE || defined TEST_DS1307 || defined TEST_SENSIRION || defined TEST_MMA8451Q || defined TEST_MMA7660F || defined TEST_FXOS8700
-        QUEUE_HANDLE IICPortID = NO_ID_ALLOCATED;                        // handle of I2C interface (global so that the debug task can access it)
+    #if defined TEST_I2C || defined I2C_SLAVE_MODE || defined TEST_DS1307 || defined TEST_SENSIRION || defined TEST_MMA8451Q || defined TEST_MMA7660F || defined TEST_FXOS8700
+        QUEUE_HANDLE I2CPortID = NO_ID_ALLOCATED;                        // handle of I2C interface (global so that the debug task can access it)
     #endif
 
     #if defined TEST_MMA8451Q && defined USE_USB_HID_MOUSE               // tilt mouse values
@@ -303,10 +303,10 @@
 #endif
 
 
-#if defined _IIC_INIT_CODE && (defined TEST_IIC || defined IIC_SLAVE_MODE || defined TEST_IIC_SLAVE || defined TEST_DS1307 || defined TEST_SENSIRION || defined TEST_MMA8451Q || defined TEST_MMA7660F || defined TEST_FXOS8700)
+#if defined _I2C_INIT_CODE && (defined TEST_I2C || defined I2C_SLAVE_MODE || defined TEST_I2C_SLAVE || defined TEST_DS1307 || defined TEST_SENSIRION || defined TEST_MMA8451Q || defined TEST_MMA7660F || defined TEST_FXOS8700)
 
-    #if defined TEST_IIC_SLAVE
-// The function is called during I2C slave interrupt handling so that the application can immediately respond in order to realise an I2C save device
+    #if defined TEST_I2C_SLAVE
+// The function is called during I2C slave interrupt handling so that the application can immediately respond in order to realise an I2C slave device
 //
 static int fnI2C_SlaveCallback(int iChannel, unsigned char *ptrDataByte, int iType)
 {
@@ -351,60 +351,56 @@ static int fnI2C_SlaveCallback(int iChannel, unsigned char *ptrDataByte, int iTy
 }
     #endif
 
-// Open IIC interface to communicate with an EEPROM, RTC, etc.
+// Open I2C interface to communicate with an EEPROM, RTC, etc.
 //
-static void fnConfigIIC_Interface(void)
+static void fnConfigI2C_Interface(void)
 {
-    IICTABLE tIICParameters;
+    I2CTABLE tI2CParameters;
 
-    tIICParameters.Channel = OUR_IIC_CHANNEL;
-    #if defined TEST_IIC_SLAVE                                           // {3}
-    tIICParameters.ucSlaveAddress = OUR_SLAVE_ADDRESS;                   // slave address
-    tIICParameters.usSpeed = 0;                                          // select slave mode of operation
-    tIICParameters.fnI2C_SlaveCallback = fnI2C_SlaveCallback;            // the I2C save interrupt callback on reception
-    #elif (defined TEST_MMA8451Q || defined TEST_MMA7660F || defined TEST_FXOS8700) && !defined KL43Z_256_32_CL // {1}
-    tIICParameters.usSpeed = 50;                                         // 50k
+    tI2CParameters.Channel = OUR_I2C_CHANNEL;
+    #if defined TEST_I2C_SLAVE                                           // {3}
+    tI2CParameters.ucSlaveAddress = OUR_SLAVE_ADDRESS;                   // slave address
+    tI2CParameters.usSpeed = 0;                                          // select slave mode of operation
+    tI2CParameters.fnI2C_SlaveCallback = fnI2C_SlaveCallback;            // the I2C slave interrupt callback on reception
+    #elif (defined TEST_MMA8451Q || defined TEST_MMA7660F || defined TEST_FXOS8700) // {1}
+    tI2CParameters.usSpeed = 50;                                         // 50k
     #else
-    tIICParameters.usSpeed = 100;                                        // 100k
+    tI2CParameters.usSpeed = 100;                                        // 100k
     #endif
-    #if defined KL43Z_256_32_CL
-    tIICParameters.Rx_tx_sizes.TxQueueSize = 256;                        // transmit queue size
-    #else
-    tIICParameters.Rx_tx_sizes.TxQueueSize = 64;                         // transmit queue size
-    #endif
+    tI2CParameters.Rx_tx_sizes.TxQueueSize = 64;                         // transmit queue size
     #if defined TEST_FXOS8700
-        tIICParameters.Rx_tx_sizes.RxQueueSize = 128;                    // receive queue size
+    tI2CParameters.Rx_tx_sizes.RxQueueSize = 128;                        // receive queue size
     #else
-        tIICParameters.Rx_tx_sizes.RxQueueSize = 64;                     // receive queue size
+    tI2CParameters.Rx_tx_sizes.RxQueueSize = 64;                         // receive queue size
     #endif
-    #if defined TEST_IIC_SLAVE
-    tIICParameters.Task_to_wake = OWN_TASK;                              // wake application task when slave transaction has completed
+    #if defined TEST_I2C_SLAVE
+    tI2CParameters.Task_to_wake = OWN_TASK;                              // wake application task when slave transaction has completed
     #else
-    tIICParameters.Task_to_wake = 0;                                     // no wake on transmission
+    tI2CParameters.Task_to_wake = 0;                                     // no wake on transmission
     #endif
 
-    if ((IICPortID = fnOpen(TYPE_IIC, FOR_I_O, &tIICParameters)) != NO_ID_ALLOCATED) { // open the channel with defined configurations
-    #if !defined TEST_IIC_SLAVE                                          // when slave we don't initiate any activity but instead wait to be addressed
-        #if defined TEST_IIC
-            #if defined TEST_IIC_INTENSIVE
+    if ((I2CPortID = fnOpen(TYPE_I2C, FOR_I_O, &tI2CParameters)) != NO_ID_ALLOCATED) { // open the channel with defined configurations
+    #if !defined TEST_I2C_SLAVE                                          // when slave we don't initiate any activity but instead wait to be addressed
+        #if defined TEST_I2C
+            #if defined TEST_I2C_INTENSIVE
         iAppState |= STATE_POLLING;                                      // mark test running
         uTaskerStateChange(OWN_TASK, UTASKER_GO);                        // set to polling mode
             #else
         static const unsigned char ucSetEEPROMAddress0[] = {ADD_EEPROM_WRITE, 0}; // command to set address to read to 0
         static const unsigned char ucReadEEPROM[] = {16, ADD_EEPROM_READ, OWN_TASK}; // command to start a read of 16 bytes with the task scheduled when the read has completed
-        fnWrite(IICPortID, (unsigned char *)ucSetEEPROMAddress0, sizeof(ucSetEEPROMAddress0)); // write the EEPROM address to read
-        fnRead(IICPortID, (unsigned char *)ucReadEEPROM, 0);             // start the read process of 16 bytes
+        fnWrite(I2CPortID, (unsigned char *)ucSetEEPROMAddress0, sizeof(ucSetEEPROMAddress0)); // write the EEPROM address to read
+        fnRead(I2CPortID, (unsigned char *)ucReadEEPROM, 0);             // start the read process of 16 bytes
             #endif	
         #elif defined TEST_DS1307
         static const unsigned char ucStartRTC[] = {ADDRTC_WRITE, RTC_CONTROL, RTC_MODE};
-        fnWrite(IICPortID, (unsigned char *)ucStartRTC, sizeof(ucStartRTC)); // initialise RTC - set 1Hz output mode
+        fnWrite(I2CPortID, (unsigned char *)ucStartRTC, sizeof(ucStartRTC)); // initialise RTC - set 1Hz output mode
         fnGetRTCTime();                                                  // get the time (start RTC if not yet running)
         iRTC_state = STATE_INIT_RTC;                                     // mark that we are initialising
         #elif defined TEST_SENSIRION
         uTaskerMonoTimer(OWN_TASK, (DELAY_LIMIT)(4.0 * SEC), E_NEXT_SENSOR_REQUEST); // start reading sequence after a delay
-        #elif (defined TEST_MMA8451Q || defined TEST_MMA7660F || defined TEST_FXOS8700) && !defined KL43Z_256_32_CL // {1}
-        fnWrite(IICPortID, (unsigned char *)ucSetAccelerometerAddress, sizeof(ucSetAccelerometerAddress)); // write the register address to read from
-        fnRead(IICPortID, (unsigned char *)ucReadAccelerometerRegisters, 0); // start the read process of the required amount of bytes
+        #elif (defined TEST_MMA8451Q || defined TEST_MMA7660F || defined TEST_FXOS8700) // {1}
+        fnWrite(I2CPortID, (unsigned char *)ucSetAccelerometerAddress, sizeof(ucSetAccelerometerAddress)); // write the register address to read from
+        fnRead(I2CPortID, (unsigned char *)ucReadAccelerometerRegisters, 0); // start the read process of the required amount of bytes
         #endif
     #endif
     }
@@ -424,17 +420,17 @@ static void acc_data_ready(void)
 #endif
 
 
-#if defined _IIC_READ_CODE && (defined TEST_IIC || defined TEST_IIC_SLAVE)
-    #if defined TEST_IIC_INTENSIVE && !defined TEST_IIC_SLAVE
-    if (iAppState & STATE_POLLING) {                                     // if I2C intensive test active
-        static unsigned char iic_testMsg[] = {0xaa, 0x00};               // fictional I2C address
+#if defined _I2C_READ_CODE && (defined TEST_I2C || defined TEST_I2C_SLAVE)
+    #if defined TEST_I2C_INTENSIVE && !defined TEST_I2C_SLAVE
+    if ((iAppState & STATE_POLLING) != 0) {                              // if I2C intensive test active
+        static unsigned char i2c_testMsg[] = {0xaa, 0x00};               // fictional I2C address
         int iLoop = 20;
-        while (iLoop--) {
-            if (fnWrite(IICPortID, 0, sizeof(iic_testMsg)) > 0) {        // check for room in output queue
-                if (fnWrite(IICPortID, iic_testMsg, sizeof(iic_testMsg)) < sizeof(iic_testMsg)) {
-                    iic_testMsg[1] = 0;                                  // error
+        while (iLoop-- != 0) {
+            if (fnWrite(I2CPortID, 0, sizeof(i2c_testMsg)) > 0) {        // check for room in output queue
+                if (fnWrite(I2CPortID, i2c_testMsg, sizeof(i2c_testMsg)) < sizeof(i2c_testMsg)) {
+                    i2c_testMsg[1] = 0;                                  // error
                 }
-                iic_testMsg[1]++;
+                i2c_testMsg[1]++;
             }
             else {
                 break;
@@ -443,9 +439,9 @@ static void acc_data_ready(void)
         uTaskerStateChange(OWN_TASK, UTASKER_GO);                        // ensure we remain in polling mode
     }
     #endif
-    if (fnMsgs(IICPortID) != 0) {                                        // if I2C message waiting
-    #if defined TEST_IIC_SLAVE
-        while (fnRead(IICPortID, ucInputMessage, 1) != 0) {              // while messages
+    if (fnMsgs(I2CPortID) != 0) {                                        // if I2C message waiting
+    #if defined TEST_I2C_SLAVE
+        while (fnRead(I2CPortID, ucInputMessage, 1) != 0) {              // while messages
             unsigned char ucMessageLength = ucInputMessage[0];           // the length of the content
             int x = 0;
             unsigned char ucReject;
@@ -457,18 +453,18 @@ static void acc_data_ready(void)
             else {
                 ucReject = 0;
             }
-            fnRead(IICPortID, ucInputMessage, ucMessageLength);          // read the message content
+            fnRead(I2CPortID, ucInputMessage, ucMessageLength);          // read the message content
             while (x < ucMessageLength) {                                // display received bytes
                 fnDebugHex(ucInputMessage[x++], (WITH_LEADIN | WITH_SPACE | 1));
             }
             while (ucReject != 0) {
-                fnRead(IICPortID, ucInputMessage, 1);                    // empty in case of over-length message
+                fnRead(I2CPortID, ucInputMessage, 1);                    // empty in case of over-length message
                 ucReject--;
             }
             fnDebugMsg("\r\n");
         }
     #else
-        while ((Length = fnRead(IICPortID, ucInputMessage, MEDIUM_MESSAGE)) != 0) {
+        while ((Length = fnRead(I2CPortID, ucInputMessage, MEDIUM_MESSAGE)) != 0) {
             static const unsigned char ucSetWriteEEPROM1[] = {ADD_EEPROM_WRITE, 3, 5}; // prepare write of one byte to address 3
             static const unsigned char ucSetWriteEEPROM2[] = {ADD_EEPROM_WRITE, 5, 3, 4, 5, 6, 7, 8, 9, 10}; // prepare write of multiple bytes to address 5
 
@@ -478,22 +474,22 @@ static void acc_data_ready(void)
             }
             fnDebugMsg("\r\n");
                                                                          // now change the contents using different writes
-            fnWrite(IICPortID, (unsigned char *)&ucSetWriteEEPROM1, sizeof(ucSetWriteEEPROM1)); // start single byte write
-            fnWrite(IICPortID, (unsigned char *)&ucSetWriteEEPROM2, sizeof(ucSetWriteEEPROM2)); // start page write
+            fnWrite(I2CPortID, (unsigned char *)&ucSetWriteEEPROM1, sizeof(ucSetWriteEEPROM1)); // start single byte write
+            fnWrite(I2CPortID, (unsigned char *)&ucSetWriteEEPROM2, sizeof(ucSetWriteEEPROM2)); // start page write
         }
     #endif
     }
-#elif defined _IIC_READ_CODE && defined TEST_DS1307
-    if ((iRTC_state & (STATE_INIT_RTC | STATE_GET_RTC)) && (fnMsgs(IICPortID) >= 7)) {
-        fnRead(IICPortID, ucInputMessage, 7);                            // get the time and put it into the local time structure
-        if (ucInputMessage[0] & CLOCK_NOT_ENABLED) {
+#elif defined _I2C_READ_CODE && defined TEST_DS1307
+    if (((iRTC_state & (STATE_INIT_RTC | STATE_GET_RTC)) != 0) && (fnMsgs(I2CPortID) >= 7)) {
+        fnRead(I2CPortID, ucInputMessage, 7);                            // get the time and put it into the local time structure
+        if ((ucInputMessage[0] & CLOCK_NOT_ENABLED) != 0) {
             uMemset(&stPresentTime, 0, sizeof(stPresentTime));           // start with cleared memory
             uMemset(ucInputMessage, 0, 7);
             fnSaveTime();                                                // write to RTC, which will also enable oscillator (performed once after power up only)
         }
         fnSetTimeStruct(ucInputMessage);                                 // convert the received time and date to a local format
 
-        if (iRTC_state & STATE_INIT_RTC) {                               // define an input for 1s interrupt
+        if ((iRTC_state & STATE_INIT_RTC) != 0) {                        // define an input for 1s interrupt
             INTERRUPT_SETUP interrupt_setup;
 
             interrupt_setup.int_type = PORT_INTERRUPT;                   // identifier when configuring
@@ -529,8 +525,8 @@ static void acc_data_ready(void)
         }
         iRTC_state = 0;                                                  // RTC state idle
     }
-#elif defined _IIC_READ_CODE && defined TEST_SENSIRION
-    if (fnRead(IICPortID, ucInputMessage, 3) != 0) {                     // one result at a time, always 3 bytes in length
+#elif defined _I2C_READ_CODE && defined TEST_SENSIRION
+    if (fnRead(I2CPortID, ucInputMessage, 3) != 0) {                     // one result at a time, always 3 bytes in length
         switch (iSensor_state) {
         case STATE_READING_TEMPERATURE:                                  // result is temperature measurement result
             {
@@ -557,8 +553,8 @@ static void acc_data_ready(void)
                 rect1.rect_corners.usY_end = rect1.rect_corners.usY_start + 25;
                 fnDoLCD_rect(&rect1);
 
-                fnWrite(IICPortID, (unsigned char *)ucTriggerHumidity, sizeof(ucTriggerHumidity));
-                fnRead(IICPortID, (unsigned char *)ucReadHumidity, 0);   // start the read process of humidity
+                fnWrite(I2CPortID, (unsigned char *)ucTriggerHumidity, sizeof(ucTriggerHumidity));
+                fnRead(I2CPortID, (unsigned char *)ucReadHumidity, 0);   // start the read process of humidity
                 iSensor_state = STATE_READING_HUMIDITY;
                 slTemperature = ucInputMessage[0];
                 slTemperature <<= 8;
@@ -602,8 +598,8 @@ static void acc_data_ready(void)
     #else
                 CHAR cTemp[20];
                 CHAR *ptrDecimalPoint;
-                fnWrite(IICPortID, (unsigned char *)ucTriggerHumidity, sizeof(ucTriggerHumidity));
-                fnRead(IICPortID, (unsigned char *)ucReadHumidity, 0);   // start the read process of humidity
+                fnWrite(I2CPortID, (unsigned char *)ucTriggerHumidity, sizeof(ucTriggerHumidity));
+                fnRead(I2CPortID, (unsigned char *)ucReadHumidity, 0);   // start the read process of humidity
                 iSensor_state = STATE_READING_HUMIDITY;
                 slTemperature = ucInputMessage[0];
                 slTemperature <<= 8;
@@ -700,10 +696,10 @@ static void acc_data_ready(void)
             break;
         }
     }
-#elif defined _IIC_READ_CODE && (defined TEST_MMA8451Q || defined TEST_MMA7660F || defined TEST_FXOS8700) // {1}
+#elif defined _I2C_READ_CODE && (defined TEST_MMA8451Q || defined TEST_MMA7660F || defined TEST_FXOS8700) // {1}
     switch (iAccelerometerState) {
     case ACC_INITIALISING:
-        if (fnRead(IICPortID, ucInputMessage, ACC_READ_LENGTH) != 0) {   // if the read has completed
+        if (fnRead(I2CPortID, ucInputMessage, ACC_READ_LENGTH) != 0) {   // if the read has completed
             int i = 0;
             int iLine;
             fnDebugMsg("3-axis accelerometer:\r\n");
@@ -730,19 +726,19 @@ static void acc_data_ready(void)
                 fnConfigureInterrupt((void *)&interrupt_setup);          // configure interrupt
             }
             iAccelerometerState = ACC_WAITING;                           // waiting for interrupts from the accelerometer
-            fnWrite(IICPortID, (unsigned char *)ucRouteIrq, sizeof(ucRouteIrq)); // route interrupt output to INT1
-            fnWrite(IICPortID, (unsigned char *)ucConfigureIrq, sizeof(ucConfigureIrq)); // configure interrupt
-            fnWrite(IICPortID, (unsigned char *)ucSetAccelerometerMode, sizeof(ucSetAccelerometerMode)); // write the operating mode
+            fnWrite(I2CPortID, (unsigned char *)ucRouteIrq, sizeof(ucRouteIrq)); // route interrupt output to INT1
+            fnWrite(I2CPortID, (unsigned char *)ucConfigureIrq, sizeof(ucConfigureIrq)); // configure interrupt
+            fnWrite(I2CPortID, (unsigned char *)ucSetAccelerometerMode, sizeof(ucSetAccelerometerMode)); // write the operating mode
             if (ACC_INT_ASSERTED()) {                                    // if the accelerometer is already signalling that it has data (it is possible that it was previouly operating and has data ready, signaled by the interrupt line laread being low)
                 acc_data_ready();                                        // start an initial read
             }
     #else
-            fnWrite(IICPortID, (unsigned char *)ucSetAccelerometerMode, sizeof(ucSetAccelerometerMode)); // write the operating mode
+            fnWrite(I2CPortID, (unsigned char *)ucSetAccelerometerMode, sizeof(ucSetAccelerometerMode)); // write the operating mode
 
             // Followed by the first status read
             //
-            fnWrite(IICPortID, (unsigned char *)ucSetAccelerometerRead, sizeof(ucSetAccelerometerRead)); // write the register address to read
-            fnRead(IICPortID, (unsigned char *)ucReadAccelerometerState, 0); // start the read process of the status
+            fnWrite(I2CPortID, (unsigned char *)ucSetAccelerometerRead, sizeof(ucSetAccelerometerRead)); // write the register address to read
+            fnRead(I2CPortID, (unsigned char *)ucReadAccelerometerState, 0); // start the read process of the status
             iAccelerometerState = ACC_X_Y_Z;
     #endif
         }
@@ -752,12 +748,12 @@ static void acc_data_ready(void)
         break;
     case ACC_TRIGGERED:                                                  // accelerometer has indicated that there is data to be read
         iAccelerometerState = ACC_X_Y_Z;
-      //fnWrite(IICPortID, (unsigned char *)ucSetAccelerometerRead, sizeof(ucSetAccelerometerRead)); // write the register address to read [it is not necessary to set the address pointer since it operates in overflow mode]
-        fnRead(IICPortID, (unsigned char *)ucReadAccelerometerState, 0); // start the read process of the status
+      //fnWrite(I2CPortID, (unsigned char *)ucSetAccelerometerRead, sizeof(ucSetAccelerometerRead)); // write the register address to read [it is not necessary to set the address pointer since it operates in overflow mode]
+        fnRead(I2CPortID, (unsigned char *)ucReadAccelerometerState, 0); // start the read process of the status
         break;
     #endif
     case ACC_X_Y_Z:                                                      // we are expecting status data from the accelerometer to arrive
-        if (fnRead(IICPortID, ucInputMessage, RESULT_LENGTH) != 0) {     // if the result read has completed
+        if (fnRead(I2CPortID, ucInputMessage, RESULT_LENGTH) != 0) {     // if the result read has completed
             static int iDisplayRate = 0;
     #if defined TEST_MMA8451Q && defined INTERRUPT_ON_READY
             #define ACC_DISPLAY_FILTER  25
@@ -818,8 +814,8 @@ static void acc_data_ready(void)
     #endif
                 iDisplayRate = 0;
     #if defined TEST_FXOS8700
-                fnWrite(IICPortID, (unsigned char *)ucSetMagnetometerRead, sizeof(ucSetMagnetometerRead)); // write the register address to read
-                fnRead(IICPortID, (unsigned char *)ucReadMagnetometerState, 0); // start the read process of the next status
+                fnWrite(I2CPortID, (unsigned char *)ucSetMagnetometerRead, sizeof(ucSetMagnetometerRead)); // write the register address to read
+                fnRead(I2CPortID, (unsigned char *)ucReadMagnetometerState, 0); // start the read process of the next status
                 iAccelerometerState = ACC_MAGNETOMETER;
                 break;;
     #endif
@@ -829,14 +825,14 @@ static void acc_data_ready(void)
                 acc_data_ready();                                        // start an initial read
             }
     #else
-          //fnWrite(IICPortID, (unsigned char *)ucSetAccelerometerRead, sizeof(ucSetAccelerometerRead)); // write the register address to read (it is not necessary to set the address pointer since it operates in overflow mode)
-            fnRead(IICPortID, (unsigned char *)ucReadAccelerometerState, 0); // start the read process of the next status
+          //fnWrite(I2CPortID, (unsigned char *)ucSetAccelerometerRead, sizeof(ucSetAccelerometerRead)); // write the register address to read (it is not necessary to set the address pointer since it operates in overflow mode)
+            fnRead(I2CPortID, (unsigned char *)ucReadAccelerometerState, 0); // start the read process of the next status
     #endif
         }
         break;
     #if defined TEST_FXOS8700
     case ACC_MAGNETOMETER:
-        if (fnRead(IICPortID, ucInputMessage, 6) != 0) {                 // if the status read has completed
+        if (fnRead(I2CPortID, ucInputMessage, 6) != 0) {                 // if the status read has completed
             static int iDisplayRate = 0;
             if (++iDisplayRate > 100) {
                 int i = 0;
@@ -849,12 +845,12 @@ static void acc_data_ready(void)
                 }
                 fnDebugMsg("\r\n");
                 iDisplayRate = 0;
-                fnWrite(IICPortID, (unsigned char *)ucSetAccelerometerRead, sizeof(ucSetAccelerometerRead)); // write the register address to read
-                fnRead(IICPortID, (unsigned char *)ucReadAccelerometerState, 0); // start the read process of the next status
+                fnWrite(I2CPortID, (unsigned char *)ucSetAccelerometerRead, sizeof(ucSetAccelerometerRead)); // write the register address to read
+                fnRead(I2CPortID, (unsigned char *)ucReadAccelerometerState, 0); // start the read process of the next status
                 iAccelerometerState = ACC_X_Y_Z;
             }
-            fnWrite(IICPortID, (unsigned char *)ucSetMagnetometerRead, sizeof(ucSetMagnetometerRead)); // write the register address to read
-            fnRead(IICPortID, (unsigned char *)ucReadMagnetometerState, 0); // start the read process of the next status
+            fnWrite(I2CPortID, (unsigned char *)ucSetMagnetometerRead, sizeof(ucSetMagnetometerRead)); // write the register address to read
+            fnRead(I2CPortID, (unsigned char *)ucReadMagnetometerState, 0); // start the read process of the next status
         }
         break;
     #endif
@@ -862,20 +858,20 @@ static void acc_data_ready(void)
 #endif
 
 
-#if defined _IIC_SENSOR_CODE && defined TEST_SENSIRION
+#if defined _I2C_SENSOR_CODE && defined TEST_SENSIRION
 // This routine is called at a periodic rate to start next sensor value requests
 //
 static void fnNextSensorRequest(void)
 {
     static const unsigned char ucTriggerTemperatur[] = {ADDSHT21_WRITE, TRIGGER_TEMPERATURE_HOLD_MASTER};
     static const unsigned char ucReadTemperature[] = {3, ADDSHT21_READ, OWN_TASK};
-    fnWrite(IICPortID, (unsigned char *)ucTriggerTemperatur, sizeof(ucTriggerTemperatur));
-    fnRead(IICPortID, (unsigned char *)ucReadTemperature, 0);            // start the read process of temperature
+    fnWrite(I2CPortID, (unsigned char *)ucTriggerTemperatur, sizeof(ucTriggerTemperatur));
+    fnRead(I2CPortID, (unsigned char *)ucReadTemperature, 0);            // start the read process of temperature
     iSensor_state = STATE_READING_TEMPERATURE;                           // mark that we expect the temperature result
 }
 #endif
 
-#if defined _IIC_RTC_CODE && defined TEST_DS1307
+#if defined _I2C_RTC_CODE && defined TEST_DS1307
 
 // Get the time from the RTC - start RTC if it is not yet running
 //
@@ -883,8 +879,8 @@ static void fnGetRTCTime(void)
 {
     static const unsigned char ucGetTime[] =  {ADDRTC_WRITE, 0};
     static const unsigned char ucSlave[] = {7, ADDRTC_READ, OWN_TASK};   // read 7 bytes from this address
-    fnWrite(IICPortID, (unsigned char*)ucGetTime, sizeof(ucGetTime));    // set the read address
-    fnRead(IICPortID, (unsigned char *)ucSlave, 0);                      // start the read process of 7 bytes
+    fnWrite(I2CPortID, (unsigned char*)ucGetTime, sizeof(ucGetTime));    // set the read address
+    fnRead(I2CPortID, (unsigned char *)ucSlave, 0);                      // start the read process of 7 bytes
 }
 
 // Converts between hex number and BCD, avoiding divides...
@@ -919,7 +915,7 @@ static void fnSaveTime(void)
     ucSetRTC[8] = fnBCD(stPresentTime.ucYear);
     uEnable_Interrupt();
 
-    fnWrite(IICPortID, (unsigned char *)ucSetRTC, sizeof(ucSetRTC));     // set new date and time
+    fnWrite(I2CPortID, (unsigned char *)ucSetRTC, sizeof(ucSetRTC));     // set new date and time
 }
 
 // Convert the received time to a local format

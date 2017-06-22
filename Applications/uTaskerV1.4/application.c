@@ -20,7 +20,7 @@
     03.06.2007 Add FTP user controllable FTP timeout                     {1}
     23.06.2007 Add IRQ test                                              {2}
     11.08.2007 Add RTC test (M5223X)                                     {3}
-    10.09.2007 Add external RTC IIC test                                 {4}
+    10.09.2007 Add external RTC I2C test                                 {4}
     15.09.2007 Modify IRQ priorities for M5223X                          {5}
     23.09.2007 Add simple test of SPI FLASH including multiple chips)    {6}
     12.10.2007 Add USB initialisation                                    {7}
@@ -130,6 +130,8 @@
 
 #include "config.h"
 
+//#define SPECIAL_TEST                                                   // test a special project code
+
 #define OWN_TASK                  TASK_APPLICATION
 
 #include "application_lcd.h"                                             // {46} LCD tests
@@ -235,6 +237,10 @@ static void fnValidatedInit(void);
 #endif
 #if defined FAT_EMULATION                                                // {98}
     static void fnPrepareEmulatedFAT(void);
+#endif
+#if defined SPECIAL_TEST
+    static void init_button_HID_codes(void);
+    static void fnHandleSpecialKeyChange(void);
 #endif
 
 /* =================================================================== */
@@ -546,7 +552,7 @@ extern void fnApplication(TTASKTABLE *ptrTaskTable)
     #else
     unsigned char       ucInputMessage[64];                              // reserve space for receiving messages (if the UART rx debug size if set less than 64 we use a 64 byte input otherwise it may be too small (and cause buffer overflow when used))
     #endif
-    #if (defined SERIAL_INTERFACE && defined DEMO_UART) || (defined CAN_INTERFACE && defined TEST_CAN) || defined TEST_IIC // {32}{39}
+    #if (defined SERIAL_INTERFACE && defined DEMO_UART) || (defined CAN_INTERFACE && defined TEST_CAN) || defined TEST_I2C // {32}{39}
     QUEUE_TRANSFER Length = 0;
     #endif
 
@@ -613,8 +619,8 @@ extern void fnApplication(TTASKTABLE *ptrTaskTable)
 #if defined FREEMASTER_UART
         FreemasterPortID = fnOpenFreeMasterUART();                       // enable UART for FreeMaster use
 #endif
-#if defined TEST_IIC || defined IIC_SLAVE_MODE || defined TEST_DS1307 || defined TEST_SENSIRION || defined TEST_MMA8451Q || defined TEST_MMA7660F || defined TEST_FXOS8700 // {56}
-        fnConfigIIC_Interface();
+#if defined TEST_I2C || defined I2C_SLAVE_MODE || defined TEST_DS1307 || defined TEST_SENSIRION || defined TEST_MMA8451Q || defined TEST_MMA7660F || defined TEST_FXOS8700 // {56}
+        fnConfigI2C_Interface();
 #endif
 #if defined USE_DHCP_CLIENT || defined USE_ZERO_CONFIG
         fnConfigureDHCP_ZERO();
@@ -675,6 +681,9 @@ extern void fnApplication(TTASKTABLE *ptrTaskTable)
 #endif
 #if defined nRF24L01_INTERFACE
         fnInit_nRF24L01();
+#endif
+#if defined SPECIAL_TEST
+        init_button_HID_codes();
 #endif
     }
 #if defined SUPPORT_GLCD && (defined MB785_GLCD_MODE || defined AVR32_EVK1105 || defined AVR32_AT32UC3C_EK || defined IDM_L35_B || defined M52259_TOWER || defined TWR_K60N512 || defined TWR_K60D100M || defined TWR_K70F120M || defined OLIMEX_LPC2478_STK || defined K70F150M_12M || (defined OLIMEX_LPC1766_STK && defined NOKIA_GLCD_MODE)) && defined SDCARD_SUPPORT // {58}{68}
@@ -769,6 +778,11 @@ extern void fnApplication(TTASKTABLE *ptrTaskTable)
                 fnSetLowPowerMode(WAIT_MODE);
     #endif
                 fnDebugMsg("RTC Alarm fired\r\n");
+                break;
+#endif
+#if defined SPECIAL_TEST
+            case KEY_EVENT_COL_1_ROW_1_PRESSED:
+                fnHandleSpecialKeyChange();
                 break;
 #endif
 #if defined nRF24L01_INTERFACE
@@ -921,11 +935,11 @@ extern void fnApplication(TTASKTABLE *ptrTaskTable)
     #endif
 #endif
 
-#define _IIC_READ_CODE
+#define _I2C_READ_CODE
     #if !defined BLAZE_K22 && !defined KL43Z_256_32_CL
-    #include "iic_tests.h"                                               // include IIC code to handle reception
+    #include "iic_tests.h"                                               // include I2C code to handle reception
     #endif
-#undef _IIC_READ_CODE
+#undef _I2C_READ_CODE
 #define _PORT_NMI_CHECK                                                  // {53}
     #include "Port_Interrupts.h"                                         // port interrupt timer interrupt event handling - ranges
 #undef _PORT_NMI_CHECK
@@ -1637,15 +1651,15 @@ static void fnTransferTFTP()
 #endif
 
 #if !defined BLAZE_K22
-    #define _IIC_RTC_CODE
-        #include "iic_tests.h"                                           // include IIC RTC code to save and retrieve the time and convert format as well as handle a second interrupt
-    #undef _IIC_RTC_CODE
-    #define _IIC_SENSOR_CODE                                             // {56}
-        #include "iic_tests.h"                                           // include IIC sensor routines
-    #undef _IIC_SENSOR_CODE
-    #define _IIC_INIT_CODE
-        #include "iic_tests.h"                                           // include IIC test initialisation routine
-    #undef _IIC_INIT_CODE
+    #define _IC_RTC_CODE
+        #include "iic_tests.h"                                           // include I2C RTC code to save and retrieve the time and convert format as well as handle a second interrupt
+    #undef _I2C_RTC_CODE
+    #define _I2C_SENSOR_CODE                                             // {56}
+        #include "iic_tests.h"                                           // include I2C sensor routines
+    #undef _I2C_SENSOR_CODE
+    #define _I2C_INIT_CODE
+        #include "iic_tests.h"                                           // include I2C test initialisation routine
+    #undef _I2C_INIT_CODE
 #endif
 
 #if defined TEST_DISTRIBUTED_TX
@@ -2307,3 +2321,242 @@ extern void fnUserHWInit(void)
     fnPrepare_nRF24L01_signals();
     #endif
 }
+
+#if defined SPECIAL_TEST
+
+#define uint8_t  unsigned char
+#define uint16_t unsigned short
+
+//Button ID's
+#define BTN_A 0
+#define BTN_B 1
+#define BTN_C 2
+#define BTN_D 3
+
+//Button Actions
+#define BTN_SP 1	//short press
+#define BTN_LP 2	//long press
+
+//Button States
+#define BTN_RELEASED 0
+#define BTN_PRESSED 1
+#define BTN_HELD 2
+
+#define BTN_NUM 4
+#define BTN_TIMEOUT 1000
+
+//Button HID Codes
+#define SP_BTN_A 0
+#define SP_BTN_B 1
+#define SP_BTN_C 2
+#define SP_BTN_D 3
+#define LP_BTN_A 4
+#define LP_BTN_B 5
+#define LP_BTN_C 6
+#define LP_BTN_D 7
+
+/* Define the port interrupt number for the buttons */
+#define BTNA_GPIO               kGpioButA
+#define BTNB_GPIO               kGpioButB
+#define BTNC_GPIO               kGpioButC
+#define BTND_GPIO               kGpioButD
+#define PROX_GPIO				kGpioProx
+#define BOARD_BUT_IRQ_NUM       PORTC_IRQn
+#define UI_IRQ_HANDLER        	PORTC_IRQHandler
+
+// Outputs
+//
+#define usb_rst    PORTB_BIT19
+#define cx3_rst    PORTD_BIT5
+#define als_rst    PORTB_BIT17
+#define ds_rst     PORTC_BIT0
+#define gps_rst    PORTC_BIT7
+#define gps_on     PORTC_BIT8
+
+// Button inputs
+//
+#define kGpioButA  PORTC_BIT3
+#define kGpioButB  PORTC_BIT4
+#define kGpioButC  PORTC_BIT5
+#define kGpioButD  PORTC_BIT6
+#define kGpioProx  PORTB_BIT2
+
+extern volatile uint16_t g_buttonHIDcode[BTN_NUM] = { 0 }; //[7-4][Long Press Code] [3-0][Short Press Cose]
+uint8_t button_state_change = 0;
+uint8_t g_ButtonStates[BTN_NUM] = { 0 };
+uint8_t g_ButtonActions[BTN_NUM] = { 0 };
+
+// Interrupt call back on key press
+//
+static void kGpioProx_pressed(void)
+{
+}
+
+// Interrupt call back on any key change
+//
+static void kGpioBut_pressed(void)
+{
+    fnInterruptMessage(OWN_TASK, KEY_EVENT_COL_1_ROW_1_PRESSED);         // existing event used (ignore name)
+}
+
+
+static void init_button_HID_codes(void)
+{
+    INTERRUPT_SETUP interrupt_setup;                                     // interrupt configuration parameters
+
+    // Configure and drive outputs
+    //
+    _CONFIG_DRIVE_PORT_OUTPUT_VALUE(B, (usb_rst | als_rst), (0), (PORT_SRE_SLOW | PORT_DSE_LOW)); // all drive '0'
+    _CONFIG_DRIVE_PORT_OUTPUT_VALUE(C, (ds_rst | gps_rst | gps_on), (ds_rst | gps_rst), (PORT_SRE_SLOW | PORT_DSE_LOW)); // ds_rst and gps_rst drive '1'
+    _CONFIG_DRIVE_PORT_OUTPUT_VALUE(D, (cx3_rst), (cx3_rst), (PORT_SRE_SLOW | PORT_DSE_LOW)); // drives '1'
+
+    g_buttonHIDcode[BTN_A] = (LP_BTN_A << 8) | SP_BTN_A;
+    g_buttonHIDcode[BTN_B] = (LP_BTN_B << 8) | SP_BTN_B;
+    g_buttonHIDcode[BTN_C] = (LP_BTN_C << 8) | SP_BTN_C;
+    g_buttonHIDcode[BTN_D] = (LP_BTN_D << 8) | SP_BTN_D;
+    /*g_buttonHIDcode[BTN_A] = (KEY_ENTER << 8) | KEY_LEFTARROW;
+    g_buttonHIDcode[BTN_B] = (KEY_ESCAPE << 8) | KEY_UPARROW;
+    g_buttonHIDcode[BTN_C] = (KEY_BACKSPACE << 8) | KEY_DOWNARROW;
+    g_buttonHIDcode[BTN_D] = (KEY_SPACEBAR << 8) | KEY_RIGHTARROW;*/
+
+    // Configure button interrupts
+    //
+    interrupt_setup.int_type = PORT_INTERRUPT;
+    interrupt_setup.int_priority = PRIORITY_PORT_B_INT;                  // interrupt priority level
+    interrupt_setup.int_port = PORTB;                                    // the port that the interrupt input is on
+    interrupt_setup.int_port_bits = kGpioProx;                           // the IRQ input connected
+    interrupt_setup.int_port_sense = (IRQ_FALLING_EDGE | PULLUP_DOWN_OFF); // interrupt is to be falling edge sensitive
+    interrupt_setup.int_handler = kGpioProx_pressed;                     // handling function
+    fnConfigureInterrupt((void *)&interrupt_setup);                      // configure interrupt
+
+    interrupt_setup.int_priority = PRIORITY_PORT_C_INT;                  // interrupt priority level
+    interrupt_setup.int_port = PORTC;                                    // the port that the interrupt input is on
+    interrupt_setup.int_port_bits = (kGpioButA | kGpioButB | kGpioButC | kGpioButD); // the IRQ input connected
+    interrupt_setup.int_port_sense = (IRQ_BOTH_EDGES | PULLUP_ON);       // interrupt is to be falling and rising edge sensitive
+    interrupt_setup.int_handler = kGpioBut_pressed;                      // handling function when any button pressed
+    fnConfigureInterrupt((void *)&interrupt_setup);                      // configure interrupt
+}
+
+
+static void button_matrix_save(uint8_t prev_state[])
+{
+    uint8_t i;
+
+    for (i = 0; i < BTN_NUM; i++)
+    {
+        prev_state[i] = g_ButtonStates[i];
+    }
+}
+
+uint8_t ui_poll(uint8_t button_id)
+{
+    //uint8_t button_value[BTN_NUM];
+    static uint8_t prev_button_states[BTN_NUM];
+
+    //Read Buttons
+    switch (button_id)
+    {
+
+    case BTN_A:
+        return _READ_PORT_MASK(C, kGpioButA);
+        break;
+    case BTN_B:
+        return _READ_PORT_MASK(C, kGpioButB);
+        break;
+    case BTN_C:
+        return _READ_PORT_MASK(C, kGpioButC);
+        break;
+    case BTN_D:
+        return _READ_PORT_MASK(C, kGpioButD);
+        break;
+    }
+    /*if(button_value[BTN_B] != 0x00)
+    {
+    button_value[BTN_B] = ReadPin(BTNB_GPIO);
+    }
+    if(button_value[BTN_C] != 0x00)
+    {
+    button_value[BTN_C] = ReadPin(BTNC_GPIO);
+    }
+    if(button_value[BTN_D] != 0x00)
+    {
+    button_value[BTN_D] = ReadPin(BTND_GPIO);
+    }*/
+    //Track Buttons
+    //button_track(BTN_A, button_value[BTN_A]);
+    //button_track(BTN_B, button_value[BTN_B]);
+    //button_track(BTN_C, button_value[BTN_C]);
+    //button_track(BTN_D, button_value[BTN_D]);
+
+    //Execute function if state change
+    /*if(prev_button_states[BTN_A] != g_ButtonStates[BTN_A])
+    {
+    buttonA_functions(prev_button_states[BTN_A]);
+    }
+    if(prev_button_states[BTN_B] != g_ButtonStates[BTN_B])
+    {
+    buttonB_functions(prev_button_states[BTN_B]);
+    }
+    if(prev_button_states[BTN_C] != g_ButtonStates[BTN_C])
+    {
+    buttonC_functions(prev_button_states[BTN_C]);
+    }
+    if(prev_button_states[BTN_D] != g_ButtonStates[BTN_D])
+    {
+    buttonD_functions(prev_button_states[BTN_D]);
+    }*/
+
+    //all_button_functions(prev_button_states);
+
+    button_matrix_save(prev_button_states);
+
+    return 0x00;
+}
+
+
+// Check keys only when there has been a change
+//
+static void fnHandleSpecialKeyChange(void)
+{
+    static uint8_t flag = 0;
+    static uint8_t flag2 = 0;
+
+    if (!flag)
+    {
+        if (ui_poll(BTN_A) != 0x00)
+        {
+            //GPIO_DRV_WritePinOutput(usb_rst, 0);
+            _CLEARBITS(B, usb_rst);
+            flag = 1;
+        }
+    }
+    else
+    {
+        if (ui_poll(BTN_B))
+        {
+          //GPIO_DRV_WritePinOutput(usb_rst, 1);
+            _SETBITS(B, usb_rst);
+            flag = 0;
+        }
+    }
+    if (!flag2)
+    {
+        if (ui_poll(BTN_C) != 0x00)
+        {
+            //GPIO_DRV_WritePinOutput(cx3_rst, 1);
+            _SETBITS(D, cx3_rst);
+            flag2 = 1;
+        }
+    }
+    else
+    {
+        if (ui_poll(BTN_D))
+        {
+            //GPIO_DRV_WritePinOutput(cx3_rst, 0);
+            _CLEARBITS(D, cx3_rst);
+            flag2 = 0;
+        }
+    }
+}
+
+#endif

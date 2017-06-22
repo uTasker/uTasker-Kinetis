@@ -298,16 +298,23 @@ extern "C" int fnGetADC_sim_channel(int iPort, int iBit)
 #if defined _PIN_COUNT
     if (iPort == _GPIO_ADC) {                                            // dedicated analog
         if (ADC_DEDICATED_MODULE[iBit] == 0) {                           // not assigned
-            return (ADC_CHANNELS * ADC_CONTROLLERS);                     // invalid large channel number returned so that it is ignored
+            return -1;                                                   // not ADC function
         }
         return (((ADC_DEDICATED_MODULE[iBit] - 1) * ADC_CHANNELS) + ADC_DEDICATED_CHANNEL[iBit]);
     }
     else {                                                               // multiplexed port
-        return (ADC_MUX_CHANNEL[iPort][iBit]);
+    #if defined KINETIS_KE
+        if (ADC_MUX_CHANNEL[iPort][7 - iBit] == 0) {
+            return -1;                                                   // not ADC function
+        }
+    #else
+        if (ADC_MUX_CHANNEL[iPort][31 - iBit] == 0) {
+            return -1;                                                   // not ADC function
+        }
+    #endif
     }
-#else
-    return 0;
 #endif
+    return 0;
 }
 
 #if defined SUPPORT_ADC 

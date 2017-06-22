@@ -239,14 +239,14 @@ static void fnInitIRQ(void)
             #else
     interrupt_setup.int_port_bits  = PORTC_BIT1;                         // (SW1 on TWR-K20D72M) LLWU_P6
             #endif
-        #elif defined FRDM_KL26Z || defined FRDM_KL27Z || defined CAPUCCINO_KL27 || defined FRDM_K22F || defined TWR_K53N512 || defined TWR_K40D100M || defined FRDM_KL25Z
+        #elif defined FRDM_KL26Z || defined FRDM_KL27Z || defined CAPUCCINO_KL27 || defined FRDM_K22F || defined K22F128_100M || defined TWR_K53N512 || defined TWR_K40D100M || defined FRDM_KL25Z
             #if defined WAKEUP_TEST
     interrupt_setup.int_type       = WAKEUP_INTERRUPT;                   // configure as wake-up interrupt
     interrupt_setup.int_handler    = test_irq_5;
             #endif
     interrupt_setup.int_priority   = PRIORITY_PORT_C_INT;                // interrupt priority level
     interrupt_setup.int_port       = PORTC;                              // the port that the interrupt input is on
-            #if defined FRDM_K22F || defined FRDM_KL27Z
+            #if defined FRDM_K22F || defined K22F128_100M || defined FRDM_KL27Z
     interrupt_setup.int_port_bits  = PORTC_BIT1;                         // the IRQ input connected (SW2 on FRDM-K22F) LLWU_P6 (SW3 on FRDM-KL27Z)
             #elif defined TWR_K53N512 || defined TWR_K40D100M || defined FRDM_KL25Z
     interrupt_setup.int_port_bits  = PORTC_BIT5;                         // the IRQ input connected (SW1 on TWR-K53N512 and TWR-K40D100M) LLWU_P9

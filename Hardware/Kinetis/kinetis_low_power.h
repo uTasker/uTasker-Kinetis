@@ -11,13 +11,18 @@
     File:      kinetis_low_power.h
     Project:   Single Chip Embedded Internet
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2017
     *********************************************************************
-    02.07.2015 Always re-synchronise the RTC counters after waking from a low leakage state {1}
-    26.07.2015 Respect that SMC_PMPROT is one-time write by setting maximum level once {2}
-
+    22.07.2014 Add fnGetLowPowerMode() and fnSetLowPowerMode()           {1}
+    02.07.2015 Always re-synchronise the RTC counters after waking from a low leakage state {2}
+    26.07.2015 Respect that SMC_PMPROT is one-time write by setting maximum level once {3}
+    03.01.2017 Display VLPR mode based purely on the settings and not the low power task {4}
+    31.01.2017 Add LOW_POWER_CYCLING_MODE                                {5}
 */
 
+#if defined LOW_POWER_CYCLING_MODE
+    int iLowPowerLoopMode = 0;
+#endif
 
 // This routine switches to low power mode. It is always called with disabled interrupts
 // - when the routine is called there were no system events pending so the system can be set to a low power mode until a masked interrupt becomes pending
@@ -119,6 +124,12 @@ extern void fnDoLowPower(void)
     #endif
         }
     }
+    #if defined LOW_POWER_CYCLING_MODE                                   // {5}
+    if (iLowPowerLoopMode == LOW_POWER_CYCLING_PAUSED) {                 // if the low power cycling had been paused we enable it before sleeping
+        iLowPowerLoopMode = LOW_POWER_CYCLING_ENABLED;
+    }
+    do {
+    #endif
     #if !defined FLL_FACTOR && !defined RUN_FROM_EXTERNAL_CLOCK && !defined RUN_FROM_LIRC && !defined RUN_FROM_DEFAULT_CLOCK && !defined KINETIS_KE && !defined RUN_FROM_HIRC && !defined RUN_FROM_LIRC && !defined KINETIS_WITH_MCG_LITE
     ucMCG_C1 = MCG_C1;                                                   // backup the original MCG_C1 setting
     #endif
@@ -128,16 +139,9 @@ extern void fnDoLowPower(void)
     }
     #endif
     #if !defined _WINDOWS
+  //TOGGLE_TEST_OUTPUT();
     __sleep_mode();                                                      // enter low power mode using wait for interrupt processor state
-    #endif
-    #if defined KINETIS_KL && defined SUPPORT_RTC
-    if (fnPresentLP_mode() >= LOW_LEAKAGE_MODES) {                       // if we are waking from a low leakage mode we need to resynchronise the RTC due to the fact that the seconds interrupt was not serviced in the meantime
-        #if defined RTC_USES_LPO_1kHz
-        fnRestoreRTC(1);                                                 // convert RTC setting back to 1s interrupt rate and adjust for any lost time
-        #else                                                            // external clock assumed that was clocking the RTC at normal 32kHz during low leakage mode
-        fnConvertSecondsTime(0, RTC_TSR);                                // {1} take the present RTC seconds count value, convert and set to time and date
-        #endif
-    }
+  //TOGGLE_TEST_OUTPUT();
     #endif
     // The processor will continue after being woken by any pending interrupt (also when the global interrupt mask is still set)
     // - this mean that the processor has woken again when the code execution reaches this location
@@ -159,6 +163,18 @@ extern void fnDoLowPower(void)
         while ((MCG_S & MCG_S_CLKST_MASK) != MCG_S_CLKST_PLL) {          // loop until the PLL clock is selected
         }
     }
+    #endif
+    #if defined KINETIS_KL && defined SUPPORT_RTC
+    if (fnPresentLP_mode() >= LOW_LEAKAGE_MODES) {                       // if we are waking from a low leakage mode we need to resynchronise the RTC due to the fact that the seconds interrupt was not serviced in the meantime
+        #if defined RTC_USES_LPO_1kHz
+        fnRestoreRTC(1);                                                 // convert RTC setting back to 1s interrupt rate and adjust for any lost time
+        #else                                                            // external clock assumed that was clocking the RTC at normal 32kHz during low leakage mode
+        fnConvertSecondsTime(0, RTC_TSR);                                // {2} take the present RTC seconds count value, convert and set to time and date
+        #endif
+    }
+    #endif
+    #if defined LOW_POWER_CYCLING_MODE                                   // {5}
+    } while ((iLowPowerLoopMode >= LOW_POWER_CYCLING_ENABLED) && (fnVirtualWakeupInterruptHandler((ulDeepSleepMode & SLEEPDEEP) != 0))); // allow the user to optionally quickly handle wakeup event without quitting the sleep loop
     #endif
     SYSTEM_CONTROL_REGISTER = ulDeepSleepMode;                           // ensure present stop mode has been returned (we may have used wait mode instead due to present peripheral activity)
     #if defined SERIAL_INTERFACE
@@ -213,7 +229,9 @@ extern void fnDoLowPower(void)
     }
         #endif
     #endif
+  //TOGGLE_TEST_OUTPUT();
     uEnable_Interrupt();                                                 // enable interrupts so that the masked interrupt that became pending can be taken
+  //TOGGLE_TEST_OUTPUT();
 }
 
 static int fnPresentLP_mode(void)
@@ -224,28 +242,42 @@ static int fnPresentLP_mode(void)
     }
     #else
         #if defined KINETIS_K_FPU || defined KINETIS_KL || defined KINETIS_REVISION_2 || (KINETIS_MAX_SPEED > 100000000)
-    if ((SMC_PMPROT & SMC_PMPROT_AVLP) && (SMC_PMCTRL & SMC_PMCTRL_RUNM_VLPR)) {
+    if (((SMC_PMPROT & SMC_PMPROT_AVLP) != 0) && ((SMC_PMCTRL & SMC_PMCTRL_RUNM_VLPR) != 0)) {
         return VLPR_MODE;
     }
     else if (SYSTEM_CONTROL_REGISTER & SLEEPDEEP) {
         if ((SMC_PMCTRL & (SMC_PMCTRL_RUNM_VLPR | SMC_PMCTRL_STOPM_VLLSx | SMC_PMCTRL_STOPM_LLS | SMC_PMCTRL_STOPM_VLPS)) == 0) {
             return STOP_MODE;
         }
-        else if ((SMC_PMPROT & SMC_PMPROT_AVLP) && ((SMC_PMCTRL & (SMC_PMCTRL_STOPM_VLLSx | SMC_PMCTRL_STOPM_LLS)) == SMC_PMCTRL_STOPM_VLPS)) {
+        else if (((SMC_PMPROT & SMC_PMPROT_AVLP) != 0) && ((SMC_PMCTRL & (SMC_PMCTRL_STOPM_VLLSx | SMC_PMCTRL_STOPM_LLS)) == SMC_PMCTRL_STOPM_VLPS)) {
             return VLPS_MODE;
         }
-#if !defined KINETIS_KL03
-        else if ((SMC_PMPROT & SMC_PMPROT_ALLS) && ((SMC_PMCTRL & (SMC_PMCTRL_STOPM_VLLSx | SMC_PMCTRL_STOPM_LLS)) == SMC_PMCTRL_STOPM_LLS)) {
+        #if defined LLS_MODE
+        else if (((SMC_PMPROT & SMC_PMPROT_ALLS) != 0) && ((SMC_PMCTRL & (SMC_PMCTRL_STOPM_VLLSx | SMC_PMCTRL_STOPM_LLS)) == SMC_PMCTRL_STOPM_LLS)) {
             return LLS_MODE;
         }
-#endif
-        else if ((SMC_PMPROT & SMC_PMPROT_AVLLS) && ((SMC_PMCTRL & (SMC_PMCTRL_STOPM_VLLSx | SMC_PMCTRL_STOPM_LLS)) == SMC_PMCTRL_STOPM_VLLSx)) {
-            #if defined KINETIS_KL                                       // KL devices
+        #endif
+        #if defined LLS2_MODE
+        else if (((SMC_PMPROT & SMC_PMPROT_ALLS) != 0) && ((SMC_PMCTRL & (SMC_PMCTRL_STOPM_VLLSx | SMC_PMCTRL_STOPM_LLS)) == SMC_PMCTRL_STOPM_LLS)) {
+            return LLS2_MODE;
+        }
+        #endif
+        #if defined LLS3_MODE
+        else if (((SMC_PMPROT & SMC_PMPROT_ALLS) != 0) && ((SMC_PMCTRL & (SMC_PMCTRL_STOPM_VLLSx | SMC_PMCTRL_STOPM_LLS)) == SMC_PMCTRL_STOPM_LLS)) {
+            return LLS3_MODE;
+        }
+        #endif
+        else if (((SMC_PMPROT & SMC_PMPROT_AVLLS) != 0) && ((SMC_PMCTRL & (SMC_PMCTRL_STOPM_VLLSx | SMC_PMCTRL_STOPM_LLS)) == SMC_PMCTRL_STOPM_VLLSx)) {
+            #if defined KINETIS_KL || defined KINETIS_K22                // KL devices
             switch (SMC_STOPCTRL & SMC_STOPCTRL_VLLSM_VLLS3) {
             case SMC_STOPCTRL_VLLSM_VLLS0:
                 return VLLS0_MODE;
             case SMC_STOPCTRL_VLLSM_VLLS1:
                 return VLLS1_MODE;
+                #if defined KINETIS_K22
+            case SMC_STOPCTRL_VLLSM_VLLS2:
+                return VLLS2_MODE;
+                #endif
             case SMC_STOPCTRL_VLLSM_VLLS3:
                 return VLLS3_MODE;
             }
@@ -264,20 +296,20 @@ static int fnPresentLP_mode(void)
         }
     }
         #else
-    if ((MC_PMPROT & MC_PMPROT_AVLP) && (MC_PMCTRL & MC_PMCTRL_RUNM_VLP_RUN)) {
+    if (((MC_PMPROT & MC_PMPROT_AVLP) != 0) && ((MC_PMCTRL & MC_PMCTRL_RUNM_VLP_RUN) != 0)) {
         return VLPR_MODE;
     }
-    else if (SYSTEM_CONTROL_REGISTER & SLEEPDEEP) {
+    else if ((SYSTEM_CONTROL_REGISTER & SLEEPDEEP) != 0) {
         if ((MC_PMCTRL & (MC_PMCTRL_RUNM_VLP_RUN | MC_PMCTRL_LPLLSM_VLLS1 | MC_PMCTRL_LPLLSM_VLLS2 | MC_PMCTRL_LPLLSM_VLLS3 | MC_PMCTRL_LPLLSM_LLS | MC_PMCTRL_LPLLSM_VLPS)) == 0) {
             return STOP_MODE;
         }
-        else if ((MC_PMPROT & MC_PMPROT_AVLP) && (MC_PMCTRL & MC_PMCTRL_LPLLSM_VLPS)) {
+        else if (((MC_PMPROT & MC_PMPROT_AVLP) != 0) && ((MC_PMCTRL & MC_PMCTRL_LPLLSM_VLPS) != 0)) {
             return VLPS_MODE;
         }
-        else if ((MC_PMPROT & MC_PMPROT_ALLS) && (MC_PMCTRL & MC_PMCTRL_LPLLSM_LLS)) {
+        else if (((MC_PMPROT & MC_PMPROT_ALLS) != 0) && ((MC_PMCTRL & MC_PMCTRL_LPLLSM_LLS) != 0)) {
             return LLS_MODE;
         }
-        else if (MC_PMPROT & (MC_PMPROT_AVLLS1 | MC_PMPROT_AVLLS2 | MC_PMPROT_AVLLS3)) {
+        else if ((MC_PMPROT & (MC_PMPROT_AVLLS1 | MC_PMPROT_AVLLS2 | MC_PMPROT_AVLLS3)) != 0) {
             switch (MC_PMCTRL & MC_PMCTRL_LPLLSM_VLLS1) {
             case MC_PMCTRL_LPLLSM_VLLS1:
                 return VLLS1_MODE;
@@ -295,14 +327,32 @@ static int fnPresentLP_mode(void)
 
 // Determine the present low power mode that is presently configured
 //
-extern int fnGetLowPowerMode(void)                                       // {98}
+extern int fnGetLowPowerMode(void)                                       // {1}
 {
     // Determine the present low power mode of operation from the SMC settings
     //
+#if defined KINETIS_KE
     if ((uGetTaskState(TASK_LOW_POWER) & (UTASKER_GO | UTASKER_POLLING)) == 0) {
         return RUN_MODE;                                                 // low power task not operating
     }
     return (fnPresentLP_mode());
+#else
+    int iLPmode = fnPresentLP_mode();                                    // {4}
+    if (iLPmode == VLPR_MODE) {                                          // VLPR mode is an exception since it doesn't use the processor's stop mode
+    #if defined VLPW_MODE
+        if ((uGetTaskState(TASK_LOW_POWER) & (UTASKER_GO | UTASKER_POLLING)) == 0) {
+            return VLPR_MODE;                                            // low power task not operating
+        }
+        return VLPW_MODE;                                                // low power task is operating so that VLPW is ued
+    #else
+        return VLPR_MODE;
+    #endif
+    }
+    if ((uGetTaskState(TASK_LOW_POWER) & (UTASKER_GO | UTASKER_POLLING)) == 0) {
+        return RUN_MODE;                                                 // low power task not operating
+    }
+    return iLPmode;
+#endif
 }
 
 
@@ -318,7 +368,7 @@ extern int fnGetLowPowerMode(void)                                       // {98}
 // Set a new low power mode
 // - note that some modes will not be able to fully operate or changes between certain modes may not be possible
 //
-extern void fnSetLowPowerMode(int new_lp_mode)                           // {98}
+extern void fnSetLowPowerMode(int new_lp_mode)                           // {1}
 {
     int next_lp_mode = (new_lp_mode & ~(LOW_POWER_OPTIONS));
     switch (next_lp_mode) {                                              // the new mode to be used
@@ -356,15 +406,15 @@ extern void fnSetLowPowerMode(int new_lp_mode)                           // {98}
         break;
     #endif
     #if !defined KINETIS_KE
-        #if defined KINETIS_KL03
+        #if defined VLPW_MODE
     case VLPW_MODE:                                                      // VLPW
         #endif
     case VLPR_MODE:                                                      // VLPR
         #if defined KINETIS_K_FPU || defined KINETIS_KL || defined KINETIS_REVISION_2 || (KINETIS_MAX_SPEED > 100000000)
-      //SMC_PMPROT |= SMC_PMPROT_AVLP;                                   // {2} - set once in kinetis.c
+      //SMC_PMPROT |= SMC_PMPROT_AVLP;                                   // {3} - set once in kinetis.c
         SMC_PMCTRL |= (SMC_PMCTRL_RUNM_VLPR | SMC_PMCTRL_LPWUI);         // VLPR is entered immediately and VLPW results if the sleep instruction is later executed
         #else
-      //MC_PMPROT |= MC_PMPROT_AVLP;                                     // {2} - set once in kinetis.c
+      //MC_PMPROT |= MC_PMPROT_AVLP;                                     // {3} - set once in kinetis.c
         MC_PMCTRL |= (MC_PMCTRL_RUNM_VLP_RUN | MC_PMCTRL_LPWUI);
         #endif
         SYSTEM_CONTROL_REGISTER &= ~(SLEEPDEEP);
@@ -375,21 +425,43 @@ extern void fnSetLowPowerMode(int new_lp_mode)                           // {98}
         break;
     case VLPS_MODE:                                                      // VLPS
         #if defined KINETIS_K_FPU || defined KINETIS_KL || defined KINETIS_REVISION_2 || (KINETIS_MAX_SPEED > 100000000)
-      //SMC_PMPROT |= SMC_PMPROT_AVLP;                                   // {2} - set once in kinetis.c
+      //SMC_PMPROT |= SMC_PMPROT_AVLP;                                   // {3} - set once in kinetis.c
         SMC_PMCTRL = (SMC_PMCTRL_RUNM_NORMAL | SMC_PMCTRL_STOPM_VLPS | SMC_PMCTRL_LPWUI);
         #else
-      //MC_PMPROT |= MC_PMPROT_AVLP;                                     // {2} - set once in kinetis.c
+      //MC_PMPROT |= MC_PMPROT_AVLP;                                     // {3} - set once in kinetis.c
         MC_PMCTRL |= (MC_PMCTRL_RUNM_NORMAL_RUN | MC_PMCTRL_LPLLSM_VLPS | MC_PMCTRL_LPWUI);
         #endif
         SYSTEM_CONTROL_REGISTER |= SLEEPDEEP;
         break;
-        #if !defined KINETIS_KL03
+        #if defined LLS_MODE
     case LLS_MODE:                                                       // LLS
         #if defined KINETIS_K_FPU || defined KINETIS_KL || defined KINETIS_REVISION_2 || (KINETIS_MAX_SPEED > 100000000)
-      //SMC_PMPROT |= SMC_PMPROT_ALLS;                                   // {2} - set once in kinetis.c
+      //SMC_PMPROT |= SMC_PMPROT_ALLS;                                   // {3} - set once in kinetis.c
         SMC_PMCTRL = (SMC_PMCTRL_RUNM_NORMAL | SMC_PMCTRL_STOPM_LLS);
         #else
-      //MC_PMPROT |= MC_PMPROT_ALLS;                                     // {2} - set once in kinetis.c
+      //MC_PMPROT |= MC_PMPROT_ALLS;                                     // {3} - set once in kinetis.c
+        MC_PMCTRL |= (MC_PMCTRL_RUNM_NORMAL_RUN | MC_PMCTRL_LPLLSM_LLS);
+        #endif
+        SYSTEM_CONTROL_REGISTER |= SLEEPDEEP;
+        break;
+        #endif
+        #if defined LLS3_MODE
+    case LLS3_MODE:                                                      // LLS3
+        #if defined KINETIS_K_FPU || defined KINETIS_KL || defined KINETIS_REVISION_2 || (KINETIS_MAX_SPEED > 100000000)
+        SMC_STOPCTRL = (unsigned char)(SMC_STOPCTRL_VLLSM_VLLS3 | (new_lp_mode & LOW_POWER_OPTIONS));
+        SMC_PMCTRL = (SMC_PMCTRL_RUNM_NORMAL | SMC_PMCTRL_STOPM_LLS);
+        #else
+        MC_PMCTRL |= (MC_PMCTRL_RUNM_NORMAL_RUN | MC_PMCTRL_LPLLSM_LLS);
+        #endif
+        SYSTEM_CONTROL_REGISTER |= SLEEPDEEP;
+        break;
+        #endif
+        #if defined LLS2_MODE
+    case LLS2_MODE:                                                      // LLS2
+        #if defined KINETIS_K_FPU || defined KINETIS_KL || defined KINETIS_REVISION_2 || (KINETIS_MAX_SPEED > 100000000)
+        SMC_STOPCTRL = (unsigned char)(SMC_STOPCTRL_VLLSM_VLLS2 | (new_lp_mode & LOW_POWER_OPTIONS));
+        SMC_PMCTRL = (SMC_PMCTRL_RUNM_NORMAL | SMC_PMCTRL_STOPM_LLS);
+        #else
         MC_PMCTRL |= (MC_PMCTRL_RUNM_NORMAL_RUN | MC_PMCTRL_LPLLSM_LLS);
         #endif
         SYSTEM_CONTROL_REGISTER |= SLEEPDEEP;
@@ -397,30 +469,30 @@ extern void fnSetLowPowerMode(int new_lp_mode)                           // {98}
         #endif
     case VLLS0_MODE:                                                     // VLLS0
         #if defined KINETIS_K_FPU || defined KINETIS_KL || defined KINETIS_REVISION_2 || (KINETIS_MAX_SPEED > 100000000)
-      //SMC_PMPROT |= SMC_PMPROT_AVLLS;                                  // {2} - set once in kinetis.c
-            #if defined KINETIS_KL
+      //SMC_PMPROT |= SMC_PMPROT_AVLLS;                                  // {3} - set once in kinetis.c
+            #if defined KINETIS_KL || defined KINETIS_K22
         SMC_STOPCTRL = (unsigned char)(SMC_STOPCTRL_VLLSM_VLLS0 | (new_lp_mode & LOW_POWER_OPTIONS));
             #else
         SMC_VLLSCTRL = (unsigned char)(SMC_VLLSCTRL_VLLSM_VLLS0 | (new_lp_mode & LOW_POWER_OPTIONS));
             #endif
         SMC_PMCTRL = (SMC_PMCTRL_RUNM_NORMAL | SMC_PMCTRL_STOPM_VLLSx);
         #else
-      //MC_PMPROT |= MC_PMPROT_ALLS;                                     // {2} - set once in kinetis.c
+      //MC_PMPROT |= MC_PMPROT_ALLS;                                     // {3} - set once in kinetis.c
         MC_PMCTRL |= (MC_PMCTRL_RUNM_NORMAL_RUN | MC_PMPROT_AVLLS1);
         #endif
         SYSTEM_CONTROL_REGISTER |= SLEEPDEEP;
         break;
     case VLLS1_MODE:                                                     // VLLS1
         #if defined KINETIS_K_FPU || defined KINETIS_KL || defined KINETIS_REVISION_2 || (KINETIS_MAX_SPEED > 100000000)
-      //SMC_PMPROT |= SMC_PMPROT_AVLLS;                                  // {2} - set once in kinetis.c
-            #if defined KINETIS_KL
+      //SMC_PMPROT |= SMC_PMPROT_AVLLS;                                  // {3} - set once in kinetis.c
+            #if defined KINETIS_KL || defined KINETIS_K22
         SMC_STOPCTRL = (unsigned char)(SMC_STOPCTRL_VLLSM_VLLS1 | (new_lp_mode & LOW_POWER_OPTIONS));
             #else
         SMC_VLLSCTRL = (unsigned char)(SMC_VLLSCTRL_VLLSM_VLLS1 | (new_lp_mode & LOW_POWER_OPTIONS));
             #endif
         SMC_PMCTRL = (SMC_PMCTRL_RUNM_NORMAL | SMC_PMCTRL_STOPM_VLLSx);
         #else
-      //MC_PMPROT |= MC_PMPROT_ALLS;                                     // {2} - set once in kinetis.c
+      //MC_PMPROT |= MC_PMPROT_ALLS;                                     // {3} - set once in kinetis.c
         MC_PMCTRL |= (MC_PMCTRL_RUNM_NORMAL_RUN | MC_PMPROT_AVLLS1);
         #endif
         SYSTEM_CONTROL_REGISTER |= SLEEPDEEP;
@@ -428,11 +500,15 @@ extern void fnSetLowPowerMode(int new_lp_mode)                           // {98}
         #if !defined KINETIS_KL
     case VLLS2_MODE:                                                     // VLLS2
         #if defined KINETIS_K_FPU || defined KINETIS_KL || defined KINETIS_REVISION_2 || (KINETIS_MAX_SPEED > 100000000)
-      //SMC_PMPROT |= SMC_PMPROT_AVLLS;                                   // {2} - set once in kinetis.c
+      //SMC_PMPROT |= SMC_PMPROT_AVLLS;                                   // {3} - set once in kinetis.c
+            #if defined KINETIS_KL || defined KINETIS_K22
+        SMC_STOPCTRL = (unsigned char)(SMC_STOPCTRL_VLLSM_VLLS2 | (new_lp_mode & LOW_POWER_OPTIONS));
+            #else
         SMC_VLLSCTRL = (unsigned char)(SMC_VLLSCTRL_VLLSM_VLLS2 | (new_lp_mode & LOW_POWER_OPTIONS));
+            #endif
         SMC_PMCTRL = (SMC_PMCTRL_RUNM_NORMAL | SMC_PMCTRL_STOPM_VLLSx);
         #else
-      //MC_PMPROT |= MC_PMPROT_ALLS;                                     // {2} - set once in kinetis.c
+      //MC_PMPROT |= MC_PMPROT_ALLS;                                     // {3} - set once in kinetis.c
         MC_PMCTRL |= (MC_PMCTRL_RUNM_NORMAL_RUN | MC_PMPROT_AVLLS2);
         #endif
         SYSTEM_CONTROL_REGISTER |= SLEEPDEEP;
@@ -440,15 +516,15 @@ extern void fnSetLowPowerMode(int new_lp_mode)                           // {98}
         #endif
     case VLLS3_MODE:                                                     // VLLS3
         #if defined KINETIS_K_FPU || defined KINETIS_KL || defined KINETIS_REVISION_2 || (KINETIS_MAX_SPEED > 100000000)
-      //SMC_PMPROT |= SMC_PMPROT_AVLLS;                                  // {2} - set once in kinetis.c
-            #if defined KINETIS_KL
+      //SMC_PMPROT |= SMC_PMPROT_AVLLS;                                  // {3} - set once in kinetis.c
+            #if defined KINETIS_KL || defined KINETIS_K22
         SMC_STOPCTRL = (unsigned char)(SMC_STOPCTRL_VLLSM_VLLS3 | (new_lp_mode & LOW_POWER_OPTIONS));
             #else
         SMC_VLLSCTRL = (unsigned char)(SMC_VLLSCTRL_VLLSM_VLLS3 | (new_lp_mode & LOW_POWER_OPTIONS));
             #endif
         SMC_PMCTRL = (SMC_PMCTRL_RUNM_NORMAL | SMC_PMCTRL_STOPM_VLLSx);
         #else
-      //MC_PMPROT |= MC_PMPROT_ALLS;                                     // {2} - set once in kinetis.c
+      //MC_PMPROT |= MC_PMPROT_ALLS;                                     // {3} - set once in kinetis.c
         MC_PMCTRL |= (MC_PMCTRL_RUNM_NORMAL_RUN | MC_PMPROT_AVLLS3);
         #endif
         SYSTEM_CONTROL_REGISTER |= SLEEPDEEP;
