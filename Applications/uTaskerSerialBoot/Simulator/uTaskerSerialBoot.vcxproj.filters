@@ -346,6 +346,7 @@
     <None Include="..\..\..\Hardware\Kinetis\kinetis_asm.s">
       <Filter>Hardware\Kinetis</Filter>
     </None>
+    <None Include="..\GNU_Kinetis\Build_Kinetis.bat" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="uTasker.rc">

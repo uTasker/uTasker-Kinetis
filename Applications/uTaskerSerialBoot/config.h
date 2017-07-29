@@ -53,7 +53,7 @@
 
 //#define FRDM_KL25Z                                                     // L processors Cortex-M0+ (ultra-low power) with USB
 //#define TWR_KL25Z48M
-#define FRDM_KL26Z
+//#define FRDM_KL26Z
 //#define TEENSY_LC                                                      // USB development board with KL26Z64
 //#define FRDM_KL27Z
 
@@ -102,6 +102,7 @@
 //#define TEENSY_3_5                                                     // USB development board with K64FX512 - http://www.utasker.com/kinetis/TEENSY_3.5.html
 
 //#define TWR_K65F180M
+#define FRDM_K66F                                                        // freedom board http://www.utasker.com/kinetis/FRDM-K66F.html
 //#define TEENSY_3_6                                                     // USB development board with K66FX1M0 - http://www.utasker.com/kinetis/TEENSY_3.6.html
 
 //#define TWR_K70F120M                                                   // K processors Cortex M4 with graphical LCD, Ethernet, USB, encryption, tamper
@@ -465,6 +466,15 @@
     #if !defined TWR_SER
         #define USB_HS_INTERFACE                                         // use HS interface rather than FS interface
     #endif
+#elif defined FRDM_K66F
+    #define TARGET_HW            "FRDM-K66F"
+    #define OUR_HEAP_SIZE        (HEAP_REQUIREMENTS)((48 * 1024) * MEM_FACTOR) // large SRAM parts
+    #define KINETIS_MAX_SPEED    180000000
+    #define KINETIS_K_FPU                                                // part with floating point unit
+    #define KINETIS_K60                                                  // specify the sub-family
+    #define KINETIS_REVISION_2
+    #define KINETIS_K66                                                  // extra sub-family type precision
+    #define USB_HS_INTERFACE                                             // use HS interface rather than FS interface
 #elif defined TEENSY_3_6
     #define TARGET_HW            "Teensy 3.6 (K66FX1M0)"
     #define OUR_HEAP_SIZE        (HEAP_REQUIREMENTS)((48 * 1024) * MEM_FACTOR) // large SRAM parts
@@ -596,7 +606,7 @@
 #if defined DEVICE_WITHOUT_USB
     #define NUMBER_USB     0                                             // no physical queue needed
 #else
-  //#define USB_INTERFACE                                                // enable USB driver interface
+    #define USB_INTERFACE                                                // enable USB driver interface
     #if defined USB_INTERFACE
       //#define USE_USB_CDC                                              // allow SREC/iHex loading via virtual COM
         #define USB_MSD_DEVICE_LOADER                                    // USB-MSD device mode (the board appears as a hardware to the host)
@@ -671,7 +681,7 @@
 #endif
 
 #if !defined TWR_K20D50M && !defined FRDM_K20D50M && !defined FRDM_KL46Z && !defined FRDM_KL43Z && !defined TWR_KL46Z48M && !defined FRDM_KL26Z && !defined FRDM_KL27Z && !defined TWR_KL25Z48M && !defined FRDM_KL02Z && !defined FRDM_KL03Z && !defined FRDM_KL05Z && !defined FRDM_KE02Z && !defined FRDM_KE02Z40M && !defined FRDM_KE04Z && !defined TWR_K20D72M && !defined TWR_K21D50M && !defined TWR_K22F120M && !defined TWR_K24F120M && !defined FRDM_K22F && !defined TWR_KV10Z32 && !defined TWR_KV31F120M // boards have no SD card socket
-  //#define SDCARD_SUPPORT                                               // SD-card interface (only choose one of these options at a time)
+    #define SDCARD_SUPPORT                                               // SD-card interface (only choose one of these options at a time)
   //#define SPI_FLASH_FAT                                                // SPI flash
         #define SIMPLE_FLASH                                             // don't perform block management and wear-leveling
         #define FLASH_FAT_MANAGEMENT_ADDRESS     (SIZE_OF_FLASH)

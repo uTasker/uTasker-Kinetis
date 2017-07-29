@@ -1,2 +1,2 @@
-SET PATH=%PATH%;C:\Freescale\KDS_2.0.0\toolchain\bin
+SET PATH=%PATH%;D:\Freescale\KDS_v3\Toolchain\bin
 make -f make_uTaskerV1.4_GNU_Kinetis all

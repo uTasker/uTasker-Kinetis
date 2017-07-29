@@ -347,6 +347,7 @@ Build_Kinetis.bat
     <None Include="..\..\..\Hardware\Kinetis\kinetis_asm.s">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='uTasker Kinetis plus GNU build|Win32'">true</ExcludedFromBuild>
     </None>
+    <None Include="..\GNU_Kinetis\Build_Kinetis.bat" />
     <None Include="..\GNU_Kinetis\make_uTaskerV1.4_GNU_Kinetis" />
     <None Include="cursor1.cur" />
     <None Include="small.ico" />

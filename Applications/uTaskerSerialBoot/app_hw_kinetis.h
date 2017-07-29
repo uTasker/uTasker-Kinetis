@@ -33,6 +33,7 @@
     21.01.2015 Disable SYSTICK_CSR when jumping to the application since it may use alternative TICK source
     09.05.2015 Add TRK_KEA128, TRK_KEA64
     06.01.2016 Add TWR_K80F150M and FRDM_K82F
+    29.07.2017 Add FRDM_K66F
 
     Application specific hardware configuration
 
@@ -115,7 +116,7 @@
   //#define USB_CRYSTAL_LESS                                             // use 48MHz IRC as USB source (according to Freescale AN4905 - only possible in device mode)
   //#define USB_CLOCK_GENERATED_INTERNALLY                               // use USB clock from internal source rather than external pin - 120MHz is suitable from PLL
     #define SUPPORT_SWAP_BLOCK                                           // support flash swap block
-#elif defined TWR_K65F180M || defined K26FN2_180|| defined TEENSY_3_6
+#elif defined TWR_K65F180M || defined K26FN2_180 || defined FRDM_K66F || defined TEENSY_3_6
   //#define RUN_FROM_DEFAULT_CLOCK                                       // default mode is FLL Engaged Internal - the 32kHz IRC is multiplied by FLL factor of 640 to obtain 20.9715MHz nominal frequency (20MHz..25MHz)
   //#define RUN_FROM_HIRC                                                // clock directly from internal 48MHz RC clock
   //#define RUN_FROM_HIRC_PLL                                            // use 48MHz RC clock as input to the PLL
@@ -150,21 +151,34 @@
         #define FLEX_CLOCK_DIVIDE    3                                   // 120/3 to give 40MHz
         #define FLASH_CLOCK_DIVIDE   5                                   // 120/5 to give 24MHz
     #else
-        #define CRYSTAL_FREQUENCY    16000000                            // 16 MHz crystal
+        #if defined FRDM_K66F
+            #define CRYSTAL_FREQUENCY    12000000                        // 12 MHz crystal
+            #define CLOCK_DIV            1                               // input must be divided to 8MHz..16MHz range (/1 to /8)
+        #else
+            #define CRYSTAL_FREQUENCY    16000000                        // 16 MHz crystal
+            #define CLOCK_DIV            2                               // input must be divided to 8MHz..16MHz range (/1 to /8)
+        #endif
         #define OSC_LOW_GAIN_MODE
         #define _EXTERNAL_CLOCK      CRYSTAL_FREQUENCY
-        #define CLOCK_DIV            2                                   // input must be divided to 8MHz..16MHz range (/1 to /8)
-      //#define USE_HIGH_SPEED_RUN_MODE
+      //#define USE_HIGH_SPEED_RUN_MODE                                  // note that flash programmin is not possible in high speed run mode and so it is not used by the serial loader
         #if defined USE_HIGH_SPEED_RUN_MODE
-            #define CLOCK_MUL            44                              // the PLL multiplication factor to achieve operating frequency of 176MHz (x16 to x47 possible) [PLL output range 90..180MHz - VCO is PLL * 2]
+            #if defined FRDM_K66F
+                #define CLOCK_MUL        30                              // the PLL multiplication factor to achieve operating frequency of 180MHz (x16 to x47 possible) [PLL output range 90..180MHz - VCO is PLL * 2]
+            #else
+                #define CLOCK_MUL        45                              // the PLL multiplication factor to achieve operating frequency of 180MHz (x16 to x47 possible) [PLL output range 90..180MHz - VCO is PLL * 2]
+            #endif
             #define BUS_CLOCK_DIVIDE     3                               // 176/3 to give 58.67MHz (max. 60MHz)
             #define FLEX_CLOCK_DIVIDE    3                               // 176/3 to give 58.67MHz (max. 60MHz)
             #define FLASH_CLOCK_DIVIDE   7                               // 176/7 to give 25.14MHz (max. 28MHz)
         #else
-            #define CLOCK_MUL            30                              // the PLL multiplication factor to achieve operating frequency of 120MHz (x16 to x47 possible) [PLL output range 90..180MHz - VCO is PLL * 2]
+            #if defined TEENSY_3_6 || defined TWR_K65F180M
+                #define CLOCK_MUL        30                              // the PLL multiplication factor to achieve operating frequency of 120MHz (x16 to x47 possible) [PLL output range 90..180MHz - VCO is PLL * 2]
+            #else
+                #define CLOCK_MUL        20                              // the PLL multiplication factor to achieve operating frequency of 120MHz (x16 to x47 possible) [PLL output range 90..180MHz - VCO is PLL * 2]
+            #endif
             #define BUS_CLOCK_DIVIDE     2                               // 120/2 to give 60MHz (max. 60MHz)
             #define FLEX_CLOCK_DIVIDE    2                               // 120/2 to give 60MHz (max. 60MHz)
-            #define FLASH_CLOCK_DIVIDE   5                               // 120/7 to give 24MHz (max. 28MHz)
+            #define FLASH_CLOCK_DIVIDE   5                               // 120/5 to give 24MHz (max. 28MHz)
         #endif
     #endif
     #define USB_CRYSTAL_LESS                                             // use 48MHz IRC as USB source (according to Freescale AN4905 - only possible in device mode)
@@ -518,9 +532,13 @@
   //#define PACKAGE_TYPE        PACKAGE_MAPBGA
     #define SIZE_OF_FLASH       (1024 * 1024)                            // 1M FLASH
     #define SIZE_OF_RAM         (256 * 1024)                             // 256k SRAM
-#elif defined TWR_K65F180M || defined K26FN2_180
+#elif defined TWR_K65F180M || defined K26FN2_180 || defined FRDM_K66F
     #define MASK_0N65N
-    #define PIN_COUNT           PIN_COUNT_169_PIN                        // 169 pin package
+    #if defined FRDM_K66F
+        #define PIN_COUNT       PIN_COUNT_144_PIN                        // 144 pin package
+    #else
+        #define PIN_COUNT       PIN_COUNT_169_PIN                        // 169 pin package
+    #endif
     #define PACKAGE_TYPE        PACKAGE_MAPBGA
   //#define PACKAGE_TYPE        PACKAGE_WLCSP
   //#define KINETIS_FLEX                                                 // X part with flex memory rather than N part with program Flash only
@@ -968,7 +986,7 @@
         #define LOADER_UART           2                                  // the serial interface used by the serial loader
     #elif defined TWR_K20D50M || defined TWR_K80F150M || defined tinyK20 || defined TWR_K20D72M || defined FRDM_KE02Z || defined FRDM_KE02Z40M || defined FRDM_KE06Z || defined FRDM_K22F || defined TWR_K22F120M || defined TWR_K24F120M || defined TWR_K64F120M || defined TWR_KW21D256 || defined TWR_KW24D512
         #define LOADER_UART           1                                  // the serial interface used by the serial loader
-    #elif defined K02F100M || defined FRDM_K20D50M || defined FRDM_KL46Z || defined FRDM_KL43Z || defined FRDM_KL25Z || defined FRDM_KL26Z || defined FRDM_KL27Z || defined TEENSY_LC || defined TWR_KL25Z48M || defined FRDM_KL02Z || defined FRDM_KL03Z || defined FRDM_KL05Z || defined TEENSY_3_1 || defined FRDM_K64F || defined FRDM_KE04Z || defined TWR_KV10Z32 || defined TWR_KV31F120M || ((defined TWR_K40X256 || defined TWR_K40D100M) && defined DEBUG_ON_VIRT_COM)
+    #elif defined K02F100M || defined FRDM_K20D50M || defined FRDM_KL46Z || defined FRDM_KL43Z || defined FRDM_KL25Z || defined FRDM_KL26Z || defined FRDM_KL27Z || defined TEENSY_LC || defined TWR_KL25Z48M || defined FRDM_KL02Z || defined FRDM_KL03Z || defined FRDM_KL05Z || defined TEENSY_3_1 || defined FRDM_K64F || defined FRDM_K66F || defined FRDM_KE04Z || defined TWR_KV10Z32 || defined TWR_KV31F120M || ((defined TWR_K40X256 || defined TWR_K40D100M) && defined DEBUG_ON_VIRT_COM)
         #define LOADER_UART           0                                  // the serial interface used by the serial loader
     #else
         #define LOADER_UART           3                                  // the serial interface used by the serial loader
@@ -1004,7 +1022,7 @@
     #endif
 
   //#define UART0_A_LOW                                                  // alternative UART0 pin mapping
-    #if defined FRDM_K20D50M || defined TEENSY_3_1 || defined TEENSY_LC || defined FRDM_K64F || defined TWR_KV10Z32 || defined TWR_KV31F120M // {4}{9}
+    #if defined FRDM_K20D50M || defined TEENSY_3_1 || defined TEENSY_LC || defined FRDM_K64F || defined FRDM_K66F || defined TWR_KV10Z32 || defined TWR_KV31F120M // {4}{9}
         #define UART0_ON_B                                               // alternative UART0 pin mapping
     #elif defined FRDM_KL46Z || defined FRDM_KL43Z || defined FRDM_KL25Z || defined FRDM_KL26Z || defined FRDM_KL27Z // {5}{7}
         #define UART0_A_LOW
@@ -1524,6 +1542,48 @@
     #define USB_HOST_POWER_CONFIG() _CONFIG_DRIVE_PORT_OUTPUT_VALUE_FAST_LOW(D, (USB_HOST_POWER_ENABLE), (0), (PORT_SRE_SLOW | PORT_DSE_HIGH))
     #define USB_HOST_POWER_ON()     _SETBITS(D, USB_HOST_POWER_ENABLE)
     #define USB_HOST_POWER_OFF()    _CLEARBITS(D, USB_HOST_POWER_ENABLE)
+
+    #define GET_SDCARD_WP_STATE()   0                                    // no card protection switch available
+    #define SD_CONTROLLER_AVAILABLE                                      // use SDHC controller rather than SPI
+    #define SET_SD_CS_HIGH()                                             // dummy with SDHC controller
+    #define SET_SD_CS_LOW()                                              // dummy with SDHC controller
+
+    #ifdef _WINDOWS
+        #define POWER_UP_SD_CARD()  SDHC_SYSCTL |= SDHC_SYSCTL_INITA; SDHC_SYSCTL &= ~SDHC_SYSCTL_INITA; // apply power to the SD card if appropriate (we use this to send 80 clocks - self-clearing bit)
+    #else
+        #define POWER_UP_SD_CARD()  SDHC_SYSCTL |= SDHC_SYSCTL_INITA; while (SDHC_SYSCTL & SDHC_SYSCTL_INITA) {}; // apply power to the SD card if appropriate (we use this to send 80 clocks)
+    #endif
+    #define POWER_DOWN_SD_CARD()                                         // remove power from SD card interface
+
+    #define SDHC_SYSCTL_SPEED_SLOW  (SDHC_SYSCTL_SDCLKFS_64 | SDHC_SYSCTL_DVS_5) // 375kHz when 120MHz clock
+    #define SDHC_SYSCTL_SPEED_FAST  (SDHC_SYSCTL_SDCLKFS_2 | SDHC_SYSCTL_DVS_3) // 20MHz when 120MHz clock
+    #define SET_SPI_SD_INTERFACE_FULL_SPEED() fnSetSD_clock(SDHC_SYSCTL_SPEED_FAST); SDHC_PROCTL |= SDHC_PROCTL_DTW_4BIT
+#elif defined FRDM_K66F
+    #define LED_GREEN          (PORTE_BIT6)                              // green LED - if the port is changed (eg. A to B) the port macros will require appropriate adjustment too
+    #define LED_RED            (PORTC_BIT9)                              // red LED - if the port is changed (eg. A to B) the port macros will require appropriate adjustment too
+    #define LED_BLUE           (PORTA_BIT11)                             // blue LED - if the port is changed (eg. A to B) the port macros will require appropriate adjustment too
+
+    #define SWITCH_2           (PORTD_BIT11)                             // switch 2 - if the port is changed (eg. A to B) the port macros will require appropriate adjustment too
+    #define SWITCH_3           (PORTA_BIT10)                             // switch 3 - if the port is changed (eg. A to B) the port macros will require appropriate adjustment too
+    #define SDCARD_DETECT      (PORTD_BIT10)
+
+    #define BLINK_LED          (LED_GREEN)
+
+    #define INIT_WATCHDOG_LED()    _CONFIG_DRIVE_PORT_OUTPUT_VALUE_FAST_LOW(E, (BLINK_LED), (BLINK_LED), (PORT_SRE_SLOW | PORT_DSE_HIGH)); _CONFIG_PORT_INPUT_FAST_LOW(D, (SWITCH_2), PORT_PS_UP_ENABLE); _CONFIG_PORT_INPUT_FAST_LOW(D, (SDCARD_DETECT), PORT_PS_DOWN_ENABLE);
+    #define TOGGLE_WATCHDOG_LED()  _TOGGLE_PORT(E, BLINK_LED)
+    #if defined SDCARD_SUPPORT || defined SPI_FLASH_FAT
+        #define FORCE_BOOT()       (_READ_PORT_MASK(D, (SWITCH_2 | SDCARD_DETECT)) != (SWITCH_2)) // pull this input down to force boot loader mode (hold SW2 at reset) or with inserted SD card (positive logic)
+        #define INIT_WATCHDOG_DISABLE() _CONFIG_PORT_INPUT(A, (SWITCH_3), PORT_PS_UP_ENABLE) // configure as input
+    #else
+        #define FORCE_BOOT()       (_READ_PORT_MASK(D, SWITCH_2) == 0)   // pull this input down to force boot loader mode (hold SW2 at reset)
+        #define INIT_WATCHDOG_DISABLE() _CONFIG_PORT_INPUT_FAST_LOW(A, (SWITCH_3), PORT_PS_UP_ENABLE) // configure as input
+    #endif
+    #define RETAIN_LOADER_MODE()   (_READ_PORT_MASK(D, SWITCH_2) == 0)
+    #define WATCHDOG_DISABLE()     (_READ_PORT_MASK(A, SWITCH_3) == 0)   // pull this input down to disable watchdog (hold SW3 at reset)
+
+    #define USB_HOST_POWER_CONFIG()
+    #define USB_HOST_POWER_ON()
+    #define USB_HOST_POWER_OFF()
 
     #define GET_SDCARD_WP_STATE()   0                                    // no card protection switch available
     #define SD_CONTROLLER_AVAILABLE                                      // use SDHC controller rather than SPI
