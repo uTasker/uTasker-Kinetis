@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project>
+	<configuration id="com.crt.advproject.config.exe.release.975616254.1431784295" name="uTaskerV1.4_FLASH">
+		<extension point="org.eclipse.cdt.core.LanguageSettingsProvider">
+			<provider copy-of="extension" id="org.eclipse.cdt.ui.UserLanguageSettingsProvider"/>
+			<provider class="org.eclipse.cdt.managedbuilder.language.settings.providers.GCCBuildCommandParser" id="com.crt.advproject.GCCBuildCommandParser" keep-relative-paths="false" name="MCU GCC Build Output Parser" parameter="(arm-none-eabi-gcc)|(arm-none-eabi-[gc]\+\+)|(gcc)|([gc]\+\+)|(clang)" prefer-non-shared="true"/>
+			<provider-reference id="org.eclipse.cdt.managedbuilder.core.MBSLanguageSettingsProvider" ref="shared-provider"/>
+		</extension>
+	</configuration>
+	<configuration id="com.crt.advproject.config.exe.release.975616254.1431784295.976524680" name="uTaskerV1.4_RAM">
+		<extension point="org.eclipse.cdt.core.LanguageSettingsProvider">
+			<provider copy-of="extension" id="org.eclipse.cdt.ui.UserLanguageSettingsProvider"/>
+			<provider class="org.eclipse.cdt.managedbuilder.language.settings.providers.GCCBuildCommandParser" id="com.crt.advproject.GCCBuildCommandParser" keep-relative-paths="false" name="MCU GCC Build Output Parser" parameter="(arm-none-eabi-gcc)|(arm-none-eabi-[gc]\+\+)|(gcc)|([gc]\+\+)|(clang)" prefer-non-shared="true"/>
+			<provider-reference id="org.eclipse.cdt.managedbuilder.core.MBSLanguageSettingsProvider" ref="shared-provider"/>
+		</extension>
+	</configuration>
+	<configuration id="com.crt.advproject.config.exe.release.975616254.1431784295.1734585806" name="uTaskerV1.4_BM_FLASH">
+		<extension point="org.eclipse.cdt.core.LanguageSettingsProvider">
+			<provider copy-of="extension" id="org.eclipse.cdt.ui.UserLanguageSettingsProvider"/>
+			<provider class="org.eclipse.cdt.managedbuilder.language.settings.providers.GCCBuildCommandParser" id="com.crt.advproject.GCCBuildCommandParser" keep-relative-paths="false" name="MCU GCC Build Output Parser" parameter="(arm-none-eabi-gcc)|(arm-none-eabi-[gc]\+\+)|(gcc)|([gc]\+\+)|(clang)" prefer-non-shared="true"/>
+			<provider-reference id="org.eclipse.cdt.managedbuilder.core.MBSLanguageSettingsProvider" ref="shared-provider"/>
+		</extension>
+	</configuration>
+	<configuration id="com.crt.advproject.config.exe.release.975616254.1431784295.2057553445" name="uTaskerSerialLoader_FLASH">
+		<extension point="org.eclipse.cdt.core.LanguageSettingsProvider">
+			<provider copy-of="extension" id="org.eclipse.cdt.ui.UserLanguageSettingsProvider"/>
+			<provider class="org.eclipse.cdt.managedbuilder.language.settings.providers.GCCBuildCommandParser" id="com.crt.advproject.GCCBuildCommandParser" keep-relative-paths="false" name="MCU GCC Build Output Parser" parameter="(arm-none-eabi-gcc)|(arm-none-eabi-[gc]\+\+)|(gcc)|([gc]\+\+)|(clang)" prefer-non-shared="true"/>
+			<provider-reference id="org.eclipse.cdt.managedbuilder.core.MBSLanguageSettingsProvider" ref="shared-provider"/>
+		</extension>
+	</configuration>
+	<configuration id="com.crt.advproject.config.exe.release.975616254.1431784295.1273323667" name="uTaskerBM_loader">
+		<extension point="org.eclipse.cdt.core.LanguageSettingsProvider">
+			<provider copy-of="extension" id="org.eclipse.cdt.ui.UserLanguageSettingsProvider"/>
+			<provider class="org.eclipse.cdt.managedbuilder.language.settings.providers.GCCBuildCommandParser" id="com.crt.advproject.GCCBuildCommandParser" keep-relative-paths="false" name="MCU GCC Build Output Parser" parameter="(arm-none-eabi-gcc)|(arm-none-eabi-[gc]\+\+)|(gcc)|([gc]\+\+)|(clang)" prefer-non-shared="true"/>
+			<provider-reference id="org.eclipse.cdt.managedbuilder.core.MBSLanguageSettingsProvider" ref="shared-provider"/>
+		</extension>
+	</configuration>
+</project>

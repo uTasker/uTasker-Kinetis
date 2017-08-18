@@ -1,0 +1,932 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+	<storageModule moduleId="org.eclipse.cdt.core.settings">
+		<cconfiguration id="com.crt.advproject.config.exe.release.975616254.1431784295">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.crt.advproject.config.exe.release.975616254.1431784295" moduleId="org.eclipse.cdt.core.settings" name="uTaskerV1.4_FLASH">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactExtension="elf" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" cleanCommand="rm -rf" description="uTasker application for Flash" errorParsers="org.eclipse.cdt.core.CWDLocator;org.eclipse.cdt.core.GmakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser" id="com.crt.advproject.config.exe.release.975616254.1431784295" name="uTaskerV1.4_FLASH" parent="com.crt.advproject.config.exe.release" postannouncebuildStep="Run a bat file to generate various outputs formats" postbuildStep="&quot;${ProjDirPath}/Applications/uTaskerV1.4/MCUXpresso/uTaskerV1.4_FLASH/generate.bat&quot;">
+					<folderInfo id="com.crt.advproject.config.exe.release.975616254.1431784295." name="/" resourcePath="">
+						<toolChain id="com.crt.advproject.toolchain.exe.release.133363448" name="NXP MCU Tools" superClass="com.crt.advproject.toolchain.exe.release">
+							<targetPlatform binaryParser="org.eclipse.cdt.core.ELF;org.eclipse.cdt.core.GNU_ELF" id="com.crt.advproject.platform.exe.release.793051207" name="ARM-based MCU (Release)" superClass="com.crt.advproject.platform.exe.release"/>
+							<builder buildPath="${workspace_loc:/test1}/Release" id="com.crt.advproject.builder.exe.release.241206487" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="com.crt.advproject.builder.exe.release"/>
+							<tool id="com.crt.advproject.cpp.exe.release.992283818" name="MCU C++ Compiler" superClass="com.crt.advproject.cpp.exe.release"/>
+							<tool id="com.crt.advproject.gcc.exe.release.1001479564" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release">
+								<option id="com.crt.advproject.gcc.thumb.309733612" name="Thumb mode" superClass="com.crt.advproject.gcc.thumb" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+								<option id="com.crt.advproject.gcc.arch.287478664" name="Architecture" superClass="com.crt.advproject.gcc.arch" useByScannerDiscovery="false" value="com.crt.advproject.gcc.target.cm4" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1466916435" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="_KINETIS"/>
+									<listOptionValue builtIn="false" value="_KDS"/>
+									<listOptionValue builtIn="false" value="_GNU"/>
+									<listOptionValue builtIn="false" value="__REDLIB__"/>
+								</option>
+								<option id="gnu.c.compiler.option.misc.other.166851315" name="Other flags" superClass="gnu.c.compiler.option.misc.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -fno-builtin -ffunction-sections -fdata-sections -fsingle-precision-constant" valueType="string"/>
+								<option id="gnu.c.compiler.option.optimization.flags.664313227" name="Other optimization flags" superClass="gnu.c.compiler.option.optimization.flags" useByScannerDiscovery="false" value="" valueType="string"/>
+								<option id="com.crt.advproject.gcc.hdrlib.1787737722" name="Library headers" superClass="com.crt.advproject.gcc.hdrlib" useByScannerDiscovery="false" value="com.crt.advproject.gcc.hdrlib.codered" valueType="enumerated"/>
+								<option id="com.crt.advproject.gcc.specs.967447637" name="Specs" superClass="com.crt.advproject.gcc.specs" useByScannerDiscovery="false" value="com.crt.advproject.gcc.specs.codered" valueType="enumerated"/>
+								<option id="com.crt.advproject.gcc.fpu.147746262" name="Floating point" superClass="com.crt.advproject.gcc.fpu" useByScannerDiscovery="false" value="com.crt.advproject.gcc.fpu.fpv4.hard" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.include.paths.162086095" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								</option>
+								<option id="com.crt.advproject.c.misc.dialect.1642584720" name="Language standard" superClass="com.crt.advproject.c.misc.dialect" useByScannerDiscovery="true" value="com.crt.advproject.misc.dialect.c99" valueType="enumerated"/>
+								<inputType id="com.crt.advproject.compiler.input.589416009" superClass="com.crt.advproject.compiler.input"/>
+							</tool>
+							<tool id="com.crt.advproject.gas.exe.release.33656807" name="MCU Assembler" superClass="com.crt.advproject.gas.exe.release">
+								<option id="com.crt.advproject.gas.thumb.684167089" name="Thumb mode" superClass="com.crt.advproject.gas.thumb" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+								<option id="com.crt.advproject.gas.arch.204943266" name="Architecture" superClass="com.crt.advproject.gas.arch" useByScannerDiscovery="false" value="com.crt.advproject.gas.target.cm4" valueType="enumerated"/>
+								<option id="gnu.both.asm.option.flags.crt.189337939" name="Assembler flags" superClass="gnu.both.asm.option.flags.crt" useByScannerDiscovery="false" value="-c -x assembler-with-cpp -D__REDLIB__" valueType="string"/>
+								<option id="com.crt.advproject.gas.hdrlib.1873623146" name="Library headers" superClass="com.crt.advproject.gas.hdrlib" useByScannerDiscovery="false" value="com.crt.advproject.gas.hdrlib.codered" valueType="enumerated"/>
+								<option id="com.crt.advproject.gas.specs.682910347" name="Specs" superClass="com.crt.advproject.gas.specs" useByScannerDiscovery="false" value="com.crt.advproject.gas.specs.codered" valueType="enumerated"/>
+								<option id="com.crt.advproject.gas.fpu.2141280551" name="Floating point" superClass="com.crt.advproject.gas.fpu" useByScannerDiscovery="false" value="com.crt.advproject.gas.fpu.fpv4.hard" valueType="enumerated"/>
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1156735494" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+								<inputType id="com.crt.advproject.assembler.input.829391291" name="Additional Assembly Source Files" superClass="com.crt.advproject.assembler.input"/>
+							</tool>
+							<tool id="com.crt.advproject.link.cpp.exe.release.1309215952" name="MCU C++ Linker" superClass="com.crt.advproject.link.cpp.exe.release"/>
+							<tool id="com.crt.advproject.link.exe.release.246140259" name="MCU Linker" superClass="com.crt.advproject.link.exe.release">
+								<option id="com.crt.advproject.link.thumb.183623290" name="Thumb mode" superClass="com.crt.advproject.link.thumb" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+								<option id="com.crt.advproject.link.memory.heapAndStack.1445883278" name="Heap and Stack options" superClass="com.crt.advproject.link.memory.heapAndStack" useByScannerDiscovery="false" value="&amp;Heap:Default;Post Data;Default&amp;Stack:Default;End;Default" valueType="string"/>
+								<option id="com.crt.advproject.link.gcc.multicore.master.userobjs.1583376881" name="Slave Objects (not visible)" superClass="com.crt.advproject.link.gcc.multicore.master.userobjs" useByScannerDiscovery="false" valueType="userObjs"/>
+								<option id="com.crt.advproject.link.arch.447510419" name="Architecture" superClass="com.crt.advproject.link.arch" useByScannerDiscovery="false" value="com.crt.advproject.link.target.cm4" valueType="enumerated"/>
+								<option id="com.crt.advproject.link.script.1354646569" name="Linker script" superClass="com.crt.advproject.link.script" useByScannerDiscovery="false" value="K_1M_256.ld" valueType="string"/>
+								<option id="com.crt.advproject.link.manage.1903031031" name="Manage linker script" superClass="com.crt.advproject.link.manage" useByScannerDiscovery="false" value="false" valueType="boolean"/>
+								<option id="gnu.c.link.option.nostdlibs.2018160721" name="No startup or default libs (-nostdlib)" superClass="gnu.c.link.option.nostdlibs" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+								<option id="gnu.c.link.option.other.1018362737" name="Other options (-Xlinker [option])" superClass="gnu.c.link.option.other" useByScannerDiscovery="false" valueType="stringList">
+									<listOptionValue builtIn="false" value="-Map=&quot;${BuildArtifactFileBaseName}.map&quot;"/>
+									<listOptionValue builtIn="false" value="--gc-sections"/>
+									<listOptionValue builtIn="false" value="-print-memory-usage"/>
+								</option>
+								<option id="com.crt.advproject.link.gcc.hdrlib.1906535791" name="Library" superClass="com.crt.advproject.link.gcc.hdrlib" useByScannerDiscovery="false" value="com.crt.advproject.gcc.link.hdrlib.codered.none" valueType="enumerated"/>
+								<option id="com.crt.advproject.link.fpu.733075842" name="Floating point" superClass="com.crt.advproject.link.fpu" useByScannerDiscovery="false" value="com.crt.advproject.link.fpu.fpv4.hard" valueType="enumerated"/>
+								<option id="com.crt.advproject.link.crpenable.1720516339" name="Enable automatic placement of Code Read Protection field in image" superClass="com.crt.advproject.link.crpenable" useByScannerDiscovery="false"/>
+								<option id="com.crt.advproject.link.gcc.multicore.slave.1557048338" name="Multicore configuration" superClass="com.crt.advproject.link.gcc.multicore.slave" useByScannerDiscovery="false"/>
+								<option defaultValue="com.crt.advproject.heapAndStack.lpcXpressoStyle" id="com.crt.advproject.link.memory.heapAndStack.style.1109485917" name="Heap and Stack placement" superClass="com.crt.advproject.link.memory.heapAndStack.style" useByScannerDiscovery="false" value="com.crt.advproject.heapAndStack.mcuXpressoStyle" valueType="enumerated"/>
+								<option id="com.crt.advproject.link.scriptdir.402295471" name="Script path" superClass="com.crt.advproject.link.scriptdir" useByScannerDiscovery="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4/GNU_Kinetis&quot;" valueType="string"/>
+								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.42046132" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+						</toolChain>
+					</folderInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.578003679" name="event_groups.c" rcbsApplicability="disable" resourcePath="FreeRTOS/Source/event_groups.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.1001479564.243830719">
+						<tool id="com.crt.advproject.gcc.exe.release.1001479564.243830719" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.1001479564">
+							<option id="gnu.c.compiler.option.include.paths.200172773" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/include&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/portable/GCC/ARM_CM4F&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.1463369182" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+					</fileInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.1769201620" name="timers.c" rcbsApplicability="disable" resourcePath="FreeRTOS/Source/timers.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.1001479564.1243579113">
+						<tool id="com.crt.advproject.gcc.exe.release.1001479564.1243579113" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.1001479564">
+							<option id="gnu.c.compiler.option.include.paths.1872647771" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/include&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/portable/GCC/ARM_CM4F&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.1197214871" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+						<tool customBuildStep="true" id="org.eclipse.cdt.managedbuilder.ui.rcbs.81014646" name="Resource Custom Build Step">
+							<inputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.inputtype.2134899043" name="Resource Custom Build Step Input Type">
+								<additionalInput kind="additionalinputdependency" paths=""/>
+							</inputType>
+							<outputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.outputtype.1193791024" name="Resource Custom Build Step Output Type"/>
+						</tool>
+					</fileInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.1280974019" name="list.c" rcbsApplicability="disable" resourcePath="FreeRTOS/Source/list.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.1001479564.1223376041">
+						<tool id="com.crt.advproject.gcc.exe.release.1001479564.1223376041" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.1001479564">
+							<option id="gnu.c.compiler.option.include.paths.1694157388" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/include&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/portable/GCC/ARM_CM4F&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.2015350739" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+					</fileInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.147770690" name="port.c" rcbsApplicability="disable" resourcePath="FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.1001479564.478246557">
+						<tool id="com.crt.advproject.gcc.exe.release.1001479564.478246557" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.1001479564">
+							<option id="gnu.c.compiler.option.include.paths.833292173" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/include&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/portable/GCC/ARM_CM4F&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.716355626" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+						<tool customBuildStep="true" id="org.eclipse.cdt.managedbuilder.ui.rcbs.10814160" name="Resource Custom Build Step">
+							<inputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.inputtype.1144375259" name="Resource Custom Build Step Input Type">
+								<additionalInput kind="additionalinputdependency" paths=""/>
+							</inputType>
+							<outputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.outputtype.1565896375" name="Resource Custom Build Step Output Type"/>
+						</tool>
+					</fileInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.495205305" name="queue.c" rcbsApplicability="disable" resourcePath="FreeRTOS/Source/queue.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.1001479564.229893122">
+						<tool id="com.crt.advproject.gcc.exe.release.1001479564.229893122" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.1001479564">
+							<option id="gnu.c.compiler.option.include.paths.37619167" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/include&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/portable/GCC/ARM_CM4F&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.1880078701" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+					</fileInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.172335297" name="tasks.c" rcbsApplicability="disable" resourcePath="FreeRTOS/Source/tasks.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.1001479564.57740038">
+						<tool id="com.crt.advproject.gcc.exe.release.1001479564.57740038" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.1001479564">
+							<option id="gnu.c.compiler.option.include.paths.1809518691" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/include&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/portable/GCC/ARM_CM4F&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.850279288" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+						<tool customBuildStep="true" id="org.eclipse.cdt.managedbuilder.ui.rcbs.1446675209" name="Resource Custom Build Step">
+							<inputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.inputtype.1987438977" name="Resource Custom Build Step Input Type">
+								<additionalInput kind="additionalinputdependency" paths=""/>
+							</inputType>
+							<outputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.outputtype.1856225820" name="Resource Custom Build Step Output Type"/>
+						</tool>
+					</fileInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.736719110" name="croutine.c" rcbsApplicability="disable" resourcePath="FreeRTOS/Source/croutine.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.1001479564.39811400">
+						<tool id="com.crt.advproject.gcc.exe.release.1001479564.39811400" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.1001479564">
+							<option id="gnu.c.compiler.option.include.paths.1746194690" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/include&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/portable/GCC/ARM_CM4F&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.81857240" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+						<tool customBuildStep="true" id="org.eclipse.cdt.managedbuilder.ui.rcbs.1247716530" name="Resource Custom Build Step">
+							<inputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.inputtype.1469236493" name="Resource Custom Build Step Input Type">
+								<additionalInput kind="additionalinputdependency" paths=""/>
+							</inputType>
+							<outputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.outputtype.1458831098" name="Resource Custom Build Step Output Type"/>
+						</tool>
+					</fileInfo>
+					<sourceEntries>
+						<entry excluding="Hardware/Kinetis/kinetis_boot.c|FreeRTOS/Source/portable/GCC/ARM_CM7|FreeRTOS/Source/portable/GCC/ARM_CM4_MPU|FreeRTOS/Source/portable/GCC/ARM_CM3_MPU|FreeRTOS/Source/portable/GCC/ARM_CM3|FreeRTOS/Source/portable/GCC/ARM_CM0|FreeRTOS/Source/portable/RVDS|FreeRTOS/Source/portable/MSVC-MingW|FreeRTOS/Source/portable/MemMang|FreeRTOS/Source/portable/Keil|FreeRTOS/Source/portable/IAR|FreeRTOS/Source/portable/Common|Hardware/Kinetis/kinetis_asm.s|Hardware/Kinetis/kinetisSim.c|Applications/uTaskerSerialBoot|Applications/uTaskerBoot|Tools|WinSim" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="com.crt.advproject.config.exe.release.975616254.1431784295.976524680">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.crt.advproject.config.exe.release.975616254.1431784295.976524680" moduleId="org.eclipse.cdt.core.settings" name="uTaskerV1.4_RAM">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactExtension="elf" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" cleanCommand="rm -rf" description="uTasker application in RAM for debugging" errorParsers="org.eclipse.cdt.core.CWDLocator;org.eclipse.cdt.core.GmakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser" id="com.crt.advproject.config.exe.release.975616254.1431784295.976524680" name="uTaskerV1.4_RAM" parent="com.crt.advproject.config.exe.release" postannouncebuildStep="" postbuildStep="">
+					<folderInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.976524680." name="/" resourcePath="">
+						<toolChain id="com.crt.advproject.toolchain.exe.release.1911058491" name="NXP MCU Tools" superClass="com.crt.advproject.toolchain.exe.release">
+							<targetPlatform binaryParser="org.eclipse.cdt.core.ELF;org.eclipse.cdt.core.GNU_ELF" id="com.crt.advproject.platform.exe.release.1996398871" name="ARM-based MCU (Release)" superClass="com.crt.advproject.platform.exe.release"/>
+							<builder buildPath="${workspace_loc:/test1}/Release" id="com.crt.advproject.builder.exe.release.958197972" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="com.crt.advproject.builder.exe.release"/>
+							<tool id="com.crt.advproject.cpp.exe.release.731805546" name="MCU C++ Compiler" superClass="com.crt.advproject.cpp.exe.release"/>
+							<tool id="com.crt.advproject.gcc.exe.release.960055490" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release">
+								<option id="com.crt.advproject.gcc.thumb.1272239370" name="Thumb mode" superClass="com.crt.advproject.gcc.thumb" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+								<option id="com.crt.advproject.gcc.arch.1939146258" name="Architecture" superClass="com.crt.advproject.gcc.arch" useByScannerDiscovery="false" value="com.crt.advproject.gcc.target.cm4" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.360155606" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="_KINETIS"/>
+									<listOptionValue builtIn="false" value="_KDS"/>
+									<listOptionValue builtIn="false" value="_GNU"/>
+									<listOptionValue builtIn="false" value="__REDLIB__"/>
+								</option>
+								<option id="gnu.c.compiler.option.misc.other.1974478346" name="Other flags" superClass="gnu.c.compiler.option.misc.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -fno-builtin -ffunction-sections -fdata-sections -fsingle-precision-constant" valueType="string"/>
+								<option id="gnu.c.compiler.option.optimization.flags.773524939" name="Other optimization flags" superClass="gnu.c.compiler.option.optimization.flags" useByScannerDiscovery="false" value="" valueType="string"/>
+								<option id="com.crt.advproject.gcc.hdrlib.1279757338" name="Library headers" superClass="com.crt.advproject.gcc.hdrlib" useByScannerDiscovery="false" value="com.crt.advproject.gcc.hdrlib.codered" valueType="enumerated"/>
+								<option id="com.crt.advproject.gcc.specs.1019002527" name="Specs" superClass="com.crt.advproject.gcc.specs" useByScannerDiscovery="false" value="com.crt.advproject.gcc.specs.codered" valueType="enumerated"/>
+								<option id="com.crt.advproject.gcc.fpu.15900322" name="Floating point" superClass="com.crt.advproject.gcc.fpu" useByScannerDiscovery="false" value="com.crt.advproject.gcc.fpu.fpv4.hard" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.include.paths.1325193896" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								</option>
+								<option id="com.crt.advproject.c.misc.dialect.1680391256" name="Language standard" superClass="com.crt.advproject.c.misc.dialect" useByScannerDiscovery="true" value="com.crt.advproject.misc.dialect.c99" valueType="enumerated"/>
+								<inputType id="com.crt.advproject.compiler.input.14129285" superClass="com.crt.advproject.compiler.input"/>
+							</tool>
+							<tool id="com.crt.advproject.gas.exe.release.1041740373" name="MCU Assembler" superClass="com.crt.advproject.gas.exe.release">
+								<option id="com.crt.advproject.gas.thumb.2133223917" name="Thumb mode" superClass="com.crt.advproject.gas.thumb" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+								<option id="com.crt.advproject.gas.arch.1203622224" name="Architecture" superClass="com.crt.advproject.gas.arch" useByScannerDiscovery="false" value="com.crt.advproject.gas.target.cm4" valueType="enumerated"/>
+								<option id="gnu.both.asm.option.flags.crt.517050829" name="Assembler flags" superClass="gnu.both.asm.option.flags.crt" useByScannerDiscovery="false" value="-c -x assembler-with-cpp -D__REDLIB__" valueType="string"/>
+								<option id="com.crt.advproject.gas.hdrlib.609687809" name="Library headers" superClass="com.crt.advproject.gas.hdrlib" useByScannerDiscovery="false" value="com.crt.advproject.gas.hdrlib.codered" valueType="enumerated"/>
+								<option id="com.crt.advproject.gas.specs.160784690" name="Specs" superClass="com.crt.advproject.gas.specs" useByScannerDiscovery="false" value="com.crt.advproject.gas.specs.codered" valueType="enumerated"/>
+								<option id="com.crt.advproject.gas.fpu.1562209917" name="Floating point" superClass="com.crt.advproject.gas.fpu" useByScannerDiscovery="false" value="com.crt.advproject.gas.fpu.fpv4.hard" valueType="enumerated"/>
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.952868162" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+								<inputType id="com.crt.advproject.assembler.input.2010130477" name="Additional Assembly Source Files" superClass="com.crt.advproject.assembler.input"/>
+							</tool>
+							<tool id="com.crt.advproject.link.cpp.exe.release.251998483" name="MCU C++ Linker" superClass="com.crt.advproject.link.cpp.exe.release"/>
+							<tool id="com.crt.advproject.link.exe.release.1666582912" name="MCU Linker" superClass="com.crt.advproject.link.exe.release">
+								<option id="com.crt.advproject.link.thumb.835721530" name="Thumb mode" superClass="com.crt.advproject.link.thumb" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+								<option id="com.crt.advproject.link.memory.heapAndStack.193079156" name="Heap and Stack options" superClass="com.crt.advproject.link.memory.heapAndStack" useByScannerDiscovery="false" value="&amp;Heap:Default;Post Data;Default&amp;Stack:Default;End;Default" valueType="string"/>
+								<option id="com.crt.advproject.link.gcc.multicore.master.userobjs.1968940512" name="Slave Objects (not visible)" superClass="com.crt.advproject.link.gcc.multicore.master.userobjs" useByScannerDiscovery="false" valueType="userObjs"/>
+								<option id="com.crt.advproject.link.arch.82999316" name="Architecture" superClass="com.crt.advproject.link.arch" useByScannerDiscovery="false" value="com.crt.advproject.link.target.cm4" valueType="enumerated"/>
+								<option id="com.crt.advproject.link.script.1713549138" name="Linker script" superClass="com.crt.advproject.link.script" useByScannerDiscovery="false" value="K_256_RAM.ld" valueType="string"/>
+								<option id="com.crt.advproject.link.manage.702164748" name="Manage linker script" superClass="com.crt.advproject.link.manage" useByScannerDiscovery="false" value="false" valueType="boolean"/>
+								<option id="gnu.c.link.option.nostdlibs.425713675" name="No startup or default libs (-nostdlib)" superClass="gnu.c.link.option.nostdlibs" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+								<option id="gnu.c.link.option.other.277012903" name="Other options (-Xlinker [option])" superClass="gnu.c.link.option.other" useByScannerDiscovery="false" valueType="stringList">
+									<listOptionValue builtIn="false" value="-Map=&quot;${BuildArtifactFileBaseName}.map&quot;"/>
+									<listOptionValue builtIn="false" value="--gc-sections"/>
+									<listOptionValue builtIn="false" value="-print-memory-usage"/>
+								</option>
+								<option id="com.crt.advproject.link.gcc.hdrlib.1805434473" name="Library" superClass="com.crt.advproject.link.gcc.hdrlib" useByScannerDiscovery="false" value="com.crt.advproject.gcc.link.hdrlib.codered.none" valueType="enumerated"/>
+								<option id="com.crt.advproject.link.fpu.1297649154" name="Floating point" superClass="com.crt.advproject.link.fpu" useByScannerDiscovery="false" value="com.crt.advproject.link.fpu.fpv4.hard" valueType="enumerated"/>
+								<option id="com.crt.advproject.link.crpenable.1867047259" name="Enable automatic placement of Code Read Protection field in image" superClass="com.crt.advproject.link.crpenable" useByScannerDiscovery="false"/>
+								<option id="com.crt.advproject.link.gcc.multicore.slave.964941925" name="Multicore configuration" superClass="com.crt.advproject.link.gcc.multicore.slave" useByScannerDiscovery="false"/>
+								<option defaultValue="com.crt.advproject.heapAndStack.lpcXpressoStyle" id="com.crt.advproject.link.memory.heapAndStack.style.197253488" name="Heap and Stack placement" superClass="com.crt.advproject.link.memory.heapAndStack.style" useByScannerDiscovery="false" value="com.crt.advproject.heapAndStack.mcuXpressoStyle" valueType="enumerated"/>
+								<option id="com.crt.advproject.link.scriptdir.1397301987" name="Script path" superClass="com.crt.advproject.link.scriptdir" useByScannerDiscovery="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4/GNU_Kinetis&quot;" valueType="string"/>
+								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.1888105000" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+						</toolChain>
+					</folderInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.976524680.FreeRTOS/Source/event_groups.c" name="event_groups.c" rcbsApplicability="disable" resourcePath="FreeRTOS/Source/event_groups.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.128424245">
+						<tool id="com.crt.advproject.gcc.exe.release.128424245" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.960055490">
+							<option id="gnu.c.compiler.option.include.paths.191007047" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/include&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/portable/GCC/ARM_CM4F&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.1942026894" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+					</fileInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.976524680.FreeRTOS/Source/timers.c" name="timers.c" rcbsApplicability="disable" resourcePath="FreeRTOS/Source/timers.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.1479063489">
+						<tool id="com.crt.advproject.gcc.exe.release.1479063489" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.960055490">
+							<option id="gnu.c.compiler.option.include.paths.95456024" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/include&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/portable/GCC/ARM_CM4F&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.813727711" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+						<tool customBuildStep="true" id="org.eclipse.cdt.managedbuilder.ui.rcbs.81014646.347076731" name="Resource Custom Build Step">
+							<inputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.inputtype.2134899043.862112224" name="Resource Custom Build Step Input Type">
+								<additionalInput kind="additionalinputdependency" paths=""/>
+							</inputType>
+							<outputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.outputtype.1193791024.2096079953" name="Resource Custom Build Step Output Type"/>
+						</tool>
+					</fileInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.976524680.FreeRTOS/Source/list.c" name="list.c" rcbsApplicability="disable" resourcePath="FreeRTOS/Source/list.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.1990197543">
+						<tool id="com.crt.advproject.gcc.exe.release.1990197543" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.960055490">
+							<option id="gnu.c.compiler.option.include.paths.2075136388" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/include&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/portable/GCC/ARM_CM4F&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.1609816983" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+					</fileInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.976524680.FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c" name="port.c" rcbsApplicability="disable" resourcePath="FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.1137693746">
+						<tool id="com.crt.advproject.gcc.exe.release.1137693746" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.960055490">
+							<option id="gnu.c.compiler.option.include.paths.355359284" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/include&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/portable/GCC/ARM_CM4F&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.849965626" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+						<tool customBuildStep="true" id="org.eclipse.cdt.managedbuilder.ui.rcbs.10814160.2046226581" name="Resource Custom Build Step">
+							<inputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.inputtype.1144375259.974960527" name="Resource Custom Build Step Input Type">
+								<additionalInput kind="additionalinputdependency" paths=""/>
+							</inputType>
+							<outputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.outputtype.1565896375.1380868882" name="Resource Custom Build Step Output Type"/>
+						</tool>
+					</fileInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.976524680.FreeRTOS/Source/queue.c" name="queue.c" rcbsApplicability="disable" resourcePath="FreeRTOS/Source/queue.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.1261033455">
+						<tool id="com.crt.advproject.gcc.exe.release.1261033455" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.960055490">
+							<option id="gnu.c.compiler.option.include.paths.182148442" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/include&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/portable/GCC/ARM_CM4F&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.1854359944" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+					</fileInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.976524680.FreeRTOS/Source/tasks.c" name="tasks.c" rcbsApplicability="disable" resourcePath="FreeRTOS/Source/tasks.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.1337638990">
+						<tool id="com.crt.advproject.gcc.exe.release.1337638990" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.960055490">
+							<option id="gnu.c.compiler.option.include.paths.973257035" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/include&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/portable/GCC/ARM_CM4F&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.1666352256" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+						<tool customBuildStep="true" id="org.eclipse.cdt.managedbuilder.ui.rcbs.1446675209.1402333761" name="Resource Custom Build Step">
+							<inputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.inputtype.1987438977.513173476" name="Resource Custom Build Step Input Type">
+								<additionalInput kind="additionalinputdependency" paths=""/>
+							</inputType>
+							<outputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.outputtype.1856225820.831627266" name="Resource Custom Build Step Output Type"/>
+						</tool>
+					</fileInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.976524680.FreeRTOS/Source/croutine.c" name="croutine.c" rcbsApplicability="disable" resourcePath="FreeRTOS/Source/croutine.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.1581668677">
+						<tool id="com.crt.advproject.gcc.exe.release.1581668677" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.960055490">
+							<option id="gnu.c.compiler.option.include.paths.1150835709" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/include&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/portable/GCC/ARM_CM4F&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.1392560784" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+						<tool customBuildStep="true" id="org.eclipse.cdt.managedbuilder.ui.rcbs.1247716530.1766682753" name="Resource Custom Build Step">
+							<inputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.inputtype.1469236493.1772306465" name="Resource Custom Build Step Input Type">
+								<additionalInput kind="additionalinputdependency" paths=""/>
+							</inputType>
+							<outputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.outputtype.1458831098.855708706" name="Resource Custom Build Step Output Type"/>
+						</tool>
+					</fileInfo>
+					<sourceEntries>
+						<entry excluding="Hardware/Kinetis/kinetis_boot.c|FreeRTOS/Source/portable/GCC/ARM_CM7|FreeRTOS/Source/portable/GCC/ARM_CM4_MPU|FreeRTOS/Source/portable/GCC/ARM_CM3_MPU|FreeRTOS/Source/portable/GCC/ARM_CM3|FreeRTOS/Source/portable/GCC/ARM_CM0|FreeRTOS/Source/portable/RVDS|FreeRTOS/Source/portable/MSVC-MingW|FreeRTOS/Source/portable/MemMang|FreeRTOS/Source/portable/Keil|FreeRTOS/Source/portable/IAR|FreeRTOS/Source/portable/Common|Hardware/Kinetis/kinetis_asm.s|Hardware/Kinetis/kinetisSim.c|Applications/uTaskerSerialBoot|Applications/uTaskerBoot|Tools|WinSim" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="com.crt.advproject.config.exe.release.975616254.1431784295.1734585806">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.crt.advproject.config.exe.release.975616254.1431784295.1734585806" moduleId="org.eclipse.cdt.core.settings" name="uTaskerV1.4_BM_FLASH">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactExtension="elf" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" cleanCommand="rm -rf" description="uTasker application for use with Boot Loaders" errorParsers="org.eclipse.cdt.core.CWDLocator;org.eclipse.cdt.core.GmakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser" id="com.crt.advproject.config.exe.release.975616254.1431784295.1734585806" name="uTaskerV1.4_BM_FLASH" parent="com.crt.advproject.config.exe.release" postannouncebuildStep="Run a bat file to combinae and encode loadable targets" postbuildStep="&quot;${ProjDirPath}/Applications/uTaskerV1.4/MCUXpresso/uTaskerV1.4_BM_FLASH/generate.bat&quot;">
+					<folderInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.1734585806." name="/" resourcePath="">
+						<toolChain id="com.crt.advproject.toolchain.exe.release.521529066" name="NXP MCU Tools" superClass="com.crt.advproject.toolchain.exe.release">
+							<targetPlatform binaryParser="org.eclipse.cdt.core.ELF;org.eclipse.cdt.core.GNU_ELF" id="com.crt.advproject.platform.exe.release.1072790622" name="ARM-based MCU (Release)" superClass="com.crt.advproject.platform.exe.release"/>
+							<builder buildPath="${workspace_loc:/test1}/Release" id="com.crt.advproject.builder.exe.release.919255520" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="com.crt.advproject.builder.exe.release"/>
+							<tool id="com.crt.advproject.cpp.exe.release.1215062888" name="MCU C++ Compiler" superClass="com.crt.advproject.cpp.exe.release"/>
+							<tool id="com.crt.advproject.gcc.exe.release.830260776" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release">
+								<option id="com.crt.advproject.gcc.thumb.934703513" name="Thumb mode" superClass="com.crt.advproject.gcc.thumb" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+								<option id="com.crt.advproject.gcc.arch.1750611990" name="Architecture" superClass="com.crt.advproject.gcc.arch" useByScannerDiscovery="false" value="com.crt.advproject.gcc.target.cm4" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.198451503" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="_KINETIS"/>
+									<listOptionValue builtIn="false" value="_BM_BUILD"/>
+									<listOptionValue builtIn="false" value="_KDS"/>
+									<listOptionValue builtIn="false" value="_GNU"/>
+									<listOptionValue builtIn="false" value="__REDLIB__"/>
+								</option>
+								<option id="gnu.c.compiler.option.misc.other.1092038585" name="Other flags" superClass="gnu.c.compiler.option.misc.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -fno-builtin -ffunction-sections -fdata-sections -fsingle-precision-constant" valueType="string"/>
+								<option id="gnu.c.compiler.option.optimization.flags.1698335083" name="Other optimization flags" superClass="gnu.c.compiler.option.optimization.flags" useByScannerDiscovery="false" value="" valueType="string"/>
+								<option id="com.crt.advproject.gcc.hdrlib.580096320" name="Library headers" superClass="com.crt.advproject.gcc.hdrlib" useByScannerDiscovery="false" value="com.crt.advproject.gcc.hdrlib.codered" valueType="enumerated"/>
+								<option id="com.crt.advproject.gcc.specs.715810511" name="Specs" superClass="com.crt.advproject.gcc.specs" useByScannerDiscovery="false" value="com.crt.advproject.gcc.specs.codered" valueType="enumerated"/>
+								<option id="com.crt.advproject.gcc.fpu.1330229103" name="Floating point" superClass="com.crt.advproject.gcc.fpu" useByScannerDiscovery="false" value="com.crt.advproject.gcc.fpu.fpv4.hard" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.include.paths.1959306924" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								</option>
+								<option id="com.crt.advproject.c.misc.dialect.366884677" name="Language standard" superClass="com.crt.advproject.c.misc.dialect" useByScannerDiscovery="true" value="com.crt.advproject.misc.dialect.c99" valueType="enumerated"/>
+								<inputType id="com.crt.advproject.compiler.input.1377661163" superClass="com.crt.advproject.compiler.input"/>
+							</tool>
+							<tool id="com.crt.advproject.gas.exe.release.1609572562" name="MCU Assembler" superClass="com.crt.advproject.gas.exe.release">
+								<option id="com.crt.advproject.gas.thumb.2136922522" name="Thumb mode" superClass="com.crt.advproject.gas.thumb" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+								<option id="com.crt.advproject.gas.arch.1804180074" name="Architecture" superClass="com.crt.advproject.gas.arch" useByScannerDiscovery="false" value="com.crt.advproject.gas.target.cm4" valueType="enumerated"/>
+								<option id="gnu.both.asm.option.flags.crt.784098631" name="Assembler flags" superClass="gnu.both.asm.option.flags.crt" useByScannerDiscovery="false" value="-c -x assembler-with-cpp -D__REDLIB__" valueType="string"/>
+								<option id="com.crt.advproject.gas.hdrlib.253016256" name="Library headers" superClass="com.crt.advproject.gas.hdrlib" useByScannerDiscovery="false" value="com.crt.advproject.gas.hdrlib.codered" valueType="enumerated"/>
+								<option id="com.crt.advproject.gas.specs.318897663" name="Specs" superClass="com.crt.advproject.gas.specs" useByScannerDiscovery="false" value="com.crt.advproject.gas.specs.codered" valueType="enumerated"/>
+								<option id="com.crt.advproject.gas.fpu.1351786527" name="Floating point" superClass="com.crt.advproject.gas.fpu" useByScannerDiscovery="false" value="com.crt.advproject.gas.fpu.fpv4.hard" valueType="enumerated"/>
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.924145688" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+								<inputType id="com.crt.advproject.assembler.input.1085475721" name="Additional Assembly Source Files" superClass="com.crt.advproject.assembler.input"/>
+							</tool>
+							<tool id="com.crt.advproject.link.cpp.exe.release.1122735510" name="MCU C++ Linker" superClass="com.crt.advproject.link.cpp.exe.release"/>
+							<tool id="com.crt.advproject.link.exe.release.599772736" name="MCU Linker" superClass="com.crt.advproject.link.exe.release">
+								<option id="com.crt.advproject.link.thumb.390844965" name="Thumb mode" superClass="com.crt.advproject.link.thumb" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+								<option id="com.crt.advproject.link.memory.heapAndStack.804608362" name="Heap and Stack options" superClass="com.crt.advproject.link.memory.heapAndStack" useByScannerDiscovery="false" value="&amp;Heap:Default;Post Data;Default&amp;Stack:Default;End;Default" valueType="string"/>
+								<option id="com.crt.advproject.link.gcc.multicore.master.userobjs.532224496" name="Slave Objects (not visible)" superClass="com.crt.advproject.link.gcc.multicore.master.userobjs" useByScannerDiscovery="false" valueType="userObjs"/>
+								<option id="com.crt.advproject.link.arch.550740842" name="Architecture" superClass="com.crt.advproject.link.arch" useByScannerDiscovery="false" value="com.crt.advproject.link.target.cm4" valueType="enumerated"/>
+								<option id="com.crt.advproject.link.script.41534815" name="Linker script" superClass="com.crt.advproject.link.script" useByScannerDiscovery="false" value="K_1M_256_BM.ld" valueType="string"/>
+								<option id="com.crt.advproject.link.manage.1981559110" name="Manage linker script" superClass="com.crt.advproject.link.manage" useByScannerDiscovery="false" value="false" valueType="boolean"/>
+								<option id="gnu.c.link.option.nostdlibs.1746473340" name="No startup or default libs (-nostdlib)" superClass="gnu.c.link.option.nostdlibs" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+								<option id="gnu.c.link.option.other.304629597" name="Other options (-Xlinker [option])" superClass="gnu.c.link.option.other" useByScannerDiscovery="false" valueType="stringList">
+									<listOptionValue builtIn="false" value="-Map=&quot;${BuildArtifactFileBaseName}.map&quot;"/>
+									<listOptionValue builtIn="false" value="--gc-sections"/>
+									<listOptionValue builtIn="false" value="-print-memory-usage"/>
+								</option>
+								<option id="com.crt.advproject.link.gcc.hdrlib.1825948554" name="Library" superClass="com.crt.advproject.link.gcc.hdrlib" useByScannerDiscovery="false" value="com.crt.advproject.gcc.link.hdrlib.codered.none" valueType="enumerated"/>
+								<option id="com.crt.advproject.link.fpu.293612023" name="Floating point" superClass="com.crt.advproject.link.fpu" useByScannerDiscovery="false" value="com.crt.advproject.link.fpu.fpv4.hard" valueType="enumerated"/>
+								<option id="com.crt.advproject.link.crpenable.1114768696" name="Enable automatic placement of Code Read Protection field in image" superClass="com.crt.advproject.link.crpenable" useByScannerDiscovery="false"/>
+								<option id="com.crt.advproject.link.gcc.multicore.slave.1924794466" name="Multicore configuration" superClass="com.crt.advproject.link.gcc.multicore.slave" useByScannerDiscovery="false"/>
+								<option defaultValue="com.crt.advproject.heapAndStack.lpcXpressoStyle" id="com.crt.advproject.link.memory.heapAndStack.style.694936624" name="Heap and Stack placement" superClass="com.crt.advproject.link.memory.heapAndStack.style" useByScannerDiscovery="false" value="com.crt.advproject.heapAndStack.mcuXpressoStyle" valueType="enumerated"/>
+								<option id="com.crt.advproject.link.scriptdir.34668481" name="Script path" superClass="com.crt.advproject.link.scriptdir" useByScannerDiscovery="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4/GNU_Kinetis&quot;" valueType="string"/>
+								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.724308021" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+						</toolChain>
+					</folderInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.1734585806.FreeRTOS/Source/event_groups.c" name="event_groups.c" rcbsApplicability="disable" resourcePath="FreeRTOS/Source/event_groups.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.1289363396">
+						<tool id="com.crt.advproject.gcc.exe.release.1289363396" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.830260776">
+							<option id="gnu.c.compiler.option.include.paths.1311210674" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/include&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/portable/GCC/ARM_CM4F&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.1217242446" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+					</fileInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.1734585806.FreeRTOS/Source/timers.c" name="timers.c" rcbsApplicability="disable" resourcePath="FreeRTOS/Source/timers.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.268974337">
+						<tool id="com.crt.advproject.gcc.exe.release.268974337" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.830260776">
+							<option id="gnu.c.compiler.option.include.paths.362333775" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/include&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/portable/GCC/ARM_CM4F&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.1452648951" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+						<tool customBuildStep="true" id="org.eclipse.cdt.managedbuilder.ui.rcbs.81014646.1404666757" name="Resource Custom Build Step">
+							<inputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.inputtype.2134899043.1366051636" name="Resource Custom Build Step Input Type">
+								<additionalInput kind="additionalinputdependency" paths=""/>
+							</inputType>
+							<outputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.outputtype.1193791024.977628021" name="Resource Custom Build Step Output Type"/>
+						</tool>
+					</fileInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.1734585806.FreeRTOS/Source/list.c" name="list.c" rcbsApplicability="disable" resourcePath="FreeRTOS/Source/list.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.693751376">
+						<tool id="com.crt.advproject.gcc.exe.release.693751376" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.830260776">
+							<option id="gnu.c.compiler.option.include.paths.1628376396" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/include&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/portable/GCC/ARM_CM4F&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.846383625" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+					</fileInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.1734585806.FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c" name="port.c" rcbsApplicability="disable" resourcePath="FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.16110923">
+						<tool id="com.crt.advproject.gcc.exe.release.16110923" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.830260776">
+							<option id="gnu.c.compiler.option.include.paths.162672867" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/include&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/portable/GCC/ARM_CM4F&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.1365287559" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+						<tool customBuildStep="true" id="org.eclipse.cdt.managedbuilder.ui.rcbs.10814160.1305470144" name="Resource Custom Build Step">
+							<inputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.inputtype.1144375259.680862590" name="Resource Custom Build Step Input Type">
+								<additionalInput kind="additionalinputdependency" paths=""/>
+							</inputType>
+							<outputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.outputtype.1565896375.1520903263" name="Resource Custom Build Step Output Type"/>
+						</tool>
+					</fileInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.1734585806.FreeRTOS/Source/queue.c" name="queue.c" rcbsApplicability="disable" resourcePath="FreeRTOS/Source/queue.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.708746586">
+						<tool id="com.crt.advproject.gcc.exe.release.708746586" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.830260776">
+							<option id="gnu.c.compiler.option.include.paths.835368158" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/include&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/portable/GCC/ARM_CM4F&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.723573907" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+					</fileInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.1734585806.FreeRTOS/Source/tasks.c" name="tasks.c" rcbsApplicability="disable" resourcePath="FreeRTOS/Source/tasks.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.1183576957">
+						<tool id="com.crt.advproject.gcc.exe.release.1183576957" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.830260776">
+							<option id="gnu.c.compiler.option.include.paths.366686066" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/include&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/portable/GCC/ARM_CM4F&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.60902877" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+						<tool customBuildStep="true" id="org.eclipse.cdt.managedbuilder.ui.rcbs.1446675209.116448330" name="Resource Custom Build Step">
+							<inputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.inputtype.1987438977.441994560" name="Resource Custom Build Step Input Type">
+								<additionalInput kind="additionalinputdependency" paths=""/>
+							</inputType>
+							<outputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.outputtype.1856225820.958298322" name="Resource Custom Build Step Output Type"/>
+						</tool>
+					</fileInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.1734585806.FreeRTOS/Source/croutine.c" name="croutine.c" rcbsApplicability="disable" resourcePath="FreeRTOS/Source/croutine.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.1155400783">
+						<tool id="com.crt.advproject.gcc.exe.release.1155400783" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.830260776">
+							<option id="gnu.c.compiler.option.include.paths.502468578" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/include&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/portable/GCC/ARM_CM4F&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.1034031108" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+						<tool customBuildStep="true" id="org.eclipse.cdt.managedbuilder.ui.rcbs.1247716530.213724225" name="Resource Custom Build Step">
+							<inputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.inputtype.1469236493.3913923" name="Resource Custom Build Step Input Type">
+								<additionalInput kind="additionalinputdependency" paths=""/>
+							</inputType>
+							<outputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.outputtype.1458831098.1521055473" name="Resource Custom Build Step Output Type"/>
+						</tool>
+					</fileInfo>
+					<sourceEntries>
+						<entry excluding="Hardware/Kinetis/kinetis_boot.c|FreeRTOS/Source/portable/GCC/ARM_CM7|FreeRTOS/Source/portable/GCC/ARM_CM4_MPU|FreeRTOS/Source/portable/GCC/ARM_CM3_MPU|FreeRTOS/Source/portable/GCC/ARM_CM3|FreeRTOS/Source/portable/GCC/ARM_CM0|FreeRTOS/Source/portable/RVDS|FreeRTOS/Source/portable/MSVC-MingW|FreeRTOS/Source/portable/MemMang|FreeRTOS/Source/portable/Keil|FreeRTOS/Source/portable/IAR|FreeRTOS/Source/portable/Common|Hardware/Kinetis/kinetis_asm.s|Hardware/Kinetis/kinetisSim.c|Applications/uTaskerSerialBoot|Applications/uTaskerBoot|Tools|WinSim" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="com.crt.advproject.config.exe.release.975616254.1431784295.2057553445">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.crt.advproject.config.exe.release.975616254.1431784295.2057553445" moduleId="org.eclipse.cdt.core.settings" name="uTaskerSerialLoader_FLASH">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactExtension="elf" artifactName="uTaskerSerialLoader" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" cleanCommand="rm -rf" description="uTasker serial loader for Flash" errorParsers="org.eclipse.cdt.core.CWDLocator;org.eclipse.cdt.core.GmakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser" id="com.crt.advproject.config.exe.release.975616254.1431784295.2057553445" name="uTaskerSerialLoader_FLASH" parent="com.crt.advproject.config.exe.release" postannouncebuildStep="Convert the generated elf file to BIN, SREC and HEX formats" postbuildStep="&quot;${ProjDirPath}/Applications/uTaskerSerialBoot/MCUXpresso/uTaskerSerialLoader_FLASH/generate.bat&quot;">
+					<folderInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.2057553445." name="/" resourcePath="">
+						<toolChain id="com.crt.advproject.toolchain.exe.release.1230382047" name="NXP MCU Tools" superClass="com.crt.advproject.toolchain.exe.release">
+							<targetPlatform binaryParser="org.eclipse.cdt.core.ELF;org.eclipse.cdt.core.GNU_ELF" id="com.crt.advproject.platform.exe.release.1824576131" name="ARM-based MCU (Release)" superClass="com.crt.advproject.platform.exe.release"/>
+							<builder buildPath="${workspace_loc:/test1}/Release" id="com.crt.advproject.builder.exe.release.890060091" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="com.crt.advproject.builder.exe.release"/>
+							<tool id="com.crt.advproject.cpp.exe.release.350371529" name="MCU C++ Compiler" superClass="com.crt.advproject.cpp.exe.release"/>
+							<tool id="com.crt.advproject.gcc.exe.release.1462475879" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release">
+								<option id="com.crt.advproject.gcc.thumb.1369967603" name="Thumb mode" superClass="com.crt.advproject.gcc.thumb" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+								<option id="com.crt.advproject.gcc.arch.468728433" name="Architecture" superClass="com.crt.advproject.gcc.arch" useByScannerDiscovery="false" value="com.crt.advproject.gcc.target.cm4" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1048987040" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="_KINETIS"/>
+									<listOptionValue builtIn="false" value="_KDS"/>
+									<listOptionValue builtIn="false" value="_GNU"/>
+									<listOptionValue builtIn="false" value="__REDLIB__"/>
+								</option>
+								<option id="gnu.c.compiler.option.misc.other.1269589432" name="Other flags" superClass="gnu.c.compiler.option.misc.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -fno-builtin -ffunction-sections -fdata-sections -fsingle-precision-constant" valueType="string"/>
+								<option id="gnu.c.compiler.option.optimization.flags.1759919892" name="Other optimization flags" superClass="gnu.c.compiler.option.optimization.flags" useByScannerDiscovery="false" value="" valueType="string"/>
+								<option id="com.crt.advproject.gcc.hdrlib.2101614262" name="Library headers" superClass="com.crt.advproject.gcc.hdrlib" useByScannerDiscovery="false" value="com.crt.advproject.gcc.hdrlib.codered" valueType="enumerated"/>
+								<option id="com.crt.advproject.gcc.specs.1949179786" name="Specs" superClass="com.crt.advproject.gcc.specs" useByScannerDiscovery="false" value="com.crt.advproject.gcc.specs.codered" valueType="enumerated"/>
+								<option id="com.crt.advproject.gcc.fpu.1515046969" name="Floating point" superClass="com.crt.advproject.gcc.fpu" useByScannerDiscovery="false" value="com.crt.advproject.gcc.fpu.fpv4.hard" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.include.paths.1758235143" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerSerialBoot&quot;"/>
+								</option>
+								<option id="com.crt.advproject.c.misc.dialect.567363436" name="Language standard" superClass="com.crt.advproject.c.misc.dialect" useByScannerDiscovery="true" value="com.crt.advproject.misc.dialect.c99" valueType="enumerated"/>
+								<inputType id="com.crt.advproject.compiler.input.1665919761" superClass="com.crt.advproject.compiler.input"/>
+							</tool>
+							<tool id="com.crt.advproject.gas.exe.release.903645817" name="MCU Assembler" superClass="com.crt.advproject.gas.exe.release">
+								<option id="com.crt.advproject.gas.thumb.1231166964" name="Thumb mode" superClass="com.crt.advproject.gas.thumb" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+								<option id="com.crt.advproject.gas.arch.1950413673" name="Architecture" superClass="com.crt.advproject.gas.arch" useByScannerDiscovery="false" value="com.crt.advproject.gas.target.cm4" valueType="enumerated"/>
+								<option id="gnu.both.asm.option.flags.crt.923904741" name="Assembler flags" superClass="gnu.both.asm.option.flags.crt" useByScannerDiscovery="false" value="-c -x assembler-with-cpp -D__REDLIB__" valueType="string"/>
+								<option id="com.crt.advproject.gas.hdrlib.495239872" name="Library headers" superClass="com.crt.advproject.gas.hdrlib" useByScannerDiscovery="false" value="com.crt.advproject.gas.hdrlib.codered" valueType="enumerated"/>
+								<option id="com.crt.advproject.gas.specs.719861546" name="Specs" superClass="com.crt.advproject.gas.specs" useByScannerDiscovery="false" value="com.crt.advproject.gas.specs.codered" valueType="enumerated"/>
+								<option id="com.crt.advproject.gas.fpu.1216277969" name="Floating point" superClass="com.crt.advproject.gas.fpu" useByScannerDiscovery="false" value="com.crt.advproject.gas.fpu.fpv4.hard" valueType="enumerated"/>
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.846048111" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+								<inputType id="com.crt.advproject.assembler.input.1729604236" name="Additional Assembly Source Files" superClass="com.crt.advproject.assembler.input"/>
+							</tool>
+							<tool id="com.crt.advproject.link.cpp.exe.release.1479082939" name="MCU C++ Linker" superClass="com.crt.advproject.link.cpp.exe.release"/>
+							<tool id="com.crt.advproject.link.exe.release.1953778927" name="MCU Linker" superClass="com.crt.advproject.link.exe.release">
+								<option id="com.crt.advproject.link.thumb.1138423936" name="Thumb mode" superClass="com.crt.advproject.link.thumb" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+								<option id="com.crt.advproject.link.memory.heapAndStack.432510815" name="Heap and Stack options" superClass="com.crt.advproject.link.memory.heapAndStack" useByScannerDiscovery="false" value="&amp;Heap:Default;Post Data;Default&amp;Stack:Default;End;Default" valueType="string"/>
+								<option id="com.crt.advproject.link.gcc.multicore.master.userobjs.477625051" name="Slave Objects (not visible)" superClass="com.crt.advproject.link.gcc.multicore.master.userobjs" useByScannerDiscovery="false" valueType="userObjs"/>
+								<option id="com.crt.advproject.link.arch.720599984" name="Architecture" superClass="com.crt.advproject.link.arch" useByScannerDiscovery="false" value="com.crt.advproject.link.target.cm4" valueType="enumerated"/>
+								<option id="com.crt.advproject.link.script.1489684750" name="Linker script" superClass="com.crt.advproject.link.script" useByScannerDiscovery="false" value="K_1M_256.ld" valueType="string"/>
+								<option id="com.crt.advproject.link.manage.1398554095" name="Manage linker script" superClass="com.crt.advproject.link.manage" useByScannerDiscovery="false" value="false" valueType="boolean"/>
+								<option id="gnu.c.link.option.nostdlibs.1058804759" name="No startup or default libs (-nostdlib)" superClass="gnu.c.link.option.nostdlibs" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+								<option id="gnu.c.link.option.other.981312112" name="Other options (-Xlinker [option])" superClass="gnu.c.link.option.other" useByScannerDiscovery="false" valueType="stringList">
+									<listOptionValue builtIn="false" value="-Map=&quot;${BuildArtifactFileBaseName}.map&quot;"/>
+									<listOptionValue builtIn="false" value="--gc-sections"/>
+									<listOptionValue builtIn="false" value="-print-memory-usage"/>
+								</option>
+								<option id="com.crt.advproject.link.gcc.hdrlib.1309018180" name="Library" superClass="com.crt.advproject.link.gcc.hdrlib" useByScannerDiscovery="false" value="com.crt.advproject.gcc.link.hdrlib.codered.none" valueType="enumerated"/>
+								<option id="com.crt.advproject.link.fpu.1867905446" name="Floating point" superClass="com.crt.advproject.link.fpu" useByScannerDiscovery="false" value="com.crt.advproject.link.fpu.fpv4.hard" valueType="enumerated"/>
+								<option id="com.crt.advproject.link.crpenable.1943952751" name="Enable automatic placement of Code Read Protection field in image" superClass="com.crt.advproject.link.crpenable" useByScannerDiscovery="false"/>
+								<option id="com.crt.advproject.link.gcc.multicore.slave.331855094" name="Multicore configuration" superClass="com.crt.advproject.link.gcc.multicore.slave" useByScannerDiscovery="false"/>
+								<option defaultValue="com.crt.advproject.heapAndStack.lpcXpressoStyle" id="com.crt.advproject.link.memory.heapAndStack.style.1345655357" name="Heap and Stack placement" superClass="com.crt.advproject.link.memory.heapAndStack.style" useByScannerDiscovery="false" value="com.crt.advproject.heapAndStack.mcuXpressoStyle" valueType="enumerated"/>
+								<option id="com.crt.advproject.link.scriptdir.234515157" name="Script path" superClass="com.crt.advproject.link.scriptdir" useByScannerDiscovery="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4/GNU_Kinetis&quot;" valueType="string"/>
+								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.1145025574" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+						</toolChain>
+					</folderInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.2057553445.FreeRTOS/Source/event_groups.c" name="event_groups.c" rcbsApplicability="disable" resourcePath="FreeRTOS/Source/event_groups.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.603984999">
+						<tool id="com.crt.advproject.gcc.exe.release.603984999" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.1462475879">
+							<option id="gnu.c.compiler.option.include.paths.1681200438" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/include&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/portable/GCC/ARM_CM4F&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.986739960" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+					</fileInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.2057553445.FreeRTOS/Source/timers.c" name="timers.c" rcbsApplicability="disable" resourcePath="FreeRTOS/Source/timers.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.2132024815">
+						<tool id="com.crt.advproject.gcc.exe.release.2132024815" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.1462475879">
+							<option id="gnu.c.compiler.option.include.paths.557132985" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/include&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/portable/GCC/ARM_CM4F&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.178691186" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+						<tool customBuildStep="true" id="org.eclipse.cdt.managedbuilder.ui.rcbs.81014646.2034153924" name="Resource Custom Build Step">
+							<inputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.inputtype.2134899043.1293008059" name="Resource Custom Build Step Input Type">
+								<additionalInput kind="additionalinputdependency" paths=""/>
+							</inputType>
+							<outputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.outputtype.1193791024.242072357" name="Resource Custom Build Step Output Type"/>
+						</tool>
+					</fileInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.2057553445.FreeRTOS/Source/list.c" name="list.c" rcbsApplicability="disable" resourcePath="FreeRTOS/Source/list.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.1900215367">
+						<tool id="com.crt.advproject.gcc.exe.release.1900215367" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.1462475879">
+							<option id="gnu.c.compiler.option.include.paths.2121228399" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/include&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/portable/GCC/ARM_CM4F&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.1381126798" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+					</fileInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.2057553445.FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c" name="port.c" rcbsApplicability="disable" resourcePath="FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.436049217">
+						<tool id="com.crt.advproject.gcc.exe.release.436049217" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.1462475879">
+							<option id="gnu.c.compiler.option.include.paths.444757339" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/include&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/portable/GCC/ARM_CM4F&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.787258993" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+						<tool customBuildStep="true" id="org.eclipse.cdt.managedbuilder.ui.rcbs.10814160.473962774" name="Resource Custom Build Step">
+							<inputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.inputtype.1144375259.1517768013" name="Resource Custom Build Step Input Type">
+								<additionalInput kind="additionalinputdependency" paths=""/>
+							</inputType>
+							<outputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.outputtype.1565896375.2043189373" name="Resource Custom Build Step Output Type"/>
+						</tool>
+					</fileInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.2057553445.FreeRTOS/Source/queue.c" name="queue.c" rcbsApplicability="disable" resourcePath="FreeRTOS/Source/queue.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.1265711305">
+						<tool id="com.crt.advproject.gcc.exe.release.1265711305" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.1462475879">
+							<option id="gnu.c.compiler.option.include.paths.1745505240" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/include&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/portable/GCC/ARM_CM4F&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.1361266636" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+					</fileInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.2057553445.FreeRTOS/Source/tasks.c" name="tasks.c" rcbsApplicability="disable" resourcePath="FreeRTOS/Source/tasks.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.712423891">
+						<tool id="com.crt.advproject.gcc.exe.release.712423891" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.1462475879">
+							<option id="gnu.c.compiler.option.include.paths.75982013" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/include&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/portable/GCC/ARM_CM4F&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.709840970" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+						<tool customBuildStep="true" id="org.eclipse.cdt.managedbuilder.ui.rcbs.1446675209.1180309078" name="Resource Custom Build Step">
+							<inputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.inputtype.1987438977.1574683845" name="Resource Custom Build Step Input Type">
+								<additionalInput kind="additionalinputdependency" paths=""/>
+							</inputType>
+							<outputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.outputtype.1856225820.1124048976" name="Resource Custom Build Step Output Type"/>
+						</tool>
+					</fileInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.2057553445.FreeRTOS/Source/croutine.c" name="croutine.c" rcbsApplicability="disable" resourcePath="FreeRTOS/Source/croutine.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.1893098533">
+						<tool id="com.crt.advproject.gcc.exe.release.1893098533" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.1462475879">
+							<option id="gnu.c.compiler.option.include.paths.464071596" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/include&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/portable/GCC/ARM_CM4F&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.811500162" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+						<tool customBuildStep="true" id="org.eclipse.cdt.managedbuilder.ui.rcbs.1247716530.837866504" name="Resource Custom Build Step">
+							<inputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.inputtype.1469236493.397913484" name="Resource Custom Build Step Input Type">
+								<additionalInput kind="additionalinputdependency" paths=""/>
+							</inputType>
+							<outputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.outputtype.1458831098.512113932" name="Resource Custom Build Step Output Type"/>
+						</tool>
+					</fileInfo>
+					<sourceEntries>
+						<entry excluding="FreeRTOS|Applications/uTaskerSerialBoot/Simulator|Applications/uTaskerV1.4|Hardware/Kinetis/kinetis_boot.c|FreeRTOS/Source/portable/GCC/ARM_CM7|FreeRTOS/Source/portable/GCC/ARM_CM4_MPU|FreeRTOS/Source/portable/GCC/ARM_CM3_MPU|FreeRTOS/Source/portable/GCC/ARM_CM3|FreeRTOS/Source/portable/GCC/ARM_CM0|FreeRTOS/Source/portable/RVDS|FreeRTOS/Source/portable/MSVC-MingW|FreeRTOS/Source/portable/MemMang|FreeRTOS/Source/portable/Keil|FreeRTOS/Source/portable/IAR|FreeRTOS/Source/portable/Common|Hardware/Kinetis/kinetis_asm.s|Hardware/Kinetis/kinetisSim.c|Applications/uTaskerBoot|Tools|WinSim" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="com.crt.advproject.config.exe.release.975616254.1431784295.1273323667">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.crt.advproject.config.exe.release.975616254.1431784295.1273323667" moduleId="org.eclipse.cdt.core.settings" name="uTaskerBM_loader">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactExtension="elf" artifactName="uTaskerBM_loader" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" cleanCommand="rm -rf" description="&quot;Bare-minimum&quot; loader build" errorParsers="org.eclipse.cdt.core.CWDLocator;org.eclipse.cdt.core.GmakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser" id="com.crt.advproject.config.exe.release.975616254.1431784295.1273323667" name="uTaskerBM_loader" parent="com.crt.advproject.config.exe.release" postannouncebuildStep="Run a bat file to generate various outputs formats" postbuildStep="&quot;${ProjDirPath}/Applications/uTaskerBoot/MCUXpresso/uTaskerBM_loader/generate.bat&quot;">
+					<folderInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.1273323667." name="/" resourcePath="">
+						<toolChain id="com.crt.advproject.toolchain.exe.release.374319907" name="NXP MCU Tools" superClass="com.crt.advproject.toolchain.exe.release">
+							<targetPlatform binaryParser="org.eclipse.cdt.core.ELF;org.eclipse.cdt.core.GNU_ELF" id="com.crt.advproject.platform.exe.release.280585626" name="ARM-based MCU (Release)" superClass="com.crt.advproject.platform.exe.release"/>
+							<builder buildPath="${workspace_loc:/test1}/Release" id="com.crt.advproject.builder.exe.release.582548751" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="com.crt.advproject.builder.exe.release"/>
+							<tool id="com.crt.advproject.cpp.exe.release.362304118" name="MCU C++ Compiler" superClass="com.crt.advproject.cpp.exe.release"/>
+							<tool id="com.crt.advproject.gcc.exe.release.217866019" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release">
+								<option id="com.crt.advproject.gcc.thumb.679168187" name="Thumb mode" superClass="com.crt.advproject.gcc.thumb" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+								<option id="com.crt.advproject.gcc.arch.1545729010" name="Architecture" superClass="com.crt.advproject.gcc.arch" useByScannerDiscovery="false" value="com.crt.advproject.gcc.target.cm4" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1163217815" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="_KINETIS"/>
+									<listOptionValue builtIn="false" value="_KDS"/>
+									<listOptionValue builtIn="false" value="_GNU"/>
+									<listOptionValue builtIn="false" value="__REDLIB__"/>
+								</option>
+								<option id="gnu.c.compiler.option.misc.other.1131564240" name="Other flags" superClass="gnu.c.compiler.option.misc.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -fno-builtin -ffunction-sections -fdata-sections -fsingle-precision-constant" valueType="string"/>
+								<option id="gnu.c.compiler.option.optimization.flags.1671426224" name="Other optimization flags" superClass="gnu.c.compiler.option.optimization.flags" useByScannerDiscovery="false" value="" valueType="string"/>
+								<option id="com.crt.advproject.gcc.hdrlib.2024917512" name="Library headers" superClass="com.crt.advproject.gcc.hdrlib" useByScannerDiscovery="false" value="com.crt.advproject.gcc.hdrlib.codered" valueType="enumerated"/>
+								<option id="com.crt.advproject.gcc.specs.1845784656" name="Specs" superClass="com.crt.advproject.gcc.specs" useByScannerDiscovery="false" value="com.crt.advproject.gcc.specs.codered" valueType="enumerated"/>
+								<option id="com.crt.advproject.gcc.fpu.1391258533" name="Floating point" superClass="com.crt.advproject.gcc.fpu" useByScannerDiscovery="false" value="com.crt.advproject.gcc.fpu.fpv4.hard" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.include.paths.2117490476" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerBoot&quot;"/>
+								</option>
+								<option id="com.crt.advproject.c.misc.dialect.1208520695" name="Language standard" superClass="com.crt.advproject.c.misc.dialect" useByScannerDiscovery="true" value="com.crt.advproject.misc.dialect.c99" valueType="enumerated"/>
+								<inputType id="com.crt.advproject.compiler.input.759793699" superClass="com.crt.advproject.compiler.input"/>
+							</tool>
+							<tool id="com.crt.advproject.gas.exe.release.1468614921" name="MCU Assembler" superClass="com.crt.advproject.gas.exe.release">
+								<option id="com.crt.advproject.gas.thumb.1711933420" name="Thumb mode" superClass="com.crt.advproject.gas.thumb" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+								<option id="com.crt.advproject.gas.arch.221113708" name="Architecture" superClass="com.crt.advproject.gas.arch" useByScannerDiscovery="false" value="com.crt.advproject.gas.target.cm4" valueType="enumerated"/>
+								<option id="gnu.both.asm.option.flags.crt.1848736178" name="Assembler flags" superClass="gnu.both.asm.option.flags.crt" useByScannerDiscovery="false" value="-c -x assembler-with-cpp -D__REDLIB__" valueType="string"/>
+								<option id="com.crt.advproject.gas.hdrlib.936980479" name="Library headers" superClass="com.crt.advproject.gas.hdrlib" useByScannerDiscovery="false" value="com.crt.advproject.gas.hdrlib.codered" valueType="enumerated"/>
+								<option id="com.crt.advproject.gas.specs.1369798824" name="Specs" superClass="com.crt.advproject.gas.specs" useByScannerDiscovery="false" value="com.crt.advproject.gas.specs.codered" valueType="enumerated"/>
+								<option id="com.crt.advproject.gas.fpu.1431666466" name="Floating point" superClass="com.crt.advproject.gas.fpu" useByScannerDiscovery="false" value="com.crt.advproject.gas.fpu.fpv4.hard" valueType="enumerated"/>
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1347598631" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+								<inputType id="com.crt.advproject.assembler.input.868807910" name="Additional Assembly Source Files" superClass="com.crt.advproject.assembler.input"/>
+							</tool>
+							<tool id="com.crt.advproject.link.cpp.exe.release.334407525" name="MCU C++ Linker" superClass="com.crt.advproject.link.cpp.exe.release"/>
+							<tool id="com.crt.advproject.link.exe.release.594840664" name="MCU Linker" superClass="com.crt.advproject.link.exe.release">
+								<option id="com.crt.advproject.link.thumb.1357173113" name="Thumb mode" superClass="com.crt.advproject.link.thumb" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+								<option id="com.crt.advproject.link.memory.heapAndStack.449185762" name="Heap and Stack options" superClass="com.crt.advproject.link.memory.heapAndStack" useByScannerDiscovery="false" value="&amp;Heap:Default;Post Data;Default&amp;Stack:Default;End;Default" valueType="string"/>
+								<option id="com.crt.advproject.link.gcc.multicore.master.userobjs.1709580662" name="Slave Objects (not visible)" superClass="com.crt.advproject.link.gcc.multicore.master.userobjs" useByScannerDiscovery="false" valueType="userObjs"/>
+								<option id="com.crt.advproject.link.arch.1770502523" name="Architecture" superClass="com.crt.advproject.link.arch" useByScannerDiscovery="false" value="com.crt.advproject.link.target.cm4" valueType="enumerated"/>
+								<option id="com.crt.advproject.link.script.1262317472" name="Linker script" superClass="com.crt.advproject.link.script" useByScannerDiscovery="false" value="K_1M_256.ld" valueType="string"/>
+								<option id="com.crt.advproject.link.manage.206571863" name="Manage linker script" superClass="com.crt.advproject.link.manage" useByScannerDiscovery="false" value="false" valueType="boolean"/>
+								<option id="gnu.c.link.option.nostdlibs.974255787" name="No startup or default libs (-nostdlib)" superClass="gnu.c.link.option.nostdlibs" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+								<option id="gnu.c.link.option.other.27668189" name="Other options (-Xlinker [option])" superClass="gnu.c.link.option.other" useByScannerDiscovery="false" valueType="stringList">
+									<listOptionValue builtIn="false" value="-Map=&quot;${BuildArtifactFileBaseName}.map&quot;"/>
+									<listOptionValue builtIn="false" value="--gc-sections"/>
+									<listOptionValue builtIn="false" value="-print-memory-usage"/>
+								</option>
+								<option id="com.crt.advproject.link.gcc.hdrlib.1146416661" name="Library" superClass="com.crt.advproject.link.gcc.hdrlib" useByScannerDiscovery="false" value="com.crt.advproject.gcc.link.hdrlib.codered.none" valueType="enumerated"/>
+								<option id="com.crt.advproject.link.fpu.539200507" name="Floating point" superClass="com.crt.advproject.link.fpu" useByScannerDiscovery="false" value="com.crt.advproject.link.fpu.fpv4.hard" valueType="enumerated"/>
+								<option id="com.crt.advproject.link.crpenable.1236792303" name="Enable automatic placement of Code Read Protection field in image" superClass="com.crt.advproject.link.crpenable" useByScannerDiscovery="false"/>
+								<option id="com.crt.advproject.link.gcc.multicore.slave.112229586" name="Multicore configuration" superClass="com.crt.advproject.link.gcc.multicore.slave" useByScannerDiscovery="false"/>
+								<option defaultValue="com.crt.advproject.heapAndStack.lpcXpressoStyle" id="com.crt.advproject.link.memory.heapAndStack.style.1261427074" name="Heap and Stack placement" superClass="com.crt.advproject.link.memory.heapAndStack.style" useByScannerDiscovery="false" value="com.crt.advproject.heapAndStack.mcuXpressoStyle" valueType="enumerated"/>
+								<option id="com.crt.advproject.link.scriptdir.686493710" name="Script path" superClass="com.crt.advproject.link.scriptdir" useByScannerDiscovery="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4/GNU_Kinetis&quot;" valueType="string"/>
+								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.141341229" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+						</toolChain>
+					</folderInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.1273323667.FreeRTOS/Source/event_groups.c" name="event_groups.c" rcbsApplicability="disable" resourcePath="FreeRTOS/Source/event_groups.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.521808375">
+						<tool id="com.crt.advproject.gcc.exe.release.521808375" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.217866019">
+							<option id="gnu.c.compiler.option.include.paths.1732494972" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/include&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/portable/GCC/ARM_CM4F&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.1991219178" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+					</fileInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.1273323667.FreeRTOS/Source/timers.c" name="timers.c" rcbsApplicability="disable" resourcePath="FreeRTOS/Source/timers.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.184279703">
+						<tool id="com.crt.advproject.gcc.exe.release.184279703" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.217866019">
+							<option id="gnu.c.compiler.option.include.paths.2118832440" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/include&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/portable/GCC/ARM_CM4F&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.860025967" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+						<tool customBuildStep="true" id="org.eclipse.cdt.managedbuilder.ui.rcbs.81014646.590892744" name="Resource Custom Build Step">
+							<inputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.inputtype.2134899043.685101838" name="Resource Custom Build Step Input Type">
+								<additionalInput kind="additionalinputdependency" paths=""/>
+							</inputType>
+							<outputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.outputtype.1193791024.1483784588" name="Resource Custom Build Step Output Type"/>
+						</tool>
+					</fileInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.1273323667.FreeRTOS/Source/list.c" name="list.c" rcbsApplicability="disable" resourcePath="FreeRTOS/Source/list.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.1455092795">
+						<tool id="com.crt.advproject.gcc.exe.release.1455092795" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.217866019">
+							<option id="gnu.c.compiler.option.include.paths.340378389" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/include&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/portable/GCC/ARM_CM4F&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.1652598717" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+					</fileInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.1273323667.FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c" name="port.c" rcbsApplicability="disable" resourcePath="FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.1849436216">
+						<tool id="com.crt.advproject.gcc.exe.release.1849436216" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.217866019">
+							<option id="gnu.c.compiler.option.include.paths.348486165" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/include&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/portable/GCC/ARM_CM4F&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.358406103" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+						<tool customBuildStep="true" id="org.eclipse.cdt.managedbuilder.ui.rcbs.10814160.1214023103" name="Resource Custom Build Step">
+							<inputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.inputtype.1144375259.1379227956" name="Resource Custom Build Step Input Type">
+								<additionalInput kind="additionalinputdependency" paths=""/>
+							</inputType>
+							<outputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.outputtype.1565896375.1255723437" name="Resource Custom Build Step Output Type"/>
+						</tool>
+					</fileInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.1273323667.FreeRTOS/Source/queue.c" name="queue.c" rcbsApplicability="disable" resourcePath="FreeRTOS/Source/queue.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.868111863">
+						<tool id="com.crt.advproject.gcc.exe.release.868111863" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.217866019">
+							<option id="gnu.c.compiler.option.include.paths.1973930469" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/include&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/portable/GCC/ARM_CM4F&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.1559629093" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+					</fileInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.1273323667.FreeRTOS/Source/tasks.c" name="tasks.c" rcbsApplicability="disable" resourcePath="FreeRTOS/Source/tasks.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.2030521379">
+						<tool id="com.crt.advproject.gcc.exe.release.2030521379" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.217866019">
+							<option id="gnu.c.compiler.option.include.paths.711744139" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/include&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/portable/GCC/ARM_CM4F&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.775329866" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+						<tool customBuildStep="true" id="org.eclipse.cdt.managedbuilder.ui.rcbs.1446675209.767795029" name="Resource Custom Build Step">
+							<inputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.inputtype.1987438977.985806470" name="Resource Custom Build Step Input Type">
+								<additionalInput kind="additionalinputdependency" paths=""/>
+							</inputType>
+							<outputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.outputtype.1856225820.1935306529" name="Resource Custom Build Step Output Type"/>
+						</tool>
+					</fileInfo>
+					<fileInfo id="com.crt.advproject.config.exe.release.975616254.1431784295.1273323667.FreeRTOS/Source/croutine.c" name="croutine.c" rcbsApplicability="disable" resourcePath="FreeRTOS/Source/croutine.c" toolsToInvoke="com.crt.advproject.gcc.exe.release.1338788681">
+						<tool id="com.crt.advproject.gcc.exe.release.1338788681" name="MCU C Compiler" superClass="com.crt.advproject.gcc.exe.release.217866019">
+							<option id="gnu.c.compiler.option.include.paths.1033718725" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Applications/uTaskerV1.4&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/include&quot;"/>
+								<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/FreeRTOS/Source/portable/GCC/ARM_CM4F&quot;"/>
+							</option>
+							<inputType id="com.crt.advproject.compiler.input.1298387694" superClass="com.crt.advproject.compiler.input"/>
+						</tool>
+						<tool customBuildStep="true" id="org.eclipse.cdt.managedbuilder.ui.rcbs.1247716530.1067612871" name="Resource Custom Build Step">
+							<inputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.inputtype.1469236493.1550703637" name="Resource Custom Build Step Input Type">
+								<additionalInput kind="additionalinputdependency" paths=""/>
+							</inputType>
+							<outputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.outputtype.1458831098.1887778310" name="Resource Custom Build Step Output Type"/>
+						</tool>
+					</fileInfo>
+					<sourceEntries>
+						<entry excluding="uTasker|uTasker/Driver.c|Applications/uTaskerV1.4|uTasker/utFAT|uTasker/uGLCDLIB|uTasker/MODBUS|stack|FreeRTOS|Hardware/Kinetis/Crypto|Hardware/Kinetis/CMSIS_DSP|Hardware/Kinetis/kinetis.c|Applications/uTaskerBoot/Simulator|FreeRTOS/Source/portable/GCC/ARM_CM7|FreeRTOS/Source/portable/GCC/ARM_CM4_MPU|FreeRTOS/Source/portable/GCC/ARM_CM3_MPU|FreeRTOS/Source/portable/GCC/ARM_CM3|FreeRTOS/Source/portable/GCC/ARM_CM0|FreeRTOS/Source/portable/RVDS|FreeRTOS/Source/portable/MSVC-MingW|FreeRTOS/Source/portable/MemMang|FreeRTOS/Source/portable/Keil|FreeRTOS/Source/portable/IAR|FreeRTOS/Source/portable/Common|Hardware/Kinetis/kinetis_asm.s|Hardware/Kinetis/kinetisSim.c|Applications/uTaskerSerialBoot|Tools|WinSim" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+	</storageModule>
+	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+		<project id="test1.com.crt.advproject.projecttype.exe.1137726752" name="Executable" projectType="com.crt.advproject.projecttype.exe"/>
+	</storageModule>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+	<storageModule moduleId="com.crt.config">
+		<projectStorage>&lt;?xml version="1.0" encoding="UTF-8"?&gt;&#13;
+&lt;TargetConfig&gt;&#13;
+&lt;Properties property_3="NXP" property_4="Generic-M4" property_count="5" version="70200"/&gt;&#13;
+&lt;infoList vendor="NXP"&gt;&lt;info chip="Generic-M4" match_id="0x0" name="Generic-M4" stub="crt_emu_cm3_gen"&gt;&lt;chip&gt;&lt;name&gt;Generic-M4&lt;/name&gt;&#13;
+&lt;family&gt;Generic-M4&lt;/family&gt;&#13;
+&lt;vendor&gt;NXP (formerly Philips)&lt;/vendor&gt;&#13;
+&lt;reset board="None" core="Real" sys="Real"/&gt;&#13;
+&lt;clock changeable="TRUE" freq="12MHz" is_accurate="TRUE"/&gt;&#13;
+&lt;memory can_program="true" id="Flash" is_ro="true" type="Flash"/&gt;&#13;
+&lt;memory id="RAM" type="RAM"/&gt;&#13;
+&lt;memory id="Periph" is_volatile="true" type="Peripheral"/&gt;&#13;
+&lt;memoryInstance derived_from="RAM" id="RamLoc" location="0x0" size="0x4000"/&gt;&#13;
+&lt;peripheralInstance derived_from="V7M_MPU" determined="infoFile" id="MPU" location="0xe000ed90"/&gt;&#13;
+&lt;peripheralInstance derived_from="V7M_NVIC" determined="infoFile" id="NVIC" location="0xe000e000"/&gt;&#13;
+&lt;peripheralInstance derived_from="V7M_DCR" determined="infoFile" id="DCR" location="0xe000edf0"/&gt;&#13;
+&lt;peripheralInstance derived_from="V7M_ITM" determined="infoFile" id="ITM" location="0xe0000000"/&gt;&#13;
+&lt;/chip&gt;&#13;
+&lt;processor&gt;&lt;name gcc_name="cortex-m4"&gt;Cortex-M4&lt;/name&gt;&#13;
+&lt;family&gt;Cortex-M&lt;/family&gt;&#13;
+&lt;/processor&gt;&#13;
+&lt;link href="CM3_peripheral.xme" show="embed" type="simple"/&gt;&#13;
+&lt;/info&gt;&#13;
+&lt;/infoList&gt;&#13;
+&lt;/TargetConfig&gt;</projectStorage>
+	</storageModule>
+	<storageModule moduleId="com.crt.advproject"/>
+	<storageModule moduleId="refreshScope"/>
+	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
+</cproject>
