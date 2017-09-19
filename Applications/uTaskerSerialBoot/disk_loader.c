@@ -11,7 +11,7 @@
     File:      disk_loader.c
     Project:   uTasker disk loader
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2017
     *********************************************************************
     03.03.2012 Add TWR_K53N512                                           {1}
     19.09.2012 Close Flash buffer when device has flash with row writing {2}
@@ -26,8 +26,9 @@
     21.01.2015 Add file object whenever USB-MSD is enabled               {11}
     02.07.2015 Allow existing application to start if no matching file is found and using wildcard matching {12}
     21.07.2015 Add option to start the application by pressing a button (to restart update check and to jump to the [new] application) {13}
-    23.10.2015 Renamed to from SDLoader.c to disk_loader.c
+    23.10.2015 Renamed from SDLoader.c to disk_loader.c
     07.01.2016 Use fnJumpToValidApplication() to start application       {14}
+    20.09.2017 Correct decryption when offset is larger than the file length {15}
 
 */
 
@@ -178,7 +179,7 @@ extern void fnSD_loader(TTASKTABLE *ptrTaskTable)
         ptr_utDirectory = utAllocateDirectory(LOADING_DISK, 0);          // allocate a directory for use by this module associated with D: without path name string length
     }
     else {
-        while (fnRead(PortIDInternal, ucInputMessage, HEADER_LENGTH)) {  // check input queue
+        while (fnRead(PortIDInternal, ucInputMessage, HEADER_LENGTH) != 0) { // check input queue
             if (ucInputMessage[MSG_SOURCE_TASK] == TIMER_EVENT) {        // timer event
                 if (T_CHECK_CARD == ucInputMessage[MSG_TIMER_EVENT]) {   // check whether the disk is ready
                     const UTDISK *ptrDiskInfo = fnGetDiskInfo(LOADING_DISK);
@@ -413,6 +414,7 @@ static int fnUpdateSoftware(int iAppState, UTFILE *ptr_utFile, UPLOAD_HEADER *pt
     static unsigned char  *ptrInternalFlash;
     static unsigned long  ulFileLength;
     int                   iNextState = iAppState;
+    MAX_FILE_LENGTH       toProgram;
     unsigned char         ucBuffer[COPY_BUFFER_SIZE];
 
     switch (iAppState) {
@@ -429,8 +431,7 @@ static int fnUpdateSoftware(int iAppState, UTFILE *ptr_utFile, UPLOAD_HEADER *pt
         while (ulCodeOffset >= ptrFile_header->ulCodeLength) {
             ulCodeOffset -= ptrFile_header->ulCodeLength;
         }
-      //ptrInternalFlash += ulCodeOffset;
-        utSeek(&utFile_decrypt, (SIZE_OF_UPLOAD_HEADER + CODE_OFFSET), UTFAT_SEEK_SET); // move to the start of the encrypted code
+        utSeek(&utFile_decrypt, (SIZE_OF_UPLOAD_HEADER + ulCodeOffset), UTFAT_SEEK_SET); // {15} move to the start of the encrypted code
         fnDecrypt(0, 0);                                                 // reset decryptor
     #endif
         iNextState = STATE_CHECKING;
@@ -495,7 +496,7 @@ static int fnUpdateSoftware(int iAppState, UTFILE *ptr_utFile, UPLOAD_HEADER *pt
         ptrInternalFlash = (unsigned char *)_UTASKER_APP_START_;
     #if defined ENCRYPTED_CARD_CONTENT                                   // {9}
         ulProgrammed = sizeof(ucCodeStart);
-        utSeek(ptr_utFile, (SIZE_OF_UPLOAD_HEADER + CODE_OFFSET), UTFAT_SEEK_SET); // return to the start of the encrypted code
+        utSeek(ptr_utFile, (SIZE_OF_UPLOAD_HEADER + ulCodeOffset), UTFAT_SEEK_SET); // {15} return to the start of the encrypted code
         utReadFile(ptr_utFile, ucCodeStart, sizeof(ucCodeStart));        // store code start for programming as final step
         fnDecrypt(0, 0);                                                 // reset decryptor
         fnDecrypt(ucCodeStart, sizeof(ucCodeStart));
@@ -511,9 +512,15 @@ static int fnUpdateSoftware(int iAppState, UTFILE *ptr_utFile, UPLOAD_HEADER *pt
         utReadFile(ptr_utFile, ucBuffer, sizeof(ucBuffer));              // read buffer from file
     #if defined ENCRYPTED_CARD_CONTENT                                   // {9}
         fnDecrypt(ucBuffer, ptr_utFile->usLastReadWriteLength);          // decrypt the buffer before programming
-        fnWriteBytesFlash(ptrInternalFlash, ucBuffer, ptr_utFile->usLastReadWriteLength); // program to Flash
-        ptrInternalFlash += ptr_utFile->usLastReadWriteLength;
         ulProgrammed += ptr_utFile->usLastReadWriteLength;
+        if (ulProgrammed > ptrFile_header->ulCodeLength) {
+            toProgram = (ptr_utFile->usLastReadWriteLength - (ulProgrammed - ptrFile_header->ulCodeLength)); // final content length
+        }
+        else {
+            toProgram = ptr_utFile->usLastReadWriteLength;
+        }
+        fnWriteBytesFlash(ptrInternalFlash, ucBuffer, toProgram);        // program to Flash
+        ptrInternalFlash += ptr_utFile->usLastReadWriteLength;
         if (ptr_utFile->ulFilePosition >= ptr_utFile->ulFileSize) {      // end of file reached
             utSeek(ptr_utFile, SIZE_OF_UPLOAD_HEADER, UTFAT_SEEK_SET);   // move back to start of code in file
             ptr_utFile->usLastReadWriteLength = sizeof(ucBuffer);        // avoid terminating
