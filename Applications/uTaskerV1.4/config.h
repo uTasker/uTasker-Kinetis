@@ -106,7 +106,7 @@
 //#define TWR_K21D50M
 //#define TWR_K21F120M
 //#define FRDM_K22F
-#define K22F128_100M
+//#define K22F128_100M
 //#define TWR_K22F120M
 //#define BLAZE_K22
 //#define TWR_K24F120M
@@ -134,7 +134,7 @@
 //#define FRDM_K66F                                                      // freedom board http://www.utasker.com/kinetis/FRDM-K66F.html
 //#define TEENSY_3_6                                                     // USB development board with K66FX1M0 - http://www.utasker.com/kinetis/TEENSY_3.6.html
 
-//#define TWR_K70F120M                                                   // K processors Cortex M4 with graphical LCD, Ethernet, USB, encryption, tamper
+#define TWR_K70F120M                                                     // K processors Cortex M4 with graphical LCD, Ethernet, USB, encryption, tamper
 //#define EMCRAFT_K70F120M
 //#define K70F150M_12M                                                   // development board with 150MHz K70 and 12MHz crystal
 
@@ -792,7 +792,7 @@
 
 // Configure MODBUS extension package
 //
-#define USE_MODBUS                                                       // activate MODBUS support in the project
+//#define USE_MODBUS                                                     // activate MODBUS support in the project
 #if defined USE_MODBUS
     #define USE_MODBUS_SLAVE                                             // slave capability supported
     //#define NO_SLAVE_MODBUS_READ_COILS                                 // disable specific slave public function support
@@ -945,7 +945,7 @@
             #define NUMBER_USB     (5 + 1)                               // physical queues (control plus 5 endpoints)
         #else                                                            // define one or more device classes (multiple classes creates a composite device)
             #define USE_USB_CDC                                          // USB-CDC (use also for Modbus over USB)
-            #define USE_USB_MSD                                          // needs SD card to compile (or alternatives FLASH_FAT / SPI_FLASH_FAT / FAT_EMULATION)
+          //#define USE_USB_MSD                                          // needs SD card to compile (or alternatives FLASH_FAT / SPI_FLASH_FAT / FAT_EMULATION)
           //#define USE_USB_HID_MOUSE                                    // human interface device (mouse)
           //#define USE_USB_HID_KEYBOARD                                 // human interface device (keyboard)
           //#define USE_USB_HID_RAW                                      // human interface device (raw)
@@ -961,7 +961,7 @@
                 #define NUMBER_USB_HID 0
             #endif
             #if defined USE_USB_MSD
-                #define FAT_EMULATION                                    // support FAT emulation (full mass-storage not required by USB-MSD)
+              //#define FAT_EMULATION                                    // support FAT emulation (full mass-storage not required by USB-MSD)
                 #if defined FAT_EMULATION
                     #define NUMBER_USB_MSD 2                             // single MSD LUM (set to 2 for SD card and emulated drive)
                     #define EMULATED_FAT_LUMS         1                  // the number of logical units on emulated drive
@@ -1075,9 +1075,10 @@
     #define I2C_INTERFACE                                                // enable I2C interface driver
     #define SUPPORT_FLUSH_I2C
 #else
-    #define I2C_INTERFACE
+  //#define I2C_INTERFACE
 #endif
 #if defined I2C_INTERFACE
+    #define NUMBER_I2C       I2C_AVAILABLE                               // I2C interfaces available
   //#define I2C_SLAVE_MODE                                               // support slave mode
 #else
     #define NUMBER_I2C     0                                             // no physical queue needed
@@ -1293,7 +1294,7 @@
             #define CONTROL_WINDOW_SIZE                                  // support variable windows size to quench reception
 
             #define USE_FTP                                              // enable FTP - needs TCP
-            #define USE_FTP_CLIENT                                       // enable FTP client - needs TCP
+          //#define USE_FTP_CLIENT                                       // enable FTP client - needs TCP
             #define USE_SMTP                                             // enable SMTP - needs TCP
           //#define USE_POP3                                             // enable POP3 Email - needs TCP
             #define USE_HTTP                                             // support embedded Web server - needs TCP
