@@ -414,7 +414,9 @@ static int fnUpdateSoftware(int iAppState, UTFILE *ptr_utFile, UPLOAD_HEADER *pt
     static unsigned char  *ptrInternalFlash;
     static unsigned long  ulFileLength;
     int                   iNextState = iAppState;
+    #if defined ENCRYPTED_CARD_CONTENT
     MAX_FILE_LENGTH       toProgram;
+    #endif
     unsigned char         ucBuffer[COPY_BUFFER_SIZE];
 
     switch (iAppState) {

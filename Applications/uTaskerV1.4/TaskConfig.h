@@ -318,7 +318,7 @@ const UTASKTABLEINIT ctTaskTable[] = {
     {"keeper",    fnTimeKeeper, SMALL_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP}, // time keeper task
 #endif
 #if defined QUICK_DEV_TASKS
-    {"1",    fnQuickTask1, MEDIUM_QUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP}, // quick development  tasks
+    {"1",    fnQuickTask1, MEDIUM_QUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_ACTIVATE}, // quick development  tasks (runs immediatley and can be used to start other development tasks)
     {"2",    fnQuickTask2, MEDIUM_QUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP},
     {"3",    fnQuickTask3, MEDIUM_QUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP},
     {"4",    fnQuickTask4, MEDIUM_QUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP},

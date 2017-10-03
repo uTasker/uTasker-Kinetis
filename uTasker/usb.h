@@ -106,7 +106,7 @@ typedef struct _PACK stUSB_DEVICE_DESCRIPTOR
 //
 #define DEVICE_CLASS_AT_INTERFACE                        0,0,0           // class defined at interface level
 #define DEVICE_CLASS_AUDIO                               1,0,0           // Audio Device Class
-//#define DEVICE_CLASS_COMMUNICATION_AND_CONTROL         2,0,0           // Communication and Communication Device Class Control
+#define DEVICE_CLASS_COMMUNICATION_AND_CONTROL_MANUAL    2,0,0           // Communication and Communication Device Class Control
 #define DEVICE_CLASS_COMMUNICATION_AND_CONTROL           2,2,0           // Communication and Communication Device Class Control - recommended by Microsoft for Windows 10 (no installation required)
 #define DEVICE_CLASS_COMMUNICATION_ABSTRACT_VENDOR       2,2,0xff        // Communication and Communication Device Class Control - abstract control mode, vendor specific
 #define DEVICE_CLASS_HID                                 3,0,0           // Human Interface Device Class
@@ -583,7 +583,7 @@ typedef struct _PACK stREMOTE_NDIS_RESPONSE_AVAILABLE
 
 
 #define TYPE_NOTIFICATION_REQUEST         0xa1
-#define RESONSE_NOTIFICATION_AVAILABLE    0x01
+#define RESPONSE_NOTIFICATION_AVAILABLE   0x01
 
 #define RNDIS_MAJOR_VERSION               1
 #define RNDIS_MINOR_VERSION               0

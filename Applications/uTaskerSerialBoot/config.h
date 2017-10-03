@@ -102,8 +102,8 @@
 //#define TEENSY_3_5                                                     // USB development board with K64FX512 - http://www.utasker.com/kinetis/TEENSY_3.5.html
 
 //#define TWR_K65F180M
-#define FRDM_K66F                                                        // freedom board http://www.utasker.com/kinetis/FRDM-K66F.html
-//#define TEENSY_3_6                                                     // USB development board with K66FX1M0 - http://www.utasker.com/kinetis/TEENSY_3.6.html
+//#define FRDM_K66F                                                        // freedom board http://www.utasker.com/kinetis/FRDM-K66F.html
+#define TEENSY_3_6                                                     // USB development board with K66FX1M0 - http://www.utasker.com/kinetis/TEENSY_3.6.html
 
 //#define TWR_K70F120M                                                   // K processors Cortex M4 with graphical LCD, Ethernet, USB, encryption, tamper
 //#define K70F150M_12M                                                   // development board with 150MHz F70 and 12MHz oscillator

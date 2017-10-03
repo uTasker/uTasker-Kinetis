@@ -1559,7 +1559,7 @@ extern int fnModified(CHAR cPar)
 
     case '8':                                                            // DHCPV6 setting change?
     #if defined USE_PARAMETER_BLOCK
-        return ((temp_pars->temp_parameters.usServers & ACTIVE_DHCPV6) != (parameters->usServers & ACTIVE_DHCPV6));
+        return ((temp_pars->temp_parameters.usServers[DEFAULT_NETWORK] & ACTIVE_DHCPV6) != (parameters->usServers[DEFAULT_NETWORK] & ACTIVE_DHCPV6));
     #else
         return 0;
     #endif

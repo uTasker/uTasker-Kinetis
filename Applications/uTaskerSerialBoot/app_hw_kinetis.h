@@ -1608,14 +1608,12 @@
 
     #define BLINK_LED          (LED_RED)
 
-    #if !defined USE_MAINTENANCE
-        #define INIT_WATCHDOG_LED() _CONFIG_DRIVE_PORT_OUTPUT_VALUE(C, (BLINK_LED), (BLINK_LED), (PORT_SRE_SLOW | PORT_DSE_HIGH))
-    #else
-        #define INIT_WATCHDOG_LED()                                      // configured according to user parameters
-    #endif
+    #define INIT_WATCHDOG_LED() _CONFIG_DRIVE_PORT_OUTPUT_VALUE(C, (BLINK_LED), (BLINK_LED), (PORT_SRE_SLOW | PORT_DSE_HIGH))
+
     #define INIT_WATCHDOG_DISABLE() _CONFIG_PORT_INPUT_FAST_LOW(C, (SWITCH_1 | SWITCH_2), PORT_PS_UP_ENABLE) // configure as input
     #define WATCHDOG_DISABLE()     (_READ_PORT_MASK(C, SWITCH_2) == 0)   // pull this input down to disable watchdog (connect pin pad 23 to GND at reset)
     #define FORCE_BOOT()           (_READ_PORT_MASK(C, SWITCH_1) == 0)   // pull this input down to force boot loader mode (connect pin pad 22 to GND at reset)
+    #define RETAIN_LOADER_MODE()   0                                     
 
     #define TOGGLE_WATCHDOG_LED()   _TOGGLE_PORT(C, BLINK_LED)
 

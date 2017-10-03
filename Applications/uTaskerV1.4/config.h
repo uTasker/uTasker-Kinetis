@@ -28,6 +28,7 @@
 //#define BLINKEY                                                        // it give simplest scheduling of a single task called at 200ms rate that retriggers the watchdog and toggles respective the board's heartbeat LED
 //                                                                       // 
 /////////////////////////////////////////////////////////////////////////
+//#define QUICK_DEV_TASKS                                                // add 4 additional tasks for simple and quick development use (located at the end of appication.c)
 
 #define _TICK_RESOLUTION     TICK_UNIT_MS(50)                            // 50ms system tick period - max possible at 50MHz SYSTICK would be about 335ms !
 
@@ -126,7 +127,7 @@
 
 //#define EMCRAFT_K61F150M                                               // K processors Cortex M4 with Ethernet, USB, encryption, tamper, key storage protection area
 
-//#define FRDM_K64F                                                      // next generation K processors Cortex M4 with Ethernet, USB, encryption, tamper, key storage protection area - freedom board http://www.utasker.com/kinetis/FRDM-K64F.html
+#define FRDM_K64F                                                        // next generation K processors Cortex M4 with Ethernet, USB, encryption, tamper, key storage protection area - freedom board http://www.utasker.com/kinetis/FRDM-K64F.html
 //#define TWR_K64F120M                                                   // tower board http://www.utasker.com/kinetis/TWR-K64F120M.html
 //#define TEENSY_3_5                                                     // USB development board with K64FX512 - http://www.utasker.com/kinetis/TEENSY_3.5.html
 //#define FreeLON                                                        // K64 based with integrated LON
@@ -134,7 +135,7 @@
 //#define FRDM_K66F                                                      // freedom board http://www.utasker.com/kinetis/FRDM-K66F.html
 //#define TEENSY_3_6                                                     // USB development board with K66FX1M0 - http://www.utasker.com/kinetis/TEENSY_3.6.html
 
-#define TWR_K70F120M                                                     // K processors Cortex M4 with graphical LCD, Ethernet, USB, encryption, tamper
+//#define TWR_K70F120M                                                   // K processors Cortex M4 with graphical LCD, Ethernet, USB, encryption, tamper
 //#define EMCRAFT_K70F120M
 //#define K70F150M_12M                                                   // development board with 150MHz K70 and 12MHz crystal
 
@@ -1225,7 +1226,7 @@
         //#define ALTERNATIVE_VLAN_COUNT  2                              // alternative VLANs managed (in addition to standard VLAN) - used only together with SUPPORT_DYNAMIC_VLAN
       // Configure TCP/IP services
       //
-      //#define USE_IPV6                                                 // enable IPv6
+        #define USE_IPV6                                                 // enable IPv6
       //#define USE_IPV6INV4                                             // support tunnelling IPv6 ind IPv4
       //#define USE_IPV6INV4_RELAY_DESTINATIONS 2                        // enable relaying to other nodes in the network - the number of destination in the IPv6 in IPv4 relay table
         #define MAX_HW_ADDRESS_LENGTH  MAC_LENGTH                        // set a variable maximum hardware address length - default is Ethernet MAC-48, 6 bytes
@@ -1245,7 +1246,7 @@
         #define ARP_IGNORE_FOREIGN_ENTRIES                               // only add used addresses to ARP table
       //#define RESTRICTED_GATEWAY_INTERFACE                             // used only when multiple interfaces are available, in which case the user must supply fnRestrictGatewayInterface() to decide which interfaces are included in gateway ARP re-resolves (when not used all interfaces are used in a single network environment or only the original interface in a multi-network environment)
         #define USE_ICMP                                                 // enable ICMP
-        #define USE_IGMP                                                 // enable IGMP
+      //#define USE_IGMP                                                 // enable IGMP
             #if defined ENC424J600_INTERFACE && (ETHERNET_INTERFACES > 1)
                 #define IGMP_ALL_HOSTS_INTERFACES   (ETHERNET_INTERFACE | ENC424J00_INTERFACE) // interfaces that IGMP is to work on (enabling the all-host group on all required interfaces - only needed when IP_INTERFACE_COUNT > 1)
             #elif defined RNDIS_IP_INTERFACE && (ETHERNET_INTERFACES > 1)
@@ -1293,16 +1294,16 @@
             #define WINDOWING_BUFFERS      4                             // we can send 4 frames before requiring ACKs
             #define CONTROL_WINDOW_SIZE                                  // support variable windows size to quench reception
 
-            #define USE_FTP                                              // enable FTP - needs TCP
+          //#define USE_FTP                                              // enable FTP - needs TCP
           //#define USE_FTP_CLIENT                                       // enable FTP client - needs TCP
-            #define USE_SMTP                                             // enable SMTP - needs TCP
+          //#define USE_SMTP                                             // enable SMTP - needs TCP
           //#define USE_POP3                                             // enable POP3 Email - needs TCP
             #define USE_HTTP                                             // support embedded Web server - needs TCP
-            #define USE_TELNET                                           // enable TELNET support
+          //#define USE_TELNET                                           // enable TELNET support
           //#define USE_TELNET_CLIENT                                    // enable TELNET client support
           //#define USE_TIME_SERVER                                      // enable time server support - presently demo started in application
                 #define NUMBER_OF_TIME_SERVERS 3                         // number of time servers that are used
-            #define MODBUS_TCP                                           // support MODBUS TCP protocol
+          //#define MODBUS_TCP                                           // support MODBUS TCP protocol
 
           //#define TEST_CLIENT_SERVER                                   // TCP client/server test (see debug.c)
           //#define TEST_TCP_SERVER                                      // TCP server (see debug.c) - uses also a TELNET session
