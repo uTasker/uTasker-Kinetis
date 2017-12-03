@@ -30,7 +30,7 @@
     30.10.2015 Added emulated FAT support (FAT_EMULATION)                {12} [uFATV2.02]
     16.11.2015 Ensure that EMULATED_FAT_LUMS is available                {13}
     17.01.2016 Add utFileAttribute() - allows changing file attributes (not directories) {14}
-    17.01.2016 Reset log file name counter when skipping hidden files    {15} [uFATV2.03]
+    17.01.2016 Reset long file name counter when skipping hidden files   {15} [uFATV2.03]
 
 */
 

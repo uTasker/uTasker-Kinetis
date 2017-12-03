@@ -34,6 +34,7 @@
     09.05.2015 Add TRK_KEA128, TRK_KEA64
     06.01.2016 Add TWR_K80F150M and FRDM_K82F
     29.07.2017 Add FRDM_K66F
+    03.12.2017 Added TRK_KEA64, TRK_KEA128, FRDM_KEAZN32Q64, FRDM_KEAZ64Q64 and FRDM_KEAZ128Q80
 
     Application specific hardware configuration
 
@@ -62,7 +63,7 @@
 
 // Define clock settings
 //
-#if defined FRDM_K64F || defined TWR_K64F120M  || defined TEENSY_3_5     // {9}
+#if defined FRDM_K64F || defined TWR_K64F120M  || defined TEENSY_3_5   // {9}
     #define MASK_1N83J
   //#define RUN_FROM_DEFAULT_CLOCK                                       // default mode is FLL Engaged Internal - the 32kHz IRC is multiplied by FLL factor of 640 to obtain 20.9715MHz nominal frequency (20MHz..25MHz)
   //#define RUN_FROM_HIRC                                                // clock directly from internal 48MHz RC clock
@@ -387,7 +388,7 @@
     #define BUS_CLOCK_DIVIDE     3                                       // bus and flash clock 72MHz/3 = 24MHz
     #define ADC_CLOCK_DIVIDE     2
   //#define ADC_CLOCK_ENABLED
-#elif defined FRDM_KE04Z                                                 // {11}
+#elif defined FRDM_KE04Z || defined FRDM_KEAZN32Q64                      // {11}
     #define CRYSTAL_FREQUENCY    8000000                                 // 8 MHz crystal
     #define _EXTERNAL_CLOCK      CRYSTAL_FREQUENCY
     #define CLOCK_DIV            256                                     // input must be divided to 31.25kHz..39.06525kHz range (/1, 2, 4, 8, 16, 32, 64, 128, 256, 512 or 1024 possible)
@@ -398,12 +399,12 @@
     #define RUN_FROM_DEFAULT_CLOCK                                       // default mode is FLL Engaged Internal - the 31.25kHz IRC is multiplied by FLL factor of 1024 to obtain 32MHz nominal frequency
     #define SYSTEM_CLOCK_DIVIDE  1                                       // divide the clock output to give the system clock (maximum 40MHz) (/1, 2, 4, 8, 16, 32, 64 or 128 possible)
     #define BUS_CLOCK_DIVIDE     2                                       // divide by 1 or 2 to give bus and flash clock (maximum 20MHz)
-#elif defined TRK_KEA128
+#elif defined TRK_KEA128 || defined FRDM_KEAZ64Q64 || defined FRDM_KEAZ128Q80
     #define CRYSTAL_FREQUENCY    8000000                                 // 8 MHz crystal
   //#define RUN_FROM_EXTERNAL_CLOCK                                      // run directly from external 8MHz clock (without FLL)
     #define _EXTERNAL_CLOCK      CRYSTAL_FREQUENCY
     #define CLOCK_DIV            256                                     // input must be divided to 31.25kHz..39.06525kHz range (/1, 2, 4, 8, 16, 32, 64, 128, 256, 512 or 1024 possible)
-                                                                         // this input is multipled by 1280 to 40MHz..50MHz at the FLL output
+                                                                         // this input is multiplied by 1280 to 40MHz..50MHz at the FLL output
     #define SYSTEM_CLOCK_DIVIDE  1                                       // divide the clock output to give the system clock (maximum 48MHz) (/1, 2, 4, 8, 16, 32, 64 or 128 possible)
     #if defined RUN_FROM_EXTERNAL_CLOCK
         #define BUS_CLOCK_DIVIDE 1                                       // divide by 1 or 2 to give bus and flash clock (maximum 24MHz)
@@ -758,14 +759,14 @@
     #define INTERRUPT_VECTORS_IN_FLASH                                   // when RAM is very limited interrupt vectors are fixed in flash
   //#define SIZE_OF_RAM         (8 * 1024)
   //#define SIZE_OF_RAM         (16 * 1024)
-#elif defined TRK_KEA64
+#elif defined TRK_KEA64 || defined FRDM_KEAZ64Q64
   //#define PIN_COUNT           PIN_COUNT_32_PIN                         // 32 pin LQFP
     #define PIN_COUNT           PIN_COUNT_64_PIN                         // 64 pin LQFP
   //#define SIZE_OF_FLASH       (32 * 1024)
     #define SIZE_OF_FLASH       (64 * 1024)                              // 64k program Flash
   //#define SIZE_OF_RAM         (2 * 1024)
     #define SIZE_OF_RAM         (4 * 1024)                               // 4k SRAM
-#elif defined FRDM_KE06Z || defined TRK_KEA128                           // {11}
+#elif defined FRDM_KE06Z || defined TRK_KEA128 || defined FRDM_KEAZ128Q80 // {11}
   //#define PIN_COUNT           PIN_COUNT_44_PIN                         // 44 pin LQFP
   //#define PIN_COUNT           PIN_COUNT_64_PIN                         // 64 pin (L)QFP
     #define PIN_COUNT           PIN_COUNT_80_PIN                         // 80 pin LQFP
@@ -773,6 +774,20 @@
     #define SIZE_OF_FLASH       (128 * 1024)                             // 128k Flash
   //#define SIZE_OF_RAM         (8 * 1024)
     #define SIZE_OF_RAM         (16 * 1024)                              // 16k SRAM
+#elif defined FRDM_KEAZN32Q64
+  //#define PIN_COUNT           PIN_COUNT_32_PIN                         // 32 pin LQFP
+    #define PIN_COUNT           PIN_COUNT_64_PIN                         // 64 pin LQFP
+    #define SIZE_OF_FLASH       (32 * 1024)                              // 32k program Flash
+  //#define SIZE_OF_FLASH       (64 * 1024)
+  //#define SIZE_OF_RAM         (2 * 1024)
+    #define SIZE_OF_RAM         (4 * 1024)                               // 4k SRAM
+#elif defined TRK_KEA64 || defined FRDM_KEAZ64Q64
+  //#define PIN_COUNT           PIN_COUNT_32_PIN                         // 32 pin LQFP
+    #define PIN_COUNT           PIN_COUNT_64_PIN                         // 64 pin LQFP
+  //#define SIZE_OF_FLASH       (32 * 1024)
+    #define SIZE_OF_FLASH       (64 * 1024)                              // 64k program Flash
+  //#define SIZE_OF_RAM         (2 * 1024)
+    #define SIZE_OF_RAM         (4 * 1024)                               // 4k SRAM
 #elif defined FRDM_KE02Z || defined FRDM_KE02Z40M
   //#define PIN_COUNT           PIN_COUNT_32_PIN                         // 32 pin LQFP
   //#define PIN_COUNT           PIN_COUNT_44_PIN                         // 44 pin LQFP
@@ -982,7 +997,7 @@
         #define LOADER_UART           5                                  // the serial interface used by the serial loader
     #elif defined FRDM_K82F
         #define LOADER_UART           4                                  // use UART 4
-    #elif defined TWR_K70F120M || defined TWR_KL46Z48M || defined TWR_K21D50M || defined TWR_KL43Z48M || defined TRK_KEA128 || defined TRK_KEA64 || defined KL25_TEST_BOARD || defined TWR_K65F180M || defined K26FN2_180 || defined TEENSY_3_5 || defined TEENSY_3_6
+    #elif defined TWR_K70F120M || defined TWR_KL46Z48M || defined TWR_K21D50M || defined TWR_KL43Z48M || defined TRK_KEA128 || defined TRK_KEA64 || defined KL25_TEST_BOARD || defined TWR_K65F180M || defined K26FN2_180 || defined FRDM_KEAZN32Q64 || defined FRDM_KEAZ64Q64 || defined FRDM_KEAZ128Q80 || defined TEENSY_3_5 || defined TEENSY_3_6
         #define LOADER_UART           2                                  // the serial interface used by the serial loader
     #elif defined TWR_K20D50M || defined TWR_K80F150M || defined tinyK20 || defined TWR_K20D72M || defined FRDM_KE02Z || defined FRDM_KE02Z40M || defined FRDM_KE06Z || defined FRDM_K22F || defined TWR_K22F120M || defined TWR_K24F120M || defined TWR_K64F120M || defined TWR_KW21D256 || defined TWR_KW24D512
         #define LOADER_UART           1                                  // the serial interface used by the serial loader
@@ -2023,6 +2038,46 @@
     #define FORCE_BOOT()           1 //(!_READ_PORT_MASK(A, SWITCH_3))   // pull this input down to force boot loader mode (connect J1-2 with GND at reset)
 
     #define TOGGLE_WATCHDOG_LED()  _TOGGLE_PORT(A, BLINK_LED)
+#elif defined TRK_KEA128 || defined TRK_KEA64
+    #define BLINK_LED              (KE_PORTC_BIT0)                        // if the port is changed (eg. A to D) the port macros will require appropriate adjustment too
+    #define SWITCH_1               (KE_PORTD_BIT0)                        // if the port is changed (eg. A to D) the port macros will require appropriate adjustment too
+    #define SWITCH_2               (KE_PORTD_BIT1)                        // if the port is changed (eg. A to D) the port macros will require appropriate adjustment too
+
+    #define INIT_WATCHDOG_LED()    _CONFIG_DRIVE_PORT_OUTPUT_VALUE(A, (BLINK_LED), (BLINK_LED), (PORT_SRE_SLOW | PORT_DSE_HIGH))
+    #define INIT_WATCHDOG_DISABLE() _CONFIG_PORT_INPUT(A, (SWITCH_1 | SWITCH_2), PORT_NO_PULL) // configure as inputs
+
+    #define WATCHDOG_DISABLE()     (_READ_PORT_MASK(A, SWITCH_2) != 0)   // hold SW2 down at reset to disable watchdog
+  //#define FORCE_BOOT()           (_READ_PORT_MASK(A, SWITCH_1) != 0)   // hold SW1 down at reset to force boot loader mode
+    // If the application has commanded a reset after writing the pattern 0x6723 into the boot mail box the serial loader mode should be started as well
+    //
+    #define FORCE_BOOT()           ((_READ_PORT_MASK(A, SWITCH_1) != 0) || (((SIM_SRSID & SIM_SRSID_SW) != 0) && (*(BOOT_MAIL_BOX) == 0x6723)))
+
+    #define TOGGLE_WATCHDOG_LED()  _TOGGLE_PORT(A, BLINK_LED)
+#elif defined FRDM_KEAZ128Q80 || defined FRDM_KEAZ64Q64 || defined FRDM_KEAZN32Q64
+    #define GREEN_LED              (KE_PORTH_BIT1)                       // (green LED - PTC1) if the port is changed (eg. A to D) the port macros will require appropriate adjustment too
+    #define RED_LED                (KE_PORTH_BIT0)                       // (red LED - PTC0) if the port is changed (eg. A to D) the port macros will require appropriate adjustment too
+    #define BLUE_LED               (KE_PORTE_BIT7)                       // (blue LED - PTC2) if the port is changed (eg. A to D) the port macros will require appropriate adjustment too
+
+    #define BLINK_LED              GREEN_LED
+
+    #define INIT_WATCHDOG_LED()    _CONFIG_DRIVE_PORT_OUTPUT_VALUE(B, (BLINK_LED), (BLINK_LED), (PORT_SRE_SLOW | PORT_DSE_HIGH))
+
+    #if defined FRDM_KEAZN32Q64
+        #define SWITCH_2           (KE_PORTA_BIT0)                       // SW2 if the port is changed (eg. A to D) the port macros will require appropriate adjustment too
+        #define SWITCH_3           (KE_PORTA_BIT1)                       // SW3 if the port is changed (eg. A to D) the port macros will require appropriate adjustment too
+        #define INIT_WATCHDOG_DISABLE() _CONFIG_PORT_INPUT(A, (SWITCH_2 | SWITCH_3), PORT_PS_UP_ENABLE) // configure as inputs
+        #define FORCE_BOOT()       (_READ_PORT_MASK(A, SWITCH_2) != 0)   // pull this input down to force boot loader mode (hold SW2 at reset)
+        #define WATCHDOG_DISABLE() (_READ_PORT_MASK(A, SWITCH_3) != 0)   // pull this input down to disable watchdog (hold SW3 at reset)
+    #else
+        #define SWITCH_2           (KE_PORTE_BIT4)                       // SW2 if the port is changed (eg. A to D) the port macros will require appropriate adjustment too
+        #define SWITCH_3           (KE_PORTE_BIT5)                       // SW3 if the port is changed (eg. A to D) the port macros will require appropriate adjustment too
+        #define INIT_WATCHDOG_DISABLE() _CONFIG_PORT_INPUT(B, (SWITCH_2 | SWITCH_3), PORT_PS_UP_ENABLE) // configure as inputs
+        #define FORCE_BOOT()       (_READ_PORT_MASK(B, SWITCH_2) != 0)   // pull this input down to force boot loader mode (hold SW2 at reset)
+        #define WATCHDOG_DISABLE() (_READ_PORT_MASK(B, SWITCH_3) != 0)   // pull this input down to disable watchdog (hold SW3 at reset)
+    #endif
+
+    #define TOGGLE_WATCHDOG_LED()  _TOGGLE_PORT(B, BLINK_LED)
+
 #elif defined TRK_KEA128 || defined TRK_KEA64
     #define BLINK_LED              (KE_PORTC_BIT0)                        // if the port is changed (eg. A to D) the port macros will require appropriate adjustment too
     #define SWITCH_1               (KE_PORTD_BIT0)                        // if the port is changed (eg. A to D) the port macros will require appropriate adjustment too

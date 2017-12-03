@@ -39,6 +39,12 @@
 
 // Major hardware dependent settings for this project (choice of board - select only one at a time)
 //
+//#define TRK_KEA64                                                      // EA ultra-reliable automotive processors Cortex-M0+ - starterTRAK board http://www.utasker.com/kinetis/TRK-KEA64.html
+//#define TRK_KEA128                                                     // starterTRAK board http://www.utasker.com/kinetis/TRK-KEA128.html
+//#define FRDM_KEAZN32Q64                                                // freedom board http://www.utasker.com/kinetis/FRDM-KEAZN32Q64.html
+//#define FRDM_KEAZ64Q64                                                 // freedom board http://www.utasker.com/kinetis/FRDM-KEAZ64Q64.html
+//#define FRDM_KEAZ128Q80                                                // freedom board http://www.utasker.com/kinetis/FRDM-KEAZ128Q80.html
+
 //#define FRDM_KE02Z                                                     // E processors Cortex-M0+ (5V robust)
 //#define FRDM_KE02Z40M
 //#define FRDM_KE04Z                                                     // this board's device has 8k Flash and 1k SRAM and so is generally not practical to use boot loader with the serial loader
@@ -97,13 +103,13 @@
 
 //#define EMCRAFT_K61F150M                                               // K processors Cortex M4 with Ethernet, USB, encryption, tamper, key storage protection area
 
-//#define FRDM_K64F                                                      // next generation K processors Cortex M4 with Ethernet, USB, encryption, tamper, key storage protection area
+#define FRDM_K64F                                                      // next generation K processors Cortex M4 with Ethernet, USB, encryption, tamper, key storage protection area
 //#define TWR_K64F120M
 //#define TEENSY_3_5                                                     // USB development board with K64FX512 - http://www.utasker.com/kinetis/TEENSY_3.5.html
 
 //#define TWR_K65F180M
-//#define FRDM_K66F                                                        // freedom board http://www.utasker.com/kinetis/FRDM-K66F.html
-#define TEENSY_3_6                                                     // USB development board with K66FX1M0 - http://www.utasker.com/kinetis/TEENSY_3.6.html
+//#define FRDM_K66F                                                      // freedom board http://www.utasker.com/kinetis/FRDM-K66F.html
+//#define TEENSY_3_6                                                     // USB development board with K66FX1M0 - http://www.utasker.com/kinetis/TEENSY_3.6.html
 
 //#define TWR_K70F120M                                                   // K processors Cortex M4 with graphical LCD, Ethernet, USB, encryption, tamper
 //#define K70F150M_12M                                                   // development board with 150MHz F70 and 12MHz oscillator
@@ -112,7 +118,49 @@
 //#define TWR_POS_K81
 //#define TWR_K80F120M
 
-#if defined FRDM_KE02Z
+#if defined TRK_KEA64
+    #define TARGET_HW            "TRK-KEA64"
+    #define KINETIS_MAX_SPEED    40000000                                // 40MHz version
+    #define OUR_HEAP_SIZE        (HEAP_REQUIREMENTS)((2 * 1024) * MEM_FACTOR)
+    #define KINETIS_KE
+    #define KINETIS_KEA
+    #define KINETIS_KEA64
+    #define DEVICE_WITHOUT_ETHERNET                                      // KEA doesn't have Ethernet controller
+    #define DEVICE_WITHOUT_USB                                           // KEA doesn't have USB
+#elif defined TRK_KEA128
+    #define TARGET_HW            "TRK-KEA128"
+    #define KINETIS_MAX_SPEED    48000000
+    #define OUR_HEAP_SIZE        (HEAP_REQUIREMENTS)((12 * 1024) * MEM_FACTOR)
+    #define KINETIS_KE
+    #define KINETIS_KEA
+    #define KINETIS_KEA128
+    #define DEVICE_WITHOUT_ETHERNET                                      // KEA doesn't have Ethernet controller
+    #define DEVICE_WITHOUT_USB                                           // KEA doesn't have USB
+#elif defined FRDM_KEAZN32Q64
+    #define TARGET_HW            "FRDM-KEAZN32Q64"
+    #define KINETIS_MAX_SPEED    40000000                                // 40MHz version
+    #define OUR_HEAP_SIZE        (HEAP_REQUIREMENTS)((2 * 1024) * MEM_FACTOR)
+    #define KINETIS_KE
+    #define KINETIS_KEA
+    #define KINETIS_KEA32
+    #define DEVICE_WITHOUT_ETHERNET                                      // KEA doesn't have Ethernet controller
+    #define DEVICE_WITHOUT_USB                                           // KEA doesn't have USB
+#elif defined FRDM_KEAZ128Q80 || defined FRDM_KEAZ64Q64
+    #define KINETIS_KE
+    #define KINETIS_KEA
+    #if defined FRDM_KEAZ64Q64
+        #define KINETIS_KEA64
+        #define TARGET_HW        "FRDM-KEAZ64Q64"
+        #define OUR_HEAP_SIZE    (HEAP_REQUIREMENTS)((2 * 1024) * MEM_FACTOR)
+    #else
+        #define KINETIS_KEA128
+        #define TARGET_HW        "FRDM-KEAZ128Q80"
+        #define OUR_HEAP_SIZE    (HEAP_REQUIREMENTS)((8 * 1024) * MEM_FACTOR)
+    #endif
+    #define KINETIS_MAX_SPEED    48000000
+    #define DEVICE_WITHOUT_ETHERNET                                      // KEA doesn't have Ethernet controller
+    #define DEVICE_WITHOUT_USB                                           // KEA doesn't have USB
+#elif defined FRDM_KE02Z
     #define KINETIS_KE
     #define KINETIS_KE02
     #define KINETIS_MAX_SPEED    20000000
@@ -681,7 +729,7 @@
 #endif
 
 #if !defined TWR_K20D50M && !defined FRDM_K20D50M && !defined FRDM_KL46Z && !defined FRDM_KL43Z && !defined TWR_KL46Z48M && !defined FRDM_KL26Z && !defined FRDM_KL27Z && !defined TWR_KL25Z48M && !defined FRDM_KL02Z && !defined FRDM_KL03Z && !defined FRDM_KL05Z && !defined FRDM_KE02Z && !defined FRDM_KE02Z40M && !defined FRDM_KE04Z && !defined TWR_K20D72M && !defined TWR_K21D50M && !defined TWR_K22F120M && !defined TWR_K24F120M && !defined FRDM_K22F && !defined TWR_KV10Z32 && !defined TWR_KV31F120M // boards have no SD card socket
-    #define SDCARD_SUPPORT                                               // SD-card interface (only choose one of these options at a time)
+  //#define SDCARD_SUPPORT                                               // SD-card interface (only choose one of these options at a time)
   //#define SPI_FLASH_FAT                                                // SPI flash
         #define SIMPLE_FLASH                                             // don't perform block management and wear-leveling
         #define FLASH_FAT_MANAGEMENT_ADDRESS     (SIZE_OF_FLASH)

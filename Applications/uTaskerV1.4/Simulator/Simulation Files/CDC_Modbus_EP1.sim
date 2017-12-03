@@ -1,5 +1,5 @@
 // USB CDC Modbus ASCII slave request
 
-+50 USB-1     = ":2101000A000BC9"
-+50 USB-1     = 0d 0a
++50 USB-0     = ":0101000A000BC9"
++50 USB-0     = 0d 0a
 // End of test

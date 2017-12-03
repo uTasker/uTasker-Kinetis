@@ -100,7 +100,7 @@
         #define SERIAL_SPEED          SERIAL_BAUD_57600                  // the Baud rate of the UART
     #elif defined FRDM_KL03Z || defined FRDM_KE04Z
         #define SERIAL_SPEED          SERIAL_BAUD_19200                  // the Baud rate of the UART (there is a 100nF capacitor on the Rx input on this board so a slow Baud rate is needed)
-    #elif defined FRDM_KE02Z || defined FRDM_KE02Z40M || defined TWR_KW21D256
+    #elif defined FRDM_KE02Z || defined FRDM_KE02Z40M || defined TWR_KW21D256 || defined FRDM_KEAZ128Q80 || defined FRDM_KEAZ64Q64 || defined FRDM_KEAZN32Q64
         #define SERIAL_SPEED          SERIAL_BAUD_38400                  // the Baud rate of the UART
     #else
         #define SERIAL_SPEED          SERIAL_BAUD_115200                 // the Baud rate of the UART
@@ -135,6 +135,12 @@
         #else
             #define UTASKER_APP_END   (unsigned char *)(UTASKER_APP_START + (22 * 1024)) // end of application space - after maximum application size
         #endif
+    #elif defined FRDM_KEAZ64Q64
+        #define UTASKER_APP_START     (32 * 1024)                        // application starts at this address
+        #define UTASKER_APP_END       (unsigned char *)(UTASKER_APP_START + (28 * 1024)) // end of application space - after maximum application size
+    #elif defined FRDM_KEAZ128Q80 || defined FRDM_KL82Z
+        #define UTASKER_APP_START     (32 * 1024)                        // application starts at this address
+        #define UTASKER_APP_END       (unsigned char *)(UTASKER_APP_START + (40 * 1024)) // end of application space - after maximum application size
     #else
         #if defined FRDM_K64F && defined MEMORY_SWAP
             #define UTASKER_APP_START     (SIZE_OF_FLASH/2)              // second half of flash memory is used by the next application
