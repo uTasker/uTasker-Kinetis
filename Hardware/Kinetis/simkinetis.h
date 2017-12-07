@@ -1742,22 +1742,25 @@ typedef struct stKINETIS_SIM
 #if defined KINETIS_KE
     unsigned long SIM_SRSID;
     unsigned long SIM_SOPT0;
-    #if defined KINETIS_KE04 || defined KINETIS_KE06 || defined KINETIS_KEA64 || defined KINETIS_KEA128
+    #if defined KINETIS_KE04 || defined KINETIS_KE06 || (defined KINETIS_KEA64 && !defined KINETIS_KEAN64) || defined KINETIS_KEA128
         unsigned long SIM_SOPT1;
     #endif
     unsigned long SIM_PINSEL0;
-    #if defined KINETIS_KE04 || defined KINETIS_KE06 || defined KINETIS_KEA64 || defined KINETIS_KEA128
+    #if defined KINETIS_KE04 || defined KINETIS_KE06 || (defined KINETIS_KEA64 && !defined KINETIS_KEAN64) || defined KINETIS_KEA128
         unsigned long SIM_PINSEL1;
     #endif
     unsigned long SIM_SCGC;
     unsigned long SIM_UUIDL;
-    #if defined KINETIS_KE04 || defined KINETIS_KE06 || defined KINETIS_KEA64 || defined KINETIS_KEA128
+    #if defined KINETIS_KE04 || defined KINETIS_KE06 || (defined KINETIS_KEA64 && !defined KINETIS_KEAN64) || defined KINETIS_KEA128
         unsigned long SIM_UUIDML;
         unsigned long SIM_UUIDMH;
         unsigned long SIM_CLKDIV;
     #else
         unsigned long SIM_UUIDH;
         unsigned long SIM_BUSDIV;
+    #endif
+    #if (defined KINETIS_KE04 && (SIZE_OF_FLASH <= (8 * 1024))) || (defined KINETIS_KEA && !defined KINETIS_KEAN64)
+        unsigned long SIM_CLKDIV;
     #endif
 #else
     #if !defined KINETIS_KL02

@@ -198,6 +198,7 @@
     #define KINETIS_KE
     #define KINETIS_KEA
     #define KINETIS_KEA64
+    #define KINETIS_KEAN64                                               // N variation
     #define DEVICE_WITHOUT_ETHERNET                                      // KEA doesn't have Ethernet controller
     #define DEVICE_WITHOUT_USB                                           // KEA doesn't have USB
 #elif defined TRK_KEA128

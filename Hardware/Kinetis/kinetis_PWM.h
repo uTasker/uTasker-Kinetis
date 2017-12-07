@@ -364,32 +364,25 @@ static __interrupt void _PWM_Interrupt_5(void)
                         break;
                     default:
                         _EXCEPTION("Invalid timer channel!!");
-                        return;                                              // invalid channel
+                        return;                                          // invalid channel
                     }
                 }
                 ptrFlexTimer = (FLEX_TIMER_MODULE *)FTM_BLOCK_1;
                 break;
     #endif
     #if FLEX_TIMERS_AVAILABLE > 2
-            case 2:
-        #if defined KINETIS_KL
-                POWER_UP(6, SIM_SCGC6_FTM2);
-        #else
-                POWER_UP(3, SIM_SCGC3_FTM2);                             // ensure that the FlexTimer module is powered up
-        #endif
-                ptrFlexTimer = (FLEX_TIMER_MODULE *)FTM_BLOCK_2;
-        #if defined KINETIS_KE
-                ptrFlexTimer->FTM_CONF = FTM_DEBUG_BEHAVIOUR;            // set the debugging behaviour (whether the counter runs in debug mode and how the outputs react - only available on FlexTimer 2)
-        #endif
-        #if defined KINETIS_KL
-                iInterruptID = irq_TPM2_ID;
-        #else
-                iInterruptID = irq_FTM2_ID;
-        #endif
-                if ((ulMode & PWM_NO_OUTPUT) == 0) {                     // {6}
-                    switch (ptrPWM_settings->pwm_reference & ~_TIMER_MODULE_MASK) { // configure appropriate pin for the PWM output signal
+                case 2:                                                  // timer 2
+                    switch (ptrPWM_settings->pwm_reference & ~_TIMER_MODULE_MASK) { // configure appropriate pin for the timer signal
                     case 0:                                              // timer 2, channel 0
-        #if defined KINETIS_KE
+        #if defined KINETIS_KE15
+            #if defined TPM2_0_ON_C
+                        _CONFIG_PERIPHERAL(C, 5, (PC_5_FTM2_CH0 | PORT_SRE_FAST | PORT_DSE_HIGH)); // FTM2_CH0 on PC.5 (alt. function 2)
+            #elif defined TPM2_0_ON_D_HIGH
+                        _CONFIG_PERIPHERAL(D, 10, (PD_10_FTM2_CH0 | PORT_SRE_FAST | PORT_DSE_HIGH)); // FTM2_CH0 on PD.10 (alt. function 2)
+            #else
+                        _CONFIG_PERIPHERAL(D, 0, (PD_0_FTM2_CH0 | PORT_SRE_FAST | PORT_DSE_HIGH)); // FTM2_CH0 on PD.0 (alt. function 4)
+            #endif
+        #elif defined KINETIS_KE && !defined KINETIS_KE18
             #if defined FTM2_0_ON_H
                         SIM_PINSEL0 |= SIM_PINSEL_FTM1PS1;
                         _CONFIG_PERIPHERAL(H, 0, (PH_0_FTM2_CH0 | PORT_SRE_FAST | PORT_DSE_HIGH)); // FTM2_CH0 on PH.0 (alt. function 2)
@@ -410,7 +403,15 @@ static __interrupt void _PWM_Interrupt_5(void)
         #endif
                         break;
                     case 1:                                              // timer 2, channel 1
-        #if defined KINETIS_KE
+        #if defined KINETIS_KE15
+            #if defined TPM2_1_ON_A
+                        _CONFIG_PERIPHERAL(A, 0, (PA_0_FTM2_CH1 | PORT_SRE_FAST | PORT_DSE_HIGH)); // FTM2_CH1 on PA.0 (alt. function 2)
+            #elif defined TPM2_1_ON_D_HIGH
+                        _CONFIG_PERIPHERAL(D, 11, (PD_11_FTM2_CH1 | PORT_SRE_FAST | PORT_DSE_HIGH)); // FTM2_CH1 on PD.11 (alt. function 2)
+            #else
+                        _CONFIG_PERIPHERAL(D, 1, (PD_1_FTM2_CH1 | PORT_SRE_FAST | PORT_DSE_HIGH)); // FTM2_CH1 on PD.1 (alt. function 4)
+            #endif
+        #elif defined KINETIS_KE && !defined KINETIS_KE18
             #if defined FTM2_1_ON_H
                 #if defined KINETIS_KE06
                         SIM_PINSEL1 |= SIM_PINSEL1_FTM2PS0_PTH0;
@@ -424,7 +425,7 @@ static __interrupt void _PWM_Interrupt_5(void)
                         SIM_PINSEL1 |= SIM_PINSEL1_FTM2PS0_PTF0;
                         _CONFIG_PERIPHERAL(F, 1, (PF_1_FTM2_CH1 | PORT_SRE_FAST | PORT_DSE_HIGH)); // FTM2_CH1 on PF.1 (alt. function 2)
             #else
-                #if ((defined KINETIS_KE04 && (SIZE_OF_FLASH > (8 * 1024))) || defined KINETIS_KE06) || defined KINETIS_KEA64 || defined KINETIS_KEA128
+                #if (defined SIM_PINSEL1 && (((defined KINETIS_KE04 && (SIZE_OF_FLASH > (8 * 1024))) || defined KINETIS_KE06) || defined KINETIS_KEA64 || defined KINETIS_KEA128))
                         SIM_PINSEL1 &= ~(SIM_PINSEL1_FTM2PS0_PTH0 | SIM_PINSEL1_FTM2PS0_PTF0);
                 #else
                         SIM_PINSEL0 &= ~SIM_PINSEL_FTM2PS1;
@@ -441,9 +442,15 @@ static __interrupt void _PWM_Interrupt_5(void)
                         _CONFIG_PERIPHERAL(A, 11, (PA_11_FTM2_CH1 | PORT_SRE_FAST | PORT_DSE_HIGH)); // FTM2_CH1 on PA.11 (alt. function 3)
         #endif
                         break;
-        #if defined KINETIS_KE
+        #if FLEX_TIMERS_2_CHANNELS > 2
                     case 2:                                              // timer 2, channel 2
-            #if defined FTM2_2_ON_D
+            #if defined KINETIS_KE15
+                #if defined TPM2_2_ON_D
+                        _CONFIG_PERIPHERAL(D, 12, (PD_12_FTM2_CH2 | PORT_SRE_FAST | PORT_DSE_HIGH)); // FTM2_CH2 on PD.12 (alt. function 2)
+                #else
+                        _CONFIG_PERIPHERAL(E, 4, (PE_4_FTM2_CH2 | PORT_SRE_FAST | PORT_DSE_HIGH)); // FTM2_CH2 on PE.4 (alt. function 4)
+                #endif
+            #elif defined FTM2_2_ON_D
                 #if defined KINETIS_KE06
                         SIM_PINSEL1 |= SIM_PINSEL1_FTM2PS2_PTD0;
                         SIM_PINSEL1 &= ~SIM_PINSEL1_FTM2PS2_PTG4;
@@ -455,7 +462,7 @@ static __interrupt void _PWM_Interrupt_5(void)
                         SIM_PINSEL1 |= (SIM_PINSEL1_FTM2PS2_PTD0 | SIM_PINSEL1_FTM2PS2_PTG4);
                         _CONFIG_PERIPHERAL(G, 4, (PG_4_FTM2_CH2 | PORT_SRE_FAST | PORT_DSE_HIGH)); // FTM2_CH2 on PG.4 (alt. function 2)
             #else
-                #if ((defined KINETIS_KE04 && (SIZE_OF_FLASH > (8 * 1024))) || defined KINETIS_KE06) || defined KINETIS_KEA64 || defined KINETIS_KEA128
+                #if (defined SIM_PINSEL1 && (((defined KINETIS_KE04 && (SIZE_OF_FLASH > (8 * 1024))) || defined KINETIS_KE06) || defined KINETIS_KEA64 || defined KINETIS_KEA128))
                         SIM_PINSEL1 &= ~(SIM_PINSEL1_FTM2PS2_PTD0 | SIM_PINSEL1_FTM2PS2_PTG4);
                 #else
                         SIM_PINSEL0 &= ~SIM_PINSEL_FTM2PS2;
@@ -463,8 +470,16 @@ static __interrupt void _PWM_Interrupt_5(void)
                         _CONFIG_PERIPHERAL(C, 2, (PC_2_FTM2_CH2 | PORT_SRE_FAST | PORT_DSE_HIGH)); // FTM2_CH2 on PC.2 (alt. function 1)
             #endif
                         break;
+        #endif
+        #if FLEX_TIMERS_2_CHANNELS > 3
                     case 3:                                              // timer 2, channel 3
-            #if defined FTM2_3_ON_D
+            #if defined KINETIS_KE15
+                #if defined TPM2_3_ON_D
+                        _CONFIG_PERIPHERAL(D, 5, (PD_5_FTM2_CH3 | PORT_SRE_FAST | PORT_DSE_HIGH)); // FTM2_CH3 on PD.5 (alt. function 2)
+                #else
+                        _CONFIG_PERIPHERAL(E, 5, (PE_5_FTM2_CH3 | PORT_SRE_FAST | PORT_DSE_HIGH)); // FTM2_CH3 on PE.5 (alt. function 4)
+                #endif
+            #elif defined FTM2_3_ON_D
                 #if defined KINETIS_KE06
                         SIM_PINSEL1 |= SIM_PINSEL1_FTM2PS3_PTD1;
                         SIM_PINSEL1 &= ~SIM_PINSEL1_FTM2PS3_PTG5;
@@ -477,7 +492,7 @@ static __interrupt void _PWM_Interrupt_5(void)
                         SIM_PINSEL1 |= SIM_PINSEL1_FTM2PS3_PTG5;
                         _CONFIG_PERIPHERAL(G, 5, (PG_5_FTM2_CH3 | PORT_SRE_FAST | PORT_DSE_HIGH)); // FTM2_CH3 on PG.5 (alt. function 2)
             #else
-                    #if ((defined KINETIS_KE04 && (SIZE_OF_FLASH > (8 * 1024))) || defined KINETIS_KE06) || defined KINETIS_KEA64 ||  defined KINETIS_KEA128
+                    #if (defined SIM_PINSEL1 && (((defined KINETIS_KE04 && (SIZE_OF_FLASH > (8 * 1024))) || defined KINETIS_KE06) || defined KINETIS_KEA64 ||  defined KINETIS_KEA128))
                         SIM_PINSEL1 &= ~(SIM_PINSEL1_FTM2PS3_PTD1 | SIM_PINSEL1_FTM2PS3_PTG5);
                     #else
                         SIM_PINSEL0 &= ~SIM_PINSEL_FTM2PS3;
@@ -485,8 +500,10 @@ static __interrupt void _PWM_Interrupt_5(void)
                         _CONFIG_PERIPHERAL(C, 3, (PC_3_FTM2_CH3 | PORT_SRE_FAST | PORT_DSE_HIGH)); // FTM2_CH3 on PC.3 (alt. function 1)
             #endif
                         break;
-                    case 4:                                                  // timer 2, channel 4
-            #if defined FTM2_4_ON_G
+        #endif
+        #if FLEX_TIMERS_2_CHANNELS > 4
+                    case 4:                                              // timer 2, channel 4
+            #if defined FTM2_4_ON_G && defined SIM_PINSEL1
                         SIM_PINSEL1 |= SIM_PINSEL1_FTM2PS4;
                         _CONFIG_PERIPHERAL(G, 6, (PG_6_FTM2_CH4 | PORT_SRE_FAST | PORT_DSE_HIGH)); // FTM2_CH4 on PG.6 (alt. function 2)
             #else
@@ -496,8 +513,10 @@ static __interrupt void _PWM_Interrupt_5(void)
                         _CONFIG_PERIPHERAL(B, 4, (PB_4_FTM2_CH4 | PORT_SRE_FAST | PORT_DSE_HIGH)); // FTM2_CH4 on PB.4 (alt. function 1)
             #endif
                         break;
-                    case 5:                                                  // timer 2, channel 5
-            #if defined FTM2_5_ON_G
+        #endif
+        #if FLEX_TIMERS_2_CHANNELS > 5
+                    case 5:                                              // timer 2, channel 5
+            #if defined FTM2_5_ON_G && defined SIM_PINSEL1
                         SIM_PINSEL1 |= SIM_PINSEL1_FTM2PS5;
                         _CONFIG_PERIPHERAL(G, 7, (PG_7_FTM2_CH5 | PORT_SRE_FAST | PORT_DSE_HIGH)); // FTM2_CH5 on PG.7 (alt. function 2)
             #else
@@ -512,8 +531,7 @@ static __interrupt void _PWM_Interrupt_5(void)
                         _EXCEPTION("Invalid timer channel!!");
                         return;                                          // invalid channel
                     }
-                }
-                break;
+        break;
     #endif
     #if FLEX_TIMERS_AVAILABLE > 3
             case 3:

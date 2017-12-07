@@ -1184,6 +1184,8 @@ typedef struct stRESET_VECTOR
     #else
         #define I2C_AVAILABLE            3
     #endif
+#elif defined KINETIS_KEAN64
+    #define I2C_AVAILABLE                1
 #elif defined KINETIS_KL02 || defined KINETIS_KL25 || defined KINETIS_KL43 || defined KINETIS_KL46 || defined KINETIS_KE06 || defined KINETIS_KEA64 || defined KINETIS_KEA128 || defined KINETIS_KV31 || defined KINETIS_KL27 || defined KINETIS_KW2X
     #define I2C_AVAILABLE                2
 #elif (KINETIS_MAX_SPEED  <= 50000000) || defined KINETIS_KV || defined KINETIS_K02
@@ -1242,6 +1244,27 @@ typedef struct stRESET_VECTOR
     #define FLEX_TIMERS_AVAILABLE   2
 #else
     #define FLEX_TIMERS_AVAILABLE   3
+#endif
+
+#if defined KINETIS_KL02 || defined KINETIS_KL03
+    #define FLEX_TIMERS_0_CHANNELS  2
+    #define FLEX_TIMERS_1_CHANNELS  2
+#elif defined KINETIS_KL04 || defined KINETIS_KL53
+    #define FLEX_TIMERS_0_CHANNELS  6
+    #define FLEX_TIMERS_1_CHANNELS  2
+#elif defined KINETIS_KE15
+    #define FLEX_TIMERS_0_CHANNELS  8
+    #define FLEX_TIMERS_1_CHANNELS  4
+    #define FLEX_TIMERS_2_CHANNELS  4
+#elif defined KINETIS_KE
+    #define FLEX_TIMERS_0_CHANNELS  2
+    #define FLEX_TIMERS_1_CHANNELS  2
+    #define FLEX_TIMERS_2_CHANNELS  6
+#else
+    #define FLEX_TIMERS_0_CHANNELS  8
+    #define FLEX_TIMERS_1_CHANNELS  2
+    #define FLEX_TIMERS_2_CHANNELS  2
+    #define FLEX_TIMERS_3_CHANNELS  8
 #endif
 
 // ADC configuration
@@ -8003,7 +8026,7 @@ typedef struct stKINETIS_ADMA2_BD
       #define SIM_SRSID_REVID                0x00f00000
       #define SIM_SRSID_SUBFAMID             0x0f000000
       #define SIM_SRSID_FAMID                0xf0000000
-    #if (defined KINETIS_KE04 && (SIZE_OF_FLASH > (8 * 1024))) || defined KINETIS_KE06 || defined KINETIS_KEA64 || defined KINETIS_KEA128
+    #if (defined KINETIS_KE04 && (SIZE_OF_FLASH > (8 * 1024))) || defined KINETIS_KE06 || (defined KINETIS_KEA64 && !defined KINETIS_KEAN64) || defined KINETIS_KEA128
         #define SIM_SOPT0                    *(volatile unsigned long *)(SIM_BLOCK + 0x04) // System Options Register
           #define SIM_SOPT_NMIE              0x00000002                  // NMI pin enable (unaffected by reset and write-once only on each reset) - default power on enabled
           #define SIM_SOPT_RSTPE             0x00000004                  // Reset pin enabled (unaffected by reset and write-once only on each reset) - default power on enabled
@@ -8090,7 +8113,7 @@ typedef struct stKINETIS_ADMA2_BD
       #define SIM_PINSEL_FTM0PS1             0x00000200                  // FTM0[1] mapped to PTB3 rather than PTA1
       #define SIM_PINSEL_FTM1PS0             0x00000400                  // FTM1[0] mapped to PTH2 rather than PTC4
       #define SIM_PINSEL_FTM1PS1             0x00000800                  // FTM1[1] mapped to PTE7 rather than PTC5
-    #if (defined KINETIS_KE04 && (SIZE_OF_FLASH > (8 * 1024))) || defined KINETIS_KE06 || defined KINETIS_KEA64 || defined KINETIS_KEA128
+    #if (defined KINETIS_KE04 && (SIZE_OF_FLASH > (8 * 1024))) || defined KINETIS_KE06 || (defined KINETIS_KEA64 && !defined KINETIS_KEAN64) || defined KINETIS_KEA128
         #define SIM_PINSEL1                  *(volatile unsigned long *)(SIM_BLOCK + 0x10)  // Pin Selection Register 1
           #define SIM_PINSEL1_FTM2PS0_PTC0   0x00000000                  // FTM2[0] mapped to PTC0
           #define SIM_PINSEL1_FTM2PS0_PTH0   0x00000001                  // FTM2[0] mapped to PTH0
@@ -8159,7 +8182,7 @@ typedef struct stKINETIS_ADMA2_BD
       #define SIM_SCGC4_SPI1                 SIM_SCGC_SPI1
       #define SIM_SCGC6_RTC                  SIM_SCGC_RTC
 
-    #if (defined KINETIS_KE04 && (SIZE_OF_FLASH > (8 * 1024))) || defined KINETIS_KE06 || defined KINETIS_KEA64 || defined KINETIS_KEA128
+    #if (defined KINETIS_KE04 && (SIZE_OF_FLASH > (8 * 1024))) || defined KINETIS_KE06 || (defined KINETIS_KEA64 && !defined KINETIS_KEAN64) || defined KINETIS_KEA128
         #define SIM_UUIDL                    *(volatile unsigned long *)(SIM_BLOCK + 0x18) // Universally Unique Identifier Low Register (read-only)
         #define SIM_UUIDML                   *(volatile unsigned long *)(SIM_BLOCK + 0x1c) // Universally Unique Identifier Middle Low Register (read-only)
         #define SIM_UUIDMH                   *(volatile unsigned long *)(SIM_BLOCK + 0x20) // Universally Unique Identifier Middle High Register (read-only)
@@ -8182,7 +8205,7 @@ typedef struct stKINETIS_ADMA2_BD
 			#define SIM_BUSDIV               *(volatile unsigned long *)(SIM_BLOCK + 0x18) // Bus Clock Divider Register
 			  #define SIM_BUSDIVBUSDIV       0x00000001                  // bus clock is ICSOUTCLK divided by 2 (value not affected by warm reset)
           #endif
-        #if (defined KINETIS_KE04 && (SIZE_OF_FLASH <= (8 * 1024))) || defined KINETIS_KEA
+        #if (defined KINETIS_KE04 && (SIZE_OF_FLASH <= (8 * 1024))) || (defined KINETIS_KEA && !defined KINETIS_KEAN64)
             #define SIM_CLKDIV                   *(volatile unsigned long *)(SIM_BLOCK + 0x1c) // Clock Divider Register
               #define SIM_CLKDIV_OUTDIV3_1   0x00000000                  // FTM and PWT clocks equal to ICSOUTCLK
               #define SIM_CLKDIV_OUTDIV3_2   0x00100000                  // FTM and PWT clocks equal to ICSOUTCLK/2
