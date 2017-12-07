@@ -19,6 +19,6 @@ http://www.utasker.com/docs/documentation.html
 To get started downloading, importing, building see https://www.youtube.com/watch?v=K8ScSgpgQ6M&index=9&list=PLWKlVb_MqDQFZAulrUywU30v869JBYi9Q
 
 
-The uTasker Open Source project is supplied for free use, including for commercial applications. It is a contribution from the main uTasker project which is generally 1 or 2 years more advanced than the open sourec version. The open source version is not supported (reports of problem will however be taken seriously and corrected). Users who like it and find that it allows them to save development time and costs are urged to consider the main project for their next commercial development, which is fully supported at a very moderate fee that helps to finance continued development and thus more interesting contributions in the future to the free maker community.
+The uTasker Open Source project is supplied for free use, including for commercial applications. It is a contribution from the main uTasker project which is generally 1 or 2 years more advanced than the open source version. The open source version is not supported (reports of problem will however be taken seriously and corrected). Users who like it and find that it allows them to save development time and costs are urged to consider the main project for their next commercial development, which is fully supported at a very moderate fee that helps to finance continued development and thus more interesting contributions in the future to the free maker community.
 
 
