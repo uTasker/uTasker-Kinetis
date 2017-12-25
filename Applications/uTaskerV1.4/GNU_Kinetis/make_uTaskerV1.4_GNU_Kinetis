@@ -96,7 +96,7 @@ all: uTaskerV1.4.elf uTaskerV1.4_BM.elf
 
 # Application files
 #
-Build/application.o: ../application.c $(DEPENDS) ..\application.h ..\application_lcd.h ..\app_user_files.h ..\Port_Interrupts.h ..\ADC_Timers.h ..\can_tests.h ..\widgets.h ..\iic_tests.h ..\slcd_time.h
+Build/application.o: ../application.c $(DEPENDS) ../application.h ../application_lcd.h ../app_user_files.h ../Port_Interrupts.h ../ADC_Timers.h ../can_tests.h ../widgets.h ../iic_tests.h ../slcd_time.h
 		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../application.c -o Build/application.o
 
 Build/debug.o: ../debug.c $(DEPENDS) ../application.h ../debug_hal.h
