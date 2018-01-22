@@ -56,6 +56,8 @@
     28.11.2015 Reset ucCollectingMode only after receiving all data and reset to 0xff {38}
     14.12.2015 Add audio endpoints                                       {39}
 
+    22.01.2018 Block USB-MSD further command handling until complete write data has been received {46}
+
 */
 
 
@@ -290,6 +292,7 @@ static unsigned char  ucCollectingMode = 0xff;
     static unsigned long ulLogicalBlockAdr = 0;                          // present logical block address (shared between read and write)
     static unsigned long ulReadBlock = 0;                                // the outstanding blocks to be read from the media
     static unsigned long ulWriteBlock = 0;                               // the outstanding blocks to be written to the media
+    static int iWriteInProgress = 0;                                     // {46} flag indicating that reception is write data and not commands
     static int iContent = 0;
     static const UTDISK *ptrDiskInfo[DISK_COUNT] = {0};
     static USB_MASS_STORAGE_CSW csw = {{'U', 'S', 'B', 'S'}, {0}, {0}, CSW_STATUS_COMMAND_PASSED };
@@ -515,6 +518,7 @@ extern void fnTaskUSB(TTASKTABLE *ptrTaskTable)
                 ulWriteBlock = 0;                                        // reset local variables on each reset
                 ulReadBlock = 0;
                 iContent = 0;
+                iWriteInProgress = 0;                                    // {46}
 #endif
 #if defined KL43Z_256_32_CL
                 I2S0_TCR3 &= ~(I2S_TCR3_TCE);                            // disable rx and tx
@@ -953,6 +957,7 @@ extern void fnTaskUSB(TTASKTABLE *ptrTaskTable)
             if (ulWriteBlock != 0) {                                     // more data expected
                 continue;
             }                                                            // allow CSW to be sent after a complete transfer has completed
+            iWriteInProgress = 0;                                        // {46} allow further USB-MSD commands to be interpreted
         }
         else {
           //unsigned long ulTransferLength;
@@ -2616,7 +2621,7 @@ extern void fnBridgeEthernetFrame(ETHERNET_FRAME *ptr_rx_frame)
 #if defined USE_USB_MSD
 static int mass_storage_callback(unsigned char *ptrData, unsigned short length, int iType)
 {
-    if (ulWriteBlock != 0) {                                             // data expected
+    if (iWriteInProgress != 0) {                                         // {46} data expected
         return TRANSPARENT_CALLBACK;                                     // handle data in task
     }
     if (uMemcmp(cCBWSignature, ptrData, sizeof(cCBWSignature)) == 0) {   // check that the signature matches
@@ -2644,7 +2649,7 @@ static int mass_storage_callback(unsigned char *ptrData, unsigned short length, 
                     case UFI_READ_CAPACITY:                              // {36}
                     case UFI_READ_FORMAT_CAPACITY:
                         if (ptrDiskInfo[ucActiveLUN]->usDiskFlags & (DISK_MOUNTED | DISK_UNFORMATTED)) { // {16} only respond when there is media inserted, else stall
-                            return TRANSPARENT_CALLBACK;             // the call-back has done its work and the input buffer can now be used
+                            return TRANSPARENT_CALLBACK;                 // the call-back has done its work and the input buffer can now be used
                         }
                         break;                                           // stall
                     case UFI_READ_10:
@@ -2653,6 +2658,7 @@ static int mass_storage_callback(unsigned char *ptrData, unsigned short length, 
                             CBW_READ_10 *ptrRead = (CBW_READ_10 *)ptrCBW->CBWCB;
                             ulLogicalBlockAdr = ((ptrRead->ucLogicalBlockAddress[0] << 24) | (ptrRead->ucLogicalBlockAddress[1] << 16) | (ptrRead->ucLogicalBlockAddress[2] << 8) | ptrRead->ucLogicalBlockAddress[3]);
                             if (ulLogicalBlockAdr < ptrDiskInfo[ucActiveLUN]->ulSD_sectors) { // check that the sector is valid
+                                iWriteInProgress = 1;                    // {46} do not handle further commands until the data had been received
                                 return TRANSPARENT_CALLBACK;             // the call-back has done its work and the input buffer can now be used
                             }
                         }
