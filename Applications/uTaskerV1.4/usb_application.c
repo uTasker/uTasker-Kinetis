@@ -57,6 +57,7 @@
     14.12.2015 Add audio endpoints                                       {39}
 
     22.01.2018 Block USB-MSD further command handling until complete write data has been received {46}
+    25.01.2018 Correct location of protection from read to write         {46a}
 
 */
 
@@ -2658,7 +2659,6 @@ static int mass_storage_callback(unsigned char *ptrData, unsigned short length, 
                             CBW_READ_10 *ptrRead = (CBW_READ_10 *)ptrCBW->CBWCB;
                             ulLogicalBlockAdr = ((ptrRead->ucLogicalBlockAddress[0] << 24) | (ptrRead->ucLogicalBlockAddress[1] << 16) | (ptrRead->ucLogicalBlockAddress[2] << 8) | ptrRead->ucLogicalBlockAddress[3]);
                             if (ulLogicalBlockAdr < ptrDiskInfo[ucActiveLUN]->ulSD_sectors) { // check that the sector is valid
-                                iWriteInProgress = 1;                    // {46} do not handle further commands until the data had been received
                                 return TRANSPARENT_CALLBACK;             // the call-back has done its work and the input buffer can now be used
                             }
                         }
@@ -2678,8 +2678,10 @@ static int mass_storage_callback(unsigned char *ptrData, unsigned short length, 
                             CBW_WRITE_10 *ptrWrite = (CBW_WRITE_10 *)ptrCBW->CBWCB;
                             ulLogicalBlockAdr = ((ptrWrite->ucLogicalBlockAddress[0] << 24) | (ptrWrite->ucLogicalBlockAddress[1] << 16) | (ptrWrite->ucLogicalBlockAddress[2] << 8) | ptrWrite->ucLogicalBlockAddress[3]);
                             if (ulLogicalBlockAdr < ptrDiskInfo[ucActiveLUN]->ulSD_sectors) { // check that the sector is valid
+                                iWriteInProgress = 1;                    // {46a}{46} do not handle further commands until the data had been received
                                 return TRANSPARENT_CALLBACK;             // the call-back has done its work and the input buffer can now be used
-                            }                        }
+                            }                        
+                        }
                         break;                                           // stall
                     default:
                         break;
