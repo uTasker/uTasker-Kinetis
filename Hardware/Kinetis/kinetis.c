@@ -2253,7 +2253,12 @@ const _RESET_VECTOR __vector_table
     0,
     0,
     0,
-    #if defined _MINIMUM_IRQ_INITIALISATION
+    #if defined RUN_IN_FREE_RTOS
+    vPortSVCHandler,                                                     // FreeRTOS's SCV handler
+    irq_debug_monitor,
+    0,
+    xPortPendSVHandler,                                                  // FreeRTOS's PendSV handler
+    #elif defined _MINIMUM_IRQ_INITIALISATION
     irq_default,
     irq_default,
     0,
@@ -2266,77 +2271,118 @@ const _RESET_VECTOR __vector_table
     #endif
     _RealTimeInterrupt,                                                  // systick
     {                                                                    // processor specific interrupts
-    irq_default,
-    irq_default,
-    irq_default,
-    irq_default,
-    irq_default,
-    irq_default,
-    irq_default,
+    irq_default,                                                         // 0
+    irq_default,                                                         // 1
+    irq_default,                                                         // 2
+    irq_default,                                                         // 3
+    irq_default,                                                         // 4
+    irq_default,                                                         // 5
+    irq_default,                                                         // 6
     #if defined SUPPORT_LOW_POWER && defined LLWU_AVAILABLE && defined SUPPORT_LLWU
-    _wakeup_isr,
+    _wakeup_isr,                                                         // 7
     #else
-    irq_default,
+    irq_default,                                                         // 7
     #endif
     #if defined I2C_INTERFACE
-    _IIC_Interrupt_0,
+    _I2C_Interrupt_0,                                                    // 8
     #else
-    irq_default,
+    irq_default,                                                         // 8
     #endif
-    irq_default,
-    irq_default,
-    irq_default,
+    irq_default,                                                         // 9
+    irq_default,                                                         // 10
+    irq_default,                                                         // 11
     #if defined SERIAL_INTERFACE
         #if defined KINETIS_KL03
-    _LPSCI0_Interrupt,                                                   // LPUART 0
+    _LPSCI0_Interrupt,                                                   // 12 LPUART 0
         #else
-    _SCI0_Interrupt,                                                     // UART 0
+    _SCI0_Interrupt,                                                     // 12 UART 0
         #endif
     #else
-    irq_default,
+        irq_default,                                                     // 12
     #endif
-    irq_default,
-    irq_default,
-    irq_default,
-    irq_default,
-    irq_default,
-    irq_default,
-    irq_default,
+    irq_default,                                                         // 13
+    irq_default,                                                         // 14
+    #if defined SUPPORT_ADC
+        _ADC_Interrupt_0,                                                // 15 ADC0
+    #else
+        irq_default,                                                     // 15
+    #endif
+    irq_default,                                                         // 16
+    #if defined SUPPORT_TIMER && (FLEX_TIMERS_AVAILABLE > 0)
+	_flexTimerInterrupt_0,                                               // 17
+    #else
+    irq_default,                                                         // 17
+    #endif
+    #if defined SUPPORT_TIMER && (FLEX_TIMERS_AVAILABLE > 1 && !defined NO_FLEX_TIMER_2)
+	_flexTimerInterrupt_1,                                               // 18
+    #else
+    irq_default,                                                         // 18
+    #endif
+	#if defined SUPPORT_TIMER && (FLEX_TIMERS_AVAILABLE > 2)
+	_flexTimerInterrupt_2,                                               // 19
+    #else
+    irq_default,                                                         // 19
+    #endif
     #if defined SUPPORT_RTC && defined KINETIS_KE
-    _rtc_handler,
-    irq_default,
+    _rtc_handler,                                                        // 20
+    irq_default,                                                         // 21
     #elif defined SUPPORT_RTC && !defined KINETIS_KL02
-    _rtc_alarm_handler,
-    _rtc_handler,
+    _rtc_alarm_handler,                                                  // 20
+    _rtc_handler,                                                        // 21
     #else
-    irq_default,
-    irq_default,
+    irq_default,                                                         // 20
+    irq_default,                                                         // 21
     #endif
-    irq_default,
-    irq_default,
-    irq_default,
-    irq_default,
-    irq_default,
-    irq_default,
-    #if defined TICK_USES_LPTMR
-    _RealTimeInterrupt,
+    #if (defined SUPPORT_PITS || defined USB_HOST_SUPPORT) && !defined KINETIS_WITHOUT_PIT
+        #if defined KINETIS_KL
+	_PIT_Interrupt,                                                      // 22
+	irq_default,                                                         // 23
+        #else
+	_PIT0_Interrupt,                                                     // 22
+	_PIT1_Interrupt,                                                     // 23
+        #endif
     #else
-    irq_default,
+    irq_default,                                                         // 22
+	irq_default,                                                         // 23
+    #endif
+    #if defined USB_INTERFACE
+    _usb_otg_isr,                                                        // 24
+    #else
+        #if defined KINETIS_KE && defined SUPPORT_KEYBOARD_INTERRUPTS && (KBIS_AVAILABLE > 0)
+    _KBI0_isr,                                                           // 24
+        #else
+    irq_default,                                                         // 24
+        #endif
+    #endif
+        #if defined KINETIS_KE && defined SUPPORT_KEYBOARD_INTERRUPTS && (KBIS_AVAILABLE > 1)
+    _KBI1_isr,                                                           // 25
+        #else
+    irq_default,                                                         // 25
+        #endif
+    irq_default,                                                         // 26
+    irq_default,                                                         // 27
+    #if defined TICK_USES_LPTMR
+    _RealTimeInterrupt,                                                  // 28
+    #elif defined SUPPORT_LPTMR && !defined TICK_USES_LPTMR && !defined KINETIS_KE
+    _LPTMR_periodic,                                                     // 28 warning that only periodic interrupt is supported (not single-shot)
+    #else
+    irq_default,                                                         // 28
     #endif
     #if defined KINETIS_KL03
-    irq_default,
+    irq_default,                                                         // 29
         #if defined SUPPORT_PORT_INTERRUPTS && !defined NO_PORT_INTERRUPTS_PORTA
-    _port_A_isr,
+    _port_A_isr,                                                         // 30
         #else
-    irq_default,
+    irq_default,                                                         // 30
         #endif
         #if defined SUPPORT_PORT_INTERRUPTS && !defined NO_PORT_INTERRUPTS_PORTB
-    _port_B_isr
+    _port_B_isr,                                                         // 30
         #else
-    irq_default,
+    irq_default,                                                         // 30
         #endif
     #endif
     }
+
 #endif
 };
 

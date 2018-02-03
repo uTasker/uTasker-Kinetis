@@ -6782,12 +6782,16 @@ typedef struct stFLEX_TIMER_MODULE
     #endif
 
     #define ADC_DP0_SINGLE      0
+    #define ADC_SE0_SINGLE      0
     #define ADC_D0_DIFF         0
     #define ADC_DP1_SINGLE      1
+    #define ADC_SE1_SINGLE      1
     #define ADC_D1_DIFF         1
     #define PGA_DP_SINGLE       2
+    #define ADC_SE2_SINGLE      2
     #define PGA_D_DIFF          2
     #define ADC_DP3_SINGLE      3
+    #define ADC_SE3_SINGLE      3
     #define ADC_D3_DIFF         3
     #define ADC_SE4_SINGLE      4
     #define ADC_SE5_SINGLE      5
