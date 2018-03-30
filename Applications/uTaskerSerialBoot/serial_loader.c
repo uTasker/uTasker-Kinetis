@@ -2,7 +2,7 @@
     Mark Butcher    Bsc (Hons) MPhil MIET
 
     M.J.Butcher Consulting
-    Birchstrasse 20f,    CH-5406, Rütihof
+    Birchstrasse 20f,    CH-5406, Rï¿½tihof
     Switzerland
 
     www.uTasker.com    Skype: M_J_Butcher
@@ -1589,7 +1589,7 @@ extern int fnHandleKboot(QUEUE_HANDLE hInterface, int iInterfaceType, KBOOT_PACK
                 if (iParameters > 1) {
                     _EXCEPTION("only one parameter tested!");
                 }
-                while (iParameters--) {                                  // for each requested parameter (presently only one parameter is ever received)
+                while (iParameters-- != 0) {                             // for each requested parameter (presently only one parameter is ever received)
                   /*ulStatus = */fnHandlePropertyGet(*prType, &ulValue);
                 }
                 KBOOT_response.ucLength[0] = 12;

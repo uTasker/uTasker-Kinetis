@@ -16,6 +16,7 @@
 # 24.03.2015 Add kinetis hardware peripheral headers as dependencies
 # 04.06.2015 Add FreeMaster.c and nRF24201.c
 # 21.11.2015 Exchanged HW dependency to kinetis_USB_OTG.h
+# 30.03.2018 Add mqtt.c
 
 
 # Compiler flags (thumb mode - little endian)
@@ -34,7 +35,7 @@ OBJS = Build/application.o Build/debug.o Build/webInterface.o Build/KeyScan.o Bu
        Build/GLCD.o Build/LCD.o \
        Build/eth_drv.o Build/Driver.o Build/uMalloc.o Build/uTasker.o Build/Tty_drv.o Build/iic_drv.o Build/USB_drv.o Build/uFile.o Build/Watchdog.o Build/GlobalTimer.o Build/time_keeper.o Build/low_power.o Build/can_drv.o \
        Build/Ethernet.o Build/arp.o Build/dhcp.o Build/dns.o Build/ftp.o Build/http.o Build/icmp.o Build/ip_utils.o Build/ip.o Build/pop3.o Build/smtp.o Build/snmp.o \
-                        Build/tcp.o Build/telnet.o Build/tftp.o Build/udp.o Build/webutils.o Build/NetBIOS.o Build/zero_config.o Build/ftp_client.o Build/igmp.o
+                        Build/tcp.o Build/telnet.o Build/tftp.o Build/udp.o Build/webutils.o Build/NetBIOS.o Build/zero_config.o Build/ftp_client.o Build/igmp.o Build/mqtt.o
 
 OBJS2 = Build/kinetis.o
 
@@ -241,6 +242,8 @@ Build/ftp_client.o: ../../../stack/ftp_client.c $(DEPENDS)
 Build/igmp.o: ../../../stack/igmp.c $(DEPENDS)
 		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../../../stack/igmp.c -o Build/igmp.o
 
+Build/mqtt.o: ../../../stack/mqtt.c $(DEPENDS)
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../../../stack/mqtt.c -o Build/mqtt.o
 
 
 # uGLCDLIB files

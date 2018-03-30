@@ -1788,17 +1788,17 @@ static void fnSetSerialNumberString(CHAR *ptrSerialNumber) {             // {12}
 
 // This routine must always be supplied by the user if usb strings are supported
 //
-extern unsigned char *fnGetUSB_string_entry(unsigned short usStringRef, unsigned short *usLength)
+extern unsigned char *fnGetUSB_string_entry(unsigned char ucStringRef, unsigned short *usLength)
 {
     #if defined USB_HOST_SUPPORT
     return 0;                                                            // dummy for host
     #else
-    if (usStringRef > LAST_STRING_INDEX) {
+    if (ucStringRef > LAST_STRING_INDEX) {
         return 0;                                                        // invalid string index
     }
         #if defined USB_RUN_TIME_DEFINABLE_STRINGS                       // if variable strings are supported
-    if (ucStringTable[usStringRef][0] == 0) {                            // no length defined, meaning it is a run-time definabled string
-        switch (usStringRef) {
+    if (ucStringTable[ucStringRef][0] == 0) {                            // no length defined, meaning it is a run-time definabled string
+        switch (ucStringRef) {
         case SERIAL_NUMBER_STRING_INDEX:                                 // USB driver needs to know what string is used as serial number
             *usLength = (unsigned short)SerialNumberDescriptor->bLength; // return length and location of the user defined serial number
             return (unsigned char *)SerialNumberDescriptor;
@@ -1807,12 +1807,12 @@ extern unsigned char *fnGetUSB_string_entry(unsigned short usStringRef, unsigned
         }
     }
     else {
-        *usLength = ucStringTable[usStringRef][0];                       // the length of the string
+        *usLength = ucStringTable[ucStringRef][0];                       // the length of the string
     }
         #else
     *usLength = ucStringTable[usStringRef][0];                           // the length of the string
         #endif
-    return ((unsigned char *)ucStringTable[usStringRef]);                // return a pointer to the string
+    return ((unsigned char *)ucStringTable[ucStringRef]);                // return a pointer to the string
     #endif
 }
 #endif
@@ -3870,6 +3870,63 @@ static void fnConfigureApplicationEndpoints(void)
     USBPortID_Audio = fnOpen(TYPE_USB, 0, &tInterfaceParameters);        // open the endpoints with defined configurations (initially inactive)
     fnAudio(USBPortID_Audio, tInterfaceParameters.queue_sizes.RxQueueSize); // initialise the audio output
     #endif
+}
+#endif
+
+#if defined USE_MAINTENANCE && defined USB_INTERFACE && defined USE_USB_CDC
+extern int fnUSB_CDC_TX(int iStart)
+{
+    static unsigned long ulTxCount[USB_CDC_VCOM_COUNT] = {0};
+    static unsigned char ucTxComplete[USB_CDC_VCOM_COUNT] = {0};
+    #if SIZE_OF_RAM < (16 * 1024)
+    static unsigned char ucTestData[128];                                // the transmit block size is best a length of half the output buffer size so that it can keep the output buffer filled
+    #else
+    static unsigned char ucTestData[512];
+    #endif
+    int i;
+    int iNotComplete = 0;
+    if (iStart != 0) {
+        static int iNotTested = 0;
+        iNotTested = 0;
+        uMemset(ucTxComplete, 0, sizeof(ucTxComplete));
+        for (i = 0; i < USB_CDC_VCOM_COUNT; i++) {
+            if (fnWrite(USBPortID_comms[i], 0, 1) == 0) {                // if it is not possible to queue a single byte of data the interface is not active
+                ucTxComplete[i] = 1;                                     // mark that this interface will not be tested
+                iNotTested++;                                            // count the number of interfaces that will not be tested
+            }
+            else {
+                fnFlush(USBPortID_comms[i], FLUSH_TX);                  // flush the transmitter before starting in order to have an aligned circular buffer for optimal efficiency
+            }
+        }
+        if (iNotTested >= USB_CDC_VCOM_COUNT) {                          // if there are no active interfaces
+            fnDebugMsg("No USB-CDC interface active!\r\n");              // abort the test
+            return 0;
+        }
+        uMemset(ulTxCount, 0, sizeof(ulTxCount));
+        uMemset(ucTestData, 'X', sizeof(ucTestData));                    // set the transmission pattern
+    }
+    for (i = 0; i < USB_CDC_VCOM_COUNT; i++) {                           // fo reach possible interface
+        if (ucTxComplete[i] != 0) {                                      // ignore interfaces that have completed or aren't to be tested
+            continue;
+        }
+        if (fnWrite(USBPortID_comms[i], 0, sizeof(ucTestData)) != 0) {   // check whether the data can be copied to the output buffer
+            fnWrite(USBPortID_comms[i], ucTestData, sizeof(ucTestData)); // copy data for transmission
+            ulTxCount[i] += sizeof(ucTestData);                          // the amount of data queued for transmission
+            if (ulTxCount[i] >= (10 * 1024 * 1024)) {                    // has all the test data been sent over this interface?
+                ucTxComplete[i] = 1;                                     // mark that this interface has completed
+                continue;                                                // avoid setting the "not complete" flag due to the final queued data block
+            }
+        }
+        iNotComplete = 1;
+    }
+    if (iNotComplete != 0) {                                             // if not complete
+        fnInterruptMessage(TASK_DEBUG, E_USB_TX_CONTINUE);               // schedule the next transmission
+        return 1;
+    }
+    // All USB CDC interfaces have terminated
+    //
+    fnDebugMsg("\r\nComplete!\r\n");
+    return 0;
 }
 #endif
 

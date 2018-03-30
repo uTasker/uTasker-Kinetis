@@ -11,7 +11,7 @@
     File:      TaskConfig.h
     Project:   Single Chip Embedded Internet
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2017
+    Copyright (C) M.J.Butcher Consulting 2004..2018
     *********************************************************************
     28.04.2007 Add SNMP task
     13.05.2007 Add PPP task
@@ -31,7 +31,8 @@
     02.06.2014 Allow task TASK_NETWORK_INDICATOR to be used with define INTERRUPT_TASK_PHY {11}
     11.02.2015 Added task TASK_TIME_KEEPER                               {12}
     18.11.2015 Add USB host task                                         {13}
-    18.04.2017 Add BLINKEY configuration
+    18.04.2017 Add BLINKY configuration
+    10.11.2017 Add MQTT task                                             {14}
 
 */
  
@@ -67,7 +68,9 @@
 #define TASK_MASS_STORAGE       'M'                                      // {5} mass storage task
 #define TASK_ZERO_CONFIG        'z'                                      // {7} zero config task
 #define TASK_TIME_KEEPER        'k'                                      // {12} time keeper task (RTC/SNTP)
+#define TASK_MQTT               'Q'                                      // {14}
 
+#define TASK_STEPPER_MOTOR      '0'
 #define TASK_DEV_1              '1'
 #define TASK_DEV_2              '2'
 #define TASK_DEV_3              '3'
@@ -108,6 +111,10 @@ extern void fnMODBUS(TTASKTABLE *);
 extern void fnMassStorage(TTASKTABLE *);                                 // {5}
 extern void fnZeroConfig(TTASKTABLE *);                                  // {7}
 extern void fnTimeKeeper(TTASKTABLE *ptrTaskTable);                      // {12}
+extern void fnMQTT(TTASKTABLE *ptrTaskTable);                            // {14}
+#if defined STEPPER_MOTOR_EXAMPLE
+    extern void fnStepper(TTASKTABLE *);
+#endif
 #if defined QUICK_DEV_TASKS
     extern void fnQuickTask1(TTASKTABLE *ptrTaskTable);
     extern void fnQuickTask2(TTASKTABLE *ptrTaskTable);
@@ -162,12 +169,17 @@ const UTASK_TASK ctNodes[] = {                                           // we u
 #if defined USE_MODBUS
     TASK_MODBUS,                                                         // MODBUS task
 #endif
-#if !defined BLINKEY
+#if !defined BLINKY
     TASK_APPLICATION,                                                    // application task
+    #if defined USE_MAINTENANCE
     TASK_DEBUG,                                                          // maintenance task
+    #endif
 #endif
 #if defined SDCARD_SUPPORT || defined SPI_FLASH_FAT || defined FLASH_FAT || defined MANAGED_FILES || defined USB_MSD_HOST
     TASK_MASS_STORAGE,                                                   // {5} mass storage task
+#endif
+#if defined USE_MQTT_CLIENT || defined USE_MQTT_BROKER
+    TASK_MQTT,                                                           // {14} MQTT client/server task
 #endif
 #if defined USE_DHCP_CLIENT
     TASK_DHCP,                                                           // DHCP task
@@ -208,13 +220,16 @@ const UTASK_TASK ctNodes[] = {                                           // we u
 #if defined USE_IGMP
     TASK_IGMP,                                                           // {10} IGMP task
 #endif
-#if (defined LAN_REPORT_ACTIVITY || defined PHY_POLL_LINK || defined INTERRUPT_TASK_PHY) && !defined BLINKEY // {11}
+#if (defined LAN_REPORT_ACTIVITY || defined PHY_POLL_LINK || defined INTERRUPT_TASK_PHY) && !defined BLINKY // {11}
     TASK_NETWORK_INDICATOR,                                              // network activity indicator task
 #endif
-#if (defined USE_SNTP || defined USE_TIME_SERVER || defined USE_TIME_SERVER || defined SUPPORT_RTC || defined SUPPORT_SW_RTC) && !defined BLINKEY // {12}
+#if (defined USE_SNTP || defined USE_TIME_SERVER || defined USE_TIME_SERVER || defined SUPPORT_RTC || defined SUPPORT_SW_RTC) && !defined BLINKY // {12}
     TASK_TIME_KEEPER,
 #endif
-#if defined QUICK_DEV_TASKS
+#if defined STEPPER_MOTOR_EXAMPLE
+    TASK_STEPPER_MOTOR,
+#endif
+#if defined QUICK_DEV_TASKS && !defined BLINKY
     TASK_DEV_1,
     TASK_DEV_2,
     TASK_DEV_3,
@@ -239,29 +254,32 @@ const UTASKTABLEINIT ctTaskTable[] = {
     // task name,  task routine,   input queue size, start delay, period, initial task state
     //
 #if defined _HW_SAM7X
-    {"Wdog",      fnTaskWatchdog, NO_QUE,   (DELAY_LIMIT)(0.2 * SEC), (DELAY_LIMIT)(0.2 * SEC),  UTASKER_STOP}, // watchdog task (note SAM7X is not allowed to start watchdog immediately since it also checks for too fast triggering!!)
+    {"Wdog",      fnTaskWatchdog, NO_QUEUE, (DELAY_LIMIT)(0.2 * SEC), (DELAY_LIMIT)(0.2 * SEC),  UTASKER_STOP}, // watchdog task (note SAM7X is not allowed to start watchdog immediately since it also checks for too fast triggering!!)
 #else
-    {"Wdog",      fnTaskWatchdog, NO_QUE,   0, (DELAY_LIMIT)(0.2 * SEC),  UTASKER_GO}, // watchdog task (runs immediately and then periodically)
+    {"Wdog",      fnTaskWatchdog, NO_QUEUE, 0, (DELAY_LIMIT)(0.2 * SEC),  UTASKER_GO}, // watchdog task (runs immediately and then periodically)
 #endif
 #if defined USE_IP || defined USE_IPV6                                   // {6} warning - start ARP task before Ethernet. If Ethernet messages are received before ARP table is ready there would be an error..
-    {"ARP",       fnTaskArp,    MEDIUM_QUE, (DELAY_LIMIT)(0.05 * SEC), 0, UTASKER_STOP}, // ARP task check periodically state of ARP table
+    {"ARP",       fnTaskArp,    MEDIUM_QUEUE, (DELAY_LIMIT)(0.05 * SEC), 0, UTASKER_STOP}, // ARP task check periodically state of ARP table
 #endif
 #if defined ETH_INTERFACE
     {"Eth",       fnTaskEthernet, (HEADER_LENGTH * 12), (DELAY_LIMIT)((0.05 * SEC) + (PHY_POWERUP_DELAY)), 0, UTASKER_STOP}, // {1} ethernet task - runs automatically
 #endif
 #if defined USE_TCP
-    {"TCP",       fnTaskTCP,    MEDIUM_QUE,  (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP}, // {1} TCP task checks periodically state of session timeouts (controlled by task itself)
+    {"TCP",       fnTaskTCP,    MEDIUM_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP}, // {1} TCP task checks periodically state of session timeouts (controlled by task itself)
 #endif
 #if defined USE_MODBUS
-    {"O-MOD",     fnMODBUS,     MEDIUM_QUE,  (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP}, // MODBUS task  
+    {"O-MOD",     fnMODBUS,     MEDIUM_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP}, // MODBUS task  
 #endif
-#if defined _EXE && defined ETH_INTERFACE && !defined BLINKEY
-    {"app",       fnApplication,  MEDIUM_QUE,  (DELAY_LIMIT)((0.5 * SEC) + (PHY_POWERUP_DELAY)), 0, UTASKER_STOP}, // application - start after Ethernet to be sure we have Ethernet handle
-#elif !defined BLINKEY
-    {"app",       fnApplication,  MEDIUM_QUE,  (DELAY_LIMIT)((0.10 * SEC) + (PHY_POWERUP_DELAY)), 0, UTASKER_STOP}, // application - start after Ethernet to be sure we have Ethernet handle
+#if defined _EXE && defined ETH_INTERFACE && !defined BLINKY
+    {"app",       fnApplication,  MEDIUM_QUEUE, (DELAY_LIMIT)((0.5 * SEC) + (PHY_POWERUP_DELAY)), 0, UTASKER_STOP}, // application - start after Ethernet to be sure we have Ethernet handle
+#elif !defined BLINKY
+    {"app",       fnApplication,  MEDIUM_QUEUE, (DELAY_LIMIT)((0.10 * SEC) + (PHY_POWERUP_DELAY)), 0, UTASKER_STOP}, // application - start after Ethernet to be sure we have Ethernet handle
 #endif
 #if defined SDCARD_SUPPORT || defined SPI_FLASH_FAT || defined FLASH_FAT || defined MANAGED_FILES || defined USB_MSD_HOST
-    {"MassSt",    fnMassStorage,  MEDIUM_QUE,  (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP}, // mass storage task
+    {"MassSt",    fnMassStorage,  MEDIUM_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP}, // mass storage task
+#endif
+#if defined USE_MQTT_CLIENT || defined USE_MQTT_BROKER                   // {14}
+    {"Q-mqtt",    fnMQTT,       SMALL_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP },
 #endif
 #if defined USE_DHCP_CLIENT
     {"DHCP",      fnDHCP,       SMALL_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP}, // delay only for timer queue space
@@ -291,16 +309,16 @@ const UTASKTABLEINIT ctTaskTable[] = {
     {"zero",      fnZeroConfig, SMALL_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP},
 #endif
 #if defined SUPPORT_LCD
-    {"LCD",       fnLCD,        MEDIUM_QUE,  (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP},
+    {"LCD",       fnLCD,        MEDIUM_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP},
 #elif defined SUPPORT_GLCD || defined SUPPORT_OLED /* || defined SUPPORT_TFT || defined GLCD_COLOR */ // {2}{4}{8}
     #if defined GLCD_COLOR
     {"LCD",       fnLCD,        SMALL_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_ACTIVATE}, // runs immediately
     #else
-    {"LCD",       fnLCD,        (LARGE_QUE + 128),  (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP}, // large queue for queuing text
+    {"LCD",       fnLCD,        (LARGE_QUEUE + 128), (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP}, // large queue for queuing text
     #endif
 #endif
 #if defined SUPPORT_KEY_SCAN
-    {"Key",       fnKey,        NO_QUE,      (DELAY_LIMIT)(0.4 * SEC), (DELAY_LIMIT)(0.05 * SEC), UTASKER_STOP}, // {3}
+    {"Key",       fnKey,        NO_QUEUE, (DELAY_LIMIT)(0.4 * SEC), (DELAY_LIMIT)(0.05 * SEC), UTASKER_STOP}, // {3}
 #endif
 #if defined GLOBAL_TIMER_TASK
     {"period",    fnTimer,      SMALL_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP}, // gobal timer task
@@ -308,23 +326,26 @@ const UTASKTABLEINIT ctTaskTable[] = {
 #if defined USE_MAINTENANCE
     {"maintenace",fnDebug,      SMALL_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP}, // task used for debug messages (started by application)
 #endif
-#if (defined LAN_REPORT_ACTIVITY || defined PHY_POLL_LINK || defined INTERRUPT_TASK_PHY) && !defined BLINKEY // {9}{11}
-    {"NetInd",    fnNetworkIndicator,LARGE_QUE,   (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP}, // network activity task
+#if (defined LAN_REPORT_ACTIVITY || defined PHY_POLL_LINK || defined INTERRUPT_TASK_PHY) && !defined BLINKY // {9}{11}
+    {"NetInd",    fnNetworkIndicator, LARGE_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP}, // network activity task
 #endif
 #if defined USB_INTERFACE
     {"usb",       fnTaskUSB,    SMALL_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP}, // USB (application) task
 #endif
-#if (defined USE_SNTP || defined USE_TIME_SERVER || defined USE_TIME_SERVER || defined SUPPORT_RTC || defined SUPPORT_SW_RTC) && !defined BLINKEY // {12}
+#if (defined USE_SNTP || defined USE_TIME_SERVER || defined USE_TIME_SERVER || defined SUPPORT_RTC || defined SUPPORT_SW_RTC) && !defined BLINKY // {12}
     {"keeper",    fnTimeKeeper, SMALL_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP}, // time keeper task
 #endif
-#if defined QUICK_DEV_TASKS
-    {"1",    fnQuickTask1, MEDIUM_QUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_ACTIVATE}, // quick development  tasks (runs immediatley and can be used to start other development tasks)
-    {"2",    fnQuickTask2, MEDIUM_QUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP},
-    {"3",    fnQuickTask3, MEDIUM_QUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP},
-    {"4",    fnQuickTask4, MEDIUM_QUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP},
+#if defined STEPPER_MOTOR_EXAMPLE
+    { "0_step",   fnStepper, SMALL_QUEUE, (DELAY_LIMIT)(0.5 * SEC), 0, UTASKER_STOP }, // time keeper task
+#endif
+#if defined QUICK_DEV_TASKS && !defined BLINKY
+    {"1",    fnQuickTask1, MEDIUM_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP}, // quick development  tasks
+    {"2",    fnQuickTask2, MEDIUM_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP},
+    {"3",    fnQuickTask3, MEDIUM_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP},
+    {"4",    fnQuickTask4, MEDIUM_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP},
 #endif
 #if defined SUPPORT_LOW_POWER
-    {"lowPower",  fnLowPower,   NO_QUE,      0, 0, UTASKER_GO},          // low power task
+    {"lowPower",  fnLowPower,   NO_QUEUE,  0, 0, UTASKER_GO},          // low power task
 #endif
     {0}
 };

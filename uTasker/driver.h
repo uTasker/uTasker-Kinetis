@@ -11,7 +11,7 @@
     File:      driver.h
     Project:   Single Chip Embedded Internet
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2017
+    Copyright (C) M.J.Butcher Consulting 2004..2018
     *********************************************************************
     01.03.2007 Added uCompareFile()
     19.05.2007 Add FLASH protection functions fnProtectFile(), fnUnprotectFile()
@@ -32,7 +32,7 @@
     24.02.2009 Add CONFIG_RTS_PIN, CONFIG_CTS_PIN, SET_RS485_MODE        {14}
     24.02.2009 TTYTABLE configuration extended to configurable tye. TTYQUE opn_mode also changed to same type {15}
     24.02.2009 Add INFORM_ON_FRAME_TRANSMISSION                          {16}
-    07.04.2009 Add fnGetUserMimeType(), fnEnterUserFiles() and USER_FILE struc {17}
+    07.04.2009 Add fnGetUserMimeType(), fnEnterUserFiles() and USER_FILE struct {17}
     16.04.2009 Add WITH_CR_LF flag for use with string functions         {18}
     26.05.2009 Add uMemset_long() and uMemcpy_long()                     {19}
     10.06.2009 DCE_MODE and DTE_MODE removed (replaced by INFORM_ON_FRAME_TRANSMISSION) {20}
@@ -44,7 +44,7 @@
     11.12.2009 Add additional ASCII character defines                    {26}
     23.12.2009 Correct LITTLE_LONG_WORD() macro for big-endian processors{27}
     02.01.2010 Add UTFAT_OPERATION_COMPLETED                             {28}
-    02.02.2010 Add uFree()                                               {29}
+    02.02.2010 Add optional uFree()                                      {29}
     21.03.2010 Add USB_ENDPOINT_TERMINATES, TRANSPARENT_CALLBACK, ENDPOINT_REQUEST_TYPE and ENDPOINT_CLEARED {30}
     31.03.2010 Add ucParameters and ucPaired_IN to USB_ENDPOINT and mode USB_TERMINATING_ENDPOINT {31}
     02.04.2010 Add fnGetPairedIN()                                       {32}
@@ -91,6 +91,14 @@
     07.01.2017 Add UART_TIMED_TRANSMISSION_MODE                          {72}
     16.02.2017 Add crypography AES defines                               {73}
     17.01.2017 Add DSP FFT defines                                       {74}
+    03.05.2017 Add UART_RX_MODULO and UART_TX_MODULO flags               {75}
+    09.05.2017 Add PAUSE_TX                                              {76}
+    26.11.2017 Added FOREVER_LOOP()                                      {77}
+    29.11.2017 Add UART_INVERT_TX                                        {78}
+    16.12.2017 Add optional uCalloc() and uCFree()                       {79}
+    17.12.2017 Change uMemset() to match memset() parameters             {80}
+    13.03.2018 Add UART_IDLE_LINE_INTERRUPT                              {81}
+    16.03.2018 Add CONTROL_QUESTION_MARK                                 {82}
 
 */
 
@@ -101,6 +109,8 @@
 /* =================================================================== */
 /*                           global defines                            */
 /* =================================================================== */
+
+#define FOREVER_LOOP()    while ((int)1 != (int)0)                       // {77}
 
 // Queues and physical queues supported
 //
@@ -177,6 +187,7 @@
 #define CONFIG_CTS_PIN    0x1000                                         // {14}
 #define SET_RS485_MODE    0x2000                                         // {14}
 #define SET_RS485_NEG     0x4000                                         // {36}
+#define PAUSE_TX          0x8000                                         // {76}
 
 #define MODIFY_TX         0x1000
 #define MODIFY_RX         0x0000
@@ -192,7 +203,7 @@
 #define ASCII_ENQ                    0x05
 #define ASCII_ACK                    0x06
 #define ASCII_BEL                    0x07
-#define DELETE_KEY                   0x08                                // back space
+#define DELETE_KEY                   0x08                                // back space (control-H)
 #define ASCII_HT                     0x09
 #define LINE_FEED                    0x0a
 #define ASCII_VT                     0x0b
@@ -223,6 +234,7 @@
 #define ARROW_LEFT_SEQUENCE          0x44                                // {43}
 #define ESCAPE_ARROWS                0x5b                                // {43}
 #define BACK_SLASH                   0x5c                                // {26}
+#define CONTROL_QUESTION_MARK        0x7f                                // {82} control-? (this is used by putty as back space if not set to control-H)
 
 
 // Serial configuration
@@ -235,6 +247,7 @@
 #define CHAR_7                       0x0001
 #define RS232_EVEN_PARITY            0x0002
 #define RS232_ODD_PARITY             0x0004
+#define ONE_STOP                     0x0000
 #define ONE_HALF_STOPS               0x0008
 #define TWO_STOPS                    0x0010
 
@@ -252,15 +265,23 @@
 #define INFORM_ON_FRAME_TRANSMISSION 0x2000                              // {16} transmitter informs on transmission completion (no more data waiting) in output buffer
 #define BREAK_AFTER_TX               0x4000                              // send a break once the tx buffer has emptied
 #define MSG_BREAK_MODE               0x8000                              // message framing using break
-#define MULTIDROP_MODE_RX            0x00010000                          // {23} extended mode - also known as 9-bit mode (reception)
-#define MULTIDROP_MODE_TX            0x00020000                          // {38} extended mode - also known as 9-bit mode (transmission)
-#define UART_TIMED_TRANSMISSION_MODE 0x00040000                          // {72}
+#if defined UART_EXTENDED_MODE
+    // The following options are available when UART_EXTENDED_MODE is enabled
+    //
+    #define MULTIDROP_MODE_RX            0x00010000                      // {23} extended mode - also known as 9-bit mode (reception)
+    #define MULTIDROP_MODE_TX            0x00020000                      // {38} extended mode - also known as 9-bit mode (transmission)
+    #define UART_TIMED_TRANSMISSION_MODE 0x00040000                      // {72}
+    #define UART_INVERT_TX               0x00080000                      // {78}
+    #define UART_IDLE_LINE_INTERRUPT     0x00100000                      // {81}
+#endif
 
 #define UART_TX_DMA                  0x01                                // UART uses DMA for transmission
 #define UART_RX_DMA                  0x02                                // UART uses DMA for reception
 #define UART_RX_DMA_FULL_BUFFER      0x04                                // DMA complete when rx buffer full
 #define UART_RX_DMA_HALF_BUFFER      0x08                                // DMA complete when rx buffer half full
 #define UART_RX_DMA_BREAK            0x10                                // DMA complete when break detected
+#define UART_RX_MODULO               0x20                                // {75} reception memory must be moduo aligned
+#define UART_TX_MODULO               0x40                                // {75} transmission memory must be moduo aligned
 
 #define FLUSH_RX          0
 #define FLUSH_TX          1
@@ -316,6 +337,7 @@
 
 // I2C shared states
 //
+#define RX_ACTIVE_FIRST_READ        SEND_XON
 #define I2C_SLAVE_TX_BUFFER_MODE    SEND_XOFF
 #define I2C_SLAVE_RX_MESSAGE_MODE   SEND_XOFF                            // {65}
 
@@ -614,14 +636,14 @@ typedef struct stSPITABLE {
 // Ethernet table structure used to configure an Ethernet interface
 //
 typedef struct stETHtable {
-#if !defined ETHERNET_AVAILABLE || defined NO_INTERNAL_ETHERNET || (ETHERNET_INTERFACES > 1) || (defined USB_CDC_RNDIS && defined USB_TO_TCP_IP)
+#if !defined ETHERNET_AVAILABLE || defined NO_INTERNAL_ETHERNET || (ETHERNET_INTERFACES > 1) || (defined USB_CDC_RNDIS && defined USB_TO_TCP_IP) || defined USE_PPP
     void *ptrEthernetFunctions;                                          // function table used when there is an external controller available
 #endif
     QUEUE_HANDLE   Channel;                                              // channel number 0, 1, ...
     unsigned short usMode;                                               // mode of operation
     unsigned short usSizeRx;                                             // size to set for Rx buffer
     unsigned short usSizeTx;                                             // size to set for Tx buffer
-    UTASK_TASK     Task_to_wake;                                         // 0 = don't wake any else first letter
+    UTASK_TASK     Task_to_wake;                                         // 0 = don't wake any, else first letter
 #if !defined USE_IPV6
     unsigned char  ucMAC[6];                                             // MAC address of device
 #endif
@@ -631,14 +653,14 @@ typedef struct stETHtable {
 
 typedef struct stETHERNET_FUNCTIONS {
     int (*fnConfigEthernet)(ETHTABLE *);                                 // configuration function for the Ethernet interface
-    int (*fnGetQuantityRxBuf)(void);
-    unsigned char *(*fnGetTxBufferAdd)(int);
-    int (*fnWaitTxFree)(void);
-    void (*fnPutInBuffer)(unsigned char *, unsigned char *, QUEUE_TRANSFER);
-    QUEUE_TRANSFER (*fnStartEthTx)(QUEUE_TRANSFER, unsigned char *);
-    void (*fnFreeEthernetBuffer)(int);
+    int (*fnGetQuantityRxBuf)(void);                                     // call-back used to get the number of available receive buffers
+    unsigned char *(*fnGetTxBufferAdd)(int);                             // call-back used to get a memory-mapped buffer address
+    int (*fnWaitTxFree)(void);                                           // call-back used to allow waiting on transmit buffer availability
+    void (*fnPutInBuffer)(unsigned char *, unsigned char *, QUEUE_TRANSFER); // call-back used to prepare transmit data to the output buffer
+    QUEUE_TRANSFER (*fnStartEthTx)(QUEUE_TRANSFER, unsigned char *);     // call-back used to release a prepared transmit buffer
+    void (*fnFreeEthernetBuffer)(int);                                   // call-back used to free a used reception buffer
 #if defined USE_IGMP
-    void (*fnModifyMulticastFilter)(QUEUE_TRANSFER, unsigned char *);
+    void (*fnModifyMulticastFilter)(QUEUE_TRANSFER, unsigned char *);    // call-back used to setup the multicast filter
 #endif
 } ETHERNET_FUNCTIONS;
 
@@ -814,7 +836,7 @@ typedef struct stUSBQUE
 //
 typedef struct stIDinfo
 {
-#if (!defined ETH_INTERFACE && (ETHERNET_INTERFACES == 1)) || !defined ETHERNET_AVAILABLE || defined NO_INTERNAL_ETHERNET || (ETHERNET_INTERFACES > 1) || defined USB_CDC_RNDIS
+#if (!defined ETH_INTERFACE && (ETHERNET_INTERFACES == 1)) || !defined ETHERNET_AVAILABLE || defined NO_INTERNAL_ETHERNET || (ETHERNET_INTERFACES > 1) || defined USB_CDC_RNDIS || defined USE_PPP
     void *ptrDriverFunctions;                                            // list of functions that are used to handle certain driver types
 #endif
     QUEUE_TRANSFER (*CallAddress)(QUEUE_HANDLE, unsigned char *, QUEUE_TRANSFER, unsigned char, QUEUE_HANDLE); // address of driver for all interraction
@@ -837,7 +859,6 @@ extern QUEUE_HANDLE Ethernet_handle[ETHERNET_INTERFACES];                // Ethe
 /* =================================================================== */
 /*                 global function prototype declarations              */
 /* =================================================================== */
-
 
 extern QUEUE_TRANSFER fnDebugMsg (CHAR *ucToSend);                       // send string to debug interface
 extern unsigned long  fnHexStrHex(CHAR *ucNewAdd);                       // converts an ASCII hex byte sequence to its hex value (can be up to a 32 bit value in length)
@@ -921,6 +942,7 @@ extern QUEUE_HANDLE   fnOpenCAN(CANTABLE *pars, unsigned char driver_mode);
     extern void fnSetUSBEndpointState(int iEndpoint, unsigned char ucStateSet);
     extern int  fnGetPairedIN(int iEndpoint_OUT);                        // {32}
     extern QUEUE_TRANSFER entry_usb(QUEUE_HANDLE channel, unsigned char *ptBuffer, QUEUE_TRANSFER Counter, unsigned char ucCallType, QUEUE_HANDLE DriverID);
+    extern QUEUE_TRANSFER fnStartUSB_send(QUEUE_HANDLE channel, USBQUE *ptrUsbQueue, QUEUE_TRANSFER txLength);
 #endif
 extern QUEUE_HANDLE   fnOpenETHERNET(ETHTABLE *pars, unsigned short driver_mode);
 extern QUEUE_HANDLE   fnOpenSPI(SPITABLE *pars, unsigned char driver_mode);
@@ -970,34 +992,40 @@ extern void fnRTS_change(QUEUE_HANDLE Channel, int iState);
 
 extern void *uMalloc(MAX_MALLOC);
 extern void *uMallocAlign(MAX_MALLOC __size, unsigned short ucAlign);    // {2}
-extern MAX_MALLOC uFree(int iFreeRegion);                                // {29}
+#if defined SUPPORT_UFREE
+    extern MAX_MALLOC uFree(int iFreeRegion);                            // {29}
+#endif
 #if defined SECONDARY_UMALLOC                                            // {52}
     extern void *uMalloc2(unsigned long);
     extern void *uMallocAlign2(unsigned long __size, unsigned short ucAlign);
     extern unsigned long uFree2(int iFreeRegion);
 #endif
+#if defined SUPPORT_UCALLOC                                              // {79}
+    extern void uCFree(void *ptr);
+    extern void *uCalloc(size_t n, size_t size);
+#endif
 
 
 #if defined RUN_LOOPS_IN_RAM
-  extern void  fnInitDriver(void);
-  extern int (*uMemcmp)(const void *ptrTo, const void *ptrFrom, size_t Size);
-  extern int (*uStrcmp)(const CHAR *ptrTo, const CHAR *ptrFrom);
-  extern CHAR *(*uStrcpy)(CHAR *ptrTo, const CHAR *ptrFrom);
-  extern int (*uStrlen)(const CHAR *ptrStr);
- #if defined DMA_MEMCPY_SET && !defined DEVICE_WITHOUT_DMA
-  extern void *uMemcpy(void *ptrTo, const void *ptrFrom, size_t Size);
-  extern void *uMemset(void *ptrTo, unsigned char ucValue, size_t Size);
- #else
-  extern void (*uMemcpy)(void *ptrTo, const void *ptrFrom, size_t Size);
-  extern void (*uMemset)(void *ptrTo, unsigned char ucValue, size_t Size);
- #endif
+    extern void  fnInitDriver(void);
+    extern int (*uMemcmp)(const void *ptrTo, const void *ptrFrom, size_t Size);
+    extern int (*uStrcmp)(const CHAR *ptrTo, const CHAR *ptrFrom);
+    extern CHAR *(*uStrcpy)(CHAR *ptrTo, const CHAR *ptrFrom);
+    extern int (*uStrlen)(const CHAR *ptrStr);
+    #if defined DMA_MEMCPY_SET && !defined DEVICE_WITHOUT_DMA
+        extern void *uMemcpy(void *ptrTo, const void *ptrFrom, size_t Size);
+        extern void *uMemset(void *ptrTo, int iValue, size_t Size);      // {80} use int as second parameter to match memset()
+    #else
+        extern void (*uMemcpy)(void *ptrTo, const void *ptrFrom, size_t Size);
+        extern void (*uMemset)(void *ptrTo, int iValue, size_t Size);    // {80} use int as second parameter to match memset()
+    #endif
 #else
-  extern int   uMemcmp(const void *ptrTo, const void *ptrFrom, size_t Size);
-  extern void *uMemcpy(void *ptrTo, const void *ptrFrom, size_t Size);
-  extern void *uMemset(void *ptrTo, unsigned char ucValue, size_t Size);
-  extern int   uStrcmp(const CHAR *ptrTo, const CHAR *ptrFrom);
-  extern CHAR *uStrcpy(CHAR *ptrTo, const CHAR *ptrFrom);
-  extern int   uStrlen(const CHAR *ptrStr);
+    extern int   uMemcmp(const void *ptrTo, const void *ptrFrom, size_t Size);
+    extern void *uMemcpy(void *ptrTo, const void *ptrFrom, size_t Size);
+    extern void *uMemset(void *ptrTo, int iValue, size_t Size);          // {80} use int as second parameter to match memset()
+    extern int   uStrcmp(const CHAR *ptrTo, const CHAR *ptrFrom);
+    extern CHAR *uStrcpy(CHAR *ptrTo, const CHAR *ptrFrom);
+    extern int   uStrlen(const CHAR *ptrStr);
 #endif
 
 extern void uMemset_long(unsigned long *ptrTo, unsigned long ulValue, size_t Size); // {19}

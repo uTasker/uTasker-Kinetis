@@ -45,7 +45,7 @@
 // Minimalist heap management without free support
 //
 static HEAP_REQUIREMENTS present_HeapSize = 0;
-static unsigned char *pucBottomOfHeap = 0;
+unsigned char *pucBottomOfHeap = 0;
 static unsigned char *pucTopOfHeap = 0;
 
 #if defined SECONDARY_UMALLOC                                            // {6}

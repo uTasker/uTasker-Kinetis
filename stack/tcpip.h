@@ -11,7 +11,7 @@
     File:      tcpip.h
     Project:   Single Chip Embedded Internet
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2018
     *********************************************************************
     16.02.2007 Add SMTP LOGIN defines
     17.02.2007 Add TFTP support defines
@@ -120,6 +120,13 @@
     31.01.2015 Add fnInsertOID_value() and fnExtractOID_value()          {97}
     05.12.2015 Add fnHandleEthernetFrame(), fnEthernetStateChange() and fnGetLinkState() {98}
     12.12.2015 Add network parameter to fnStartDHCP() and fnStopDHCP()   {99}
+    10.02.2016 Add return value to fnDecode64()                          {100}
+    11.02 2016 Parameters for fnStartHTTP() modified                     {101}
+    05.11.2016 Add pseudo flag TCP_FLAG_FIN_RECEIVED                     {102}
+    16.02.2017 Add RFC 2217 (Telnet com port control option) mode        {103}
+    10.05.2017 Add optional Ethernet frame ucErrorFlags field            {104}
+    09.01.2018 Add fnInsertTCPHeader(), fnSecureLayerTransmission() and SECURE_SOCKET_MODE {105}
+    20.02.2018 Add buffered TCP extended option TCP_BUF_PREPARE in order to allow preparing data in the output buffer of an open connection but not start its transmission yet {106}
 
 */
 
@@ -136,10 +143,10 @@
 #define MAX_IPV6_STRING         40                                       // maximum size of IPV6 address as terminated string
 
 #if !defined IP_NETWORK_COUNT                                            // {61}
-    #define IP_NETWORK_COUNT     1                                       // default is for one network
+    #define IP_NETWORK_COUNT    1                                        // default is for one network
 #endif
 #if !defined IP_INTERFACE_COUNT
-    #define IP_INTERFACE_COUNT   1
+    #define IP_INTERFACE_COUNT  1
 #endif
 #if !defined DEFAULT_NETWORK                                             // {61}
     #define DEFAULT_NETWORK      (unsigned char)0
@@ -153,16 +160,31 @@
 #else
     #define _ALTERNATIVE_VLAN(uSocket) 0                                 // {69}
 #endif
-#if IP_INTERFACE_COUNT > 1 || IP_NETWORK_COUNT > 1                       // {74}
-    #define _TCP_SOCKET_MASK_ASSIGN(uSocket)  (uSocket &= (SOCKET_NUMBER_MASK))
-    #define _TCP_SOCKET_MASK(uSocket)  (USOCKET)((uSocket) & (SOCKET_NUMBER_MASK))
-    #define _UDP_SOCKET_MASK_ASSIGN(uSocket)  (uSocket &= (SOCKET_NUMBER_MASK))
-    #define _UDP_SOCKET_MASK(uSocket)  (USOCKET)((uSocket) & (SOCKET_NUMBER_MASK))
+#if defined USE_SECURE_SOCKET_LAYER                                      // {105}
+    #define SECURE_SOCKET_MODE   (1 << ((sizeof(USOCKET) * 8) - 2))      // 0x40, 0x4000 or 0x40000000
+    #if IP_INTERFACE_COUNT > 1 || IP_NETWORK_COUNT > 1                   // {74}
+        #define _TCP_SOCKET_MASK_ASSIGN(uSocket)  (uSocket &= (SOCKET_NUMBER_MASK))
+        #define _TCP_SOCKET_MASK(uSocket)         (USOCKET)((uSocket) & (SOCKET_NUMBER_MASK))
+        #define _UDP_SOCKET_MASK_ASSIGN(uSocket)  (uSocket &= (SOCKET_NUMBER_MASK))
+        #define _UDP_SOCKET_MASK(uSocket)         (USOCKET)((uSocket) & (SOCKET_NUMBER_MASK))
+    #else
+        #define _TCP_SOCKET_MASK_ASSIGN(uSocket)  (uSocket &= ~(SECURE_SOCKET_MODE))
+        #define _TCP_SOCKET_MASK(uSocket)         (uSocket & ~(SECURE_SOCKET_MODE))
+        #define _UDP_SOCKET_MASK_ASSIGN(uSocket)  (uSocket &= ~(SECURE_SOCKET_MODE))
+        #define _UDP_SOCKET_MASK(uSocket)         (uSocket & ~(SECURE_SOCKET_MODE))
+    #endif
 #else
-    #define _TCP_SOCKET_MASK_ASSIGN(uSocket)                             // does nothing when single interface and single networks
-    #define _TCP_SOCKET_MASK(uSocket) (uSocket)
-    #define _UDP_SOCKET_MASK_ASSIGN(uSocket)
-    #define _UDP_SOCKET_MASK(uSocket) (uSocket)
+    #if IP_INTERFACE_COUNT > 1 || IP_NETWORK_COUNT > 1                   // {74}
+        #define _TCP_SOCKET_MASK_ASSIGN(uSocket)  (uSocket &= (SOCKET_NUMBER_MASK))
+        #define _TCP_SOCKET_MASK(uSocket)         (USOCKET)((uSocket) & (SOCKET_NUMBER_MASK))
+        #define _UDP_SOCKET_MASK_ASSIGN(uSocket)  (uSocket &= (SOCKET_NUMBER_MASK))
+        #define _UDP_SOCKET_MASK(uSocket)         (USOCKET)((uSocket) & (SOCKET_NUMBER_MASK))
+    #else
+        #define _TCP_SOCKET_MASK_ASSIGN(uSocket)
+        #define _TCP_SOCKET_MASK(uSocket)         (uSocket)
+        #define _UDP_SOCKET_MASK_ASSIGN(uSocket) 
+        #define _UDP_SOCKET_MASK(uSocket)         (uSocket)
+    #endif
 #endif
 
 /************************** Ethernet Defines *****************************************************************/
@@ -227,21 +249,29 @@ typedef struct _PACK stETHERNET_FRAME                                    // {1}
 #if defined PHY_TAIL_TAGGING                                             // {76}
     unsigned char           ucRxPort;                                    // the source port of the receive frame
 #endif
+#if defined ETH_ERROR_FLAGS
+    unsigned char           ucErrorFlags;                                // {104}
+#endif
 } ETHERNET_FRAME;
+
+#define ETH_ERROR_INVALID_IPv4                0x01                       // not IPv4, or corrupted IPv4 content
+#define ETH_ERROR_INVALID_IPv4_CHECKSUM       0x02                       // IPv4 type but with bad IP checksum
+#define ETH_ERROR_INVALID_ARP_RARP            0x04                       // not ARP/RARP
 
 #define INTERFACE_NO_RX_CS_OFFLOADING         0x01                       // force receive IP checksum calculation
 #define INTERFACE_NO_TX_CS_OFFLOADING         0x02                       // force transmit IP checksum calculation in all cases
 #define INTERFACE_NO_TX_PAYLOAD_CS_OFFLOADING 0x04                       // force transmit IP checksum calculation when payload is involved
 #define INTERFACE_NO_MAC_FILTERING            0x08                       // the interface operate in promiscuous mode so MAC filtering may be required in software
+#define INTERFACE_NO_MAC_ETHERNET_II          0x10                       // the interface uses IP without MAC (eg. PPP)
 
-#define INTERFACE_RX_PAYLOAD_CS_FRAGS         0x10                       // used only locally - do not set as interface characteristic
+#define INTERFACE_RX_PAYLOAD_CS_FRAGS         0x40                       // used only locally - do not set as interface characteristic
 #define INTERFACE_CALC_TCP_IPv6               0x80                       // used only locally - do not set as interface characteristic
 
-#define VLAN_UNTAG_TX_FRAME   0x10                                       // force transmission to be untagged
-#define VLAN_UNTAGGED_FRAME   0x20                                       // {67} this flag indicates that the frame arrived untagged but hasn't been dropped even though VLAN operation is enabled (eg. untagged frames are allowed on certain ports in certain circumstances)
-#define VLAN_CONTENT_PRESENT  0x40                                       // the VLAN content has not been removed
-#define VLAN_TAGGED_FRAME     0x80                                       // the original frame had VLAN content
-#define VLAN_MEMBER_MASK      0x0f                                       // maximum alternative VLAN groups is 15
+#define VLAN_UNTAG_TX_FRAME                   0x10                       // force transmission to be untagged
+#define VLAN_UNTAGGED_FRAME                   0x20                       // {67} this flag indicates that the frame arrived untagged but hasn't been dropped even though VLAN operation is enabled (eg. untagged frames are allowed on certain ports in certain circumstances)
+#define VLAN_CONTENT_PRESENT                  0x40                       // the VLAN content has not been removed
+#define VLAN_TAGGED_FRAME                     0x80                       // the original frame had VLAN content
+#define VLAN_MEMBER_MASK                      0x0f                       // maximum alternative VLAN groups is 15
 
 typedef struct _PACK stETHERNET_STATS                                    // don't change order due to dynamic html references...
 {
@@ -788,6 +818,7 @@ typedef struct stUDP_TX_PROPERTIES                                       // {95}
 #define NOT_DHCP_SOCKET                  -8
 #define FOREIGN_DHCP_PACKET              -9
 #define BAD_MAGIC_COOKIE                 -10
+#define NO_UDP_SOCKET_FOR_DHCP_SERVER    -11
 
 // DHCP states
 //
@@ -944,9 +975,13 @@ __PACK_OFF
 #define TCP_FLAG_RESET                 0x04
 #define TCP_FLAG_PUSH                  0x08
 #define TCP_FLAG_ACK                   0x10
+#define TCP_FLAG_FIN_RECEIVED          0x80                              // {102}
 
 #define MIN_TCP_HLEN                   20                                // TCP header length without options
 #define MAX_TCP_OPTLEN                 40                                // maximum TCP options length
+
+#define MAX_SECURE_SOCKET_HEADER       21                                // record header plus maximum initial vector length
+#define MAX_SECURE_SOCKET_TAIL         36                                // MAC plus maximum padding length
 
 #define TCP_CLOSEPENDING               0x01                              // internal flag
 #define SILLY_WINDOW_AVOIDANCE         0x02                              // we are stalling the transmitter to avoid silly (small) window
@@ -1128,14 +1163,17 @@ __PACK_OFF
 #define TCP_WINDOW_UPDATE                   11                           // {4}
 #define TCP_WINDOW_PROBE                    12                           // {4}
 
-#define APP_ACCEPT                          0x00                         // TCP listener return values
-#define APP_SENT_DATA                       0x01
-#define APP_REJECT                          0x02
-#define APP_WAIT                            0x04
-#define APP_REQUEST_CLOSE                   0x08
-#define APP_REJECT_DATA                     0x10
-#define HANDLING_PARTICAL_ACK               0x20
-#define APP_REQUEST_AUTHENTICATION          0x40                         // {21}
+#define APP_ACCEPT                          0x0000                       // TCP listener return values
+#define APP_SENT_DATA                       0x0001
+#define APP_REJECT                          0x0002
+#define APP_WAIT                            0x0004
+#define APP_REQUEST_CLOSE                   0x0008
+#define APP_REJECT_DATA                     0x0010
+#define HANDLING_PARTICAL_ACK               0x0020
+#define APP_REQUEST_AUTHENTICATION          0x0040                       // {21}
+#define APP_SECURITY_HANDLED                0x0080
+#define APP_FREE_DATA                       0x0100
+#define APP_SECURITY_CONNECTED              0x0200
 
 
 #define NO_TCP_LISTENER_INSTALLED          -1                            // TCP error codes
@@ -1211,6 +1249,10 @@ __PACK_OFF
 #define TELNET_NEW_ENVIRONMENT_OPTION  39
 #define TELNET_TN3270E                 40
 
+#define TELNET_RFC2217_COM_PORT_OPTION 44                                // {103}
+
+
+
 
 // Telnet commands
 //
@@ -1224,7 +1266,50 @@ __PACK_OFF
 #define TELNET_RAW_RX_IAC_OFF          7
 #define TELNET_RAW_TX_IAC_ON           8
 #define TELNET_RAW_TX_IAC_OFF          9
-#define TELNET_RESET_MODE              10
+#define TELNET_RFC2217_ON              10                                // {103}
+#define TELNET_RFC2217_OFF             11
+#define TELNET_RESET_MODE              12
+
+// RFC 2217 commands
+//
+#define SET_SIGNATURE_SERVER           0
+#define SET_SIGNATURE_CLIENT           100
+
+#define SET_BAUDRATE_SERVER            1
+#define SET_BAUDRATE_CLIENT            101
+
+#define SET_DATASIZE_SERVER            2
+#define SET_DATASIZE_CLIENT            102
+
+#define SET_PARITY_SERVER              3
+#define SET_PARITY_CLIENT              103
+
+#define SET_STOPSIZE_SERVER            4
+#define SET_STOPSIZE_CLIENT            104
+
+#define SET_CONTROL_SERVER             5
+#define SET_CONTROL_CLIENT             105
+
+#define NOTIFY_LINESTATE_SERVER        6
+#define NOTIFY_LINESTATE_CLIENT        106
+
+#define NOTIFY_MODEMSTATE_SERVER       7
+#define NOTIFY_MODEMSTATE_CLIENT       107
+
+#define FLOWCONTROL_SUSPEND_SERVER     8
+#define FLOWCONTROL_SUSPEND_CLIENT     108
+
+#define FLOWCONTROL_RESUME_SERVER      9
+#define FLOWCONTROL_RESUME_CLIENT      109
+
+#define SET_LINESTATE_MASK_SERVER      10
+#define SET_LINESTATE_MASK_CLIENT      110
+
+#define SET_MODEMSTATE_MASK_SERVER     11
+#define SET_MODEMSTATE_MASK_CLIENT     111
+
+#define PURGE_DATA_SERVER              12
+#define PURGE_DATA_CLIENT              112
 
 // Telnet modes
 //
@@ -1242,6 +1327,7 @@ __PACK_OFF
 #define TELNET_STUFF_TX_IAC            0x0400
 #define TELNET_SEARCH_RX_IAC           0x0800
 #define TELNET_CLIENT_NO_NEGOTIATION   0x1000
+#define TELNET_RFC2217_ACTIVE          0x2000                            // {103}
 
 typedef struct stTELNET_CLIENT_DETAILS                                   // {91}
 {
@@ -1257,11 +1343,100 @@ typedef struct stTELNET_CLIENT_DETAILS                                   // {91}
 } TELNET_CLIENT_DETAILS;
 
 
+#define RFC2217_PARITY_NONE                      1
+#define RFC2217_PARITY_ODD                       2
+#define RFC2217_PARITY_EVEN                      3
+#define RFC2217_PARITY_MARK                      4
+#define RFC2217_PARITY_SPACE                     5
+
+#define RFC2217_STOPS_ONE                        1
+#define RFC2217_STOPS_TWO                        2
+#define RFC2217_STOPS_1_5                        3
+
+#define RFC2217_REQUEST_FLOW_CONTROL             0
+#define RFC2217_NO_FLOW_CONTROL                  1
+#define RFC2217_XON_XOFF_FLOW_CONTROL            2
+#define RFC2217_HARDWARE_FLOW_CONTROL            3
+#define RFC2217_REQUEST_BREAK_STATE              4
+#define RFC2217_SET_BREAK_STATE_ON               5
+#define RFC2217_SET_BREAK_STATE_OFF              6
+#define RFC2217_REQUEST_DTR_STATE                7
+#define RFC2217_SET_DTR_STATE_ON                 8
+#define RFC2217_SET_DTR_STATE_OFF                9
+#define RFC2217_REQUEST_RTS_STATE                10
+#define RFC2217_SET_RTS_STATE_ON                 11
+#define RFC2217_SET_RTS_STATE_OFF                12
+#define RFC2217_REQUEST_FLOW_CONTROL_INBOUND     13
+#define RFC2217_NO_FLOW_CONTROL_INBOUND          14
+#define RFC2217_XON_XOFF_FLOW_CONTROL_INBOUND    15
+#define RFC2217_HARDWARE_FLOW_CONTROL_INBOUND    16
+#define RFC2217_USE_DCD_FLOW_CONTROL             17
+#define RFC2217_USE_DTR_FLOW_CONTROL             18
+#define RFC2217_USE_DSR_FLOW_CONTROL             19
+
+#define RFC2217_LINE_STATE_MASK_DATA_READY                         0x01
+#define RFC2217_LINE_STATE_MASK_OVERRUN_ERROR                      0x02
+#define RFC2217_LINE_STATE_MASK_PARITY_ERROR                       0x04
+#define RFC2217_LINE_STATE_MASK_FRAMING_ERROR                      0x08
+#define RFC2217_LINE_STATE_MASK_BREAK_DETECT_ERROR                 0x10
+#define RFC2217_LINE_STATE_MASK_TRANSFER_HOLDING_REGISTER_EMPTY    0x20
+#define RFC2217_LINE_STATE_MASK_TRANSFER_SHIFT_REGISTER_EMPTY      0x40
+#define RFC2217_LINE_STATE_MASK_TIMEOUT_ERROR                      0x80
+
+#define RFC2217_LINE_STATE_MASK_DELTA_CLEAR_TO_SEND                0x01
+#define RFC2217_LINE_STATE_MASK_DELTA_DATA_SET_READY               0x02
+#define RFC2217_LINE_STATE_MASK_TRAINING_EDGE_RING_DETECTOR        0x04
+#define RFC2217_LINE_STATE_MASK_DELTA_RECEIVE_LINE_SIGNAL_DETECT   0x08
+#define RFC2217_LINE_STATE_MASK_CLEAR_TO_SEND_SIGNAL_STATE         0x10
+#define RFC2217_LINE_STATE_MASK_DATA_SET_READY_SIGAL_STATE         0x20
+#define RFC2217_LINE_STATE_MASK_RING_INDICATOR                     0x40
+#define RFC2217_LINE_STATE_MASK_CARRIER_DETECT                     0x80
+
+#define RFC2217_PURGE_ACCESS_SERVER_RECEIVE_DATA_BUFFER    1
+#define RFC2217_PURGE_ACCESS_SERVER_TRANSMIT_DATA_BUFFER   2
+#define RFC2217_PURGE_ACCESS_SERVER_TX_RX_DATA_BUFFERS     3
+
+typedef struct stRFC2217_UART_SETTINGS                                   // {103}
+{
+    unsigned long ulBaudRate;
+    QUEUE_HANDLE  uartID;
+    unsigned char ucDataSize;                                            // 5, 6, 7 or 8
+    unsigned char ucParity;
+    unsigned char ucStopBits;
+    unsigned char ucFlowControl;
+} RFC2217_UART_SETTINGS;
+
+#define RFC2217_CONNECTION_OPENED    1
+#define RFC2217_SETTINGS_CHANGED     2
+#define RFC2217_CONNECTION_CLOSED    3
+
+typedef struct stRFC2217_INSTANCE                                        // {103}
+{
+    int     iInstanceState;
+    USOCKET Telnet_RFC2217_socket;
+    int    (*RFC2217_callback)(int, RFC2217_UART_SETTINGS *);
+    unsigned char ucLineStateMask;
+    unsigned char ucModemStateMast;
+    RFC2217_UART_SETTINGS uart_settings;
+    RFC2217_UART_SETTINGS uart_settings_original;
+} RFC2217_INSTANCE;
+
+typedef struct stRFC2217_SESSION_CONFIG                                   // {103}
+{
+    int(*RFC2217_userCallback)(int, RFC2217_UART_SETTINGS *);
+    unsigned short usPortNumber;
+    unsigned short usIdleTimeout;
+    RFC2217_UART_SETTINGS uart_settings;
+} RFC2217_SESSION_CONFIG;
+
 typedef struct stTELNET                                                  // {8} don't force packed
 {
     int (*fnApp)(USOCKET, unsigned char, unsigned char *, unsigned short);
 #if defined USE_TELNET_CLIENT                                            // {91}
     TELNET_CLIENT_DETAILS *ptrTelnetClientDetails;                       // pointer to client characteristics
+#endif
+#if defined TELNET_RFC2217_SUPPORT                                       // {103}
+    RFC2217_INSTANCE *ptrRFC2217_Instance;                               // pointer to an RFC2217 session instance
 #endif
     unsigned short usTelnetMode;
     unsigned short usTelnetPortNumber;
@@ -1344,26 +1519,32 @@ typedef struct stHTTP                                                    // {8} 
   #define MAXIMUM_DYNAMIC_INSERTS       0x20                             // {36} flag that no further dynamic inserts should be started in the present TCP frame
 #endif
 
-#define HTTP_STATE_FREE                 0                                // HTTP states
-#define HTTP_STATE_RESERVED             1
-#define HTTP_STATE_ACTIVE               2
-#define HTTP_STATE_REQUEST_CREDS        3
-#define HTTP_STATE_PROCESSING           4
-#define HTTP_STATE_START_POST           5
-#define HTTP_STATE_POSTING              6
-#define HTTP_STATE_BEGIN_POSTING        7
-#define HTTP_STATE_READY_POSTING        8
-#define HTTP_STATE_POSTING_DATA         9
-#define HTTP_STATE_DUMPING_DATA         10
-#define HTTP_STATE_POSTING_TO_APP       11
-#define HTTP_STATE_DELAYED_SERVING      12
-#define HTTP_STATE_POSTING_PLAIN        13
-#define HTTP_STATE_DOING_PARAMETER_POST 14                               // {20}
+#if !defined NO_OF_HTTPS_SESSIONS                                        // if no define is available for the number of secure HTTP sockets
+    #define NO_OF_HTTPS_SESSIONS 0                                       // set none in order to disable HTTPS
+#endif
+
+#define HTTP_STATE_FREE                  0                               // HTTP states
+#define HTTP_STATE_RESERVED              1
+#define HTTP_STATE_ACTIVE                2
+#define HTTP_STATE_REQUEST_CREDS         3
+#define HTTP_STATE_PROCESSING            4
+#define HTTP_STATE_START_POST            5
+#define HTTP_STATE_POSTING               6
+#define HTTP_STATE_BEGIN_POSTING         7
+#define HTTP_STATE_READY_POSTING         8
+#define HTTP_STATE_POSTING_DATA          9
+#define HTTP_STATE_DUMPING_DATA          10
+#define HTTP_STATE_POSTING_TO_APP        11
+#define HTTP_STATE_DELAYED_SERVING       12
+#define HTTP_STATE_POSTING_PLAIN         13
+#define HTTP_STATE_DOING_PARAMETER_POST  14                              // {20}
+#define HTTP_STATE_WEB_SOCKET_CONNECTION 15
 
 #define CREDENTIALS_REQUIRED           -1                                // user return codes
 #define DISPLAY_INTERNAL               -2
 #define PROCESSING_INPUT               -3
 #define DELAY_SERVING                  -4
+#define WEB_SOCKET_HANDSHAKE           -5
 
 #define GET_STARTING                  (unsigned char)0                   // {90}
 #define CAN_POST_BEGIN                (unsigned char)-1
@@ -1373,6 +1554,65 @@ typedef struct stHTTP                                                    // {8} 
 #define POSTING_PARAMETER_DATA_TO_APP (unsigned char)-5                  // {18}
 #define POSTING_PARTIAL_PARAMETER_DATA_TO_APP (unsigned char)-6          // {25}
 #define CHECK_AUTHENTICATION_ON_PAGE  (unsigned char)-7                  // {90}
+
+typedef struct stWEB_SOCKET_FRAME_MASKED
+{
+    unsigned char ucFinOpcode;
+    unsigned char ucPayloadLength;
+    unsigned char ucMaskingKey[4];
+    unsigned char ucPayload[1];                                          // variable length payload
+} WEB_SOCKET_FRAME_MASKED;
+
+typedef struct stWEB_SOCKET_FRAME_UNMASKED
+{
+    unsigned char ucFinOpcode;
+    unsigned char ucPayloadLength;
+    unsigned char ucPayload[1];                                          // variable length payload
+} WEB_SOCKET_FRAME_UNMASKED;
+
+typedef struct stWEB_SOCKET_FRAME_EXT_16_MASKED                          // if the payload length is 126
+{
+    unsigned char ucFinOpcode;
+    unsigned char ucPayloadLength[3];
+    unsigned char ucMaskingKey[4];
+    unsigned char ucPayload[1];                                          // variable length payload
+} WEB_SOCKET_FRAME_16_MASKED;
+
+typedef struct stWEB_SOCKET_FRAME_EXT_16_UNMASKED                        // if the payload length is 126
+{
+    unsigned char ucFinOpcode;
+    unsigned char ucPayloadLength[3];
+    unsigned char ucPayload[1];                                          // variable length payload
+} WEB_SOCKET_FRAME_16_UNMASKED;
+
+typedef struct stWEB_SOCKET_FRAME_EXT_64_MASKED                          // if the payload length is 127
+{
+    unsigned char ucFinOpcode;
+    unsigned char ucPayloadLength[9];
+    unsigned char ucMaskingKey[4];
+    unsigned char ucPayload[1];                                          // variable length payload
+} WEB_SOCKET_FRAME_64_MASKED;
+
+typedef struct stWEB_SOCKET_FRAME_EXT_64_UNMASKED                        // if the payload length is 127
+{
+    unsigned char ucFinOpcode;
+    unsigned char ucPayloadLength[9];
+    unsigned char ucMaskingKey[4];
+    unsigned char ucPayload[1];                                          // variable length payload
+} WEB_SOCKET_FRAME_64_UNMASKED;
+
+#define WEB_SOCKET_FIN                     0x80                          // indicates that the payload contains the final fragment of a message
+#define WEB_SOCKET_OPCODE_MASK             0x0f
+#define WEBSOCKET_CONTROL_FRAME            0x08
+#define WEB_SOCKET_OPCODE_CONTINUATION     0x00
+#define WEB_SOCKET_OPCODE_TEXT             0x01
+#define WEB_SOCKET_OPCODE_BINARY           0x02
+#define WEB_SOCKET_OPCODE_CONNECTION_CLOSE 0x08
+#define WEB_SOCKET_OPCODE_PING             0x09
+#define WEB_SOCKET_OPCODE_PONG             0x0a
+
+#define WEB_SOCKET_MASK                    0x80                          // payload is masked
+#define WEB_SOCKET_PAYLOAD_LEN_MASK        0x7f
 
 /************************** SMTP ************************************************************************************/
 
@@ -1716,7 +1956,8 @@ typedef struct _PACK stETH_IP_ENCAPSULATION_HEADER                       // fixe
 #define NetBIOS_PORT               137                                   // {7}
 #define SNMP_AGENT_PORT            161
 #define SNMP_MANAGER_PORT          162
-#define ETHERNET_IP_PORT           44818                                 // 0xaf12 at least 2 sockets expected
+#define mDNS_PORT                  5353
+#define ETHERNET_IP_PORT           44818                                 // 0xaf12 - at least 2 sockets expected
 
 // TCP ports
 //
@@ -1728,19 +1969,24 @@ typedef struct _PACK stETH_IP_ENCAPSULATION_HEADER                       // fixe
 #define HTTP_SERVERPORT            80
 #define POP_PORT                   110
 #define HTTPS_SERVERPORT           443
-//#define ETHERNET_IP_PORT         44818                                 // used by UDP and TCP
+//#define ETHERNET_IP_PORT         44818                                 // used by both UDP and TCP
+#define MQTT_PORT                  1883
+#define MQTTS_PORT                 8883
 
 
 // Cipher suites
 //
 #define TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256      0xc02b
 #define TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256        0xc02f
+#define TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256      0xc023
+#define TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256        0xc027
 #define TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA         0xc00a
 #define TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA         0xc009
 #define TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA           0xc013
 #define TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA           0xc014
 #define TLS_ECDHE_ECDSA_WITH_RC4_128_SHA             0xc007
 #define TLS_ECDHE_RSA_WITH_RC4_128_SHA               0xc011
+#define TLS_RSA_WITH_AES_128_GCM_SHA256              0x009c
 #define TLS_DHE_RSA_WITH_AES_128_CBC_SHA             0x0033
 #define TLS_DHE_DSS_WITH_AES_128_CBC_SHA             0x0032
 #define TLS_DHE_RSA_WITH_AES_256_CBC_SHA             0x0039
@@ -1749,14 +1995,69 @@ typedef struct _PACK stETH_IP_ENCAPSULATION_HEADER                       // fixe
 #define TLS_RSA_WITH_3DES_EDE_CBC_SHA                0x000a
 #define TLS_RSA_WITH_RC4_128_SHA                     0x0005
 #define TLS_RSA_WITH_RC4_128_MD5                     0x0004
+#define TLS_EMPTY_RENEGOTIATION_INFO_SCSV            0x00ff
 
-// Secure sockets layer
+// Secure sockets layer - messages
 //
-#define SSL_TLS_CONTENT_HANDSHAKE                    0x16
-#define TLS_VERSION_1_0                              0x0301
+#define SSL_TLS_CONTENT_CHANGE_CIPHER_SPEC           0x14                // 20
+#define SSL_TLS_CONTENT_ALERT                        0x15                // 21
+#define SSL_TLS_CONTENT_HANDSHAKE                    0x16                // 22
+#define SSL_TLS_CONTENT_APPLICATION_DATA             0x17                // 23
+
+#define TLS_VERSION_1_0                              0x0301              // version number - follows messages (plus length in two bytes)
 #define TLS_VERSION_1_2                              0x0303
+
+// Secure sockets layer - handshakes (followed by three byte length)
+//
+#define SSL_TLS_HANDSHAKE_TYPE_HELLO_REQUEST         0x00
 #define SSL_TLS_HANDSHAKE_TYPE_CLIENT_HELLO          0x01
 #define SSL_TLS_HANDSHAKE_TYPE_SERVER_HELLO          0x02
+#define SSL_TLS_HANDSHAKE_TYPE_HELLO_VERIFY_REQUEST  0x03
+#define SSL_TLS_HANDSHAKE_TYPE_NEW_SESSION_TICKET    0x04
+#define SSL_TLS_HANDSHAKE_TYPE_CERTIFICATE           0x0b                // 11
+#define SSL_TLS_HANDSHAKE_TYPE_SERVER_KEY_EXCHANGE   0x0c                // 12
+#define SSL_TLS_HANDSHAKE_TYPE_CERTIFICATE_REQUEST   0x0d                // 13
+#define SSL_TLS_HANDSHAKE_TYPE_SERVER_HELLO_DONE     0x0e                // 14
+#define SSL_TLS_HANDSHAKE_TYPE_CERTIFICATE_VERIFY    0x0f                // 15
+#define SSL_TLS_HANDSHAKE_TYPE_CLIENT_KEY_EXCHANGE   0x10                // 16
+#define SSL_TLS_HANDSHAKE_TYPE_FINISHED              0x14                // 20
+
+#define SSL_TLS_CHANGE_CIPHER_SPEC_MESSAGE           0x01
+
+// Alert levels and codes
+//
+#define SSL_TLS_ALERT_LEVEL_WARNING                  0x01
+#define SSL_TLS_ALERT_LEVEL_FATAL                    0x02
+
+#define SSL_TLS_ALERT_MSG_CLOSE_NOTIFY               0x00                // 0
+#define SSL_TLS_ALERT_MSG_UNEXPECTED_MESSAGE         0x0a                // 10
+#define SSL_TLS_ALERT_MSG_BAD_RECORD_MAC             0x14                // 20 
+#define SSL_TLS_ALERT_MSG_DECRYPTION_FAILED          0x15                // 21 
+#define SSL_TLS_ALERT_MSG_RECORD_OVERFLOW            0x16                // 22 
+#define SSL_TLS_ALERT_MSG_DECOMPRESSION_FAILURE      0x1E                // 30 
+#define SSL_TLS_ALERT_MSG_HANDSHAKE_FAILURE          0x28                // 40 
+#define SSL_TLS_ALERT_MSG_NO_CERT                    0x29                // 41 
+#define SSL_TLS_ALERT_MSG_BAD_CERT                   0x2A                // 42 
+#define SSL_TLS_ALERT_MSG_UNSUPPORTED_CERT           0x2B                // 43 
+#define SSL_TLS_ALERT_MSG_CERT_REVOKED               0x2C                // 44 
+#define SSL_TLS_ALERT_MSG_CERT_EXPIRED               0x2D                // 45 
+#define SSL_TLS_ALERT_MSG_CERT_UNKNOWN               0x2E                // 46 
+#define SSL_TLS_ALERT_MSG_ILLEGAL_PARAMETER          0x2F                // 47 
+#define SSL_TLS_ALERT_MSG_UNKNOWN_CA                 0x30                // 48 
+#define SSL_TLS_ALERT_MSG_ACCESS_DENIED              0x31                // 49 
+#define SSL_TLS_ALERT_MSG_DECODE_ERROR               0x32                // 50 
+#define SSL_TLS_ALERT_MSG_DECRYPT_ERROR              0x33                // 51 
+#define SSL_TLS_ALERT_MSG_EXPORT_RESTRICTION         0x3C                // 60 
+#define SSL_TLS_ALERT_MSG_PROTOCOL_VERSION           0x46                // 70 
+#define SSL_TLS_ALERT_MSG_INSUFFICIENT_SECURITY      0x47                // 71 
+#define SSL_TLS_ALERT_MSG_INTERNAL_ERROR             0x50                // 80 
+#define SSL_TLS_ALERT_MSG_INAPROPRIATE_FALLBACK      0x56                // 86 
+#define SSL_TLS_ALERT_MSG_USER_CANCELED              0x5A                // 90 
+#define SSL_TLS_ALERT_MSG_NO_RENEGOTIATION           0x64                // 100
+#define SSL_TLS_ALERT_MSG_UNSUPPORTED_EXT            0x6E                // 110
+#define SSL_TLS_ALERT_MSG_UNRECOGNIZED_NAME          0x70                // 112
+#define SSL_TLS_ALERT_MSG_UNKNOWN_PSK_IDENTITY       0x73                // 115
+#define SSL_TLS_ALERT_MSG_NO_APPLICATION_PROTOCOL    0x78                // 120
 
 typedef struct _PACK stSSL_TLS_EXTENSION
 {
@@ -1765,18 +2066,45 @@ typedef struct _PACK stSSL_TLS_EXTENSION
     unsigned char  renegotiation_info_extension;
 } SSL_TLS_EXTENSION;
 
-typedef struct _PACK stSSL_TLS_HANDSHAKE_PROTOCOL
+typedef struct _PACK stSSL_TLS_HANDSHAKE_PROTOCOL_HELLO_DETAILS
 {
-    unsigned char  handshake_type;
-    unsigned char  length[3];
-    unsigned char  version[2];
-    unsigned char  random[32];
-    unsigned char  session_id_length;
-    unsigned char  session_id[32];
     unsigned char  cipher[2];
     unsigned char  compression_method;
     unsigned char  extensionsLength[2];
     SSL_TLS_EXTENSION extension;
+} SSL_TLS_HANDSHAKE_PROTOCOL_HELLO_DETAILS;
+
+typedef struct _PACK stSSL_TLS_HANDSHAKE_PROTOCOL_HELLO_NO_ID
+{
+    unsigned char  version[2];
+    unsigned char  random[32];
+    unsigned char  session_id_length;
+    SSL_TLS_HANDSHAKE_PROTOCOL_HELLO_DETAILS session_details;
+} SSL_TLS_HANDSHAKE_PROTOCOL_HELLO_NO_ID;
+
+typedef struct _PACK stSSL_TLS_HANDSHAKE_PROTOCOL_HELLO_16_ID
+{
+    unsigned char  version[2];
+    unsigned char  random[32];
+    unsigned char  session_id_length;
+    unsigned char  session_id[16];
+    SSL_TLS_HANDSHAKE_PROTOCOL_HELLO_DETAILS session_details;
+} SSL_TLS_HANDSHAKE_PROTOCOL_HELLO_16_ID;
+
+typedef struct _PACK stSSL_TLS_HANDSHAKE_PROTOCOL_HELLO_32_ID
+{
+    unsigned char  version[2];
+    unsigned char  random[32];
+    unsigned char  session_id_length;
+    unsigned char  session_id[32];
+    SSL_TLS_HANDSHAKE_PROTOCOL_HELLO_DETAILS session_details;
+} SSL_TLS_HANDSHAKE_PROTOCOL_HELLO_32_ID;
+
+typedef struct _PACK stSSL_TLS_HANDSHAKE_PROTOCOL
+{
+    unsigned char  handshake_type;
+    unsigned char  length[3];
+    SSL_TLS_HANDSHAKE_PROTOCOL_HELLO_32_ID handshake_protocol;
 } SSL_TLS_HANDSHAKE_PROTOCOL;
 
 typedef struct _PACK stSSL_TLS_RECORD
@@ -1900,6 +2228,7 @@ extern void fnSendICMPError(ICMP_ERROR *tICMP_error, unsigned short usLength);
 #else
     extern USOCKET fnTCP_Connect(USOCKET TCP_socket, unsigned char *RemoteIP, unsigned short usRemotePort, unsigned short usOurPort, unsigned short usMaxWindow);
 #endif
+extern void *fnInsertSecureLayer(USOCKET TCP_socket, int(*listener)(USOCKET, unsigned char, unsigned char *, unsigned short), int iInsert);
 extern USOCKET fnTCP_close(USOCKET TCP_Socket);
 //extern unsigned char fnGetTCP_state(USOCKET TCP_socket);               // {14}{94}
 extern TCP_CONTROL *fnGetSocketControl(USOCKET TCP_socket);              // {94}
@@ -1921,8 +2250,9 @@ extern signed short fnSendTCP(USOCKET TCP_socket, unsigned char *ptrBuf, unsigne
     #define TCP_CONTENT_NEGOTIATION    0x20
     #define TCP_REPEAT_WINDOW          0x40
     #define TCP_BUF_KICK_NEXT          0x80
-    #define TCP_BUF_QUEUE              0x0100                            // {47} queue the data is the connection is not yet established
-#if defined INDIVIDUAL_BUFFERED_TCP_BUFFER_SIZE                          // {40}
+    #define TCP_BUF_QUEUE              0x0100                            // {47} queue the data if the connection is not yet established
+    #define TCP_BUF_PREPARE            0x0200                            // {106} allow preparing data in the output buffer of an open connection but not start its transmission yet
+#if defined INDIVIDUAL_BUFFERED_TCP_BUFFER_SIZE                          // {40} 
     extern unsigned short fnDefineTCPBufferSize(USOCKET TCP_socket, unsigned short usBufferSize); // enter the buffer size associated with a buffered TCP socket
 #endif
 extern USOCKET fnModifyTCPWindow(USOCKET TCPSocket, unsigned short usBufferSpace); // {33}
@@ -1932,13 +2262,18 @@ extern int  fnActiveTCP_connections(int iReset);                         // {44}
     #define SEARCH_CONNECTION 0
     #define RESET_CONNECTIONS 1
 extern USOCKET fnTCP_IdleTimeout(USOCKET TCPSocket, unsigned short usIdleTimeout); // {49}
+extern unsigned char *fnInsertTCPHeader(USOCKET TCPSocket, unsigned char *ptrBuffer); // {105}
+extern int fnSecureLayerTransmission(USOCKET Socket, unsigned char *ucPrtData, unsigned short usLength, unsigned char ucFlag);// {105}
+
 extern signed short fnResolveHostName(const CHAR *cHostNamePtr, void (*fnListener)(unsigned char , unsigned char *));
 extern int  fnConnectPOP3(unsigned char *ucIP);
 extern void fnStartPopPolling(DELAY_LIMIT PollTime, CHAR *(*fnCallback)(unsigned char, unsigned char *));
 extern void fnStartSNTP(DELAY_LIMIT syncDelay);
 extern void fnStartTimeServer(DELAY_LIMIT syncDelay);
 extern int  fnStartDHCP(UTASK_TASK OwnerTask, USOCKET uDetails);         // {99}
-    #define FORCE_INIT 0x80
+    #define FORCE_INIT            0x80                                   // UTASK_TASK option
+    #define DHCP_CLIENT_OPERATION 0x01                                   // USOCKET options
+    #define DHCP_SERVER_OPERATION 0x02
 #if defined DHCP_HOST_NAME
     extern CHAR *fnGetDHCP_host_name(unsigned char *ptr_ucHostNameLength, int iNetwork); // {77}
 #endif
@@ -1958,24 +2293,37 @@ extern int  fnStartTFTP_client(void (*Callback)(unsigned short, CHAR *), unsigne
 #else
     #define FGEN_PROTO unsigned char (*fnGenerator)(unsigned char *)
 #endif
-#if defined _VARIABLE_HTTP_PORT                                          // {41}
-    #if defined HTTP_DYNAMIC_CONTENT                                     // {11}{12}
-        extern void fnStartHTTP(int (*fnWebHandler)(unsigned char, CHAR *, HTTP *), FGEN_PROTO, CHAR *(*fnInsertRoutine)(unsigned char *, LENGTH_CHUNK_COUNT, unsigned short *, HTTP *), unsigned char ucParameters, unsigned short usPort);
-    #else
-        extern void fnStartHTTP(int (*fnWebHandler)(unsigned char, CHAR *, HTTP *), FGEN_PROTO, CHAR *(*fnInsertRoutine)(unsigned char *, LENGTH_CHUNK_COUNT, unsigned short *), unsigned char ucParameters, unsigned short usPort);
-    #endif
+extern int fnStart_mDNS(USOCKET network_interface);
+
+typedef struct stHTTP_FUNCTION_SET                                       // {101}
+{
+    int (*fnWebHandler)(unsigned char, CHAR *, HTTP *);
+#if defined FNGENERATOR_PASS_HTTP
+    unsigned char (*fnGenerator)(unsigned char *, HTTP *);
 #else
-    #if defined HTTP_DYNAMIC_CONTENT                                     // {11}{12}
-        extern void fnStartHTTP(int (*fnWebHandler)(unsigned char, CHAR *, HTTP *), FGEN_PROTO, CHAR *(*fnInsertRoutine)(unsigned char *, LENGTH_CHUNK_COUNT, unsigned short *, HTTP *), unsigned char ucParameters);
-    #else
-        extern void fnStartHTTP(int (*fnWebHandler)(unsigned char, CHAR *, HTTP *), FGEN_PROTO, CHAR *(*fnInsertRoutine)(unsigned char *, LENGTH_CHUNK_COUNT, unsigned short *), unsigned char ucParameters);
-    #endif
+    unsigned char (*fnGenerator)(unsigned char *);
 #endif
+#if defined HTTP_DYNAMIC_CONTENT
+    CHAR *(*fnInsertRoutine)(unsigned char *, LENGTH_CHUNK_COUNT, unsigned short *, HTTP *);
+#else
+    CHAR *(*fnInsertRoutine)(unsigned char *, LENGTH_CHUNK_COUNT, unsigned short *);
+#endif
+#if defined SUPPORT_WEBSOCKET
+    int (*fnWebSocketHandler)(unsigned char *, unsigned long, unsigned char, HTTP *);
+#endif
+#if defined _VARIABLE_HTTP_PORT
+    unsigned short usPort;
+#endif
+    unsigned char  ucParameters;
+} HTTP_FUNCTION_SET;
+
+extern void fnStartHTTP(HTTP_FUNCTION_SET *ptrFunctionSet);              // {101}
     #define NOT_SELECTED   0
     #define IS_SELECTED    1
     #define IS_CHECKED     2
     #define IS_DISABLED    3
 extern void fnStopHTTP(void);
+extern int fnWebSocketSend(unsigned char *ptrPayload, unsigned long ulPayloadLength, unsigned char ucOpCode, HTTP *http_session);
 
 #if defined PASS_SERVER_DELAYED_STRING
     extern unsigned char fnServeDelayed(CHAR *cFile, unsigned char ucOption);
@@ -1998,6 +2346,9 @@ extern void fnStopTelnet(USOCKET TelnetSocket);
 extern int  fnTelnet(USOCKET Telnet_socket, int iCommand);
 extern int  fnCheckTelnetBinaryTx(USOCKET Socket);
 extern USOCKET fnConnectTELNET(TELNET_CLIENT_DETAILS *ptrTelnetClientDetails); // {91}
+#if defined TELNET_RFC2217_SUPPORT
+    extern USOCKET fnTelnetRF2217(RFC2217_SESSION_CONFIG *ptrConfig);
+#endif
 
 extern void fnStartFtp(unsigned short usFTPTimeout, unsigned char ucFTP_operating_mode);
     #define FTP_AUTHENTICATE       0x01                                  // require authentication rather than accepting anonymous login
@@ -2022,13 +2373,54 @@ extern int  fnFTP_client_transfer(CHAR *ptrFilePath, int iMode);         // {48}
     #define FTP_DO_PUT             0x02
     #define FTP_DO_APPEND          0x04
 extern int  fnInsertHTMLString(CHAR *cToAdd, unsigned short usAddLength, unsigned char **ptrBuffer, unsigned short *usMaxLen, unsigned short *usLen, unsigned char *ptrBufferEnd); // {9}
-extern void fnDecode64(CHAR *ptrInput, CHAR *ptrOutput);
+extern int  fnDecode64(CHAR *ptrInput, CHAR *ptrOutput);                 // {100}
 extern MAX_FILE_LENGTH fnEncode64(unsigned char *ptrInput, CHAR *ptrOutput, MAX_FILE_LENGTH input_length); // {15}
 extern int  fnVerifyUser(CHAR *cDecodedUser, unsigned char iCheckUser);
-    #define DO_CHECK_USER_NAME     0x01
-    #define DO_CHECK_PASSWORD      0x02
-    #define HTML_PASS_CHECK        0x04
-    #define FTP_PASS_CHECK         0x08
+    #define DO_CHECK_USER_NAME            0x01
+    #define DO_CHECK_PASSWORD             0x02
+    #define HTML_PASS_CHECK               0x04
+    #define FTP_PASS_CHECK                0x08
+
+extern int fnConnectMQTT(unsigned char *ucIP, unsigned short(*fnCallback)(signed char, unsigned char *, unsigned long, unsigned char), unsigned long ulModeFlags);
+    #define UNSECURE_MQTT_CONNECTION                 0
+    #define SECURE_MQTT_CONNECTION               0x100
+    #define MQTT_CONNECT_FLAG_CLEAN_SESSION       0x02                   // flag to request that a new session clears and previous session states
+    #define MQTT_CONNECT_FLAG_WILL_FLAG           0x04                   // flag to signal that the "will QoS" and "will retain" fields will be used by the server
+    #define MQTT_CONNECT_FLAG_WILL_QOS_MASK       0x18                   // the QoS level to be used when publishing the "will message" (must be set to 0 if the "will flag" is not set)
+    #define MQTT_CONNECT_FLAG_WILL_RETAIN         0x20                   // flag to signal that the server must publish the "will message" as a retained message (not allowed if the "will flag" is not set)
+    #define MQTT_CONNECT_FLAG_PASSWORD_FLAG       0x40                   // flag to indicate that a password must be present in the payload (not allowed if the user name flag is not set)
+    #define MQTT_CONNECT_FLAG_USER_NAME_FLAG      0x80                   // flag to indicate that a user name must be present in the payload
+
+extern int fnDisconnectMQTT(void);
+extern int fnPublishMQTT(unsigned char ucTopicReference, CHAR *ptrTopic, signed char cQoS);
+    #define MQTT_SUBSCRIPTION_QoS_0       0x00
+    #define MQTT_SUBSCRIPTION_QoS_1       0x01
+    #define MQTT_SUBSCRIPTION_QoS_2       0x02
+extern int fnShowMQTT_subscription(int iRef);
+extern int fnSubscribeMQTT(CHAR *ptrInput, unsigned char ucQoS);
+extern int fnUnsubscribeMQTT(unsigned char ucSubscriptionRef);
+
+#define ERROR_MQTT_NOT_READY             -1
+#define ERROR_MQTT_IN_USE                -2
+#define ERROR_MQTT_ARP_FAIL              -3
+#define ERROR_MQTT_NO_SUBSCRIPTION_ENTRY -4
+#define ERROR_MQTT_MISSING_TOPIC         -5
+#define ERROR_MQTT_INVALID_SUBSCRIPTION  -6
+#define MQTT_RESULT_OK                    0
+#define MQTT_CLIENT_IDENTIFIER            1
+#define MQTT_WILL_TOPIC                   2
+#define MQTT_WILL_MESSAGE                 3
+#define MQTT_USER_NAME                    4
+#define MQTT_USER_PASSWORD                5
+#define MQTT_CONNACK_RECEIVED             6
+#define MQTT_SUBACK_RECEIVED              7
+#define MQTT_UNSUBACK_RECEIVED            8
+#define MQTT_PUBLISH_ACKNOWLEDGED         9
+#define MQTT_PUBLISH_TOPIC                10
+#define MQTT_PUBLISH_DATA                 11
+#define MQTT_TOPIC_MESSAGE                12
+#define MQTT_CONNECTION_CLOSED            13
+#define MQTT_HOST_CLOSED                  14
 
 extern int  fnCheckPass(CHAR *ucReference, CHAR *ucNewInput);
 extern CHAR *fnWebStrcpy(CHAR *cStrOut, CHAR *cStrIn);

@@ -112,6 +112,8 @@
     19.04.2017 Adjust USB FS crossbar master setting for K65 and K66     {95}
     08.05.2017 Correct K26, K65 and K66 HS USB base address              {96}
 
+    11.03.2018 Correct PWM clock source                                  {107}
+
 */
 
 #if defined _WINDOWS
@@ -14123,7 +14125,7 @@ extern void fnSimPers(void);
     #define PWM_CLOCK             (TIMER_CLOCK)
 #else
     #define TIMER_CLOCK           (BUS_CLOCK)
-    #define PWM_CLOCK             (SYSTEM_CLOCK/2)
+    #define PWM_CLOCK             (TIMER_CLOCK)                          // {107} - corrected from (SYSTEM_CLOCK/2)
 #endif
 
 // FlexTimer delays

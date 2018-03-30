@@ -11,7 +11,7 @@
     File:      usb.h
     Project:   Single Chip Embedded Internet
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2018
     *********************************************************************
     20.09.2008 Add USB host defines                                      {1}
     23.11.2009 Remove little-endian macros and padding defined to driver.h since the same is required for SD cards and other general use
@@ -22,22 +22,14 @@
     25.01.2012 Add HID mouse defines                                     {6}
     15.08.2014 Add interface association descriptor                      {7}
     01.12.2015 Add RNDIS definitions                                     {8}
+    13.04.2016 Change parameter of fnGetUSB_string_entry() to unsigned char {9}
 
 */
 
 #if !defined _USB_
 #define _USB_
 
-#if defined _CODE_WARRIOR_CF                                                  // ensure no padding in structs in this file
-    #pragma pack(1)
-    #define __PACK_ON 
-    #define __PACK_OFF 
-#endif
-#if defined _COMPILE_COSMIC
-    #define _PACK
-    #define __PACK_ON 
-    #define __PACK_OFF 
-#endif
+__PACK_ON                                                                // ensure no padding in structs in this file
 
 #define ENDPOINT_PAIR(x, y)          ()
 
@@ -405,57 +397,57 @@ typedef struct _PACK CDC_NOTIFICATION_HEADER
 #if defined USB_CDC_RNDIS                                                // {8}
 // General objects
 //
-#define OID_GEN_SUPPORTED_LIST                  0x00010101
-#define OID_GEN_HARDWARE_STATUS                 0x00010102
-#define OID_GEN_MEDIA_SUPPORTED                 0x00010103
-#define OID_GEN_MEDIA_IN_USE                    0x00010104
+#define OID_GEN_SUPPORTED_LIST                  0x00010101               // required
+#define OID_GEN_HARDWARE_STATUS                 0x00010102               // required
+#define OID_GEN_MEDIA_SUPPORTED                 0x00010103               // required
+#define OID_GEN_MEDIA_IN_USE                    0x00010104               // required
 #define OID_GEN_MAXIMUM_LOOKAHEAD               0x00010105
-#define OID_GEN_MAXIMUM_FRAME_SIZE              0x00010106
-#define OID_GEN_LINK_SPEED                      0x00010107
+#define OID_GEN_MAXIMUM_FRAME_SIZE              0x00010106               // required
+#define OID_GEN_LINK_SPEED                      0x00010107               // required
 #define OID_GEN_TRANSMIT_BUFFER_SPACE           0x00010108
 #define OID_GEN_RECEIVE_BUFFER_SPACE            0x00010109
-#define OID_GEN_TRANSMIT_BLOCK_SIZE             0x0001010a
-#define OID_GEN_RECEIVE_BLOCK_SIZE              0x0001010b
-#define OID_GEN_VENDOR_ID                       0x0001010c
-#define OID_GEN_VENDOR_DESCRIPTION              0x0001010d
-#define OID_GEN_CURRENT_PACKET_FILTER           0x0001010e
+#define OID_GEN_TRANSMIT_BLOCK_SIZE             0x0001010a               // required
+#define OID_GEN_RECEIVE_BLOCK_SIZE              0x0001010b               // required
+#define OID_GEN_VENDOR_ID                       0x0001010c               // required
+#define OID_GEN_VENDOR_DESCRIPTION              0x0001010d               // required
+#define OID_GEN_CURRENT_PACKET_FILTER           0x0001010e               // required
 #define OID_GEN_CURRENT_LOOKAHEAD               0x0001010f
 #define OID_GEN_DRIVER_VERSION                  0x00010110
-#define OID_GEN_MAXIMUM_TOTAL_SIZE              0x00010111
+#define OID_GEN_MAXIMUM_TOTAL_SIZE              0x00010111               // required
 #define OID_GEN_PROTOCOL_OPTIONS                0x00010112
-#define OID_GEN_MAC_OPTIONS                     0x00010113
-#define OID_GEN_MEDIA_CONNECT_STATUS            0x00010114
+#define OID_GEN_MAC_OPTIONS                     0x00010113               // optional
+#define OID_GEN_MEDIA_CONNECT_STATUS            0x00010114               // required
 #define OID_GEN_MAXIMUM_SEND_PACKETS            0x00010115
-#define OID_GEN_VENDOR_DRIVER_VERSION           0x00010116
-#define OID_GEN_XMIT_OK                         0x00020101
-#define OID_GEN_RCV_OK                          0x00020102
-#define OID_GEN_XMIT_ERROR                      0x00020103
-#define OID_GEN_RCV_ERROR                       0x00020104
-#define OID_GEN_RCV_NO_BUFFER                   0x00020105
-#define OID_GEN_DIRECTED_BYTES_XMIT             0x00020201
-#define OID_GEN_DIRECTED_FRAMES_XMIT            0x00020202
-#define OID_GEN_MULTICAST_BYTES_XMIT            0x00020203
-#define OID_GEN_MULTICAST_FRAMES_XMIT           0x00020204
-#define OID_GEN_BROADCAST_BYTES_XMIT            0x00020205
-#define OID_GEN_BROADCAST_FRAMES_XMIT           0x00020206
-#define OID_GEN_DIRECTED_BYTES_RCV              0x00020207
-#define OID_GEN_DIRECTED_FRAMES_RCV             0x00020208
-#define OID_GEN_MULTICAST_BYTES_RCV             0x00020209
-#define OID_GEN_MULTICAST_FRAMES_RCV            0x0002020a
-#define OID_GEN_BROADCAST_BYTES_RCV             0x0002020b
-#define OID_GEN_BROADCAST_FRAMES_RCV            0x0002020c
-#define OID_GEN_RCV_CRC_ERROR                   0x0002020d
-#define OID_GEN_TRANSMIT_QUEUE_LENGTH           0x0002020e
+#define OID_GEN_VENDOR_DRIVER_VERSION           0x00010116               // required
+#define OID_GEN_XMIT_OK                         0x00020101               // required
+#define OID_GEN_RCV_OK                          0x00020102               // required
+#define OID_GEN_XMIT_ERROR                      0x00020103               // required
+#define OID_GEN_RCV_ERROR                       0x00020104               // required
+#define OID_GEN_RCV_NO_BUFFER                   0x00020105               // required
+#define OID_GEN_DIRECTED_BYTES_XMIT             0x00020201               // optional
+#define OID_GEN_DIRECTED_FRAMES_XMIT            0x00020202               // optional
+#define OID_GEN_MULTICAST_BYTES_XMIT            0x00020203               // optional
+#define OID_GEN_MULTICAST_FRAMES_XMIT           0x00020204               // optional
+#define OID_GEN_BROADCAST_BYTES_XMIT            0x00020205               // optional
+#define OID_GEN_BROADCAST_FRAMES_XMIT           0x00020206               // optional
+#define OID_GEN_DIRECTED_BYTES_RCV              0x00020207               // optional
+#define OID_GEN_DIRECTED_FRAMES_RCV             0x00020208               // optional
+#define OID_GEN_MULTICAST_BYTES_RCV             0x00020209               // optional
+#define OID_GEN_MULTICAST_FRAMES_RCV            0x0002020a               // optional
+#define OID_GEN_BROADCAST_BYTES_RCV             0x0002020b               // optional
+#define OID_GEN_BROADCAST_FRAMES_RCV            0x0002020c               // optional
+#define OID_GEN_RCV_CRC_ERROR                   0x0002020d               // optional
+#define OID_GEN_TRANSMIT_QUEUE_LENGTH           0x0002020e               // optional
 #define OID_GEN_GET_TIME_CAPS                   0x0002020f
 #define OID_GEN_GET_NETCARD_TIME                0x00020210
 
 // 802.3 Ethernet operational characteristics
 //
-#define OID_802_3_PERMANENT_ADDRESS             0x01010101
-#define OID_802_3_CURRENT_ADDRESS               0x01010102
-#define OID_802_3_MULTICAST_LIST                0x01010103
-#define OID_802_3_MAXIMUM_LIST_SIZE             0x01010104
-#define OID_802_3_MAC_OPTIONS                   0x01010105
+#define OID_802_3_PERMANENT_ADDRESS             0x01010101               // required
+#define OID_802_3_CURRENT_ADDRESS               0x01010102               // required
+#define OID_802_3_MULTICAST_LIST                0x01010103               // required
+#define OID_802_3_MAXIMUM_LIST_SIZE             0x01010104               // required
+#define OID_802_3_MAC_OPTIONS                   0x01010105               // optional
 
 // 802.3 Ethernet statistics
 //
@@ -482,6 +474,21 @@ typedef struct _PACK CDC_NOTIFICATION_HEADER
 #define OID_ETHERNET_STATISTICS_2                       0x02
 
 #define NON_REGISTERED_VENDOR                   0xffffff00               // value to use when no IEEE OUI is available
+
+// Ndis Packet Filter Bits (OID_GEN_CURRENT_PACKET_FILTER).
+//
+#define NDIS_PACKET_TYPE_DIRECTED               0x0001
+#define NDIS_PACKET_TYPE_MULTICAST              0x0002
+#define NDIS_PACKET_TYPE_ALL_MULTICAST          0x0004
+#define NDIS_PACKET_TYPE_BROADCAST              0x0008
+#define NDIS_PACKET_TYPE_SOURCE_ROUTING         0x0010
+#define NDIS_PACKET_TYPE_PROMISCUOUS            0x0020
+#define NDIS_PACKET_TYPE_SMT                    0x0040
+#define NDIS_PACKET_TYPE_ALL_LOCAL              0x0080
+#define NDIS_PACKET_TYPE_MAC_FRAME              0x8000
+#define NDIS_PACKET_TYPE_FUNCTIONAL             0x4000
+#define NDIS_PACKET_TYPE_ALL_FUNCTIONAL         0x2000
+#define NDIS_PACKET_TYPE_GROUP                  0x1000
 
 // RNDIS encapsulated messages
 //
@@ -943,7 +950,7 @@ typedef struct _PACK stCDC_PSTN_LINE_CODING
 //
 extern void *fnGetUSB_config_descriptor(unsigned short *usLength);
 extern void *fnGetUSB_device_descriptor(unsigned short *usLength);
-extern unsigned char *fnGetUSB_string_entry(unsigned short usStringRef, unsigned short *usLength);
+extern unsigned char *fnGetUSB_string_entry(unsigned char ucStringRef, unsigned short *usLength); // {9}
 
 extern void *fnGetDeviceInfo(int iInfoRef);                              // used by host application to access device information
     #define REQUEST_USB_DEVICE_DESCRIPTOR 0

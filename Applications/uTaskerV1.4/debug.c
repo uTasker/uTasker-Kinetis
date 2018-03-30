@@ -11,7 +11,7 @@
     File:      debug.c
     Project:   uTasker project
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2018
     *********************************************************************
     18.02.2007 Corrected port support for M52233 DEMO board              {1}
     26.02.2007 Improve port control via serial/Telnet                    {2}
@@ -106,6 +106,14 @@
     18.11.2015 Enable disk interface when USB-MSD host is enabled        {81}
     23.11.2015 Add USB host CDC virtual COM connection                   {82}
     17.01.2015 Add file hide and write-protect commands                  {83}
+    12.12.2016 Add CMSIS CFFT and AES                                    {84}
+    02.02.2017 Add low power cycling control                             {85} - see video https://youtu.be/v4UnfcDiaE4
+    05.07.2017 Modify SD card sector write interface                     {86}
+    10.11.2017 Add MQTT client commands                                  {87}
+    04.12.2017 Add memory-mapped divide and square root demonstration    {88} - Kinetis processors with MMDVSQ
+    17.01.2018 Add I2C master firmware loader                            {89}
+    16.03.2018 Accept control-? (0x7f) as back space (used by putty by default) {90}
+    17.03.2018 Add FlexIO menu                                           {91}
 
 */
 
@@ -126,11 +134,19 @@
 
 //#define TEST_SDCARD_SECTOR_WRITE                                       // {44} activate to allow sector writes to be tested
 //#define TEST_I2C_INTERFACE                                             // activate to enable special I2C tests via menu
-//#define DEVELOP_PHY_CONTROL                                            // {33} activate to enable PHY register dump and writes to individual register addresses
+//#define DEVELOP_PHY_CONTROL                                            // {33} activate to enable PHY register dump and writes to individual register addresses (warning: disabled STOP_MII_CLOCK option when using this)
                                                                          // note that STOP_MII_CLOCK should not be enabled when using this (kinetis)
 //#define _DEBUG_CAN                                                     // support dumping CAN register details for debugging purpose
+//#define I2C_MASTER_LOADER                                              // {89} load firmware to a connected I2C slave (requires I2C_INTERFACE - enable TEST_I2C in i2c_tests.h for interface open)
+#if defined CHIP_HAS_FLEXIO
+  //#define TEST_FLEXIO                                                  // {91} allow testing of flexio operations
+#endif
+
+#if defined CMSIS_DSP_CFFT
+    #define TEST_CMSIS_CFFT                                              // {84} enable test of CMSIS CFFT
+#endif
 #if !defined KINETIS_KE && !defined KINETIS_KL
-    #define EZPORT_CLONER                                                // {55}
+  //#define EZPORT_CLONER                                                // {55}
         #define EZPORT_CLONER_SKIP_REGIONS                               // cloner leaves defined areas blank
 #endif
 //#define LOW_MEMORY                                                     // remove utFAT print and sector display to save stack space when calling other utFAT interface routines
@@ -176,8 +192,11 @@
 
     #define STALL_CRITICAL          (TX_BUFFER_SIZE/2)                   // when the Windows TCP implementation sees that the window is less than half the maximum windows size we have advertised it will perform a delay of about 5s.
 
-    #define IIC_WRITE_ADDRESS       0xd0
-    #define IIC_READ_ADDRESS        0xd1
+    #define I2C_READ_ADDRESS        0xa5
+    #define I2C_WRITE_ADDRESS       0xa4
+  //#define I2C_READ_ADDRESS        0xaf                                 // the I2C device address to test
+  //#define I2C_WRITE_ADDRESS       0xae
+      //#define I2C_TWO_BYTE_ADDRESS                                     // when addressing I2C device internal registers use two bytes (16 bit addressing)
 
     #define UT_PATH_LENGTH          256                                  // length of maximum directory string
 
@@ -218,9 +237,11 @@
     #define DO_MENU_HELP_OLED       13
     #define DO_MENU_HELP_I2C        14
     #define DO_MENU_HELP_DISK       15                                   // {17}
-    #define DO_MENU_HELP_FTP_TELNET 16                                   // {37}
+    #define DO_MENU_HELP_FTP_TELNET_MQTT 16                              // {37}
     #define DO_MENU_HELP_CAN        17                                   // {38}
-    #define DO_HELP_UP              18                                   // go up menu tree
+    #define DO_MENU_HELP_ADVANCED   18                                   // {84}
+    #define DO_MENU_HELP_FLEXIO     19
+    #define DO_HELP_UP              20                                   // go up menu tree
 
 #define DO_HARDWARE               1                                      // reference to hardware group of commands
     #define DO_RESET                0                                    // specific hardware command to reset target
@@ -265,6 +286,23 @@
     #define DO_GET_BACKLIGHT       40                                    // specific hardware command to show backlight intensity
     #define DO_SET_BACKLIGHT       41                                    // specific hardware command to set backlight intensity
     #define DO_SUSPEND_PAGE        42                                    // specific hardware command to test suspend/resume operation during erasure
+    #define DO_FFT                 43                                    // specific hardware command to test CMSIS CFFT operation
+    #define DO_AES128              44                                    // specific hardware command to test AES128 operation
+    #define DO_AES192              45                                    // specific hardware command to test AES192 operation
+    #define DO_AES256              46                                    // specific hardware command to test AES256 operation
+    #define DO_SHA256              47                                    // specific hardware command to test SHA256 operation
+    #define DO_LP_CYCLE            48                                    // specific hardware command to enable/disable low power cycle mode
+    #define DO_GET_CONTRAST        49                                    // specific hardware command to show the LCD contrast setting (%)
+    #define DO_SET_CONTRAST        50                                    // specific hardware command to set the LCD contrast setting (%)
+    #define DO_SQRT                51                                    // specific hardware command to calculate the square root of an integer entered as dec or hex
+    #define DO_DIV                 52                                    // specific hardware command to calculate the remainder and quotient of an integer division
+    #define DO_FLEXIO_ON           53                                    // specific flexio command to power up the flexio module
+    #define DO_FLEXIO_PIN          54                                    // specific flexio command to configure pin(s) to flexio mode
+    #define DO_FLEXIO_PIN_STATE    55                                    // specific flexio command to display the pin states
+    #define DO_FLEXIO_STATUS       56                                    // specific flexio command to display shifter and timer status
+    #define DO_SHOW_TRIM           57
+    #define DO_CHANGE_TRIM_COARSE  58
+    #define DO_CHANGE_TRIM_FINE    59
 
 #define DO_TELNET                 2                                      // reference to Telnet group
     #define DO_TELNET_QUIT              0                                // specific Telnet comand to quit the session
@@ -386,6 +424,8 @@
     #define DO_USB_KEYBOARD         3                                    // specific USB command to connect the debug input to a USB-keyboard input
     #define DO_VIRTUAL_COM          4                                    // specific USB command to open a connection to a connected CDC device
     #define DO_USB_DELTA            5                                    // specific USB command to display present audio drift value
+    #define DO_USB_KEYBOARD_DELAY   6                                    // specific USB command to display and change keystroke delay
+    #define DO_USB_SPEED            7                                    // specific USB command to send 10MBytes of data to test the transmit speed
 
 #define DO_OLED                   9                                      // reference to OLED group
     #define DO_OLED_GET_GRAY_SCALES 0                                    // specific OLED command to get gray levels
@@ -398,6 +438,7 @@
     #define DO_I2C_READ_PLUS_WRITE  3                                    // specific I2C command to read from I2C bus from present address, followed by a queued write to set address zero
     #define DO_ACC_ON               4                                    // specific I2C command to enable accelerator debugout output
     #define DO_ACC_OFF              5                                    // specific I2C command to disable accelerator debugout output
+    #define DO_I2C_LOAD_FIRMWARE    6                                    // specific I2C command to load firmware to an I2C slave
 
 #define DO_DISK                   11                                     // reference to SD-card, disk group
     #define DO_DIR                  0                                    // specific command to display directory content
@@ -437,11 +478,9 @@
     #define DO_WRITE_UNHIDE         34                                   // specific command to remove hidden file/director property
     #define DO_SET_PROTECT          35                                   // specific command to set file/directory write-protection
     #define DO_REMOVE_PROTECT       36                                   // specific command to remove file/directory write-protection
+    #define DO_DISPLAY_MULTI_SECTOR 37                                   // specific command to display multiple sectors of the SD card
 
-
-
-
-#define DO_FTP_TELNET             12
+#define DO_FTP_TELNET_MQTT        12
     #define DO_SHOW_FTP_CONFIG      0                                    // specific ftp client command to show settings
     #define DO_FTP_SET_PORT         1                                    // specific ftp client command to set command port number
     #define DO_FTP_SERVER_IP        2                                    // specific ftp client command to set default server IP address
@@ -477,6 +516,15 @@
     #define DO_TELNET_CONNECT       67
     #define DO_TELNET_SET_NEGOTIATION 68
 
+    #define DO_MQTT_CONNECT         69
+    #define DO_MQTTS_CONNECT        70
+    #define DO_MQTT_SUBSCRIBE       71
+    #define DO_MQTT_UNSUBSCRIBE     72
+    #define DO_MQTT_TOPICS          73
+    #define DO_MQTT_PUB             74
+    #define DO_MQTT_PUB_LONG        75
+    #define DO_MQTT_DISCONNECT      76
+
 #define DO_CAN                    13
     #define DO_SEND_CAN_DEFAULT     0                                    // specific CAN command to send a message to the default destination
     #define DO_SEND_CAN_STANDARD    1                                    // specific CAN command to send a message to a standard (ID) destination
@@ -499,6 +547,8 @@
 #define MENU_HELP_DISK              8
 #define MENU_HELP_FTP               9
 #define MENU_HELP_CAN               10
+#define MENU_HELP_ADVANCED          11
+#define MENU_HELP_FLEXIO            11                                   // in place of MENU_HELP_ADVANCED
 
 #if defined USE_FTP_CLIENT && !defined FTP_CLIENT_BUFFERED_SOCKET_MODE && !defined FTP_CLIENT_EXTERN_DATA_SOCKET // {37}
     #define FTP_SIMPLE_DATA_SOCKET
@@ -604,8 +654,13 @@ typedef struct stCLONER_SKIP_REGION
     #if defined USE_TELNET_CLIENT
         static int fnTELNETClientListener(USOCKET Socket, unsigned char ucEvent, unsigned char *ucIp_Data, unsigned short usPortLen);
     #endif
-    static void fnSetPortBit(unsigned short usBit, int iSetClr);
-    static int  fnConfigOutputPort(CHAR cPortBit);
+    #if !defined REMOVE_PORT_INITIALISATIONS
+        static void fnSetPortBit(unsigned short usBit, int iSetClr);
+        static int  fnConfigOutputPort(CHAR cPortBit);
+    #endif
+    #if defined I2C_INTERFACE && defined I2C_MASTER_LOADER                   // {89}
+        static void fnProgramI2CSlave(unsigned char ucSlaveAddress, int iCommand);
+    #endif
 #endif
 
 /* =================================================================== */
@@ -627,15 +682,24 @@ static const DEBUG_COMMAND tMainCommand[] = {
     {"6",                 "Go to USB menu",                        DO_HELP,          DO_MENU_HELP_USB },
     {"7",                 "Go to I2C menu",                        DO_HELP,          DO_MENU_HELP_I2C },
     {"8",                 "Go to utFAT disk interface",            DO_HELP,          DO_MENU_HELP_DISK }, // {17}
-    {"9",                 "FTP/TELNET client commands",            DO_HELP,          DO_MENU_HELP_FTP_TELNET }, // {37}
+#if defined USE_MQTT_CLIENT
+    {"9",                 "FTP/TELNET/MQTT client commands",       DO_HELP,          DO_MENU_HELP_FTP_TELNET_MQTT }, // {37}
+#else
+    {"9",                 "FTP/TELNET commands",                   DO_HELP,          DO_MENU_HELP_FTP_TELNET_MQTT },
+#endif
     {"a",                 "CAN commands",                          DO_HELP,          DO_MENU_HELP_CAN }, // {38}
+#if defined TEST_FLEXIO                                                  // {91}
+    {"b",                 "FLEXIO",                                DO_HELP,          DO_MENU_HELP_FLEXIO },
+#elif defined CMSIS_DSP_CFFT || defined CRYPTOGRAPHY || defined MMDVSQ_AVAILABLE // {84}{88}
+    {"b",                 "Advanced commands",                     DO_HELP,          DO_MENU_HELP_ADVANCED },
+#endif
     {"help",              "Display menu specific help",            DO_HELP,          DO_MAIN_HELP },
     {"quit",              "Leave command mode",                    DO_TELNET,        DO_TELNET_QUIT },
 };
 
 static const DEBUG_COMMAND tLANCommand[] = {
     {"up",                "go to main menu",                       DO_HELP,          DO_HELP_UP },
-#if defined ETH_INTERFACE || defined USB_CDC_RNDIS
+#if defined ETH_INTERFACE || defined USB_CDC_RNDIS || defined USE_PPP
     #if IP_NETWORK_COUNT > 1
     {"net",               "Set network reference (0 default)",     DO_IP,            DO_SET_NETWORK },
     #endif
@@ -653,7 +717,9 @@ static const DEBUG_COMMAND tLANCommand[] = {
     {"smi_w",             "Write SMI register <reg> <val>",        DO_IP,            DO_WRITE_PHY_SMI },
         #endif   
     #endif
+    #if defined USE_DHCP_CLIENT
     {"set_dhcp",          "<enable/disable> DHCP",                 DO_SERVER,        DO_ENABLE_DHCP },
+    #endif
     {"set_ip_add",        "Set IPV4 address",                      DO_IP,            DO_SET_IP_ADDRESS },
     #if defined USE_IPV6                                                 // {21}
     {"set_ipv6_add",      "Set IPV6 address",                      DO_IP,            DO_SET_IPV6_ADDRESS },
@@ -738,12 +804,16 @@ static const DEBUG_COMMAND tIOCommand[] = {
     {"se",                "Storage Erase [address] [len-hex]",     DO_HARDWARE,      DO_STORAGE_ERASE }, // {74}
     #endif
 #endif
-//  {"set_user",          "Set output mode [0..3] [<d>|<u>]",      DO_HARDWARE,      DO_SET_USER_OUTPUT },
-//  {"get_user",          "Get output mode [0..3]",                DO_HARDWARE,      DO_GET_USER_OUTPUT },
+#if !defined REMOVE_PORT_INITIALISATIONS
     {"set_ddr",           "Set port type [1..4] [<i>|<o>",         DO_HARDWARE,      DO_DDR },
     {"get_ddr",           "Get data direction [1..4]",             DO_HARDWARE,      DO_GET_DDR },
     {"read_port",         "Read port input [1..4]",                DO_HARDWARE,      DO_INPUT },
     {"write_port",        "Set port output [1..4] [0/1]",          DO_HARDWARE,      DO_OUTPUT },
+#endif
+#if defined SUPPORT_LCD && defined LCD_CONTRAST_CONTROL                  // {88}
+    { "lcd_c",            "Show LCD contrast [0..100]%",           DO_HARDWARE,      DO_GET_CONTRAST },
+    { "slcd_c",           "Set LCD contrast [0..100]%",            DO_HARDWARE,      DO_SET_CONTRAST },
+#endif
 #if defined GLCD_BACKLIGHT_CONTROL                                       // {75}
     {"sbl",               "Show backlight",                        DO_HARDWARE,      DO_GET_BACKLIGHT },
     {"blight",            "Set backlight [0..100]%",               DO_HARDWARE,      DO_SET_BACKLIGHT },
@@ -767,6 +837,17 @@ static const DEBUG_COMMAND tIOCommand[] = {
     {"ez_clone",          "Clone software",                        DO_HARDWARE,      DO_EZCLONE },
     {"ez_s_clone",        "Securely Clone software",               DO_HARDWARE,      DO_EZSCLONE },
 #endif
+#if defined PWM_MEASUREMENT_DEVELOPMENT
+    { "test",             "Temp test",                             DO_HARDWARE,      75 },
+#endif
+#if defined SUPPORT_LPTMR
+    { "lp_cnt",           "Read LPTMR CNT",                        DO_HARDWARE,      76 },
+#endif
+#if defined DEV1
+    { "set_an",           "Set anode [hex]",                       DO_HARDWARE,      77 },
+    { "set_ca",           "Set cathode [hex]",                     DO_HARDWARE,      78 },
+    { "relay",            "Relay <1..3> <0..1>",                   DO_HARDWARE,      79 },
+#endif
 #if defined USE_PARAMETER_BLOCK
     {"save",              "Save port setting as default",          DO_HARDWARE,      DO_SAVE_PORT },
 #endif
@@ -776,7 +857,7 @@ static const DEBUG_COMMAND tIOCommand[] = {
 
 static const DEBUG_COMMAND tADMINCommand[] = {
     {"up",                "go to main menu",                       DO_HELP,          DO_HELP_UP },
-#if defined ETH_INTERFACE || defined USB_CDC_RNDIS
+#if defined ETH_INTERFACE || defined USB_CDC_RNDIS || defined USE_PPP
     {"set_ftp",           "[enable/disable] FTP server",           DO_SERVER,        DO_ENABLE_FTP },
     {"set_telnet",        "[enable/disable] Telnet service",       DO_SERVER,        DO_ENABLE_TELNET },
     {"set_web",           "[enable/disable] WEB server",           DO_SERVER,        DO_ENABLE_WEB_SERVER },
@@ -810,6 +891,9 @@ static const DEBUG_COMMAND tADMINCommand[] = {
 #if defined SUPPORT_LOW_POWER
     {"show_lp",           "Show low power mode and options",       DO_HARDWARE,      DO_LP_GET }, // {71}
     {"set_lp",            "[option] Set low power mode",           DO_HARDWARE,      DO_LP_SET }, // {71}
+    #if defined LOW_POWER_CYCLING_MODE
+    { "lpc",              "low power cycling [1/0]",               DO_HARDWARE,      DO_LP_CYCLE }, // {85}
+    #endif
 #endif
     {"reset",             "Reset device",                          DO_HARDWARE,      DO_RESET },
     {"last_rst",          "Reset cause",                           DO_HARDWARE,      DO_LAST_RESET }, // {63}
@@ -819,7 +903,7 @@ static const DEBUG_COMMAND tADMINCommand[] = {
 
 static const DEBUG_COMMAND tStatCommand[] = {
     {"up",                "go to main menu",                       DO_HELP,          DO_HELP_UP },
-#if defined ETH_INTERFACE || defined USB_CDC_RNDIS
+#if defined ETH_INTERFACE || defined USB_CDC_RNDIS || defined USE_PPP
     {"ipstat",            "Show Ethernet statistics",              DO_IP,            DO_SHOW_ETHERNET_STATS },
     {"r_ipstat",          "Reset Ethernet statistics",             DO_IP,            DO_RESET_ETHERNET_STATS },
 #endif
@@ -846,12 +930,19 @@ static const DEBUG_COMMAND tUSBCommand[] = {
     {"usb-serial",        "RS232<->USB mode (disconnect to quit)", DO_USB,           DO_USB_RS232_MODE },
         #endif
     {"usb-load",          "USB-SW download",                       DO_USB,           DO_USB_DOWNLOAD },
+    {"usb-tx",            "Test tx speed (send 10MByte data)",     DO_USB,           DO_USB_SPEED },
     #endif
-    #if defined USE_USB_HID_KEYBOARD
+    #if defined USE_USB_HID_KEYBOARD && defined SUPPORT_FIFO_QUEUES
     {"usb-kb",            "Keyboard input (disconnect to quit)",   DO_USB,           DO_USB_KEYBOARD }, // {77}
+        #if defined USB_KEYBOARD_DELAY
+    {"kb-space",          "Keystroke delay (ms)",                  DO_USB,           DO_USB_KEYBOARD_DELAY },
+        #endif
     #endif
     #if defined USE_USB_AUDIO
     {"delta",             "USB audio drift",                       DO_USB,           DO_USB_DELTA },
+    #endif
+    #if defined USE_USB_HID_KEYBOARD && defined SUPPORT_FIFO_QUEUES && defined USB_KEYBOARD_DELAY
+    {"save",              "Save configuration to FLASH",           DO_FLASH,         DO_SAVE_PARS },
     #endif
 #endif
     {"help",              "Display menu specific help",            DO_HELP,          DO_MAIN_HELP },
@@ -863,11 +954,21 @@ static const DEBUG_COMMAND tI2CCommand[] = {
 #if defined I2C_INTERFACE
     {"acc_on",            "enable accelerometer output",           DO_I2C,           DO_ACC_ON }, // {68}
     {"acc_off",           "disable output",                        DO_I2C,           DO_ACC_OFF },
+    #if LPI2C_AVAILABLE > 0 && defined TEMP_LPI2C_TEST
+    {"tpause",            "test potential bug [1/0]",              DO_I2C,           122 },
+    {"rpause",            "test potential bug [1/0]",              DO_I2C,           123 },
+    {"dozen",             "DOZEN [1/0]",                           DO_I2C,           124 },
+    {"dbgen",             "DBGEN [1/0]",                           DO_I2C,           125 },
+    {"auto",              "AUTOSTOP [1/0]",                        DO_I2C,           126 },
+    #endif
     #if defined TEST_I2C_INTERFACE
     {"wr",                "write [add] [value] {rep}",             DO_I2C,           DO_I2C_WRITE },
     {"rd",                "read  [add] [no. of bytes]",            DO_I2C,           DO_I2C_READ },
     {"srd",               "simple read [no. of bytes]",            DO_I2C,           DO_I2C_READ_NO_ADDRESS },
     {"rdq",               "read  [add] [no. of bytes] + wr",       DO_I2C,           DO_I2C_READ_PLUS_WRITE },
+    #endif
+    #if defined I2C_INTERFACE && defined I2C_MASTER_LOADER                // {89}
+    {"load",              "Load firmware [add]",                   DO_I2C,           DO_I2C_LOAD_FIRMWARE },
     #endif
     {"help",              "Display menu specific help",            DO_HELP,          DO_MAIN_HELP },
 #endif
@@ -875,134 +976,152 @@ static const DEBUG_COMMAND tI2CCommand[] = {
 };
 
 static const DEBUG_COMMAND tDiskCommand[] = {                            // {17}
-    {"up",                "go to main menu",                       DO_HELP,          DO_HELP_UP },
+    {"up",                "go to main menu",                       DO_HELP,          DO_HELP_UP},
 #if defined SDCARD_SUPPORT || defined SPI_FLASH_FAT || defined FLASH_FAT || defined USB_MSD_HOST // {81}
     #if DISK_COUNT > 1
-    {"disk",              "select disk [C/D/E]",                   DO_DISK,          DO_DISK_NUMBER },
+    {"disk",              "select disk [C/D/E]",                   DO_DISK,          DO_DISK_NUMBER},
     #endif
-    {"info",              "utFAT/card info",                       DO_DISK,          DO_INFO },
-    {"dir",               "[path] show directory content",         DO_DISK,          DO_DIR },
+    {"info",              "utFAT/card info",                       DO_DISK,          DO_INFO},
+    {"dir",               "[path] show directory content",         DO_DISK,          DO_DIR},
     #if defined UTFAT_UNDELETE || defined UTFAT_EXPERT_FUNCTIONS         // {60}
-    {"dird",              "[path] show deleted directory content", DO_DISK,          DO_DIR_DELETED },
+    {"dird",              "[path] show deleted directory content", DO_DISK,          DO_DIR_DELETED},
     #endif
     #if defined UTFAT_EXPERT_FUNCTIONS                                   // {60}
-    {"dirh",              "[path] show hidden content",            DO_DISK,          DO_DIR_HIDDEN },
-  //{"dirc",              "[path] show corrupted directory content", DO_DISK,        DO_DIR_CORRUPTED },
-    {"infof",             "[path] show file info",                 DO_DISK,          DO_INFO_FILE },
-    {"infod",             "[path] show deleted info",              DO_DISK,          DO_INFO_DELETED },
+    {"dirh",              "[path] show hidden content",            DO_DISK,          DO_DIR_HIDDEN},
+  //{"dirc",              "[path] show corrupted directory content", DO_DISK,        DO_DIR_CORRUPTED},
+    {"infof",             "[path] show file info",                 DO_DISK,          DO_INFO_FILE},
+    {"infod",             "[path] show deleted info",              DO_DISK,          DO_INFO_DELETED},
     #endif
-    {"cd",                "[path] change dir. (.. for up)",        DO_DISK,          DO_CHANGE_DIR },
+    {"cd",                "[path] change dir. (.. for up)",        DO_DISK,          DO_CHANGE_DIR},
     #if defined UTFAT_WRITE                                              // {45}
-    {"file" ,             "[path] new empty file",                 DO_DISK,          DO_NEW_FILE },
-    {"write",             "[path] test write to file",             DO_DISK,          DO_WRITE_FILE },
-    {"mkdir" ,            "new empty dir",                         DO_DISK,          DO_NEW_DIR },
-    {"rename" ,           "[from] [to] rename",                    DO_DISK,          DO_RENAME },
-    {"trunc" ,            "truncate to [length] [path]",           DO_DISK,          DO_TEST_TRUNCATE }, // {59}
+    {"file" ,             "[path] new empty file",                 DO_DISK,          DO_NEW_FILE},
+    {"write",             "[path] test write to file",             DO_DISK,          DO_WRITE_FILE},
+    {"mkdir" ,            "new empty dir",                         DO_DISK,          DO_NEW_DIR},
+    {"rename" ,           "[from] [to] rename",                    DO_DISK,          DO_RENAME},
+    {"trunc" ,            "truncate to [length] [path]",           DO_DISK,          DO_TEST_TRUNCATE}, // {59}
         #if defined UTFAT_EXPERT_FUNCTIONS                               // {83}
-    {"hide",              "[path] file/dir to hide",               DO_DISK,          DO_WRITE_HIDE },
-    {"unhide",            "[path] file/dir to un-hide",            DO_DISK,          DO_WRITE_UNHIDE },
-    {"prot",              "[path] file/dir to write-protect",      DO_DISK,          DO_SET_PROTECT },
-    {"unprot",            "[path] file/dir to un-hide",            DO_DISK,          DO_REMOVE_PROTECT },
+    {"hide",              "[path] file/dir to hide",               DO_DISK,          DO_WRITE_HIDE},
+    {"unhide",            "[path] file/dir to un-hide",            DO_DISK,          DO_WRITE_UNHIDE},
+    {"prot",              "[path] file/dir to write-protect",      DO_DISK,          DO_SET_PROTECT},
+    {"unprot",            "[path] file/dir to un-protet",          DO_DISK,          DO_REMOVE_PROTECT},
         #endif
     #endif
     #if !defined LOW_MEMORY
     {"print",             "[path] print file content",             DO_DISK,          DO_PRINT_FILE },
     #endif
-  //{"root",              "set root dir",                          DO_DISK,          DO_ROOT }, {19}
+  //{"root",              "set root dir",                          DO_DISK,          DO_ROOT}, {19}
     #if defined UTFAT_WRITE                                              // {45}
-    {"del",               "[path] delete file or dir.",            DO_DISK,          DO_DELETE },
+    {"del",               "[path] delete file or dir.",            DO_DISK,          DO_DELETE},
         #if defined UTFAT_SAFE_DELETE                                    // {60}
-    {"dels",              "[path] safe delete file or dir.",       DO_DISK,          DO_DELETE_SAFE },
+    {"dels",              "[path] safe delete file or dir.",       DO_DISK,          DO_DELETE_SAFE},
         #endif
         #if defined UTFAT_UNDELETE && defined UTFAT_WRITE                // {60}
-    {"undel",             "undelete [name]",                       DO_DISK,          DO_UNDELETE },
+    {"undel",             "undelete [name]",                       DO_DISK,          DO_UNDELETE},
         #endif
         #if defined UTFAT_FORMATTING
-    {"format",            "[-16/12] [label] format (unformatted) disk",DO_DISK,      DO_FORMAT }, // {26}
+    {"format",            "[-16/12] [label] format (unformatted) disk",DO_DISK,      DO_FORMAT}, // {26}
         #endif
         #if defined UTFAT_FULL_FORMATTING
-    {"fformat",           "[-16/12] [label] full format (unformatted) disk",DO_DISK, DO_FORMAT_FULL }, // {26}   
+    {"fformat",           "[-16/12] [label] full format (unformatted) disk",DO_DISK, DO_FORMAT_FULL}, // {26}   
         #endif
         #if defined UTFAT_FORMATTING
-    {"re-format",         "[-16/12] [label] reformat disk!!!!!",      DO_DISK,       DO_REFORMAT }, // {26} 
+    {"re-format",         "[-16/12] [label] reformat disk!!!!!",      DO_DISK,       DO_REFORMAT}, // {26} 
         #endif
         #if defined UTFAT_FULL_FORMATTING
     {"re-fformat",        "[-16/12] [label] full reformat disk!!!!!", DO_DISK,       DO_REFORMAT_FULL },// {26}
         #endif
     #endif
         #if !defined LOW_MEMORY
-    {"sect",              "[hex no.] display sector",              DO_DISK,          DO_DISPLAY_SECTOR },
+    {"sect",              "[hex no.] display sector",              DO_DISK,          DO_DISPLAY_SECTOR},
+            #if defined UTFAT_MULTIPLE_BLOCK_READ
+    { "msect",            "[hex no.] display multi sector",        DO_DISK,          DO_DISPLAY_MULTI_SECTOR },
+            #endif
         #endif
     #if defined UTFAT_WRITE
         #if defined NAND_FLASH_FAT
-    {"secti",             "[hex number] display sector info",      DO_DISK,          DO_DISPLAY_SECTOR_INFO },
-    {"del-remap",         "delete remapping table!!",              DO_DISK,          DO_DELETE_REMAP_INFO },
-    {"del-FAT",           "delete FAT",                            DO_DISK,          DO_DELETE_FAT },
-    {"page",              "[hex number] display physical page",    DO_DISK,          DO_DISPLAY_PAGE },
+    {"secti",             "[hex number] display sector info",      DO_DISK,          DO_DISPLAY_SECTOR_INFO},
+    {"del-remap",         "delete remapping table!!",              DO_DISK,          DO_DELETE_REMAP_INFO},
+    {"del-FAT",           "delete FAT",                            DO_DISK,          DO_DELETE_FAT},
+    {"page",              "[hex number] display physical page",    DO_DISK,          DO_DISPLAY_PAGE},
             #if defined VERIFY_NAND
-    {"tnand",             "write test patterns to NAND",           DO_DISK,          DO_TEST_NAND },
-    {"vnand",             "verify test patterns in NAND",          DO_DISK,          DO_VERIFY_NAND },
+    {"tnand",             "write test patterns to NAND",           DO_DISK,          DO_TEST_NAND},
+    {"vnand",             "verify test patterns in NAND",          DO_DISK,          DO_VERIFY_NAND},
             #endif
         #elif defined TEST_SDCARD_SECTOR_WRITE
-    {"sectw",             "[hex no.] [patt.] [cnt]",               DO_DISK,          DO_WRITE_SECTOR }, // {44}
+    {"sectw",             "[hex no.] [offset] [val] [cnt]",        DO_DISK,          DO_WRITE_SECTOR}, // {44}{86}
             #if defined UTFAT_MULTIPLE_BLOCK_WRITE
-    {"sectmw",            "multi-block [dito]",                    DO_DISK,          DO_WRITE_MULTI_SECTOR },
+    {"sectmw",            "multi-block [dito]",                    DO_DISK,          DO_WRITE_MULTI_SECTOR},
                 #if defined UTFAT_PRE_ERASE
-    {"sectmwp",           "multi-block with pre-erase [dito]",     DO_DISK,          DO_WRITE_MULTI_SECTOR_PRE },
+    {"sectmwp",           "multi-block with pre-erase [dito]",     DO_DISK,          DO_WRITE_MULTI_SECTOR_PRE},
                 #endif
             #endif
         #endif
     #endif
-    {"help",              "Display menu specific help",            DO_HELP,          DO_MAIN_HELP },
+    {"help",              "Display menu specific help",            DO_HELP,          DO_MAIN_HELP},
 #endif
-    {"quit",              "Leave command mode",                    DO_TELNET,        DO_TELNET_QUIT },
+    {"quit",              "Leave command mode",                    DO_TELNET,        DO_TELNET_QUIT},
 };
 
 static const DEBUG_COMMAND tFTP_TELNET_Command[] = {                     // {37}
     {"up",                "go to main menu",                       DO_HELP,          DO_HELP_UP },
 #if defined USE_FTP_CLIENT
-    {"show_config",       "Show FTP client settings",              DO_FTP_TELNET,    DO_SHOW_FTP_CONFIG },
-    {"ftp_port",          "Set default FTP command port",          DO_FTP_TELNET,    DO_FTP_SET_PORT },
-    {"ftp_ip",            "Set default FTP server IP",             DO_FTP_TELNET,    DO_FTP_SERVER_IP },
-    {"ftp_user",          "Set default FTP user name",             DO_FTP_TELNET,    DO_FTP_USER_NAME },    
-    {"ftp_pass",          "Set default FTP user password",         DO_FTP_TELNET,    DO_FTP_USER_PASS }, 
-    {"ftp_psv",           "<enable/disable> passive mode",         DO_FTP_TELNET,    DO_FTP_PASSIVE },
-    {"ftp_tout",          "Set FTP connection idle timeout",       DO_FTP_TELNET,    DO_FTP_SET_IDLE_TIMEOUT },
+    {"show_config",       "Show FTP client settings",              DO_FTP_TELNET_MQTT, DO_SHOW_FTP_CONFIG },
+    {"ftp_port",          "Set default FTP command port",          DO_FTP_TELNET_MQTT, DO_FTP_SET_PORT },
+    {"ftp_ip",            "Set default FTP server IP",             DO_FTP_TELNET_MQTT, DO_FTP_SERVER_IP },
+    {"ftp_user",          "Set default FTP user name",             DO_FTP_TELNET_MQTT, DO_FTP_USER_NAME },
+    {"ftp_pass",          "Set default FTP user password",         DO_FTP_TELNET_MQTT, DO_FTP_USER_PASS },
+    {"ftp_psv",           "<enable/disable> passive mode",         DO_FTP_TELNET_MQTT, DO_FTP_PASSIVE },
+    {"ftp_tout",          "Set FTP connection idle timeout",       DO_FTP_TELNET_MQTT, DO_FTP_SET_IDLE_TIMEOUT },
 
-    {"ftp_con",           "Connect to FTP server",                 DO_FTP_TELNET,    DO_FTP_CONNECT },
+    {"ftp_con",           "Connect to FTP server",                 DO_FTP_TELNET_MQTT, DO_FTP_CONNECT },
     #if defined USE_IPV6                                                 // {48}
-    {"ftp_con6",          "Connect to FTP server over IPv6",       DO_FTP_TELNET,    DO_FTP_CONNECT_IPV6 },
+    {"ftp_con6",          "Connect to FTP server over IPv6",       DO_FTP_TELNET_MQTT, DO_FTP_CONNECT_IPV6 },
     #endif
-    {"ftp_path",          "Set directory location",                DO_FTP_TELNET,    DO_FTP_PATH },
-    {"ftp_dir",           "Directory listing [path]",              DO_FTP_TELNET,    DO_FTP_DIR },
-    {"ftp_mkd",           "Make directory <path/dir>",             DO_FTP_TELNET,    DO_FTP_MKDIR },
-    {"ftp_get",           "Get binary file <path/file>",           DO_FTP_TELNET,    DO_FTP_GET },
-    {"ftp_get_a",         "Get ASCII file <path/file>",            DO_FTP_TELNET,    DO_FTP_GETA },
-    {"ftp_put",           "Put binary file <path/file>",           DO_FTP_TELNET,    DO_FTP_PUT },
-    {"ftp_put_a",         "Put ASCII file <path/file>",            DO_FTP_TELNET,    DO_FTP_PUTA },
-    {"ftp_app",           "Append to binary file <path/file>",     DO_FTP_TELNET,    DO_FTP_APP },
-    {"ftp_app_a",         "Append to ASCII file <path/file>",      DO_FTP_TELNET,    DO_FTP_APPA },
-    {"ftp_ren",           "Rename file or dir. <path/dir> <path/dir>", DO_FTP_TELNET,DO_FTP_RENAME },
-    {"ftp_del",           "Delete file <path/file>",               DO_FTP_TELNET,    DO_FTP_DEL },
-    {"ftp_remove",        "Delete an empty dir. <path/dir>",       DO_FTP_TELNET,    DO_FTP_REMOVE_DIR },
-    {"ftp_dis",           "Disconnect from FTP server",            DO_FTP_TELNET,    DO_FTP_DISCONNECT },
+    {"ftp_path",          "Set directory location",                DO_FTP_TELNET_MQTT, DO_FTP_PATH },
+    {"ftp_dir",           "Directory listing [path]",              DO_FTP_TELNET_MQTT, DO_FTP_DIR },
+    {"ftp_mkd",           "Make directory <path/dir>",             DO_FTP_TELNET_MQTT, DO_FTP_MKDIR },
+    {"ftp_get",           "Get binary file <path/file>",           DO_FTP_TELNET_MQTT, DO_FTP_GET },
+    {"ftp_get_a",         "Get ASCII file <path/file>",            DO_FTP_TELNET_MQTT, DO_FTP_GETA },
+    {"ftp_put",           "Put binary file <path/file>",           DO_FTP_TELNET_MQTT, DO_FTP_PUT },
+    {"ftp_put_a",         "Put ASCII file <path/file>",            DO_FTP_TELNET_MQTT, DO_FTP_PUTA },
+    {"ftp_app",           "Append to binary file <path/file>",     DO_FTP_TELNET_MQTT, DO_FTP_APP },
+    {"ftp_app_a",         "Append to ASCII file <path/file>",      DO_FTP_TELNET_MQTT, DO_FTP_APPA },
+    {"ftp_ren",           "Rename file or dir. <path/dir> <path/dir>", DO_FTP_TELNET_MQTT,DO_FTP_RENAME },
+    {"ftp_del",           "Delete file <path/file>",               DO_FTP_TELNET_MQTT, DO_FTP_DEL },
+    {"ftp_remove",        "Delete an empty dir. <path/dir>",       DO_FTP_TELNET_MQTT, DO_FTP_REMOVE_DIR },
+    {"ftp_dis",           "Disconnect from FTP server",            DO_FTP_TELNET_MQTT, DO_FTP_DISCONNECT },
     #if defined USE_PARAMETER_BLOCK    
     {"save",              "Save configuration to FLASH",           DO_FLASH,         DO_SAVE_PARS },
     #endif
-    #if !defined USE_TELNET_CLIENT
+    #if !defined USE_TELNET_CLIENT && !defined USE_MQTT_CLIENT
     {"help",              "Display menu specific help",            DO_HELP,          DO_MAIN_HELP },
     #endif
 #endif
 #if defined USE_TELNET_CLIENT                                            // {72}
     #if defined TELNET_CLIENT_COUNT && (TELNET_CLIENT_COUNT > 1)
-    {"tel_int",           "Set TELNET interface [num]",            DO_FTP_TELNET,    DO_TELNET_SET_INTERFACE },
+    {"tel_int",           "Set TELNET interface [num]",            DO_FTP_TELNET_MQTT, DO_TELNET_SET_INTERFACE },
     #endif
-    {"tel_port",          "Set TELNET [port]",                     DO_FTP_TELNET,    DO_TELNET_SET_PORT },
-    {"tel_con",           "Connect to TELNET server [ip]",         DO_FTP_TELNET,    DO_TELNET_CONNECT },
-    {"tel_echo",          "Set echo mode [1/0]",                   DO_FTP_TELNET,    DO_TELNET_SET_ECHO },
-    {"tel_neg",           "Disable negotiation [1/0]",             DO_FTP_TELNET,    DO_TELNET_SET_NEGOTIATION },
-    {"show_tel",          "Show TELNET config",                    DO_FTP_TELNET,    DO_TELNET_SHOW },
-    #if !defined USE_FTP_CLIENT
+    {"tel_port",          "Set TELNET [port]",                     DO_FTP_TELNET_MQTT, DO_TELNET_SET_PORT },
+    {"tel_con",           "Connect to TELNET server [ip]",         DO_FTP_TELNET_MQTT, DO_TELNET_CONNECT },
+    {"tel_echo",          "Set echo mode [1/0]",                   DO_FTP_TELNET_MQTT, DO_TELNET_SET_ECHO },
+    {"tel_neg",           "Disable negotiation [1/0]",             DO_FTP_TELNET_MQTT, DO_TELNET_SET_NEGOTIATION },
+    {"show_tel",          "Show TELNET config",                    DO_FTP_TELNET_MQTT, DO_TELNET_SHOW },
+    #if !defined USE_FTP_CLIENT && ! defined USE_MQTT_CLIENT
+    {"help",              "Display menu specific help",            DO_HELP,          DO_MAIN_HELP },
+    #endif
+#endif
+#if defined USE_MQTT_CLIENT                                              // {87}
+    #if defined SECURE_MQTT
+    { "mqtts_con",        "Secure con. to MQTT broker [ip]",       DO_FTP_TELNET_MQTT, DO_MQTTS_CONNECT },
+    #endif
+    { "mqtt_con",         "Connect to MQTT broker [ip]",           DO_FTP_TELNET_MQTT, DO_MQTT_CONNECT },
+    { "mqtt_sub",         "Subscribe [topic] <QoS>",               DO_FTP_TELNET_MQTT, DO_MQTT_SUBSCRIBE },
+    { "mqtt_top",         "List sub. topics",                      DO_FTP_TELNET_MQTT, DO_MQTT_TOPICS },
+    { "mqtt_un",          "Unsubscribe [ref]",                     DO_FTP_TELNET_MQTT, DO_MQTT_UNSUBSCRIBE },
+    { "mqtt_pub",         "Publish <\x22topic\x22/ref> <QoS>",    DO_FTP_TELNET_MQTT, DO_MQTT_PUB },
+    { "mqtt_pub_l",       "Publish (long) <\x22topic\x22/ref> <QoS>", DO_FTP_TELNET_MQTT, DO_MQTT_PUB_LONG },
+    { "mqtt_dis",         "Disconnect from MQTT broker",           DO_FTP_TELNET_MQTT, DO_MQTT_DISCONNECT },
+    #if !defined USE_FTP_CLIENT && ! defined USE_TELNET_CLIENT
     {"help",              "Display menu specific help",            DO_HELP,          DO_MAIN_HELP },
     #endif
 #endif
@@ -1029,6 +1148,51 @@ static const DEBUG_COMMAND tCANCommand[] = {                             // {38}
     {"quit",              "Leave command mode",                    DO_TELNET,        DO_TELNET_QUIT },
 };
 
+#if defined TEST_FLEXIO                                                  // {91}
+static const DEBUG_COMMAND tFlexioCommand[] = {
+    {"up",                "go to main menu",                       DO_HELP,          DO_HELP_UP},
+    {"flex_on",           "power up module",                       DO_HARDWARE,      DO_FLEXIO_ON},
+    #if defined KINETIS_K80
+    {"flex_pin",          "config pin [0..31]",                    DO_HARDWARE,      DO_FLEXIO_PIN},
+    #else
+    {"flex_pin",          "config pin [0..23]",                    DO_HARDWARE,      DO_FLEXIO_PIN},
+    #endif
+    #if defined KINETIS_KL28 || defined KINETIS_K80
+    {"flex_in",           "display the pin state",                 DO_HARDWARE,      DO_FLEXIO_PIN_STATE},
+    #endif
+    {"flex_stat",         "display status",                        DO_HARDWARE,      DO_FLEXIO_STATUS},
+    #if defined KINETIS_KL28
+    {"show_trim",         "display trim setting",                  DO_HARDWARE,      DO_SHOW_TRIM},
+    {"trim_c",            "coarse trim [0..0x3f]",                 DO_HARDWARE,      DO_CHANGE_TRIM_COARSE},
+    {"trim_f",            "fine trim [0..0x7f]",                   DO_HARDWARE,      DO_CHANGE_TRIM_FINE },
+    #endif
+    {"quit",              "Leave command mode",                    DO_TELNET,        DO_TELNET_QUIT},
+};
+
+#elif defined CMSIS_DSP_CFFT || defined CRYPTOGRAPHY || defined MMDVSQ_AVAILABLE
+static const DEBUG_COMMAND tAdvancedCommand[] = {                        // {84}
+    {"up",                "go to main menu",                       DO_HELP,          DO_HELP_UP },
+#if defined TEST_CMSIS_CFFT
+    {"fft",               "Test CFFT [len (16|32|...|2048|4096)]", DO_HARDWARE,      DO_FFT},
+#endif
+#if defined CRYPTOGRAPHY
+    #if defined CRYPTO_AES
+    { "aes128",           "Test aes128",                           DO_HARDWARE,      DO_AES128 },
+    { "aes192",           "Test aes192",                           DO_HARDWARE,      DO_AES192 },
+    { "aes256",           "Test aes256",                           DO_HARDWARE,      DO_AES256 },
+    #endif
+    #if defined CRYPTO_SHA
+    { "sha256",           "Test sha256",                           DO_HARDWARE,      DO_SHA256 },
+    #endif
+#endif
+#if defined MMDVSQ_AVAILABLE                                             // {88}
+    { "sqrt",             "Square root [<0xHEX><dec>]",            DO_HARDWARE,      DO_SQRT },
+    { "div",              "Divide (signed) [<0xHEX><dec>] / [<0xHEX><dec>]", DO_HARDWARE, DO_DIV },
+#endif
+    {"quit",              "Leave command mode",                    DO_TELNET,        DO_TELNET_QUIT },
+};
+#endif
+
 
 // Special secret menu - not displayed as menu...
 //
@@ -1037,20 +1201,29 @@ static const DEBUG_COMMAND tSecretCommands[] = {
 };
 
 static const MENUS ucMenus[] = {
-    { tMainCommand,        15, (sizeof(tMainCommand) / sizeof(DEBUG_COMMAND)),        "     Main menu"},
-    { tLANCommand,         20, (sizeof(tLANCommand) / sizeof(DEBUG_COMMAND)),         " LAN configuration"},
-    { tSERIALCommand,      22, (sizeof(tSERIALCommand) / sizeof(DEBUG_COMMAND)),      "   Serial config."},
-    { tIOCommand,          15, (sizeof(tIOCommand) / sizeof(DEBUG_COMMAND)),          " Input/Output menu"},
-    { tADMINCommand,       17, (sizeof(tADMINCommand) / sizeof(DEBUG_COMMAND)),       "   Admin. menu"},
-    { tStatCommand,        17, (sizeof(tStatCommand) / sizeof(DEBUG_COMMAND)),        "   Stats. menu"},
-    { tUSBCommand,         13, (sizeof(tUSBCommand) / sizeof(DEBUG_COMMAND)),         "    USB menu"},
-    { tI2CCommand,         13, (sizeof(tI2CCommand) / sizeof(DEBUG_COMMAND)),         "    I2C menu"},
-    { tDiskCommand,        13, (sizeof(tDiskCommand) / sizeof(DEBUG_COMMAND)),        "  Disk interface"}, // {17}
-    { tFTP_TELNET_Command, 15, (sizeof(tFTP_TELNET_Command) / sizeof(DEBUG_COMMAND)), "FTP/TELNET commands"}, // {37}
-    { tCANCommand,         15, (sizeof(tCANCommand) / sizeof(DEBUG_COMMAND)),         "   CAN commands"}, // {38}
+    { tMainCommand,        15, (sizeof(tMainCommand)/sizeof(DEBUG_COMMAND)),        "     Main menu"},
+    { tLANCommand,         20, (sizeof(tLANCommand)/sizeof(DEBUG_COMMAND)),         " LAN configuration"},
+    { tSERIALCommand,      22, (sizeof(tSERIALCommand)/sizeof(DEBUG_COMMAND)),      "   Serial config."},
+    { tIOCommand,          15, (sizeof(tIOCommand)/sizeof(DEBUG_COMMAND)),          " Input/Output menu"},
+    { tADMINCommand,       17, (sizeof(tADMINCommand)/sizeof(DEBUG_COMMAND)),       "   Admin. menu"},
+    { tStatCommand,        17, (sizeof(tStatCommand)/sizeof(DEBUG_COMMAND)),        "   Stats. menu"},
+    { tUSBCommand,         13, (sizeof(tUSBCommand)/sizeof(DEBUG_COMMAND)),         "    USB menu"},
+    { tI2CCommand,         13, (sizeof(tI2CCommand)/sizeof(DEBUG_COMMAND)),         "    I2C menu"},
+    { tDiskCommand,        13, (sizeof(tDiskCommand)/sizeof(DEBUG_COMMAND)),        "  Disk interface"}, // {17}
+#if defined USE_MQTT_CLIENT
+    { tFTP_TELNET_Command, 15, (sizeof(tFTP_TELNET_Command)/sizeof(DEBUG_COMMAND)), "FTP/TELNET/MQTT" }, // {37}
+#else
+    { tFTP_TELNET_Command, 15, (sizeof(tFTP_TELNET_Command)/sizeof(DEBUG_COMMAND)), "FTP/TELNET commands"}, // {37}
+#endif
+    { tCANCommand,         15, (sizeof(tCANCommand)/sizeof(DEBUG_COMMAND)),         "   CAN commands"}, // {38}
+#if defined TEST_FLEXIO                                                  // {91}
+    { tFlexioCommand,      15, (sizeof(tFlexioCommand)/sizeof(DEBUG_COMMAND)),      "   FLEXIO" },
+#elif defined CMSIS_DSP_CFFT || defined CRYPTOGRAPHY || defined MMDVSQ_AVAILABLE
+    { tAdvancedCommand,    15, (sizeof(tAdvancedCommand)/sizeof(DEBUG_COMMAND)),    "   Advanced" }, // {84}{88}
+#endif
 };
 
-#if defined EZPORT_CLONER_SKIP_REGIONS
+#if defined EZPORT_CLONER && defined EZPORT_CLONER_SKIP_REGIONS
     static const CLONER_SKIP_REGION ulSkipRegion[] = {
         {PARAMETER_BLOCK_START, (FLASH_START_ADDRESS + SIZE_OF_FLASH)},
         {0}                                                              // end of list
@@ -1126,15 +1299,15 @@ static unsigned char   ucDebugCnt = 0;
     static TELNET_CLIENT_DETAILS telnet_client_details[TELNET_CLIENT_COUNT] = {{0}};
     static int iTELNET_clientActive = 0;
 #endif
-#if defined SERIAL_INTERFACE
+#if defined SERIAL_INTERFACE || (defined USE_TELNET && defined USE_TELNET_LOGIN)
     static unsigned char ucPasswordState = PASSWORD_IDLE;
 #endif
 #if defined SDCARD_SUPPORT || defined SPI_FLASH_FAT || defined FLASH_FAT || defined USB_MSD_HOST // {17}{81}
     static UTDIRECTORY *ptr_utDirectory[DISK_COUNT] = {0};               // pointer to a directory object
     static int iFATstalled = 0;                                          // stall flags when listing large directories and printing content
 #endif
-#if defined I2C_INTERFACE && defined TEST_I2C_INTERFACE
-    extern QUEUE_HANDLE IICPortID;
+#if defined I2C_INTERFACE && (defined TEST_I2C_INTERFACE || defined I2C_MASTER_LOADER)
+    extern QUEUE_HANDLE I2CPortID;
 #endif
 #if DISK_COUNT > 1
     static unsigned char ucPresentDisk = 0;
@@ -1147,6 +1320,9 @@ static unsigned char   ucDebugCnt = 0;
     #if defined EZPORT_CLONER_SKIP_REGIONS
         static int iCloningRegion = 0;
     #endif
+#endif
+#if defined USE_MQTT_CLIENT
+    static unsigned short usPubLength = 0;
 #endif
 
 
@@ -1166,7 +1342,7 @@ extern void fnDebug(TTASKTABLE *ptrTaskTable)
 #if defined USE_TELNET_CLIENT
     if (telnet_client_details[0].listener == 0) {                        // if the TELNET clients have not yet been configured with default settings
         int i;
-        for (i = 0; i < TELNET_CLIENT_COUNT; i++) {
+        for (i = 0; i < TELNET_CLIENT_COUNT; i++) {                      // for each telnet client socket
             telnet_client_details[i].usPortNumber = TELNET_SERVERPORT;   // set default TELNET port number
             telnet_client_details[i].listener = fnTELNETClientListener;  // configure fixed listener
             telnet_client_details[i].usIdleTimeout = 120;                // set idle timeout to 120s
@@ -1206,7 +1382,7 @@ extern void fnDebug(TTASKTABLE *ptrTaskTable)
                 iCloningActive = 0;
             }
             else {
-                if (iCloningActive & CLONING_ERASING_BULK) {
+                if ((iCloningActive & CLONING_ERASING_BULK) != 0) {
                     fnEraseEz("0");                                      // erase the first sector so that the security byte is erased
                     iCloningActive &= ~(CLONING_ERASING_BULK);
                     return;
@@ -1294,8 +1470,15 @@ extern void fnDebug(TTASKTABLE *ptrTaskTable)
     }
 #endif
 
-    while (fnRead(PortIDInternal, ucInputMessage, HEADER_LENGTH)) {      // check input queue
+    while (fnRead(PortIDInternal, ucInputMessage, HEADER_LENGTH) != 0) { // check input queue
         switch (ucInputMessage[MSG_SOURCE_TASK]) {                       // switch depending on message source
+#if defined USE_MAINTENANCE && defined USB_INTERFACE && defined USE_USB_CDC
+        case TIMER_EVENT:
+            if (E_TIMER_START_USB_TX == ucInputMessage[MSG_TIMER_EVENT]) {
+                fnUSB_CDC_TX(1);                                         // start transmission of data to USB-CDC interface(s)
+            }
+            break;
+#endif
         case INTERRUPT_EVENT:
             if (TX_FREE == ucInputMessage[MSG_INTERRUPT_EVENT]) {
 #if defined SDCARD_SUPPORT || defined SPI_FLASH_FAT || defined FLASH_FAT || defined USB_MSD_HOST // {17}{81}
@@ -1318,7 +1501,7 @@ extern void fnDebug(TTASKTABLE *ptrTaskTable)
                     }
                 }
 #endif
-                if (iMenuLocation) {
+                if (iMenuLocation != 0) {
                     fnDisplayHelp(iMenuLocation);
                 }
 #if defined USE_FTP_CLIENT                                               // {37}
@@ -1330,6 +1513,13 @@ extern void fnDebug(TTASKTABLE *ptrTaskTable)
                 }
 #endif
             }
+#if defined USE_MAINTENANCE && defined USB_INTERFACE && defined USE_USB_CDC
+            else if (E_USB_TX_CONTINUE == ucInputMessage[MSG_INTERRUPT_EVENT]) {
+                if (fnUSB_CDC_TX(0) != 0) {                              // continue transmission of data to USB-CDC interface(s)
+                    return;
+                }
+            }
+#endif
 #if defined SDCARD_SUPPORT || defined SPI_FLASH_FAT || defined FLASH_FAT || defined USB_MSD_HOST // {81}
             else if (UTFAT_OPERATION_COMPLETED == ucInputMessage[MSG_INTERRUPT_EVENT]) {
                 if (iFATstalled == STALL_COUNTING_CLUSTERS) {
@@ -1349,7 +1539,7 @@ extern void fnDebug(TTASKTABLE *ptrTaskTable)
             }
 #endif
             break;
-#if defined ETH_INTERFACE || defined USB_CDC_RNDIS
+#if defined ETH_INTERFACE || defined USB_CDC_RNDIS || defined USE_PPP
         case TASK_ARP:
             fnRead(PortIDInternal, ucInputMessage, ucInputMessage[MSG_CONTENT_LENGTH]);  // read the contents
             if (ucInputMessage[0] == ARP_RESOLUTION_SUCCESS) {
@@ -1438,20 +1628,52 @@ extern void fnDebug(TTASKTABLE *ptrTaskTable)
             break;
         }
     }
-#if defined I2C_INTERFACE && defined TEST_I2C_INTERFACE
-    if (fnMsgs(IICPortID) != 0) {                                        // if IIC message waiting
-        QUEUE_TRANSFER iic_length = fnMsgs(IICPortID);
+#if defined I2C_INTERFACE
+    #if defined TEST_I2C_INTERFACE
+    if (fnMsgs(I2CPortID) != 0) {                                        // if I2C message waiting
+        QUEUE_TRANSFER i2c_length = fnMsgs(I2CPortID);
         int x = 0;
         fnDebugMsg("I2C Input = ");
-        fnRead( IICPortID, ucInputMessage, iic_length);
-        while (iic_length--) {
+        fnRead(I2CPortID, ucInputMessage, i2c_length);
+        while (i2c_length-- != 0) {
             fnDebugHex(ucInputMessage[x++], (WITH_LEADIN | WITH_SPACE | 1)); // display received bytes
         }
         fnDebugMsg("\r\n");
     }
+    #elif defined I2C_MASTER_LOADER
+    if (fnMsgs(I2CPortID) != 0) {                                        // if I2C message waiting
+        QUEUE_TRANSFER i2c_length = fnMsgs(I2CPortID);                   // the waiting length
+        fnRead(I2CPortID, ucInputMessage, i2c_length);
+        #if defined _WINDOWS
+        ucInputMessage[2] = 0x01;
+        #endif
+        if (3 == i2c_length) {                                           // delete status
+            if (ucInputMessage[2] == 0x01) {                             // flass is empty
+                fnDebugMsg("Slave flash deleted\r\n");
+                fnProgramI2CSlave(0, 2);                                 // program the firmware
+                fnDebugMsg("Programming");
+            }
+            else if (ucInputMessage[2] == 0x00) {                        // flash is not empty
+                fnDebugMsg("*");
+                fnProgramI2CSlave(0, 1);                                 // poll the delete status until the slave responds that it has completed
+            }
+            else {
+                fnDebugMsg("Slave not responding!\r\n");
+            }
+        }
+        else if (5 == i2c_length) {                                      // programming status
+            fnDebugMsg(".");
+            if (ucInputMessage[0] == 0x01) {
+                fnProgramI2CSlave(0, 2);                                 // program next block
+            }
+            else {
+                fnDebugMsg("Programming error!\r\n");
+            }
+        }
+    }
+    #endif
 #endif
 }
-
 
 static void fnDisplaySerialNumber(void)
 {
@@ -1460,7 +1682,6 @@ static void fnDisplaySerialNumber(void)
     fnShowSN(cSN);
     fnDebugMsg(cSN);
 }
-
 
 static void fnDisplaySoftwareVersion(void)
 {
@@ -1503,7 +1724,7 @@ static int fnDisplayHelp(int iStart)
 
     uMemset(ucTabs, ' ', MAX_TAB_MARK);
 
-    if (iStart) {
+    if (iStart != 0) {
         while (iEntries > iStart) {
             ptrCom++;
             iEntries--;
@@ -1515,7 +1736,7 @@ static int fnDisplayHelp(int iStart)
         fnDebugMsg("\n\r===================\n\r");
     }
 
-    while (iEntries--) {
+    while (iEntries-- != 0) {
         if (fnWrite(DebugHandle, 0, MAX_MENU_LINE) == 0) {               // the transmit buffer cannot accept more data so we will pause until it can
             fnDriver(DebugHandle, MODIFY_WAKEUP, (MODIFY_TX | OWN_TASK));// we want to be woken when the queue is free again
             iMenuLocation = (iEntries + 1);                              // save the position we stopped at
@@ -1544,12 +1765,9 @@ static unsigned short fnGetWordShift(CHAR **ptrIn)
     CHAR *ptrInput = *ptrIn;
     int i = 4;
 
-    while (*ptrInput == ' ') {                                           // jump over white space
-       ++(*ptrIn);
-       ptrInput++;
-    }
+    ptrInput = fnSkipWhiteSpace(ptrInput);                               // jump over white space                  
 
-    while ((i--) && (*ptrInput >= '0')) {
+    while ((i-- != 0) && (*ptrInput >= '0')) {
         usResult <<= 4;
         ucValue = *ptrInput++;
         ucValue -= '0';
@@ -1593,7 +1811,7 @@ static void fnDoFlash(unsigned char ucType, CHAR *ptrInput)
         }
         break;
     case DO_REJECT_CHANGES:
-    #if defined ETH_INTERFACE || defined USB_CDC_RNDIS
+    #if defined ETH_INTERFACE || defined USB_CDC_RNDIS || defined USE_PPP
         uMemcpy(&temp_pars->temp_network[0], &network[0], sizeof(network)); // reverse all changes in the network settings
     #endif
         uMemcpy(&temp_pars->temp_parameters, parameters, sizeof(PARS));
@@ -1683,7 +1901,7 @@ static void fnPingSuccess(USOCKET dummy_socket)
 static void fnPingTest(USOCKET dummy_socket)
 {
     unsigned char *ping_address;
-    #if defined ENC424J600_INTERFACE && (IP_INTERFACE_COUNT > 1)
+    #if (defined ENC424J600_INTERFACE || defined PHY_MULTI_PORT) && (IP_INTERFACE_COUNT > 1)
     if (dummy_socket >= IPv4_DUMMY_SOCKET)
     #else
     if ((dummy_socket & SOCKET_NUMBER_MASK) == IPv4_DUMMY_SOCKET)        // {50}
@@ -1728,7 +1946,7 @@ static void fnPingIPV6Success(USOCKET dummy_socket)
 static void fnPingV6Test(USOCKET dummy_socket)
 {
     unsigned char *ping_IPV6_address;
-    #if defined ENC424J600_INTERFACE && (IP_INTERFACE_COUNT > 1)
+    #if (defined ENC424J600_INTERFACE || defined PHY_MULTI_PORT) && (IP_INTERFACE_COUNT > 1)
     if (dummy_socket >= IPv6_DUMMY_SOCKET)
     #else
     if ((dummy_socket & SOCKET_NUMBER_MASK) == IPv6_DUMMY_SOCKET)        // {50}
@@ -1746,7 +1964,11 @@ static void fnPingV6Test(USOCKET dummy_socket)
 #endif
 
 #if defined SERIAL_INTERFACE && defined DEMO_UART
-#define NUMBER_OF_SPEEDS 12
+#if defined SUPPORT_MIDI_BAUD_RATE
+    #define NUMBER_OF_SPEEDS 13
+#else
+    #define NUMBER_OF_SPEEDS 12
+#endif
 static const CHAR cSpeeds[NUMBER_OF_SPEEDS][7] = {
     {"300"},
     {"600"},
@@ -1756,6 +1978,9 @@ static const CHAR cSpeeds[NUMBER_OF_SPEEDS][7] = {
     {"9600"},
     {"14400"},
     {"19200"},
+    #if defined SUPPORT_MIDI_BAUD_RATE
+    {"31250"},
+    #endif
     {"38400"},
     {"57600"},
     {"115200"},
@@ -1778,7 +2003,7 @@ static int fnGetSpeed(CHAR *ptr_input, unsigned char *ucNew_speed)
 {
     int i = 0;
     while (i < NUMBER_OF_SPEEDS) {
-        if (!(uStrcmp((CHAR *)cSpeeds[i], ptr_input))) {
+        if ((uStrcmp((CHAR *)cSpeeds[i], ptr_input)) == 0) {
             *ucNew_speed = i;                                            // set corresponding speed index
             return 1;                                                    // return found
         }
@@ -1798,10 +2023,10 @@ static const CHAR cStops[NUMBER_OF_STOPS][4] = {
 static void fnShowStops(void)
 {
     int i = 0;
-    if (temp_pars->temp_parameters.SerialMode & TWO_STOPS) {
+    if ((temp_pars->temp_parameters.SerialMode & TWO_STOPS) != 0) {
         i = 2;
     }
-    else if (temp_pars->temp_parameters.SerialMode & ONE_HALF_STOPS) {
+    else if ((temp_pars->temp_parameters.SerialMode & ONE_HALF_STOPS) != 0) {
         i = 1;
     }
     fnDebugMsg((CHAR *)cStops[i]);
@@ -1812,7 +2037,7 @@ static int fnGetStops(CHAR *ptr_input, UART_MODE_CONFIG *Mode)
 {
     int i = 0;
     while (i < NUMBER_OF_STOPS) {
-        if (!(uStrcmp((CHAR *)cStops[i], ptr_input))) {
+        if ((uStrcmp((CHAR *)cStops[i], ptr_input)) == 0) {
             *Mode &= ~(ONE_HALF_STOPS | TWO_STOPS);                      // default 1 stop bit
             switch (i) {
             case 1:                                                      // 1,5 stop bits
@@ -1841,10 +2066,10 @@ static const CHAR cParity[NUMBER_OF_PARITY][5] = {
 static void fnShowParity(void)
 {
     int i = 2;
-    if (temp_pars->temp_parameters.SerialMode & RS232_EVEN_PARITY) {
+    if ((temp_pars->temp_parameters.SerialMode & RS232_EVEN_PARITY) != 0) {
         i = 1;
     }
-    else if (temp_pars->temp_parameters.SerialMode & RS232_ODD_PARITY) {
+    else if ((temp_pars->temp_parameters.SerialMode & RS232_ODD_PARITY) != 0) {
         i = 0;
     }
     fnDebugMsg((CHAR *)cParity[i]);
@@ -1855,7 +2080,7 @@ static int fnGetParity(CHAR *ptr_input, UART_MODE_CONFIG *Mode)
 {
     int i = 0;
     while (i < NUMBER_OF_PARITY) {
-        if (!(uStrcmp(cParity[i], ptr_input))) {
+        if ((uStrcmp(cParity[i], ptr_input)) == 0) {
             *Mode &= ~(RS232_EVEN_PARITY | RS232_ODD_PARITY);            // default no parity
             switch (i) {
             case 0:                                                      // odd parity
@@ -1883,10 +2108,10 @@ static const CHAR cFlow[NUMBER_OF_FLOW][8] = {
 static void fnShowFlow(void)
 {
     int i = 0;
-    if (temp_pars->temp_parameters.SerialMode & RTS_CTS) {
+    if ((temp_pars->temp_parameters.SerialMode & RTS_CTS) != 0) {
         i = 1;
     }
-    else if (temp_pars->temp_parameters.SerialMode & USE_XON_OFF) {
+    else if ((temp_pars->temp_parameters.SerialMode & USE_XON_OFF) != 0) {
         i = 2;
     }
     fnDebugMsg("Flow control ");
@@ -1907,10 +2132,10 @@ static int fnSetFlowControl(CHAR *ptr_input, UART_MODE_CONFIG *Mode)
 
     int i = 0;
     while (i < NUMBER_OF_FLOW) {
-        if (!(uStrcmp(cFlow[i], ptr_input))) {
+        if ((uStrcmp(cFlow[i], ptr_input)) != 0) {
             *Mode &= ~(USE_XON_OFF | RTS_CTS);                           // default no flow control
             switch (i) {
-            case 1:                                                      // RTC/CTS
+            case 1:                                                      // RTS/CTS
                 *Mode |= RTS_CTS;
                 break;
 
@@ -1957,7 +2182,7 @@ static int fnEnableDisableServers(CHAR *ptr_input, unsigned short usOption) // {
     return 0;
 }
 
-#if defined ETH_INTERFACE || defined USB_CDC_RNDIS
+#if defined ETH_INTERFACE || defined USB_CDC_RNDIS || defined USE_PPP
 static int fnShowServerEnabled(const CHAR *cText, unsigned char ucOption)
 {
     fnDebugMsg((CHAR *)cText);
@@ -2003,7 +2228,7 @@ static void fnDoSerial(unsigned char ucType, CHAR *ptr_input)
     switch (ucType) {
     #if (defined SERIAL_INTERFACE && defined DEMO_UART)
     case SERIAL_SET_BAUD:
-        if (!(fnGetSpeed(ptr_input, &temp_pars->temp_parameters.ucSerialSpeed))) {
+        if ((fnGetSpeed(ptr_input, &temp_pars->temp_parameters.ucSerialSpeed)) == 0) {
            fnDebugMsg("Incorrect serial speed\r\n");
            return;
         }
@@ -2025,7 +2250,7 @@ static void fnDoSerial(unsigned char ucType, CHAR *ptr_input)
         break;
 
     case SERIAL_SET_PARITY:
-        if (!(fnGetParity(ptr_input, &temp_pars->temp_parameters.SerialMode))) {
+        if ((fnGetParity(ptr_input, &temp_pars->temp_parameters.SerialMode)) == 0) {
            fnDebugMsg("Incorrect parity\r\n");
            return;
         }
@@ -2033,7 +2258,7 @@ static void fnDoSerial(unsigned char ucType, CHAR *ptr_input)
         break;
 
     case SERIAL_SET_STOP:
-        if (!(fnGetStops(ptr_input, &temp_pars->temp_parameters.SerialMode))) {
+        if ((fnGetStops(ptr_input, &temp_pars->temp_parameters.SerialMode)) == 0) {
            fnDebugMsg("Incorrect stop bits\r\n");
            return;
         }
@@ -2041,7 +2266,7 @@ static void fnDoSerial(unsigned char ucType, CHAR *ptr_input)
         break;
 
     case SERIAL_SET_FLOW:
-        if (!(fnSetFlowControl(ptr_input, &temp_pars->temp_parameters.SerialMode))) {
+        if ((fnSetFlowControl(ptr_input, &temp_pars->temp_parameters.SerialMode)) == 0) {
            fnDebugMsg("Incorrect flow control\r\n");
            return;
         }
@@ -2097,7 +2322,7 @@ static void fnDoSerial(unsigned char ucType, CHAR *ptr_input)
 }
 #endif
 
-#if defined ETH_INTERFACE || defined USB_CDC_RNDIS
+#if defined ETH_INTERFACE || defined USB_CDC_RNDIS || defined USE_PPP
     #if defined USE_IP_STATS
 static const CHAR cIPStatTypes[TOTAL_OTHER_EVENTS + 1][19] = {
     {"Total Rx frames"},
@@ -2147,7 +2372,9 @@ static void fnShowLAN(NETWORK_PARAMETERS *ptrNetwork)
     fnDebugMsg("LAN speed ");
     fnDebugMsg((CHAR *)cLAN[i]);
     fnDebugMsg("\r\n");
+        #if defined USE_DHCP_CLIENT
     fnShowServerEnabled("DHCP_SERVER", ACTIVE_DHCP);
+        #endif
 }
     #endif
     #if defined ETH_INTERFACE
@@ -2264,6 +2491,10 @@ static void fnDoIP(unsigned char ucType, CHAR *ptr_input)
         fnStrIP(ptr_input, ucTempIP);                                    // ping entered address
     #if defined ENC424J600_INTERFACE && (IP_INTERFACE_COUNT > 1)
         fnPingTest(ETHERNET_INTERFACE | ENC424J00_INTERFACE | IPv4_DUMMY_SOCKET); // ping on both Ethernet interfaces
+    #elif defined PHY_MULTI_PORT && (IP_INTERFACE_COUNT > 1)
+        fnPingTest(ETHERNET_INTERFACE | PHY1_INTERFACE | PHY2_INTERFACE | PHY12_INTERFACE | IPv4_DUMMY_SOCKET); // ping on all Ethernet interfaces
+    #elif defined USE_PPP && defined ETH_INTERFACE
+        fnPingTest(ETHERNET_INTERFACE | PPP_INTERFACE | IPv4_DUMMY_SOCKET); // ping on both Ethernet and PPP interfaces
     #else
         fnPingTest(IPv4_DUMMY_SOCKET);                                   // {50} execute using dummy IPv4 socket
     #endif
@@ -2425,7 +2656,7 @@ static void fnDoIP(unsigned char ucType, CHAR *ptr_input)
         }
         break; 
 #endif
-#if defined ETH_INTERFACE || defined USB_CDC_RNDIS
+#if defined ETH_INTERFACE || defined USB_CDC_RNDIS || defined USE_PPP
     case DO_SET_MAC:                                                     // set device's MAC address
         if (((uMemcmp(&network[ucPresentNetwork].ucOurMAC[0], cucNullMACIP, MAC_LENGTH))) || ((fnSetMAC(ptr_input, &temp_pars->temp_network[ucPresentNetwork].ucOurMAC[0])) == 0)) {                                       // interpret MAC address input and save this
             fnDebugMsg("MAC may not be modified!!\r\n");                 // we are only allowed to save the new address once
@@ -2873,7 +3104,7 @@ static void fnDoAdmin(unsigned char ucType, CHAR *ptrInput)
     }
 }
 
-#if defined ETH_INTERFACE || defined USB_CDC_RNDIS
+#if defined ETH_INTERFACE || defined USB_CDC_RNDIS || defined USE_PPP
 static void fnShowSec(void)
 {
     fnDebugMsg("\r\nSecurity settings\r\n");
@@ -2892,7 +3123,7 @@ static void fnShowSec(void)
 static void fnDoServer(unsigned char ucType, CHAR *ptrInput)
 {
     switch (ucType) {
-#if defined ETH_INTERFACE || defined USB_CDC_RNDIS
+#if defined ETH_INTERFACE || defined USB_CDC_RNDIS || defined USE_PPP
     #if defined USE_TELNET
     case DO_ENABLE_TELNET:
         if (fnEnableDisableServers(ptrInput, ACTIVE_TELNET_SERVER)) {
@@ -2920,7 +3151,7 @@ static void fnDoServer(unsigned char ucType, CHAR *ptrInput)
             return;
         }
         break;
-#if defined ETH_INTERFACE || defined USB_CDC_RNDIS
+#if defined ETH_INTERFACE || defined USB_CDC_RNDIS || defined USE_PPP
     case DO_ENABLE_WEB_SERVER:
         if (fnEnableDisableServers(ptrInput, ACTIVE_WEB_SERVER)) {
             return;
@@ -2957,7 +3188,6 @@ static void fnDoServer(unsigned char ucType, CHAR *ptrInput)
 static void fnDoTelnet(unsigned char ucType, CHAR *ptrInput)
 {
     switch (ucType) {
-
       case DO_SET_TELNET_PORT:
           temp_pars->temp_parameters.usTelnetPort = (unsigned short)fnDecStrHex(ptrInput);
           break;
@@ -3007,7 +3237,7 @@ static int fnJumpWhiteSpace(CHAR **ptrptrInput)
     return (*ptrInput == 0);
 }
 
-
+#if !defined REMOVE_PORT_INITIALISATIONS
 static int fnSetPort(unsigned char ucType, CHAR *ptrInput)               // modify the port type
 {
     unsigned char ucBit;
@@ -3022,6 +3252,7 @@ static int fnSetPort(unsigned char ucType, CHAR *ptrInput)               // modi
     }
     return 0;
 }
+#endif
 
 #if defined MONITOR_PERFORMANCE                                          // {25}
 static void fnDisplayTaskUse(CHAR cTask)
@@ -3141,6 +3372,479 @@ void function(void) // actually an interrupt routine
 /************************************************************************/
 #endif
 
+#if defined PWM_MEASUREMENT_DEVELOPMENT                                  // temporary code for developing PWM measurement based on K pin change triggered DMA
+#define PWM_PIT_CHANNEL                  2
+#define PWM_MEASUREMENT_DMA_CHANNEL      9                               // use DMA channel 9
+#define PWM_EDGES                        10
+volatile unsigned long PWM_sample_buffer[PWM_EDGES] = {0};
+static int iInitialPortState = 0;
+static int iLastPortRef = 0;
+static unsigned long ulLastPortBit = 0;
+static void _PWM_Interrupt(void)
+{
+    volatile unsigned long *ptrPCR = (volatile unsigned long *)(PORT0_BLOCK + (iLastPortRef * 0x1000));
+    ATOMIC_PERIPHERAL_BIT_REF_CLEAR(DMA_ERQ, PWM_MEASUREMENT_DMA_CHANNEL); // disable further DMA operation
+  //DMA_ERQ &= ~(DMA_ERQ_ERQ0 << PWM_MEASUREMENT_DMA_CHANNEL);
+    while (ulLastPortBit != 0) {
+        if ((ulLastPortBit & 0x1) != 0) {
+            *ptrPCR &= ~PORT_IRQC_DMA_BOTH;                              // disable DMA on last input
+        }
+        ptrPCR++;
+        ulLastPortBit >>= 1;
+    }
+    fnInterruptMessage(TASK_APPLICATION, (unsigned char)(198));
+}
+
+extern void fnShowPWM(void)
+{
+    int i;
+    unsigned long ulHigh = 0;
+    unsigned long ulLow = 0;
+    int iIntegration = 0;
+    unsigned long ulMSR;
+    fnDebugMsg("PWM\r\n");
+    for (i = 0; i < PWM_EDGES;) {
+        fnDebugHex(PWM_sample_buffer[i], (sizeof(PWM_sample_buffer[i]) | WITH_LEADIN | WITH_CR_LF));
+        fnDebugHex(PWM_sample_buffer[i + 1], (sizeof(PWM_sample_buffer[i + 1]) | WITH_LEADIN | WITH_CR_LF));
+        if (i < (PWM_EDGES - 2)) {
+            if ((PWM_sample_buffer[i] != 0) && (PWM_sample_buffer[i + 1]) && (PWM_sample_buffer[i + 2])) {
+                ulHigh += (PWM_sample_buffer[i] - PWM_sample_buffer[i + 1]);
+                ulLow += (PWM_sample_buffer[i + 1] - PWM_sample_buffer[i + 2]);
+                iIntegration++;
+            }
+        }
+        i += 2;
+    }
+    if (iIntegration == 0) {
+        if (iInitialPortState != 0) {
+            ulMSR = 10000;
+        }
+        else {
+            ulMSR = 0;
+        }
+    }
+    else {
+        if (iInitialPortState != 0) {
+            ulMSR = ((ulLow * 10000) / (ulHigh + ulLow));                // first edge was a high to low one
+        }
+        else {
+            ulMSR = ((ulHigh * 10000) / (ulHigh + ulLow));               // first edge was a low to high one
+        }
+    }
+    fnDebugMsg("MSR = ");
+    fnDebugDec(ulMSR, 0);
+    fnDebugMsg("%%%\r\n");
+    uMemset((void *)PWM_sample_buffer, 0, sizeof(PWM_sample_buffer));
+}
+
+static void fnMeasurePWM(int iPortRef, unsigned long ulPortBit)
+{
+    KINETIS_PIT_CTL *ptrCtl = (KINETIS_PIT_CTL *)PIT_CTL_ADD;
+    PIT_SETUP pit_setup;                                                 // interrupt configuration parameters
+    KINETIS_DMA_TDC *ptrDMA_TCD = (KINETIS_DMA_TDC *)eDMA_DESCRIPTORS;
+    unsigned char *ptrDMAMUX = DMAMUX0_CHCFG_ADD;
+    INTERRUPT_SETUP interrupt_setup;                                     // interrupt configuration parameters
+    interrupt_setup.int_type = PORT_INTERRUPT;                           // identifier to configure port interrupt
+    interrupt_setup.int_port = iPortRef;                                 // the port that the interrupt input is on
+    interrupt_setup.int_port_bits = ulPortBit;
+    interrupt_setup.int_port_sense = (IRQ_BOTH_EDGES | PULLUP_ON | PORT_DMA_MODE); // DMA on both edges and keep peripheral function
+    interrupt_setup.int_handler = 0;                                    // no interrupt handler when using DMA
+    fnConfigureInterrupt((void *)&interrupt_setup);                     // configure interrupt (port triggered DMA)
+
+    iLastPortRef = iPortRef;
+    ulLastPortBit = ulPortBit;
+
+    ptrDMA_TCD += PWM_MEASUREMENT_DMA_CHANNEL;
+    ptrDMAMUX += PWM_MEASUREMENT_DMA_CHANNEL;
+    ptrDMA_TCD->DMA_TCD_SOFF = 0;                                        // source not incremented
+    ptrDMA_TCD->DMA_TCD_DOFF = sizeof(unsigned long);                    // destination incremented by one long word after each transfer
+    ptrDMA_TCD->DMA_TCD_BITER_ELINK = ptrDMA_TCD->DMA_TCD_CITER_ELINK = PWM_EDGES;
+    ptrDMA_TCD->DMA_TCD_ATTR = (DMA_TCD_ATTR_DSIZE_32 | DMA_TCD_ATTR_SSIZE_32); // transfer sizes always single bytes
+    ptrCtl += PWM_PIT_CHANNEL;
+    ptrDMA_TCD->DMA_TCD_SADDR = (unsigned long)&(ptrCtl->PIT_CVAL);
+    ptrDMA_TCD->DMA_TCD_DADDR = (unsigned long)PWM_sample_buffer;        // destination is the sample buffer
+    ptrDMA_TCD->DMA_TCD_SLAST = ptrDMA_TCD->DMA_TCD_DLASTSGA = 0;        // no change to address when the buffer has filled
+    ptrDMA_TCD->DMA_TCD_NBYTES_ML = sizeof(unsigned long);               // each request starts a single long word transfer
+    ptrDMA_TCD->DMA_TCD_CSR = (DMA_TCD_CSR_ACTIVE);                      // set active
+    POWER_UP(6, SIM_SCGC6_DMAMUX0);                                      // enable DMA multiplexer 0
+    *ptrDMAMUX = ((DMAMUX0_CHCFG_SOURCE_PORTA + iPortRef) | DMAMUX_CHCFG_ENBL); // trigger DMA channel on port changes
+
+    // Set measurement time (at least 3 edges must be collected)
+    //
+    pit_setup.int_type = PIT_INTERRUPT;
+    pit_setup.int_priority = PIT2_INTERRUPT_PRIORITY;
+    pit_setup.count_delay = PIT_MS_DELAY(2);                             // 2ms (suitable from about 1kHz)
+    pit_setup.mode = (PIT_SINGLE_SHOT);
+    pit_setup.int_handler = _PWM_Interrupt;
+#if defined SUPPORT_PITS                                                 // multiple PITs
+    pit_setup.ucPIT = PWM_PIT_CHANNEL;                                   // use PIT channel
+#endif
+    fnConfigureInterrupt((void *)&pit_setup);                            // configure PIT
+
+    {                                                                    // start the measurement and determine the initial input state
+        int iInputState1;
+        int iInputState2;
+        uDisable_Interrupt();
+        switch (iPortRef) {
+        case PORTA:
+            iInputState1 = (_READ_PORT_MASK(A, ulPortBit) != 0);             // read initial input state
+            ATOMIC_PERIPHERAL_BIT_REF_SET(DMA_ERQ, PWM_MEASUREMENT_DMA_CHANNEL); // enable request source
+          //DMA_ERQ |= (DMA_ERQ_ERQ0 << PWM_MEASUREMENT_DMA_CHANNEL);        
+            iInputState2 = (_READ_PORT_MASK(A, ulPortBit) != 0);             // read new input state
+            break;
+        case PORTB:
+            iInputState1 = (_READ_PORT_MASK(B, ulPortBit) != 0);             // read initial input state
+            ATOMIC_PERIPHERAL_BIT_REF_SET(DMA_ERQ, PWM_MEASUREMENT_DMA_CHANNEL); // enable request source
+          //DMA_ERQ |= (DMA_ERQ_ERQ0 << PWM_MEASUREMENT_DMA_CHANNEL);
+            iInputState2 = (_READ_PORT_MASK(B, ulPortBit) != 0);             // read new input state
+            break;
+        case PORTC:
+            iInputState1 = (_READ_PORT_MASK(C, ulPortBit) != 0);             // read initial input state
+            ATOMIC_PERIPHERAL_BIT_REF_SET(DMA_ERQ, PWM_MEASUREMENT_DMA_CHANNEL); // enable request source
+          //DMA_ERQ |= (DMA_ERQ_ERQ0 << PWM_MEASUREMENT_DMA_CHANNEL);
+            iInputState2 = (_READ_PORT_MASK(C, ulPortBit) != 0);             // read new input state
+            break;
+        case PORTD:
+            iInputState1 = (_READ_PORT_MASK(D, ulPortBit) != 0);             // read initial input state
+            ATOMIC_PERIPHERAL_BIT_REF_SET(DMA_ERQ, PWM_MEASUREMENT_DMA_CHANNEL); // enable request source
+          //DMA_ERQ |= (DMA_ERQ_ERQ0 << PWM_MEASUREMENT_DMA_CHANNEL);        // enable request source
+            iInputState2 = (_READ_PORT_MASK(D, ulPortBit) != 0);             // read new input state
+            break;
+        case PORTE:
+            iInputState1 = (_READ_PORT_MASK(E, ulPortBit) != 0);             // read initial input state
+            ATOMIC_PERIPHERAL_BIT_REF_SET(DMA_ERQ, PWM_MEASUREMENT_DMA_CHANNEL); // enable request source
+          //DMA_ERQ |= (DMA_ERQ_ERQ0 << PWM_MEASUREMENT_DMA_CHANNEL);        // enable request source
+            iInputState2 = (_READ_PORT_MASK(E, ulPortBit) != 0);             // read new input state
+            break;
+        }
+
+        if (iInputState1 == iInputState2) {
+            iInitialPortState = iInputState1;
+        }
+        else if (ptrDMA_TCD->DMA_TCD_CITER_ELINK != PWM_EDGES) {         // if a DMA transfer took place due to the input change
+            iInitialPortState = iInputState1;                            // the state change was recognised so we take the initial input as start state
+        }
+        else {
+            iInitialPortState = iInputState2;                            // an initial input change during DMA enabe was not recognised so the second state is the state state
+        }
+        uEnable_Interrupt();
+    }
+}
+#endif
+
+
+#if defined TEST_CMSIS_CFFT                                              // {84}
+// ARM's standard test input, defined as "Test Input signal contains 10KHz signal + Uniformly distributed white noise" but as samples rather than complex values
+//
+static const float _testInput_f32_10khz[1024] =
+{
+   -0.865129623056441,     	-2.655020678073846,    	0.600664612949661,     	0.080378093886515,    
+   -2.899160484012034,     	2.563004262857762,     	3.078328403304206,     	0.105906778385130,    
+   0.048366940168201,      	-0.145696461188734,    	-0.023417155362879,    	2.127729174988954,    
+   -1.176633086028377,     	3.690223557991855,     	-0.622791766173194,    	0.722837373872203,    
+   2.739754205367484,      	-0.062610410524552,    	-0.891296810967338,    	-1.845872258871811,   
+   1.195039415434387,      	-2.177388969045026,    	1.078649103637905,     	2.570976050490193,    
+   -1.383551403404574,     	2.392141424058873,     	2.858002843205065,     	-3.682433899725536,   
+   -3.488146646451150,     	1.323468578888120,     	-0.099771155430726,    	1.561168082500454,    
+   1.025026795103179,      	0.928841900171200,     	2.930499509864950,     	2.013349089766430,    
+   2.381676148486737,      	-3.081062307950236,    	-0.389579115537544,    	0.181540149166620,    
+   -2.601953341353208,     	0.333435137783218,     	-2.812945856162965,    	2.649109640172910,    
+   -1.003963025744654,     	1.552460768755035,     	0.088641345335247,     	-2.519951327113426,   
+   -4.341348988610527,     	0.557772429359965,     	-1.671267412948494,    	0.733951350960387,    
+   0.409263788034864,      	3.566033071952806,     	1.882565173848352,     	-1.106017073793287,   
+   0.154456720778718,      	-2.513205795512153,    	0.310978660939421,     	0.579706500111723,    
+   0.000086383683251,      	-1.311866980897721,    	1.840007477574986,     	-3.253005768451345,   
+   1.462584328739432,      	1.610103610851738,     	0.761914676858907,     	0.974541361089834,    
+   0.686845845885983,      	1.849153122025191,     	0.787800410401453,     	-1.187438909666279,   
+   -0.754937911044720,     	0.084373858395232,     	-2.600269011710521,    	-0.962982842142644,   
+   -0.369328108540868,     	0.810791418361879,     	3.587016488699641,     	-0.520776145083723,   
+   0.640249919627884,      	1.103122489464969,     	2.231779881455556,     	-1.308035392685241,   
+   0.424070304330106,      	-0.200383932651189,    	-2.365526783356541,    	-0.989114757436628,   
+   2.770807688959777,      	-0.444172737462307,    	0.079760979374078,     	-0.005199118412183,   
+   -0.664712668309527,     	-0.624171857561896,    	0.537306979007338,     	-2.575955675497642,   
+   1.562363235756780,      	1.814069369848895,     	-1.293428583392509,    	-1.026188449495686,   
+   -2.981771815588717,     	-4.223468103075124,    	2.672674782004045,     	-0.856096801117735,   
+   0.048517345512563,      	-0.026860721136222,    	0.392932277758187,     	-1.331740855093099,   
+   -1.894292129477081,     	-1.425006468460681,    	-2.721772427617057,    	-1.616831100216806,   
+   3.551177651488947,      	-0.069685667896087,    	-3.134634907409102,    	-0.263627598944639,   
+   -1.650469945991350,     	-2.203580339374399,    	-0.872203246123242,    	1.230782812607287,    
+   0.257288860093291,      	1.989083106173137,     	-1.985638729453261,    	-1.416185105842892,   
+   -1.131097688325772,     	-2.245130805416057,    	-1.938873996219074,    	2.043608361562645,    
+   -0.583727989880841,     	-1.785266378212929,    	1.961457586224753,     	1.139400099963223,    
+   -1.979519343363991,     	2.003023322818429,     	0.229004069076829,     	3.452808862193135,    
+   2.882273808365857,      	-1.549450501844438,    	-3.283872089931876,    	-0.327025884099064,   
+   -0.054979977136430,     	-1.192280531479012,    	0.645539328365578,     	2.300832863404618,    
+   -1.092951789535240,     	-1.017368249363773,    	-0.142673056169787,    	0.831073544881250,    
+   -2.314612531587064,     	-2.221456299106321,    	0.460261143885226,     	0.050585301888595,    
+   0.364373329183988,      	-1.685956552069538,    	0.050664512351055,     	-0.193355783902718,   
+   -0.158660446046828,     	2.394156453841953,     	-1.562965718554525,    	-2.199750600869900,   
+   1.544984022381773,      	-1.988307216807315,    	-0.628240722541046,    	-1.436235771505429,   
+   1.677013691147313,      	1.600741781678228,     	-0.757380959134706,    	-4.784797439515566,   
+   0.265121462834569,      	3.862029485934378,     	2.386823577249430,     	-3.655779745436893,   
+   -0.763541621368016,     	-1.182140388432962,    	-1.349106114858063,    	-2.287533624396759,   
+   -0.028603745188423,     	-1.353580755934427,    	0.461602380352937,     	-0.059599055078928,   
+   -0.929946734342228,     	0.065773089295561,     	1.106565863102982,     	4.719295086373593,    
+   -2.108377703544395,     	-2.226393620240159,    	1.375668397437521,     	-0.960772428525443,   
+   -2.156313465390571,     	1.126060012375311,     	2.756485137030720,     	0.739639690862600,    
+   3.914769510295006,      	1.685232785586675,     	4.079058040970612,     	-1.174598301660513,   
+   -2.885776587275580,     	-0.241073635188767,    	3.080489872502403,     	-2.051244183999421,   
+   0.664330486845139,      	-1.697798999370016,    	1.452369423649782,     	-1.523532831019280,   
+   0.171981186587481,      	-4.685274721583927,    	-1.336175835319380,    	1.419070770428945,    
+   -0.035791601713475,     	2.291937971632081,     	-1.962559313450293,    	-4.831595589339301,   
+   -1.857055284000925,     	2.606271522635512,     	-0.576447978738030,    	0.082299166967720,    
+   1.888399453494614,      	-3.564705298046079,    	-0.939357831083889,    	-1.903578203697778,   
+   -2.642492215447250,     	-0.182990405251017,    	3.742026478011174,     	0.104295803798333,    
+   1.848678195370347,      	-1.887384346896369,    	0.365048973046045,     	-0.889638010354219,   
+   1.173877118428863,      	-1.178562827540109,    	0.610271645685184,     	1.831284815697871,    
+   0.449575390102283,      	1.597171905253443,     	3.918574971904773,     	0.868104027970404,    
+   0.582643134746494,      	2.321256382353331,     	-0.238118642223180,    	-2.890287868054370,   
+   0.970995414625622,      	0.666137930891283,     	-0.202435718709502,    	2.057930200518194,    
+   3.120583443719949,      	-0.863945271701041,    	0.906848893874630,     	-1.434124930222570,   
+   0.754659384848783,      	-5.224154442713778,    	2.330229744098967,     	1.113946320164698,    
+   0.523324920322840,      	1.750740911548348,     	-0.899333972913577,    	0.228705845203506,    
+   -1.934782624767648,     	-3.508386237231303,    	-2.107108523073510,    	0.380587645474815,    
+   -0.476200877183279,     	-2.172086712642198,    	1.795372535780299,     	-2.100318983391055,   
+   -0.022571122461405,     	0.674514020010955,     	-0.148872569390857,    	0.298175890592737,    
+   -1.134244492493590,     	-3.146848422289455,    	-1.357950199087602,    	0.667362732020878,    
+   -3.119397998316724,     	-1.189341126297637,    	-1.532744386856668,    	-1.672972484202534,   
+   -2.042283373871558,     	-1.479481547595924,    	-0.002668662875396,    	0.262737760129546,    
+   2.734456080621830,      	-0.671945925075102,    	-3.735078262179111,    	-0.161705013319883,   
+   0.748963512361001,      	1.128046374367600,     	0.649651335592966,     	1.880020215025867,    
+   -1.095632293842306,     	1.197764876160487,     	0.323646656252985,     	-1.655502751114502,   
+   3.666399062961496,      	-0.334060899735197,    	-2.119056978738397,    	3.721375117275012,    
+   0.044874186872307,      	-2.733053897593234,    	1.590700278891042,     	3.215711772781902,    
+   -1.792085012843801,     	-0.405797188885475,    	-0.628080020080892,    	-1.831815840843960,   
+   2.973656862522834,      	-0.212032655138417,    	0.372437389437234,     	-1.614030579023492,   
+   -0.704900996358698,     	1.123700273452105,     	-0.136371848130819,    	3.020284357635585,    
+   -0.550211350877649,     	5.101256236381711,     	3.367051512192333,     	-4.385131946669234,   
+   -3.967303337694391,     	-0.965894936640022,    	0.328366945264681,     	0.199041562924914,    
+   1.067681999025495,      	-1.939516091697170,    	-1.092980954328824,    	0.273786079368066,    
+   -0.040928322190265,     	-0.118368078577437,    	1.766589628899997,     	1.738321311635393,    
+   -2.895012794321649,     	1.213521771395142,     	0.922971726633985,     	1.091516563636489,    
+   3.226378465469620,      	1.149169778666974,     	-1.695986327709386,    	-0.974803077355813,   
+   -4.898035507513607,     	1.622719302889447,     	0.583891313586579,     	-1.677182424094957,   
+   -1.915633132814685,     	-1.980150370851616,    	0.604538269404190,     	0.939862406149365,    
+   -1.266939874246416,     	-1.494771249200063,    	0.278042784093988,     	0.326627416008916,    
+   -1.914530157643303,     	1.908947721862196,     	0.531819285694044,     	3.056856632319658,    
+   -0.389241827774643,     	-2.418606606780420,    	0.915299238878703,     	-0.098774174295283,   
+   -0.906199428444304,     	0.316716451217743,     	-4.367700643578311,    	1.491687997515293,    
+   -1.962381126288365,     	-0.700829196527045,    	3.028958963615630,     	-2.313461067462598,   
+   -1.431933239886712,     	-0.831153039725342,    	3.939495598250743,     	0.342974753984771,    
+   -2.768330763002974,     	-2.744010370019008,    	3.821352685212561,     	4.551065271455856,    
+   3.270136437041298,      	-3.188028411950982,    	-0.777075012417436,    	0.097110650265216,    
+   1.221216137608812,      	-1.325824244541822,    	-2.655296734084113,    	-1.074792144885704,   
+   2.770401584439407,      	5.240270645610543,     	0.108576672208892,     	-1.209394350650142,   
+   1.403344353838785,      	-0.299032904177277,    	4.074959450638227,     	1.718727473952107,    
+   -3.061349227080806,     	-1.158596888541269,    	3.381858904662625,     	0.957339964054052,    
+   0.179900074904899,      	-3.909641902506081,    	0.805717289408649,     	2.047413793928261,    
+   -1.273580225826614,     	-2.681359186869971,    	-0.721241345822093,    	-1.613090681569475,   
+   0.463138804815955,      	0.377223507800954,     	2.046550684968141,     	0.178508732797712,    
+   -0.477815330358845,     	3.763355908332053,     	1.300430303035163,     	-0.214625793857725,   
+   1.343267891864081,      	-0.340007682433245,    	2.062703194680005,     	0.042032160234235,    
+   0.643732569732250,      	-1.913502543857589,    	3.771340762937158,     	1.050024807363386,    
+   -4.440489488592649,     	0.444904302066643,     	2.898702265650048,     	1.953232980548558,    
+   2.761564952735079,      	1.963537633260397,     	-2.168858472916215,    	-4.116235357699841,   
+   4.183678271896528,      	0.600422284944681,     	-0.659352647255126,    	-0.993127338218109,   
+   -2.463571314945747,     	0.937720951545881,     	-3.098957308429730,    	-2.354719140045463,   
+   -0.417285119323949,     	2.187974075975947,     	1.101468905172585,     	-3.185800678152109,   
+   2.357534709345083,      	0.246645606729407,     	4.440905650784504,     	-2.236807716637866,   
+   -2.171481518317550,     	-2.029571795072690,    	0.135599790431348,     	-1.277965265520191,   
+   -1.927976233157507,     	-5.434492783745394,    	-2.026375829312657,    	1.009666016819321,    
+   0.238549782367247,      	-0.516403923971309,    	-0.933977817429352,    	0.155803015935614,    
+   -0.396194809997929,     	-0.915178100253214,    	0.666329367985015,     	-1.517991149945785,   
+   0.458266744144822,      	-1.242845974381418,    	0.057914823556477,     	0.994101307476875,    
+   -2.387209849199325,     	0.459297048883826,     	0.227711405683905,     	0.030255073506117,    
+   -1.323361608181337,     	-4.650244457426706,    	0.062908579526021,     	3.462831028244432,    
+   1.303608183314856,      	-1.430415193881612,    	-1.672886118942142,    	0.992890699210099,    
+   -0.160814531784247,     	-1.238132939350430,    	-0.589223271459376,    	2.326363810561534,    
+   -4.433789496230785,     	1.664686987538929,     	-2.366128834617921,    	1.212421570743837,    
+   -4.847914267690055,     	0.228485221404712,     	0.466139765470957,     	-1.344202776943546,   
+   -1.012053673330574,     	-2.844980626424742,    	-1.552703722026340,    	-1.448830983885038,   
+   0.127010756753980,      	-1.667188263752299,    	3.424818052085100,     	0.956291135453840,    
+   -3.725533331754662,     	-1.584534272368832,    	-1.654148210472472,    	0.701610500675698,    
+   0.164954538683927,      	-0.739260064712987,    	-2.167324026090101,    	-0.310240491909496,   
+   -2.281790349106906,     	1.719655331305361,     	-2.997005923606441,    	-1.999301431556852,   
+   -0.292229010068828,     	1.172317994855851,     	0.196734885241533,     	2.981365193477068,    
+   2.637726016926352,      	1.434045125217982,     	0.883627180451827,     	-1.434040761445747,   
+   -1.528891971086553,     	-3.306913135367542,    	-0.399059265470646,    	-0.265674394285178,   
+   3.502591252855384,      	0.830301156604454,     	-0.220021317046083,    	-0.090553770476646,   
+   0.771863477047951,      	1.351209629105760,     	3.773699756201963,     	0.472600118752329,    
+   2.332825668012222,      	1.853747950314528,     	0.759515251766178,     	1.327112776215496,    
+   2.518730296237868,      	0.764450208786353,     	-0.278275349491296,    	-0.041559465082020,   
+   1.387166083167787,      	2.612996769598122,     	-0.385404831721799,    	2.005630016170309,    
+   -0.950500047307998,     	-1.166884021392492,    	1.432973552928162,     	2.540370505384567,    
+   -1.140505295054501,     	-3.673358835201185,    	-0.450691288038056,    	1.601024294408014,    
+   0.773213556014045,      	2.973873693246168,     	-1.361548406382279,    	1.409136332424815,    
+   -0.963382518314713,     	-2.031268227368161,    	0.983309972085586,     	-3.461412488471631,   
+   -2.601124929406039,     	-0.533896239766343,    	-2.627129008866350,    	0.622111169161305,    
+   -1.160926365580422,     	-2.406196188132628,    	-1.076870362758737,    	-1.791866820937175,   
+   -0.749453071522325,     	-5.324156615990973,    	-1.038698022238289,    	-2.106629944730630,   
+   0.659295598564773,      	0.520940881580988,     	-0.055649203928700,    	0.292096765423137,    
+   -4.663743901790872,     	-0.125066503391666,    	-2.452620252445380,    	-0.712128227397468,   
+   -0.048938037970968,     	-1.821520226003361,    	0.810106421304257,     	-0.196636623956257,   
+   -0.701769836763804,     	2.460345045649201,     	3.506597671641116,     	-2.711322611972225,   
+   -0.658079876600542,     	-2.040082099646173,    	2.201668355395807,     	1.181507395879711,    
+   -1.640739552179682,     	-1.613393726467190,    	-1.156741241731352,    	2.527773464519963,    
+   -0.497040638009502,     	-0.975817112895589,    	-2.866830755546166,    	1.120214498507878,    
+   5.986771654661698,      	0.398219252656757,     	-3.545606013198135,    	0.312398099396191,    
+   -2.265327979531788,     	0.792121001107366,     	-3.736145137670100,    	0.762228883650802,    
+   2.283545661214646,      	3.780020629583529,     	3.117260228608810,     	-2.011159255609613,   
+   0.279107700476072,      	2.003369134246936,     	-1.448171234480257,    	0.584697150310140,    
+   0.919508663636197,      	-3.071349141675388,    	-1.555923649263667,    	2.232497079438850,    
+   -0.012662139119883,     	0.372825540734715,     	2.378543590847629,     	1.459053407813062,    
+   -0.967913907390927,     	1.322825200678212,     	-1.033775820061824,    	-1.813629552693142,   
+   4.794348161661486,      	0.655279811518676,     	-2.224590138589720,    	0.595329481295766,    
+   3.364055988866225,      	1.863416422998127,     	1.930305751828105,     	-0.284467053432545,   
+   -0.923374905878938,     	1.922988234041399,     	0.310482143432719,     	0.332122302397134,    
+   -1.659487472408966,     	-1.865943507877961,    	-0.186775297569864,    	-1.700543850628361,   
+   0.497157959366735,      	-0.471244843957418,    	-0.432013753969948,    	-4.000189880113231,   
+   -0.415335170016467,     	0.317311950972859,     	0.038393428927595,     	0.177219909465206,    
+   0.531650958095143,      	-2.711644985175806,    	0.328744077805156,     	-0.938417707547928,   
+   0.970379584897379,      	1.873649473917137,     	0.177938226987023,     	0.155609346302393,    
+   -1.276504241867208,     	-0.463725075928807,    	-0.064748250389500,    	-1.725568534062385,   
+   -0.139066584804067,     	1.975514554117767,     	-0.807063199499478,    	-0.326926659682788,   
+   1.445727032487938,      	-0.597151107739100,    	2.732557531709386,     	-2.907130934109188,   
+   -1.461264832679981,     	-1.708588604968163,    	3.652851925431363,     	0.682050868282879,    
+   -0.281312579963294,     	0.554966483307825,     	-0.981341739340932,    	1.279543331141603,    
+   0.036589747826856,      	2.312073745896073,     	1.754682200732425,     	-0.957515875428627,   
+   -0.833596942819695,     	0.437054368791033,     	-0.898819399360279,    	-0.296050580896839,   
+   -0.785144257649601,     	-2.541503089003311,    	2.225075846758761,     	-1.587290487902002,   
+   -1.421404172056462,     	-3.015149802293631,    	1.780874288867949,     	-0.865812740882613,   
+   -2.845327531197112,     	1.445225867774367,     	2.183733236584647,     	1.163371072749080,    
+   0.883547693520409,      	-1.224093106684675,    	-1.854501116331044,    	1.783082089255796,    
+   2.301508706196191,      	-0.539901944139077,    	1.962315832319967,     	-0.060709041870503,   
+   -1.353139923300238,     	-1.482887537805234,    	1.273732601967176,     	-3.456609915556321,   
+   -3.752320586540873,     	3.536356614978951,     	0.206035952043233,     	5.933966913773842,    
+   -0.486633898075490,     	-0.329595089863342,    	1.496414153905337,     	0.137868749388880,    
+   -0.437192030996792,     	2.682750615210656,     	-2.440234892848570,    	1.433910252426186,    
+   -0.415051506104074,     	1.982003013708649,     	1.345796609972435,     	-2.335949513404370,   
+   1.065988867433025,      	2.741844905000464,     	-1.754047930934362,    	0.229252730015575,    
+   -0.679791016408669,     	-2.274097820043743,    	0.149802252231876,     	-0.139697151364830,   
+   -2.773367420505435,     	-4.403400246165611,    	-1.468974515184135,    	0.664990623095844,    
+   -3.446979775557143,     	1.850006428987618,     	-1.550866747921936,    	-3.632874882935257,   
+   0.828039662992464,      	2.794055182632816,     	-0.593995716682633,    	0.142788156054200,    
+   0.552461945119668,      	0.842127129738758,     	1.414335509600077,     	-0.311559241382430,   
+   1.510590844695250,      	1.692217183824300,     	0.613760285711957,     	0.065233463207770,    
+   -2.571912893711505,     	-1.707001531141341,    	0.673884968382041,     	0.889863883420103,    
+   -2.395635435233346,     	1.129247296359819,     	0.569074704779735,     	6.139436017480722,    
+   0.822158309259017,      	-3.289872016222589,    	0.417612988384414,     	1.493982103868165,    
+   -0.415353391377005,     	0.288670764933155,     	-1.895650228872272,    	-0.139631694475020,   
+   1.445103299005436,      	2.877182243683429,     	1.192428490172580,     	-5.964591921763842,   
+   0.570859795882959,      	2.328333316356666,     	0.333755014930026,     	1.221901577771909,    
+   0.943358697415568,      	2.793063983613067,     	3.163005066073616,     	2.098300664513867,    
+   -3.915313164333447,     	-2.475766769064539,    	1.720472044894277,     	-1.273591949275665,   
+   -1.213451272938616,     	0.697439404325690,     	-0.309902287574293,    	2.622575852162781,    
+   -2.075881936219060,     	0.777847545691770,     	-3.967947986440650,    	-3.066503371806472,   
+   1.193780625937845,      	0.214246579281311,     	-2.610681491162162,    	-1.261224183972745,   
+   -1.165071748544285,     	-1.116548474834374,    	0.847202164846982,     	-3.474301529532390,   
+   0.020799541946476,      	-3.868995473288166,    	1.757979409638067,     	0.868115130183109,    
+   0.910167436737958,      	-1.878855115563720,    	1.710357104174161,     	-1.468933980990902,   
+   1.799544171601169,      	-4.922332880027887,    	0.219424548939720,     	-0.971671113451924,   
+   -0.940533475616266,     	0.122510114412152,     	-1.373686254916911,    	1.760348103896323,    
+   0.391745067829643,      	2.521958505327354,     	-1.300693516405092,    	-0.538251788309178,   
+   0.797184135810173,      	2.908800548982588,     	1.590902251655215,     	-1.070323714487264,   
+   -3.349764443340999,     	-1.190563529731447,    	1.363369471291963,     	-1.814270299924576,   
+   -0.023381588315711,     	1.719182048679569,     	0.839917213252626,     	1.006099633839122,    
+   0.812462674381527,      	1.755814336346739,     	2.546848681206319,     	-1.555300208869455,   
+   1.017053811631167,      	0.996591039170903,     	-1.228047247924881,    	4.809462271463009,    
+   2.318113116151685,      	-1.206932520679733,    	1.273757685623312,     	0.724335352481802,    
+   1.519876652073198,      	-2.749670314714158,    	3.424042481847581,     	-3.714668360421517,   
+   1.612834197004014,      	-2.038234723985566,    	1.470938786562152,     	2.111634918450302,    
+   1.030376670151787,      	-0.420877189003829,    	-1.502024800532894,    	0.452310749163804,    
+   -1.606059382300987,     	-4.006159967834147,    	-2.152801208196508,    	1.671674089372579,    
+   1.714536333564101,      	-1.011518543005344,    	-0.576410282180584,    	0.733689809480836,    
+   1.004245602717974,      	1.010090391888449,     	3.811459513385621,     	-5.230621089271954,   
+   0.678044861034399,      	1.255935859598107,     	1.674521701615288,     	-1.656695216761705,   
+   1.169286028869693,      	0.524915416191998,     	2.397642885039520,     	2.108711400616072,    
+   2.037618211018084,      	-0.623664553406925,    	2.984106170984409,     	1.132182737400932,    
+   -2.859274340352130,     	-0.975550071398723,    	-1.359935119997407,    	-2.963308211050121,   
+   -0.228726662781163,     	-1.411110379682043,    	0.741553355734225,     	0.497554254758309,    
+   2.371907950598855,      	1.063465168988748,     	-0.641082692081488,    	-0.855439878540726,   
+   0.578321738578726,      	3.005809768796194,     	1.961458699064065,     	-3.206261663772745,   
+   -0.364431989095434,     	-0.263182496622273,    	1.843464680631139,     	-0.419107530229249,   
+   1.662335873298487,      	-0.853687563304005,    	-2.584133404357169,    	3.466839568922895,    
+   0.881671345091973,      	0.454620014206908,     	-1.737245187402739,    	2.162713238369243,    
+   -3.868539002714486,     	2.014114855933826,     	-0.703233831811006,    	-3.410319935997574,   
+   -1.851235811006584,     	0.909783907894036,     	0.091884002136728,     	-2.688294201131650,   
+   -0.906134178460955,     	3.475054609035133,     	-0.573927964170323,    	-0.429542937515399,   
+   0.991348618739939,      	1.974804904926325,     	0.975783450796698,     	-3.057119549071503,   
+   -3.899429237481194,     	0.362439009175350,     	-1.124461670265618,    	1.806000360163583,    
+   -2.768333362600288,     	0.244387897900379,     	0.908767296720926,     	1.254669374391882,    
+   -1.420441929463686,     	-0.875658895966293,    	0.183824603376167,     	-3.361653917011686,   
+   -0.796615630227952,     	-1.660226542658673,    	1.654439358307226,     	2.782812946709771,    
+   1.418064412811531,      	-0.819645647243761,    	0.807724772592699,     	-0.941967976379298,   
+   -2.312768306047469,     	0.872426936477443,     	0.919528961530845,     	-2.084904575264847,   
+   -1.972464868459322,     	-1.050687203338466,    	1.659579707007902,     	-1.820640014705855,   
+   -1.195078061671045,     	-1.639773173762048,    	1.616744338157063,     	4.019216096811563,    
+   3.461021102549681,      	1.642352734361484,     	-0.046354693720813,    	-0.041936252359677,   
+   -2.393307519480551,     	-0.341471634615121,    	-0.392073595257017,    	-0.219299018372730,   
+   -2.016391579662071,     	-0.653096251969787,    	1.466353155666821,     	-2.872058864320412,   
+   -2.157180779503830,     	0.723257479841560,     	3.769951308104384,     	-1.923392042420024,   
+   0.644899359942840,      	-2.090226891621437,    	-0.277043982890403,    	-0.528271428321112,   
+   2.518120645960652,      	1.040820431111488,     	-4.560583754742486,    	-0.226899614918836,   
+   1.713331231108959,      	-3.293941019163642,    	-1.113331444648290,    	-1.032308423149906,   
+   1.593774272982443,      	-1.246840475090529,    	-0.190344684920137,    	-1.719386356896355,   
+   -2.827721754659679,     	-0.092438285279020,    	-0.565844430675246,    	-1.077916121691716,   
+   -1.208665809504693,     	-2.996014266381254,    	2.888573323402423,     	2.829507048720695,    
+   -0.859177034120755,     	-1.969302377743254,    	0.777437674525362,     	-0.124910190157646,   
+   0.129875493115290,      	-4.192139262163992,    	3.023496047962126,     	1.149775163736637,    
+   2.038151304801731,      	3.016122489841263,     	-4.829481812137012,    	-1.668436615909279,   
+   0.958586784636918,      	1.550652410058678,     	-1.456305257976716,    	-0.079588392344731,   
+   -2.453213599392345,     	0.296795909127105,     	-0.253426616607643,    	1.418937160028195,    
+   -1.672949529066915,     	-1.620990298572947,    	-1.085103073196045,    	0.738606361195386,    
+   -2.097831202853255,     	2.711952282071310,     	1.498539238246888,     	1.317457282535915,    
+   -0.302765938349717,     	-0.044623707947201,    	2.337405215062395,     	-3.980689173859100,   
+};
+
+#if defined CMSIS_DSP_FFT_4096                                           // define the required dimension of the FFT input buffer based on the FFT size to be tested
+    #if SIZE_OF_RAM <= (16 * 1024)                                       // restrict maximum FFT size when RAM is limited
+        #define MAX_FFT_TEST_LENGTH     1024
+    #elif SIZE_OF_RAM <= (32 * 1024)
+        #define MAX_FFT_TEST_LENGTH     2048
+    #else
+        #define MAX_FFT_TEST_LENGTH     4096
+    #endif
+#elif defined CMSIS_DSP_FFT_2048
+    #if SIZE_OF_RAM <= (16 * 1024)
+        #define MAX_FFT_TEST_LENGTH     1024
+    #else
+        #define MAX_FFT_TEST_LENGTH     2048
+    #endif
+#elif defined CMSIS_DSP_FFT_1024
+    #define MAX_FFT_TEST_LENGTH         1024
+#elif defined CMSIS_DSP_FFT_512
+    #define MAX_FFT_TEST_LENGTH         512
+#elif defined CMSIS_DSP_FFT_256
+    #define MAX_FFT_TEST_LENGTH         256
+#else
+    #define MAX_FFT_TEST_LENGTH         128
+#endif
+
+static void fnTestFFT(int iLength)
+{
+    float fft_result_buffer[MAX_FFT_TEST_LENGTH/2];                      // temporary result buffer
+    if (iLength > MAX_FFT_TEST_LENGTH) {
+        iLength = MAX_FFT_TEST_LENGTH;                                   // limit the size
+        fnDebugMsg("FFT length reduced to max. of ");
+        fnDebugDec(iLength, WITH_CR_LF);
+    }
+    
+    if (fnFFT((void *)_testInput_f32_10khz, (void *)fft_result_buffer, iLength, 0, iLength, 0, 0, (FFT_INPUT_FLOATS | FFT_OUTPUT_FLOATS | FFT_MAGNITUDE_RESULT)) < 0) {
+        fnDebugMsg("Invalid FFT length\r\n");
+        return;
+    }
+    if (iLength == 1024) {                                               // check the expected result, which is maximum energy in bin 213
+        if ((fft_result_buffer[213] > 300.0) && (fft_result_buffer[212] < 300.0) && (fft_result_buffer[214] < 300.00)) {
+            fnDebugMsg("FFT result passed\r\n");
+        }
+        else {
+            fnDebugMsg("FFT FAILED!!\r\n");
+        }
+    }
+}
+#endif
+
+
 
 static void fnDoHardware(unsigned char ucType, CHAR *ptrInput)
 {
@@ -3165,22 +3869,22 @@ static void fnDoHardware(unsigned char ucType, CHAR *ptrInput)
             fnSetLowPowerMode(ucPowerMode);
         }
         break;
+    #if defined LOW_POWER_CYCLING_MODE                                   // {85}
+    case DO_LP_CYCLE:
+        fnDebugMsg("Low Power Cycling ");
+        if (*ptrInput == '1') {
+            iLowPowerLoopMode = LOW_POWER_CYCLING_ENABLED;
+            fnDebugMsg("ON\r\n");
+        }
+        else {
+            fnDebugMsg("OFF\r\n");
+            iLowPowerLoopMode = LOW_POWER_CYCLING_DISABLED;
+        }
+        break;
+    #endif
 #endif
     case DO_DISPLAY_MEMORY_USE:                                          // memory use display
-        {
-            STACK_REQUIREMENTS stackUsed;                                // {79}
-            fnDebugMsg("\n\rSystem memory use:\n\r");
-            fnDebugMsg(    "==================\n\r");
-            fnDebugMsg("Free heap = ");
-            fnDebugHex(fnHeapFree(), (2 | WITH_LEADIN));
-            fnDebugMsg(" from ");
-            fnDebugHex(fnHeapAvailable(), (2 | WITH_LEADIN));
-            fnDebugMsg("\n\rUnused stack = ");
-            fnDebugHex(fnStackFree(&stackUsed), (2 | WITH_LEADIN));      // {79}
-            fnDebugMsg(" (");
-            fnDebugHex(stackUsed, (2 | WITH_LEADIN));                    // {79}
-            fnDebugMsg(")\n\r");
-        }
+        fnDisplayMemoryUsage();
         break;
 
 #if defined MONITOR_PERFORMANCE                                          // {25}
@@ -3202,21 +3906,7 @@ static void fnDoHardware(unsigned char ucType, CHAR *ptrInput)
             fnDebugMsg(cUpTime);
         }
         return;
-
-//    case DO_GET_USER_OUTPUT:                                           // display whether default or user - removed {2}
-//        if ((*ptrInput < '0') || (*ptrInput > '3')) {
-//            fnDebugMsg("Bad port number\r\n");
-//            break;
-//        }
-//        fnDebugMsg("\r\nPort use: ");
-//        if (!fnPortInputConfig(*ptrInput)) {
-//            fnDebugMsg("USER\r\n");
-//        }
-//        else {
-//            fnDebugMsg("DEFAULT\r\n");
-//        }
-//        break;
-
+#if !defined REMOVE_PORT_INITIALISATIONS
       case DO_GET_DDR:                                                   // get present ddr setting {2}
           if ((*ptrInput < '1') || (*ptrInput > '4')) {
               fnDebugMsg("Bad port number\r\n");
@@ -3244,24 +3934,481 @@ static void fnDoHardware(unsigned char ucType, CHAR *ptrInput)
               unsigned char ucPresentPort = 0;
               unsigned char ucBit = 0x01;
               CHAR cPortBit = '1';
-              while (cPortBit < '5') {
-                  if (fnPortState(cPortBit++)) {
+              while (cPortBit < '5') {                                   // get the present port states
+                  if (fnPortState(cPortBit++) != 0) {
                       ucPresentPort |= ucBit;
                   }
                   ucBit <<= 1;
               }
-              ucBit = (unsigned char)fnHexStrHex(ptrInput);
-              ucBit = (1 << (ucBit-1));
-              if (fnHexStrHex(++ptrInput) == 0x01) {
+              ucBit = (unsigned char)fnHexStrHex(ptrInput);              // the input to be modified
+              ucBit = (1 << (ucBit - 1));                                // the bit represented by this input
+              if (fnHexStrHex(++ptrInput) == 0x01) {                     // if a '1' is to be set
                   ucPresentPort |= ucBit;
               }
-              else {
+              else {                                                     // else set 0
                   ucPresentPort &= ~ucBit;
               }
               fnSetPortOut(ucPresentPort, 0);                            // set new port state
           }
           break;
+#endif
+#if defined TEST_CMSIS_CFFT                                              // {84}
+      case DO_FFT:
+          fnTestFFT((int)fnDecStrHex(ptrInput));
+          break;
+#endif
+#if defined CRYPTOGRAPHY                                                 // {84}
+    #if defined CRYPTO_AES
+      case DO_AES128:
+      case DO_AES192:
+      case DO_AES256:
+    #endif
+    #if defined CRYPTO_SHA
+      case DO_SHA256:
+    #endif
+          {
+              typedef struct stALIGNED_BUFFER
+              {
+                  unsigned long  ulAlignedLongWord;                      // unused long word to ensure following data alignment
+                  unsigned char  ucData[256/8];
+              } ALIGNED_BUFFER;
+              static const ALIGNED_BUFFER encryption_key = { 0, { 0x60,0x3d,0xeb,0x10,0x15,0xca,0x71,0xbe,0x2b,0x73,0xae,0xf0,0x85,0x7d,0x77,0x81,0x1f,0x35,0x2c,0x07,0x3b,0x61,0x08,0xd7,0x2d,0x98,0x10,0xa3,0x09,0x14,0xdf,0xf4 } };
+              static const ALIGNED_BUFFER plaintext = { 0, { 0x60,0x3d,0xeb,0x10,0x15,0xca,0x71,0xbe,0x2b,0x73,0xae,0xf0,0x85,0x7d,0x77,0x81,0x1f,0x35,0x2c,0x07,0x3b,0x61,0x08,0xd7,0x2d,0x98,0x10,0xa3,0x09,0x14,0xdf,0xf4 } };
+              ALIGNED_BUFFER ciphertext = {0};
+              ALIGNED_BUFFER recovered  = {0};
+              int i;
+              int iKeyLength;
+              switch (ucType) {
+    #if defined CRYPTO_AES
+              case DO_AES128:
+                  iKeyLength = 128;
+                  break;
+              case DO_AES192:
+                  iKeyLength = 192;
+                  break;
+              case DO_AES256:
+                  iKeyLength = 256;
+                  break;
+    #endif
+    #if defined CRYPTO_SHA
+              case DO_SHA256:
+                  extern int fnSHA256(const unsigned char *ptrInput, unsigned char *ptrOutput, unsigned long ulLength, int iMode);
+                  TOGGLE_TEST_OUTPUT();
+                  fnSHA256(plaintext.ucData, recovered.ucData, sizeof(plaintext.ucData), 0);
+                  TOGGLE_TEST_OUTPUT();
+                  for (i = 0; i < 32; i++) {
+                      fnDebugHex(recovered.ucData[i], (WITH_SPACE | sizeof(unsigned char) | WITH_LEADIN));
+                  }
+                  return;
+    #endif
+              }
 
+              TOGGLE_TEST_OUTPUT();
+              fnAES_Init(AES_COMMAND_AES_SET_KEY_ENCRYPT, encryption_key.ucData, iKeyLength); // register the encryption key
+              TOGGLE_TEST_OUTPUT();
+              fnAES_Cipher((AES_COMMAND_AES_ENCRYPT | AES_COMMAND_AES_RESET_IV), plaintext.ucData, ciphertext.ucData, sizeof(plaintext.ucData)); // encrypt the data content
+              TOGGLE_TEST_OUTPUT();
+              for (i = 0; i < 32; i++) {
+                  fnDebugHex(ciphertext.ucData[i], (WITH_SPACE | sizeof(unsigned char) | WITH_LEADIN));
+              }
+              fnDebugMsg("\r\n");
+              TOGGLE_TEST_OUTPUT();
+              fnAES_Init(AES_COMMAND_AES_SET_KEY_DECRYPT, encryption_key.ucData, iKeyLength); // register the decryption key
+              TOGGLE_TEST_OUTPUT();
+              fnAES_Cipher((AES_COMMAND_AES_DECRYPT | AES_COMMAND_AES_RESET_IV), (const unsigned char *)ciphertext.ucData, recovered.ucData, sizeof(ciphertext.ucData)); // decrypt the data content
+              TOGGLE_TEST_OUTPUT();
+              fnDebugMsg("AES");
+              fnDebugDec(iKeyLength, 0);
+              if (uMemcmp(plaintext.ucData, recovered.ucData, sizeof(recovered.ucData)) == 0) {
+                  TOGGLE_TEST_OUTPUT();
+                  fnDebugMsg(" passed\n\r");
+                  TOGGLE_TEST_OUTPUT();
+              }
+              else {
+                  TOGGLE_TEST_OUTPUT();
+                  fnDebugMsg(" failed\n\r");
+              }
+          }
+          break;
+#endif
+#if defined TEST_FLEXIO                                                  // {91}
+      case DO_FLEXIO_ON:
+    #if defined KINETIS_WITH_PCC
+          SELECT_PCC_PERIPHERAL_SOURCE(FLEXIO0, FLEXIO_PCC_SOURCE);      // select the PCC clock used by LPI2C0
+    #endif
+          POWER_UP(2, SIM_SCGC2_FLEXIO0);
+          FLEXIO0_CTRL = (FLEXIO_CTRL_SWRST | FLEXIO_CTRL_FLEXEN | FLEXIO_CTRL_DBGE); // reset and enable
+          FLEXIO0_CTRL = (FLEXIO_CTRL_FLEXEN | FLEXIO_CTRL_DBGE);
+          fnDebugMsg("Flex io powered\r\n");
+          fnDebugMsg("Verion ID = ");
+          while ((FLEXIO0_CTRL & FLEXIO_CTRL_SWRST) != 0) {              // wait until module has completed its reset
+          }
+          fnDebugHex(FLEXIO0_VERID, (sizeof(unsigned long) | WITH_LEADIN | WITH_CR_LF));
+          fnDebugMsg("Parameter = ");
+          fnDebugHex(FLEXIO0_PARAM, (sizeof(unsigned long) | WITH_LEADIN));
+          break;
+      case DO_FLEXIO_PIN:
+          {
+              unsigned char ucPinRef = (unsigned char)fnDecStrHex(ptrInput);
+              switch (ucPinRef) {
+    #if defined KINETIS_K80
+              case 0:
+                  fnDebugMsg("PTB0");
+                  _CONFIG_PERIPHERAL(B, 0, (PB_0_FXIO0_D0 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 1:
+                  fnDebugMsg("PTB1");
+                  _CONFIG_PERIPHERAL(B, 1, (PB_1_FXIO0_D1 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 2:
+                  fnDebugMsg("PTB2");
+                  _CONFIG_PERIPHERAL(B, 2, (PB_2_FXIO0_D2 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 3:
+                  fnDebugMsg("PTB3");
+                  _CONFIG_PERIPHERAL(B, 3, (PB_3_FXIO0_D3 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 4:
+                  fnDebugMsg("PTB10");
+                  _CONFIG_PERIPHERAL(B, 10, (PB_10_FXIO0_D4 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 5:
+                  fnDebugMsg("PTB11");
+                  _CONFIG_PERIPHERAL(B, 11, (PB_11_FXIO0_D5 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 6:
+                  fnDebugMsg("PTB18");
+                  _CONFIG_PERIPHERAL(B, 18, (PB_18_FXIO0_D6 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 7:
+                  fnDebugMsg("PTB19");
+                  _CONFIG_PERIPHERAL(B, 19, (PB_19_FXIO0_D7 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 8:
+                  fnDebugMsg("PTB20");
+                  _CONFIG_PERIPHERAL(B, 20, (PB_20_FXIO0_D8 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 9:
+                  fnDebugMsg("PTB21");
+                  _CONFIG_PERIPHERAL(B, 21, (PB_21_FXIO0_D9 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 10:
+                  fnDebugMsg("PTB22");
+                  _CONFIG_PERIPHERAL(B, 22, (PB_22_FXIO0_D10 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 11:
+                  fnDebugMsg("PTB23");
+                  _CONFIG_PERIPHERAL(B, 23, (PB_23_FXIO0_D11 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 12:
+                  fnDebugMsg("PTC0");
+                  _CONFIG_PERIPHERAL(C, 0, (PC_0_FXIO0_D12 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 13:
+                  fnDebugMsg("PTC1");
+                  _CONFIG_PERIPHERAL(C, 1, (PC_1_FXIO0_D13 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 14:
+                  fnDebugMsg("PTC6");
+                  _CONFIG_PERIPHERAL(C, 6, (PC_6_FXIO0_D14 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 15:
+                  fnDebugMsg("PTC7");
+                  _CONFIG_PERIPHERAL(C, 7, (PC_7_FXIO0_D15 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 16:
+                  fnDebugMsg("PTC8");
+                  _CONFIG_PERIPHERAL(C, 8, (PC_8_FXIO0_D16 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 17:
+                  fnDebugMsg("PTC9");
+                  _CONFIG_PERIPHERAL(C, 9, (PC_9_FXIO0_D17 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 18:
+                  fnDebugMsg("PTC10");
+                  _CONFIG_PERIPHERAL(C, 10, (PC_10_FXIO0_D18 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 19:
+                  fnDebugMsg("PTC11");
+                  _CONFIG_PERIPHERAL(C, 11, (PC_11_FXIO0_D19 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 20:
+                  fnDebugMsg("PTC14");
+                  _CONFIG_PERIPHERAL(C, 14, (PC_14_FXIO0_D20 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 21:
+                  fnDebugMsg("PTC15");
+                  _CONFIG_PERIPHERAL(C, 15, (PC_15_FXIO0_D21 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 22:
+                  fnDebugMsg("PTD0");
+                  _CONFIG_PERIPHERAL(D, 0, (PD_0_FXIO0_D22 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 23:
+                  fnDebugMsg("PTD1");
+                  _CONFIG_PERIPHERAL(D, 1, (PD_1_FXIO0_D23 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 24:
+                  fnDebugMsg("PTD8");
+                  _CONFIG_PERIPHERAL(D, 8, (PD_8_FXIO0_D24 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 25:
+                  fnDebugMsg("PTD9");
+                  _CONFIG_PERIPHERAL(D, 9, (PD_9_FXIO0_D25 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 26:
+                  fnDebugMsg("PTD10");
+                  _CONFIG_PERIPHERAL(D, 10, (PD_10_FXIO0_D26 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 27:
+                  fnDebugMsg("PTD11");
+                  _CONFIG_PERIPHERAL(D, 11, (PD_11_FXIO0_D27 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 28:
+                  fnDebugMsg("PTD12");
+                  _CONFIG_PERIPHERAL(D, 12, (PD_12_FXIO0_D28 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 29:
+                  fnDebugMsg("PTD13");
+                  _CONFIG_PERIPHERAL(D, 13, (PD_13_FXIO0_D29 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 30:
+                  fnDebugMsg("PTD14");
+                  _CONFIG_PERIPHERAL(D, 14, (PD_14_FXIO0_D30 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 31:
+                  fnDebugMsg("PTD15");
+                  _CONFIG_PERIPHERAL(D, 15, (PD_15_FXIO0_D31 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+    #elif defined KINETIS_KL28
+              case 0:
+                  fnDebugMsg("PTE16");
+                  _CONFIG_PERIPHERAL(E, 16, (PE_16_FXIO0_D0 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 1:
+                  fnDebugMsg("PTE17");
+                  _CONFIG_PERIPHERAL(E, 17, (PE_17_FXIO0_D1 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 2:
+                  fnDebugMsg("PTE18");
+                  _CONFIG_PERIPHERAL(E, 18, (PE_18_FXIO0_D2 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 3:
+                  fnDebugMsg("PTE19");
+                  _CONFIG_PERIPHERAL(E, 19, (PE_19_FXIO0_D3 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 4:
+                  fnDebugMsg("PTE20");
+                  _CONFIG_PERIPHERAL(E, 20, (PE_20_FXIO0_D4 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 5:
+                  fnDebugMsg("PTE21");
+                  _CONFIG_PERIPHERAL(E, 21, (PE_21_FXIO0_D5 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 6:
+                  fnDebugMsg("PTE22");
+                  _CONFIG_PERIPHERAL(E, 22, (PE_22_FXIO0_D6 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 7:
+                  fnDebugMsg("PTE23");
+                  _CONFIG_PERIPHERAL(E, 23, (PE_23_FXIO0_D7 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 8:
+                  fnDebugMsg("PTB0");
+                  _CONFIG_PERIPHERAL(B, 0, (PB_0_FXIO0_D8 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 9:
+                  fnDebugMsg("PTB1");
+                  _CONFIG_PERIPHERAL(B, 1, (PB_1_FXIO0_D9 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 10:
+                  fnDebugMsg("PTB2");
+                  _CONFIG_PERIPHERAL(B, 2, (PB_2_FXIO0_D10 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 11:
+                  fnDebugMsg("PTB3");
+                  _CONFIG_PERIPHERAL(B, 3, (PB_3_FXIO0_D11 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 12:
+                  fnDebugMsg("PTB8");
+                  _CONFIG_PERIPHERAL(B, 8, (PB_8_FXIO0_D12 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 13:
+                  fnDebugMsg("PTB9");
+                  _CONFIG_PERIPHERAL(B, 9, (PB_9_FXIO0_D13 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 14:
+                  fnDebugMsg("PTB10");
+                  _CONFIG_PERIPHERAL(B, 10, (PB_10_FXIO0_D14 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 15:
+                  fnDebugMsg("PTB11");
+                  _CONFIG_PERIPHERAL(B, 11, (PB_11_FXIO0_D15 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 16:
+                  fnDebugMsg("PTB16");
+                  _CONFIG_PERIPHERAL(B, 16, (PB_16_FXIO0_D16 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 17:
+                  fnDebugMsg("PTB17");
+                  _CONFIG_PERIPHERAL(B, 17, (PB_17_FXIO0_D17 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 18:
+                  fnDebugMsg("PTB18");
+                  _CONFIG_PERIPHERAL(B, 18, (PB_18_FXIO0_D18 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 19:
+                  fnDebugMsg("PTB19");
+                  _CONFIG_PERIPHERAL(B, 19, (PB_19_FXIO0_D19 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 20:
+                  fnDebugMsg("PTC7");
+                  _CONFIG_PERIPHERAL(C, 7, (PC_7_FXIO0_D20 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 21:
+                  fnDebugMsg("PTC8");
+                  _CONFIG_PERIPHERAL(C, 8, (PC_8_FXIO0_D21 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 22:
+                  fnDebugMsg("PTC9");
+                  _CONFIG_PERIPHERAL(C, 9, (PC_9_FXIO0_D22 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+              case 23:
+                  fnDebugMsg("PTC10");
+                  _CONFIG_PERIPHERAL(C, 10, (PC_10_FXIO0_D23 | PORT_SRE_FAST | PORT_DSE_HIGH | PORT_PS_UP_ENABLE));
+                  break;
+    #endif
+              default:
+                  fnDebugMsg("Invalid pin");
+                  return;
+              }
+              fnDebugMsg(" configured");
+          }
+          break;
+    #if defined KINETIS_KL28 || defined KINETIS_K80
+        case DO_FLEXIO_PIN_STATE:
+            fnDebugMsg("Flexio pin state ");
+            fnDebugHex(FLEXIO0_PIN, (sizeof(unsigned long) | WITH_LEADIN));
+            break;
+        #if 0                                                            // test code for trimming fast IRC on KL28 -however not possible due to chip errata
+        case DO_SHOW_TRIM:
+            fnDebugMsg("Fast IRC trim ");
+            fnDebugHex(SCG_FIRCTCFG, (sizeof(unsigned long) | WITH_LEADIN));
+            fnDebugHex(SCG_FIRCSTAT, (WITH_SPACE | sizeof(unsigned long) | WITH_LEADIN | WITH_CR_LF));
+            break;
+        case DO_CHANGE_TRIM_COARSE:
+        case DO_CHANGE_TRIM_FINE:
+            {
+                unsigned char ucTrim = (unsigned char)fnHexStrHex(ptrInput);
+                SCG_FIRCTCFG = SCG_FIRCTCFG_TRIMSRC_OSC;
+                SCG_FIRCCSR |= SCG_FIRCCSR_FIRCTREN;
+                SCG_FIRCCSR &= ~(SCG_FIRCCSR_FIRCTRUP);                  // allow writing the register
+                if (DO_CHANGE_TRIM_FINE == ucType) {
+                    SCG_FIRCSTAT = ((SCG_FIRCSTAT & ~(SCG_FIRCSTAT_TRIMFINE_MASK)) | (ucTrim & SCG_FIRCSTAT_TRIMFINE_MASK));
+                }
+                else {
+                    SCG_FIRCSTAT = ((SCG_FIRCSTAT & ~(SCG_FIRCSTAT_TRIMCOAR_MASK)) | ((ucTrim & SCG_FIRCSTAT_TRIMCOAR_MASK) << SCG_FIRCSTAT_TRIMCOAR_SHIFT));
+                }
+            }
+            break;
+        #endif
+    #endif
+        case DO_FLEXIO_STATUS:
+            fnDebugMsg("Shifter status ");
+            fnDebugHex(FLEXIO0_SHIFTSTAT, (sizeof(unsigned long) | WITH_LEADIN));
+            fnDebugHex(FLEXIO0_SHIFTSIEN, (WITH_SPACE | sizeof(unsigned long) | WITH_LEADIN | WITH_CR_LF));
+            fnDebugMsg("Shifter error ");
+            fnDebugHex(FLEXIO0_SHIFTERR, (sizeof(unsigned long) | WITH_LEADIN));
+            fnDebugHex(FLEXIO0_SHIFTEIEN, (WITH_SPACE | sizeof(unsigned long) | WITH_LEADIN | WITH_CR_LF));
+            fnDebugMsg("Timer status ");
+            fnDebugHex(FLEXIO0_TIMSTAT, (sizeof(unsigned long) | WITH_LEADIN));
+            fnDebugHex(FLEXIO0_TIMIEN, (WITH_SPACE | sizeof(unsigned long) | WITH_LEADIN));
+            break;
+#elif defined MMDVSQ_AVAILABLE                                           // {88}
+      case DO_SQRT:
+      case DO_DIV:
+          {
+              unsigned long ulInput[2] = { 0, 0 };
+              int iInput = 0;
+              unsigned long ulDividend = 0;
+              int iHex;
+              FOREVER_LOOP() {
+                  iHex = 0;
+                  if (*ptrInput == '0') {
+                      ptrInput++;
+                      if ((*ptrInput == 'x') || (*ptrInput == 'X')) {    // recognise hex inputs
+                          ptrInput++;
+                          iHex = 1;
+                      }
+                      else {
+                          ptrInput--;
+                      }
+                  }
+                  if (iHex != 0) {
+                      ulInput[iInput] = fnHexStrHex(ptrInput);           // hex input
+                  }
+                  else {
+                      ulInput[iInput] = fnDecStrHex(ptrInput);           // decimal input
+                  }
+                  iInput++;
+                  if (DO_SQRT == ucType) {
+                      fnDebugMsg("SQRT = ");
+                      TOGGLE_TEST_OUTPUT();
+                      ulInput[0] = fnIntegerSQRT(ulInput[0]);            // perform integer square root calculation
+                      TOGGLE_TEST_OUTPUT();
+                      iInput = 1;
+                      break;
+                  }
+                  if ((iInput >= 2)) {
+                      break;
+                  }
+                  fnJumpWhiteSpace(&ptrInput);
+              }
+              while (iInput-- != 0) {
+                  if (DO_DIV == ucType) {
+                      // Division
+                      //
+                      if (ulInput[1] == 0) {
+                          fnDebugMsg("Divide by zero!");
+                          break;
+                      }
+                      if (iInput == 1) {
+                          fnDebugMsg("Quotient = ");
+                          ulDividend = ulInput[0];                       // save for second use later
+                          TOGGLE_TEST_OUTPUT();
+                          ulInput[0] = fnFastSignedIntegerDivide(ulDividend, ulInput[1]); // perform fast signed division
+                          TOGGLE_TEST_OUTPUT();
+                      }
+                      else {
+                          fnDebugMsg("\r\nRemainder = ");
+                          TOGGLE_TEST_OUTPUT();
+                          ulInput[0] = fnFastSignedModulo(ulDividend, ulInput[1]); // perform fast unsigned modulo calculation
+                          TOGGLE_TEST_OUTPUT();
+                      }
+                  }
+                  fnDebugDec(ulInput[0], DISPLAY_NEGATIVE);
+                  fnDebugMsg(" [");
+                  fnDebugHex(ulInput[0], (WITH_LEADIN | sizeof(ulInput[0])));
+                  fnDebugMsg("]");
+              }
+          }
+          break;
+#endif
+#if defined SUPPORT_LCD && defined LCD_CONTRAST_CONTROL                  // {88}
+      case DO_SET_CONTRAST:
+          temp_pars->temp_parameters.ucGLCDContrastPWM = (unsigned char)fnDecStrHex(ptrInput);
+          if (temp_pars->temp_parameters.ucGLCDContrastPWM > 100) {      // limit to 0..100% range
+              temp_pars->temp_parameters.ucGLCDContrastPWM = 100;
+          }
+          fnSetLCDContrast(temp_pars->temp_parameters.ucGLCDContrastPWM);
+          // Fall though intentionally to show the setting
+          //
+      case DO_GET_CONTRAST:
+          fnDebugMsg("LCD contrast = ");
+          fnDebugDec(temp_pars->temp_parameters.ucGLCDContrastPWM, 0);
+          fnDebugMsg("%\r\n");
+          break;
+#endif
 #if defined GLCD_BACKLIGHT_CONTROL                                       // {75}
       case DO_SET_BACKLIGHT:
           temp_pars->temp_parameters.ucGLCDBacklightPWM = (unsigned char)fnDecStrHex(ptrInput);
@@ -3272,23 +4419,18 @@ static void fnDoHardware(unsigned char ucType, CHAR *ptrInput)
           // Fall though intentionally to show the setting
           //
       case DO_GET_BACKLIGHT:
-          fnDebugMsg("Backligh intensity = ");
+          fnDebugMsg("Backlight intensity = ");
           fnDebugDec(temp_pars->temp_parameters.ucGLCDBacklightPWM, 0);
           fnDebugMsg("%\r\n");
           break;
 #endif
 
-//    case DO_SET_USER_OUTPUT:                                           // set either default or user - removed {2}
-//        if (fnConfigPort(*ptrInput, *(ptrInput+2)) < 0) {
-//            fnDebugMsg("Error in input\r\n");
-//            return;
-//        }
-//        break;
-#if defined USE_PARAMETER_BLOCK
+#if !defined REMOVE_PORT_INITIALISATIONS
+    #if defined USE_PARAMETER_BLOCK
       case DO_SAVE_PORT:
           fnSavePorts();
           break;
-#endif
+    #endif
 
       case DO_INPUT:                                                     // read an input bit {2}
             if ((*ptrInput < '1') || (*ptrInput > '4')) {
@@ -3306,10 +4448,11 @@ static void fnDoHardware(unsigned char ucType, CHAR *ptrInput)
 
       case DO_DDR:                                                       // set port direction (and use)
           if (fnSetPort(ucType, ptrInput)) {                             // modify the port
-              fnDebugMsg("\r\n??\r\n#");                                 // signal input not recognised and send prompt in command mode
+              fnDebugMsg("\r\n??");                                      // signal input not recognised
               return;
           }
           break;
+#endif
 #if defined MEMORY_DEBUGGER
     case DO_MEM_DISPLAY:
     #if !defined NO_FLASH_SUPPORT
@@ -3431,13 +4574,14 @@ static void fnDoHardware(unsigned char ucType, CHAR *ptrInput)
         #endif
         if (*ptrInput != 0) {                                            // if there is an address given
             static int iType = BYTE_ACCESS;                              // default is byte
+            int iResult = 0;
         #if !defined NO_FLASH_SUPPORT
             int iStorageAccess;
         #endif
             CAST_POINTER_ARITHMETIC ptrMemory = (CAST_POINTER_ARITHMETIC)fnHexStrHex(ptrInput); // get the address
             int iFillLength = 1;                                         // default
             if ((DO_MEM_FILL == ucType) || (DO_STORAGE_FILL == ucType)) {
-                fnDebugMsg("Fill\r\n");
+                fnDebugMsg("Fill");
             }
         #if defined SPI_FILE_SYSTEM && defined SPI_FLASH_S25FL1_K
             else if (DO_STORAGE_PAGE == ucType) {
@@ -3448,12 +4592,12 @@ static void fnDoHardware(unsigned char ucType, CHAR *ptrInput)
                     ucPattern[i] = (unsigned char)i;                     // set pattern to buffer
                     i++;
                 }
-                fnWriteBytesFlash((unsigned char *)ptrMemory, ucPattern, SPI_FLASH_PAGE_LENGTH); // write the page to flash (this is intended for testing SPI flash onl)
+                iResult = fnWriteBytesFlash((unsigned char *)ptrMemory, ucPattern, SPI_FLASH_PAGE_LENGTH); // write the page to flash (this is intended for testing SPI flash onl)
                 break;
             }
         #endif
             else {
-                fnDebugMsg("Write\r\n");
+                fnDebugMsg("Write");
             }
             fnJumpWhiteSpace(&ptrInput);
             if (*ptrInput != 0) {
@@ -3501,7 +4645,7 @@ static void fnDoHardware(unsigned char ucType, CHAR *ptrInput)
     #else
                         if (iStorageAccess != 0) {
                             unsigned char ucValue = (unsigned char)ulValue;
-                            fnWriteBytesFlash((unsigned char *)ptrMemory, &ucValue, BYTE_ACCESS);
+                            iResult = fnWriteBytesFlash((unsigned char *)ptrMemory, &ucValue, BYTE_ACCESS);
                         }
                         else {
                             *(unsigned char *)ptrMemory = (unsigned char)ulValue;
@@ -3514,7 +4658,7 @@ static void fnDoHardware(unsigned char ucType, CHAR *ptrInput)
     #else
                         if (iStorageAccess != 0) {
                             unsigned short usValue = (unsigned short)ulValue;
-                            fnWriteBytesFlash((unsigned char *)ptrMemory, (unsigned char *)&usValue, SHORT_WORD_ACCESS);
+                            iResult = fnWriteBytesFlash((unsigned char *)ptrMemory, (unsigned char *)&usValue, SHORT_WORD_ACCESS);
                         }
                         else {
                             *(unsigned short *)ptrMemory = (unsigned short)ulValue;
@@ -3526,7 +4670,7 @@ static void fnDoHardware(unsigned char ucType, CHAR *ptrInput)
                         *(unsigned long *)ptrMemory = ulValue;
     #else
                         if (iStorageAccess != 0) {
-                            fnWriteBytesFlash((unsigned char *)ptrMemory, (unsigned char *)&ulValue, LONG_WORD_ACCESS);
+                            iResult = fnWriteBytesFlash((unsigned char *)ptrMemory, (unsigned char *)&ulValue, LONG_WORD_ACCESS);
                         }
                         else {
                             *(unsigned long *)ptrMemory = ulValue;
@@ -3536,9 +4680,13 @@ static void fnDoHardware(unsigned char ucType, CHAR *ptrInput)
                     default:
                         break;
                     }
+                    if (iResult != 0) {
+                        fnDebugMsg(" - Failed\r\n");
+                    }
                     ptrMemory += iType;
                 }
             }
+            fnDebugMsg(" - OK\r\n");
         }
         break;
     #if !defined NO_FLASH_SUPPORT
@@ -3660,6 +4808,217 @@ static void fnDoHardware(unsigned char ucType, CHAR *ptrInput)
           }
           break;
 #endif
+#if defined PWM_MEASUREMENT_DEVELOPMENT
+        case 75:                                                         // temp
+            fnMeasurePWM(PORTC, PORTC_BIT4);                             // test measuring a PWM input on this input
+            break;
+#endif
+#if defined SUPPORT_LPTMR
+        case 76:                                                         // temp test to check technique for reading value of counter
+            {
+                unsigned long ulCnt;
+                LPTMR0_CNR = 0;                                          // write any value to the counter register so that it puts its present counter value into a temporay register
+                ulCnt = LPTMR0_CNR;                                      // read the value from the temporary register
+                fnDebugHex(ulCnt, (WITH_LEADIN | WITH_CR_LF | sizeof(ulCnt)));
+            }
+            break;
+#endif
+#if defined DEV1
+        case 77:
+        {
+            unsigned char ucAnode = (unsigned char)fnHexStrHex(ptrInput); // get the anode value
+            ucAnode &= 0x7f;
+            iBlockLed = 1;
+            fnDebugMsg("Anode set to ");
+            fnDebugHex(ucAnode, (WITH_LEADIN | sizeof(ucAnode)));
+            if (ucAnode & 0x01) {
+                _SETBITS(D, PORTD_BIT6);
+            }
+            else {
+                _CLEARBITS(D, PORTD_BIT6);
+            }
+            if (ucAnode & 0x02) {
+                _SETBITS(D, PORTD_BIT5);
+            }
+            else {
+                _CLEARBITS(D, PORTD_BIT5);
+            }
+            if (ucAnode & 0x04) {
+                _SETBITS(D, PORTD_BIT4);
+            }
+            else {
+                _CLEARBITS(D, PORTD_BIT4);
+            }
+            if (ucAnode & 0x08) {
+                _SETBITS(D, PORTD_BIT3);
+            }
+            else {
+                _CLEARBITS(D, PORTD_BIT3);
+            }
+            if (ucAnode & 0x10) {
+                _SETBITS(D, PORTD_BIT2);
+            }
+            else {
+                _CLEARBITS(D, PORTD_BIT2);
+            }
+            if (ucAnode & 0x20) {
+                _SETBITS(D, PORTD_BIT1);
+            }
+            else {
+                _CLEARBITS(D, PORTD_BIT1);
+            }
+            if (ucAnode & 0x40) {
+                _SETBITS(D, PORTD_BIT0);
+            }
+            else {
+                _CLEARBITS(D, PORTD_BIT0);
+            }
+        }
+        break;
+        case 78:
+        {
+            unsigned short usCathode = (unsigned short)fnHexStrHex(ptrInput); // get the cathode value
+            usCathode &= 0x7fff;
+            iBlockLed = 1;
+            fnDebugMsg("Cathod set to ");
+            fnDebugHex(usCathode, (WITH_LEADIN | sizeof(usCathode)));
+            if (usCathode & 0x0001) {
+                _SETBITS(C, PORTC_BIT3);
+            }
+            else {
+                _CLEARBITS(C, PORTC_BIT3);
+            }
+            if (usCathode & 0x0002) {
+                _SETBITS(C, PORTC_BIT2);
+            }
+            else {
+                _CLEARBITS(C, PORTC_BIT2);
+            }
+            if (usCathode & 0x0004) {
+                _SETBITS(C, PORTC_BIT1);
+            }
+            else {
+                _CLEARBITS(C, PORTC_BIT1);
+            }
+            if (usCathode & 0x0008) {
+                _SETBITS(C, PORTC_BIT0);
+            }
+            else {
+                _CLEARBITS(C, PORTC_BIT0);
+            }
+            if (usCathode & 0x0010) {
+                _SETBITS(B, PORTB_BIT19);
+            }
+            else {
+                _CLEARBITS(B, PORTB_BIT19);
+            }
+            if (usCathode & 0x0020) {
+                _SETBITS(B, PORTB_BIT18);
+            }
+            else {
+                _CLEARBITS(B, PORTB_BIT18);
+            }
+            if (usCathode & 0x0040) {
+                _SETBITS(B, PORTB_BIT17);
+            }
+            else {
+                _CLEARBITS(B, PORTB_BIT17);
+            }
+            if (usCathode & 0x0080) {
+                _SETBITS(B, PORTB_BIT16);
+            }
+            else {
+                _CLEARBITS(B, PORTB_BIT16);
+            }
+            if (usCathode & 0x0100) {
+                _SETBITS(B, PORTB_BIT3);
+            }
+            else {
+                _CLEARBITS(B, PORTB_BIT3);
+            }
+            if (usCathode & 0x0200) {
+                _SETBITS(B, PORTB_BIT2);
+            }
+            else {
+                _CLEARBITS(B, PORTB_BIT2);
+            }
+            if (usCathode & 0x0400) {
+                _SETBITS(B, PORTB_BIT1);
+            }
+            else {
+                _CLEARBITS(B, PORTB_BIT1);
+            }
+            if (usCathode & 0x0800) {
+                _SETBITS(C, PORTC_BIT8);
+            }
+            else {
+                _CLEARBITS(C, PORTC_BIT8);
+            }
+            if (usCathode & 0x1000) {
+                _SETBITS(C, PORTC_BIT9);
+            }
+            else {
+                _CLEARBITS(C, PORTC_BIT9);
+            }
+            if (usCathode & 0x2000) {
+                _SETBITS(C, PORTC_BIT10);
+            }
+            else {
+                _CLEARBITS(C, PORTC_BIT10);
+            }
+            if (usCathode & 0x4000) {
+                _SETBITS(C, PORTC_BIT11);
+            }
+            else {
+                _CLEARBITS(C, PORTC_BIT11);
+            }
+        }
+        break;
+        case 79:
+        {
+            unsigned char ucRelay = (unsigned char)fnDecStrHex(ptrInput); // get the relay value
+            if ((ucRelay < 1) || (ucRelay > 3)) {
+                fnDebugMsg("Invalid relay - 1, 2 or 3");
+                break;
+            }
+            fnJumpWhiteSpace(&ptrInput);
+            if (*ptrInput == '1') {
+                switch (ucRelay) {
+                case 1:
+                    _SETBITS(C, PORTC_BIT5);
+                    break;
+                case 2:
+                    _SETBITS(C, PORTC_BIT4);
+                    break;
+                case 3:
+#if defined CAN_INTERFACE
+                    _SETBITS(A, PORTA_BIT5);
+#else
+                    _SETBITS(A, PORTA_BIT13);
+#endif
+                    break;
+                }
+            }
+            else {
+                switch (ucRelay) {
+                case 1:
+                    _CLEARBITS(C, PORTC_BIT5);
+                    break;
+                case 2:
+                    _CLEARBITS(C, PORTC_BIT4);
+                    break;
+                case 3:
+#if defined CAN_INTERFACE
+                    _CLEARBITS(A, PORTA_BIT5);
+#else
+                    _CLEARBITS(A, PORTA_BIT13);
+#endif
+                    break;
+                }
+            }
+        }
+        break;
+#endif
     }
 }
 
@@ -3687,11 +5046,25 @@ static void fnDoUSB(unsigned char ucType, CHAR *ptrInput)                // USB 
         #endif
         }
         break;
+    case DO_USB_SPEED:
+        fnDebugMsg("Test starts in 1s - get ready to receive 10 MBytes of data....");
+        uTaskerMonoTimer(OWN_TASK, (DELAY_LIMIT)(1 * SEC), E_TIMER_START_USB_TX);
+        break;
     #endif
-    #if defined USE_USB_HID_KEYBOARD
+    #if defined USE_USB_HID_KEYBOARD && defined SUPPORT_FIFO_QUEUES
     case DO_USB_KEYBOARD:                                                // {77}
         usUSB_state |= ES_USB_KEYBOARD_MODE;                             // pass input to USB keyboard
         break;
+        #if defined USB_KEYBOARD_DELAY
+    case DO_USB_KEYBOARD_DELAY:
+        if (*ptrInput != 0) {                                            // if further input is given
+            temp_pars->temp_parameters.ucKeyboardInterCharacterDelay = (unsigned char)(fnDecStrHex(ptrInput) - 1);
+        }
+        fnDebugMsg("Keystroke delay = ");
+        fnDebugDec((temp_pars->temp_parameters.ucKeyboardInterCharacterDelay + 1), 0);
+        fnDebugMsg("ms");
+        break;
+        #endif
     #endif
     #if defined USB_CDC_HOST
     case DO_VIRTUAL_COM:                                                 // {82}
@@ -3759,7 +5132,78 @@ static void fnDoOLED(unsigned char ucType, CHAR *ptrInput)               // OLED
 }
 #endif
 
+#if defined I2C_INTERFACE && defined I2C_MASTER_LOADER                   // {89}
+static void fnProgramI2CSlave(unsigned char ucSlaveAddress, int iCommand)
+{
+    static unsigned char ucAddressToProgram = 0;
+    static MEMORY_RANGE_POINTER slave_firmware = 0;
+    static MAX_FILE_LENGTH slave_firmwareLength = 0;
+    unsigned char ucDelete[4];
+    if (iCommand == 0) {
+        if (0 == ucSlaveAddress) {
+            fnDebugMsg("Invalid slave address (0x00)!");
+            return;
+        }
+        slave_firmware = uOpenFile("0.bin");                             // location of firmware to send to the slave (uFileSystem "0.bin")
+        slave_firmwareLength = uGetFileLength(slave_firmware);           // the length of the data to program
+        if (slave_firmwareLength == 0) {
+            fnDebugMsg("No program to send!");
+            return;
+        }
+        slave_firmware += FILE_HEADER;
+        fnDebugMsg("Commanding slave device at ");
+        ucAddressToProgram = (ucSlaveAddress & 0xfe);                    // ensure the write address is used
+        fnDebugHex(ucAddressToProgram, (WITH_LEADIN | sizeof(ucAddressToProgram)));
+        fnDebugMsg(" to delete its memory...");
+        ucDelete[0] = ucAddressToProgram;                                // slave write address
+        ucDelete[1] = 0x01;                                              // write to 0x01 to command an erase
+        ucDelete[2] = 0x52;                                              // magic number must match for the erase to be executed
+        ucDelete[3] = 0x84;
+        fnWrite(I2CPortID, ucDelete, sizeof(ucDelete));                  // send delete command
+    }
+    if (iCommand < 2) {                                                  // delete or request delete status
+        ucDelete[0] = 3;                                                 // read three bytes of data (versin plus flash state)
+        ucDelete[1] = (ucAddressToProgram | 0x01);                       // slave read address
+        ucDelete[2] = OWN_TASK;                                          // wake our task when the read has completed
+        fnRead(I2CPortID, ucDelete, 0);                                  // get the status
+    }
+    else {                                                               // programming
+        if (slave_firmwareLength != 0) {                                 // if more data to program
+            unsigned char ucProgram[60];                                 // small blocks are sent since the I2C ty buffer may be no larger than 64 bytes (see setting in i2c_tests.h)
+            unsigned char ucLength = (sizeof(ucProgram) - 2);
+            if (ucLength > slave_firmwareLength) {                       // if there is not enough remaining program data to fill the buffer
+                ucLength = (unsigned char)slave_firmwareLength;          // send the remaining amount of data
+            }
+            ucProgram[0] = ucAddressToProgram;                           // slave write address
+            ucProgram[1] = 0x00;                                         // write to 0 to program slave
+            fnGetParsFile(slave_firmware, &ucProgram[2], ucLength);      // get next block of data to send
+            fnWrite(I2CPortID, ucProgram, (ucLength + 2));               // send delete command
+            slave_firmwareLength -= ucLength;
+            slave_firmware += ucLength;
+            ucProgram[0] = 5;                                            // read five bytes of data
+            ucProgram[1] = (ucAddressToProgram | 0x01);                  // slave read address
+            ucProgram[2] = OWN_TASK;                                     // wake our task when the read has completed
+            fnRead(I2CPortID, ucProgram, 0);                             // get the programming status
+        }
+        else {                                                           // all data programmed
+            unsigned char ucReset[4];
+            ucReset[0] = ucAddressToProgram;                             // slave write address
+            ucReset[1] = 0x02;                                           // write to 0x02 to command a reset
+            ucReset[2] = 0x55;                                           // magic number must match for the erase to be executed
+            ucReset[3] = 0xaa;
+            fnWrite(I2CPortID, ucReset, sizeof(ucReset));                // send reset command
+            fnDebugMsg("\r\nProgramming complete\r\n");
+        }
+    }
+}
+#endif
+
 #if defined I2C_INTERFACE
+    #if LPI2C_AVAILABLE > 0 && defined TEMP_LPI2C_TEST
+    extern unsigned long ulRxLPI2Cpause;
+    extern unsigned long ulTxLPI2Cpause;
+    extern unsigned long ulChange;
+    #endif
 static void fnDoI2C(unsigned char ucType, CHAR *ptrInput)                // I2C group
 {
     switch (ucType) {
@@ -3771,24 +5215,101 @@ static void fnDoI2C(unsigned char ucType, CHAR *ptrInput)                // I2C 
         iAccelOutput = 0;
         fnDebugMsg("Disabled\r\n");
         break;
+    #if defined I2C_INTERFACE && defined I2C_MASTER_LOADER               // {89}
+    case DO_I2C_LOAD_FIRMWARE:
+        {
+            unsigned char ucI2C_slave_address = (unsigned char)fnHexStrHex(ptrInput);
+            fnProgramI2CSlave(ucI2C_slave_address, 0);
+        }
+        break;
+    #endif
+    #if LPI2C_AVAILABLE > 0 && defined TEMP_LPI2C_TEST
+    case 122:
+        if (*ptrInput == '1') {
+            fnDebugMsg("Tx pause 0.5ms");
+            ulTxLPI2Cpause = 500;
+        }
+        else {
+            fnDebugMsg("Tx pause removed");
+            ulTxLPI2Cpause = 0;
+        }
+        break;
+    case 123:
+        if (*ptrInput == '1') {
+            fnDebugMsg("Rx pause 0.5ms");
+            ulRxLPI2Cpause = 500;
+        }
+        else {
+            fnDebugMsg("Rx pause removed");
+            ulRxLPI2Cpause = 0;
+        }
+        break;
+    case 124:
+        if (*ptrInput == '1') {
+            fnDebugMsg("DOZEN = '1'");
+            ulChange = 0x04;
+        }
+        else {
+            fnDebugMsg("DOZEN = '0'");
+            ulChange = 0x08;
+        }
+        break;
+    case 125:
+        if (*ptrInput == '1') {
+            fnDebugMsg("DBGEN = '1'");
+            ulChange = 0x10;
+        }
+        else {
+            fnDebugMsg("DBGEN = '0'");
+            ulChange = 0x20;
+        }
+        break;
+    case 126:
+        if (*ptrInput == '1') {
+            fnDebugMsg("AUTOSTOP = '1'");
+            ulChange = 0x01;
+        }
+        else {
+            fnDebugMsg("AUTOSTOP = '0'");
+            ulChange = 0x02;
+        }
+        break;
+    #endif
     #if defined TEST_I2C_INTERFACE
     case DO_I2C_WRITE:                                                   // write a value to a specified I2C address
         {
+        #if defined I2C_TWO_BYTE_ADDRESS
+            #define I2C_DATA_POSITION 3
+            unsigned short usAddress;
+        #else
+            #define I2C_DATA_POSITION 2
+        #endif
             QUEUE_TRANSFER length;
-            unsigned char ucTest[257]; // = {IIC_WRITE_ADDRESS, 0, 0};
-            ucTest[0] = IIC_WRITE_ADDRESS;
+            unsigned char ucTest[257];                                   // = {I2C_WRITE_ADDRESS, 0, 0};
+            ucTest[0] = I2C_WRITE_ADDRESS;
+        #if defined I2C_TWO_BYTE_ADDRESS
+            usAddress = (unsigned short)fnHexStrHex(ptrInput);           // the address
+            ucTest[1] = (unsigned char)(usAddress >> 8);
+            ucTest[2] = (unsigned char)(usAddress);
+        #else
             ucTest[1] = (unsigned char)fnHexStrHex(ptrInput);            // the address
+        #endif
             if (fnJumpWhiteSpace(&ptrInput) != 0) {
                 fnDebugMsg("Data missing\r\n");
                 return;
             }
-            ucTest[2] = (unsigned char)fnHexStrHex(ptrInput);            // the data
+            ucTest[I2C_DATA_POSITION] = (unsigned char)fnHexStrHex(ptrInput); // the data value
             if (fnJumpWhiteSpace(&ptrInput) == 0) {
-                int iRepeat = 1;
+                int iRepeat = (I2C_DATA_POSITION - 1);
                 length = (unsigned char)fnDecStrHex(ptrInput);           // repetition length for data
                 if (length == 0) {
-                    length = 1;
+                    length = (I2C_DATA_POSITION - 1);
                 }
+        #if defined I2C_TWO_BYTE_ADDRESS
+                else {
+                    length++;
+                }
+        #endif
                 while (iRepeat++ < length) {
                     ucTest[iRepeat + 1] = (ucTest[iRepeat] + 1);
                 }
@@ -3797,33 +5318,46 @@ static void fnDoI2C(unsigned char ucType, CHAR *ptrInput)                // I2C 
             else {
                 length = 3;
             }
-            fnWrite(IICPortID, ucTest, length);
+            fnWrite(I2CPortID, ucTest, length);
             fnDebugMsg("Written value ");
-            fnDebugHex(ucTest[2], (WITH_LEADIN | sizeof(ucTest[2])));
+            fnDebugHex(ucTest[I2C_DATA_POSITION], (WITH_LEADIN | sizeof(ucTest[2])));
             fnDebugMsg(" to address ");
+        #if defined I2C_TWO_BYTE_ADDRESS
+            fnDebugHex(usAddress, (WITH_LEADIN | WITH_CR_LF | sizeof(usAddress)));
+        #else
             fnDebugHex(ucTest[1], (WITH_LEADIN | WITH_CR_LF | sizeof(ucTest[1])));
+        #endif
         }
         break;
 
     case DO_I2C_READ_PLUS_WRITE:
     case DO_I2C_READ:                                                    // read values from an I2C address
         {
-            unsigned char ucSetAddress[2];// = {IIC_WRITE_ADDRESS, 0};
-            unsigned char ucTest[3];// = {1, IIC_READ_ADDRESS, OWN_TASK};
-            ucSetAddress[0] = IIC_WRITE_ADDRESS;
+        #if defined I2C_TWO_BYTE_ADDRESS
+            unsigned short usAddress;
+        #endif
+            unsigned char ucSetAddress[I2C_DATA_POSITION];               // = {I2C_WRITE_ADDRESS, 0, (0)};
+            unsigned char ucTest[3];                                     // = {1, I2C_READ_ADDRESS, OWN_TASK};
+            ucSetAddress[0] = I2C_WRITE_ADDRESS;
+        #if defined I2C_TWO_BYTE_ADDRESS
+            usAddress = (unsigned short)fnHexStrHex(ptrInput);           // the address
+            ucSetAddress[1] = (unsigned char)(usAddress >> 8);
+            ucSetAddress[2] = (unsigned char)(usAddress);
+        #else
             ucSetAddress[1] = (unsigned char)fnHexStrHex(ptrInput);      // the address
-            fnWrite(IICPortID, (unsigned char *)ucSetAddress, sizeof(ucSetAddress));
+        #endif
+            fnWrite(I2CPortID, (unsigned char *)ucSetAddress, sizeof(ucSetAddress)); // write the address to be read from
             if (fnJumpWhiteSpace(&ptrInput) == 0) {
-                ucTest[0] = (unsigned char)fnDecStrHex(ptrInput);        // the length               
+                ucTest[0] = (unsigned char)fnDecStrHex(ptrInput);        // the length to be read           
             }
             else {
                 ucTest[0] = 1;
             }
-            ucTest[1] = IIC_READ_ADDRESS;
+            ucTest[1] = I2C_READ_ADDRESS;
             ucTest[2] = OWN_TASK;
-            fnRead(IICPortID, (unsigned char *)ucTest, 0);               // start the read
+            fnRead(I2CPortID, (unsigned char *)ucTest, 0);               // start the read
             if (DO_I2C_READ_PLUS_WRITE == ucType) {
-                fnWrite(IICPortID, (unsigned char *)ucSetAddress, sizeof(ucSetAddress));
+                fnWrite(I2CPortID, (unsigned char *)ucSetAddress, sizeof(ucSetAddress));
                 fnDebugMsg("Reading (+ wr) ");
             }
             else {
@@ -3831,21 +5365,25 @@ static void fnDoI2C(unsigned char ucType, CHAR *ptrInput)                // I2C 
             }
             fnDebugDec(ucTest[0], sizeof(ucTest[1]));
             fnDebugMsg(" bytes from address ");
+        #if defined I2C_TWO_BYTE_ADDRESS
+            fnDebugHex(usAddress, (WITH_LEADIN | WITH_CR_LF | sizeof(usAddress)));
+        #else
             fnDebugHex(ucSetAddress[1], (WITH_LEADIN | WITH_CR_LF | sizeof(ucSetAddress[1])));
+        #endif
         }
         break;
 
     case DO_I2C_READ_NO_ADDRESS:
         {
-            unsigned char ucTest[3];// = {1, IIC_READ_ADDRESS, OWN_TASK};
+            unsigned char ucTest[3];                                     // = {1, I2C_READ_ADDRESS, OWN_TASK};
             ucTest[0] = (unsigned char)fnDecStrHex(ptrInput);            // the length
             if (ucTest[0] == 0) {
                 fnDebugMsg("Invalid length\n\r");
                 break;
             }
-            ucTest[1] = IIC_READ_ADDRESS;
+            ucTest[1] = I2C_READ_ADDRESS;
             ucTest[2] = OWN_TASK;
-            fnRead(IICPortID, (unsigned char *)ucTest, 0);               // start the read
+            fnRead(I2CPortID, (unsigned char *)ucTest, 0);               // start the read
             fnDebugMsg("Reading ");
             fnDebugDec(ucTest[0], sizeof(ucTest[1]));
             fnDebugMsg(" bytes from present address\n\r");
@@ -3857,7 +5395,6 @@ static void fnDoI2C(unsigned char ucType, CHAR *ptrInput)                // I2C 
 #endif
 
 #if defined SDCARD_SUPPORT || defined SPI_FLASH_FAT || defined FLASH_FAT || defined USB_MSD_HOST // {17}{81}
-
 
 static void fnDisplayDiskSize(unsigned long ulSectors, unsigned short usBytesPerSector) // {43}
 {
@@ -4024,7 +5561,7 @@ static int fnDoDisk(unsigned char ucType, CHAR *ptrInput)
             else {
                 iFATstalled = 0;
             }
-            while (1) {
+            FOREVER_LOOP() {
 #if defined UTFAT_UNDELETE || defined UTFAT_EXPERT_FUNCTIONS
                 if (fnWrite(DebugHandle, 0, (sizeof(cBuffer) + 3)) == 0) // check whether there is enough space in the output buffer to accept the next entry 
 #else
@@ -4183,7 +5720,7 @@ static int fnDoDisk(unsigned char ucType, CHAR *ptrInput)
                     if (utFile.usLastReadWriteLength < sizeof(ucTemp)) { // complete file content has been read
                         break;
                     }
-                } while (1);
+                } FOREVER_LOOP();
                 fnDebugMsg("\r\n");
                 utCloseFile(&utFile);
             }
@@ -4215,6 +5752,9 @@ static int fnDoDisk(unsigned char ucType, CHAR *ptrInput)
     case DO_DISPLAY_PAGE:
 #endif
 #if !defined LOW_MEMORY
+    #if defined UTFAT_MULTIPLE_BLOCK_READ
+    case DO_DISPLAY_MULTI_SECTOR:                                        // multiple sector (to test faster reading)
+    #endif
     case DO_DISPLAY_SECTOR:
         {
             int i, j;
@@ -4230,7 +5770,7 @@ static int fnDoDisk(unsigned char ucType, CHAR *ptrInput)
                 fnDebugMsg("Reading sector ");
             }
     #else
-            unsigned long ulBuffer[512/sizeof(unsigned long)];
+            unsigned long ulBuffer[512/sizeof(unsigned long)];           // long word aligned buffer for efficiency
             fnDebugMsg("Reading sector ");
     #endif
             fnDebugHex(ulSectorNumber, (WITH_LEADIN | sizeof(ulSectorNumber)));
@@ -4239,12 +5779,29 @@ static int fnDoDisk(unsigned char ucType, CHAR *ptrInput)
     #elif (!defined _LITTLE_ENDIAN) && defined UTFAT_SECT_LITTLE_ENDIAN
             fnDebugMsg(" (little-endian view)");
     #endif
-            if (fnReadSector(ucPresentDisk, (unsigned char *)ulBuffer, ulSectorNumber) != 0) {
+    #if defined UTFAT_MULTIPLE_BLOCK_READ
+            if (DO_DISPLAY_MULTI_SECTOR == ucType) {
+                fnPrepareBlockRead(ucPresentDisk, 20);                   // prepare for a block read of 20 sectors
+            }
+            for (i = 0; i < 20; i++) {                                   // read 20 consecutive sectors (block read)
+                TOGGLE_TEST_OUTPUT();
+                if (fnReadSector(ucPresentDisk, (unsigned char *)ulBuffer, ulSectorNumber++) != 0) { // the the sector content to a buffer
+                    fnDebugMsg(" FAILED!!\r\n");
+                    return 0;
+                }
+                TOGGLE_TEST_OUTPUT();
+                if (DO_DISPLAY_SECTOR == ucType) {
+                    break;
+                }
+            }
+    #else
+            if (fnReadSector(ucPresentDisk, (unsigned char *)ulBuffer, ulSectorNumber) != 0) { // the the sector content to a buffer
                 fnDebugMsg(" FAILED!!\r\n");
                 break;
             }
+    #endif
             fnDebugMsg("\r\n");
-            for (i = 0; i < 8; i++) {
+            for (i = 0; i < 8; i++) {                                    // display the read data
                 for (j = 0; j < 16; j++) {
     #if (defined _WINDOWS || defined _LITTLE_ENDIAN) && defined UTFAT_SECT_BIG_ENDIAN // {61}
                     fnDebugHex(BIG_LONG_WORD(ulBuffer[(i * 16) + j]), (WITH_LEADIN | WITH_SPACE | sizeof(ulBuffer[0])));
@@ -4275,28 +5832,41 @@ static int fnDoDisk(unsigned char ucType, CHAR *ptrInput)
     case DO_WRITE_MULTI_SECTOR_PRE:
         #endif
     #endif
-    case DO_WRITE_SECTOR:
+    case DO_WRITE_SECTOR:                                                // {86} write a number of bytes to a sector at a specified offset in the sector
         {
             unsigned long ulSectorNumber = fnHexStrHex(ptrInput);        // the sector number
-            int i;
-            unsigned char ucPattern = 0x00;
-            unsigned char ucTestPattern[512];
-            unsigned char ucSectorCount = 1;
-            if (fnJumpWhiteSpace(&ptrInput) == 0) {
-                ucPattern = (unsigned char)fnHexStrHex(ptrInput);
+            unsigned short usOffset = 0;
+            unsigned char  ucPattern = 0x00;
+            unsigned long  ulBuffer[512/sizeof(unsigned long)];
+            unsigned char *ptrStart = (unsigned char *)ulBuffer;
+            unsigned short usByteCount = 1;
+            unsigned short usThisWriteLength;
+            if (fnJumpWhiteSpace(&ptrInput) == 0) {                      // move over the input to the next parameter
+                usOffset = (unsigned short)fnDecStrHex(ptrInput);
+                if (fnJumpWhiteSpace(&ptrInput) == 0) {                  // move over the input to the next parameter
+                    ucPattern = (unsigned char)fnHexStrHex(ptrInput);
+                    if (fnJumpWhiteSpace(&ptrInput) == 0) {
+                        usByteCount = (unsigned short)fnDecStrHex(ptrInput);
+                        if (usByteCount == 0) {
+                            usByteCount = 1;
+                        }
+                    }
+                }
+                usOffset %= 512;
             }
-            for (i = 0; i < sizeof(ucTestPattern); i++) {                // generate the test pattern starting with the defined value
-                ucTestPattern[i] = ucPattern++;
+            if (fnReadSector(ucPresentDisk, (unsigned char *)ulBuffer, ulSectorNumber) != 0) { // read the present sector content
+                fnDebugMsg(" FAILED to read!!\r\n");
+                break;
             }
-            fnDebugMsg("Writing sector(s) ");
+            ptrStart += usOffset;
+            usThisWriteLength = usByteCount;
+            if ((usOffset + usByteCount) > 512) {                        // limit to a single sector
+                usThisWriteLength = (512 - usOffset);
+            }
+            uMemset(ptrStart, ucPattern, usThisWriteLength);             // modify the sector content in the buffer
+            fnDebugMsg("Writing sector ");
             fnDebugHex(ulSectorNumber, (WITH_LEADIN | sizeof(ulSectorNumber)));
             TOGGLE_TEST_OUTPUT();                                        // enable measurement of the write time
-            if (fnJumpWhiteSpace(&ptrInput) == 0) {
-                ucSectorCount = (unsigned char)fnHexStrHex(ptrInput);
-                if (ucSectorCount == 0) {
-                    ucSectorCount = 1;
-                }
-            }
     #if defined UTFAT_MULTIPLE_BLOCK_WRITE
             if (ucType == DO_WRITE_MULTI_SECTOR) {
                 fnPrepareBlockWrite(ucPresentDisk, ucSectorCount, 0);    // multiple sector write but without pre-delete
@@ -4308,18 +5878,13 @@ static int fnDoDisk(unsigned char ucType, CHAR *ptrInput)
             }
         #endif
     #endif
-else {
-//fnPrepareBlockWrite(ucPresentDisk, 0, 0); // test abort
-}
-            do {
-                if (fnWriteSector(ucPresentDisk, ucTestPattern, ulSectorNumber) != UTFAT_SUCCESS) {
-                    fnDebugMsg(" Sector write error!\n\r");
-                }
-                else {
-                    fnDebugMsg(" - OK\n\r");                             // sector write successful
-                }
-                ulSectorNumber++;
-            } while (--ucSectorCount != 0);
+          //fnPrepareBlockWrite(ucPresentDisk, 0, 0); // test abort
+            if (fnWriteSector(ucPresentDisk, (unsigned char *)ulBuffer, ulSectorNumber) != UTFAT_SUCCESS) { // write the modified sector back
+                fnDebugMsg(" Sector write error!\n\r");
+            }
+            else {
+                fnDebugMsg(" - OK\n\r");                                 // sector write successful
+            }
             TOGGLE_TEST_OUTPUT();
         }
         break;
@@ -4514,7 +6079,7 @@ else {
         {
             const UTDISK *ptrDiskInfo = fnGetDiskInfo(ucPresentDisk);
             fnDebugMsg("\r\nDisk ");
-            if (ptrDiskInfo->usDiskFlags & DISK_NOT_PRESENT) {           // {24}{49} no card detected
+            if ((ptrDiskInfo->usDiskFlags & DISK_NOT_PRESENT) != 0) {    // {24}{49} no card detected
                 fnDebugMsg("not detected\r\n");
             }
             else {
@@ -4615,7 +6180,7 @@ else {
 static void fnDoFTP_flow_control(USOCKET uDataSocket, int iForceUpdate)
 {
     unsigned short usBufferSpace;
-    if (iFTP_data_state & FTP_DATA_STATE_PAUSE) {
+    if ((iFTP_data_state & FTP_DATA_STATE_PAUSE) != 0) {
         usBufferSpace = 0;                                               // signal no space to receive in order to pause reception
         uFtpClientDataSocket = uDataSocket;                              // save the data socket number
     }
@@ -4639,7 +6204,7 @@ static void fnDoFTP_flow_control(USOCKET uDataSocket, int iForceUpdate)
 //
 static int fnFTP_client_user_callback_handler(TCP_CLIENT_MESSAGE_BOX *ptrClientMessageBox)
 {
-    if (ptrClientMessageBox->iCallbackEvent & FTP_CLIENT_ERROR_FLAG) {   // error event code
+    if ((ptrClientMessageBox->iCallbackEvent & FTP_CLIENT_ERROR_FLAG) != 0) { // error event code
         fnDebugMsg("FTP ERROR:[");
         fnDebugHex(ptrClientMessageBox->iCallbackEvent, 2);
         fnDebugMsg("] ");
@@ -4860,8 +6425,80 @@ static void fnDisplayTelnetMode(unsigned short usMode, unsigned short usFlags)
 }
 #endif
 
-#if defined USE_FTP_CLIENT || defined USE_TELNET_CLIENT                  // {72}
-static void fnDoFTP_TELNET(unsigned char ucType, CHAR *ptrInput)
+#if defined USE_MQTT_CLIENT
+static unsigned short fnMQTT_callback(signed char scEvent, unsigned char *ptrData, unsigned long ulLength, unsigned char ucSubscriptionRef)
+{
+    CHAR *ptrBuf = (CHAR *)ptrData;
+    int iAddRef = 0;
+    switch (scEvent) {
+    case MQTT_CLIENT_IDENTIFIER:
+        ptrBuf = uStrcpy(ptrBuf, temp_pars->temp_parameters.cDeviceIDName); // supply a string to be used as MQTT device identifier - this should be unique and normally contain only characters 0..9, a..z, A..Z (normally up to 23 bytes)
+        break;
+    case MQTT_WILL_TOPIC:                                                // optional connection string fields
+    case MQTT_WILL_MESSAGE:
+    case MQTT_USER_NAME:
+    case MQTT_USER_PASSWORD:
+        ptrBuf = uStrcpy(ptrBuf, "string");
+        break;
+    case MQTT_CONNACK_RECEIVED:
+        fnDebugMsg("MQTT connected\r\n");
+        break;
+    case MQTT_SUBACK_RECEIVED:
+        fnDebugMsg("MQTT subscribed");
+        iAddRef = 1;
+        break;
+    case MQTT_UNSUBACK_RECEIVED:
+        fnDebugMsg("MQTT subscribed");
+        iAddRef = 1;
+        break;
+    case MQTT_PUBLISH_ACKNOWLEDGED:
+        fnDebugMsg("MQTT published - QoS");
+        fnDebugDec(ulLength, 0);
+        iAddRef = 1;
+        break;
+    case MQTT_PUBLISH_TOPIC:                                             // add a default publish topic
+        ptrBuf = uStrcpy(ptrBuf, "xyz/abc");
+        break;
+    case MQTT_PUBLISH_DATA:
+        {
+            static unsigned char ucDataCnt = 0;
+            int i = 0;
+    #if defined nRF24L01_INTERFACE
+            if (0 == ucSubscriptionRef) {
+                ptrBuf = (CHAR *)fnSetLast_nRF24201_data(ptrData);       // insert the last received data from nRF24201 receiver
+                if (ptrBuf != (CHAR *)ptrData) {                         // if there was data to insert
+                    break;                                               // complete
+                }
+            }
+    #endif
+            ptrBuf = uStrcpy(ptrBuf, "abcd");                            // add string content
+            while (i++ < usPubLength) {                                  // plus some binary content
+                *ptrBuf++ = ucDataCnt++;
+            }
+        }
+        break;
+    case MQTT_HOST_CLOSED:
+    case MQTT_CONNECTION_CLOSED:
+        fnDebugMsg("MQTT closed\r\n");
+        break;
+    case MQTT_TOPIC_MESSAGE:
+        fnDebugMsg("Message (");
+        fnDebugDec(ulLength, 0);
+        fnDebugMsg(")");
+        iAddRef = 1;
+        break;
+    }
+    if (iAddRef != 0) {
+        fnDebugMsg(" [");
+        fnDebugDec(ucSubscriptionRef, 0);
+        fnDebugMsg("]\r\n");
+    }
+    return (unsigned short)((unsigned char *)ptrBuf - ptrData);
+}
+#endif
+
+#if defined USE_FTP_CLIENT || defined USE_TELNET_CLIENT || defined USE_MQTT_CLIENT // {72}{87}
+static void fnDoFTP_TELNET_MQTT(unsigned char ucType, CHAR *ptrInput)
 {
     switch (ucType) {
     #if defined USE_FTP_CLIENT
@@ -5021,7 +6658,139 @@ static void fnDoFTP_TELNET(unsigned char ucType, CHAR *ptrInput)
             }
         }
         break;
-   #endif
+    #endif
+    #if defined USE_MQTT_CLIENT
+        #if defined SECURE_MQTT
+    case DO_MQTTS_CONNECT:
+        #endif
+    case DO_MQTT_CONNECT:
+        {
+            unsigned char ucDestinationIP[IPV4_LENGTH] = {0};
+            if (fnStrIP(ptrInput, ucDestinationIP) != 0) {
+                unsigned long ulModeFlags = (UNSECURE_MQTT_CONNECTION | MQTT_CONNECT_FLAG_CLEAN_SESSION);
+        #if defined SECURE_MQTT
+                if (DO_MQTTS_CONNECT == ucType) {
+                    ulModeFlags = (SECURE_MQTT_CONNECTION | MQTT_CONNECT_FLAG_CLEAN_SESSION);
+                }
+        #endif
+                fnDebugMsg("MQTT client ");
+                if (fnConnectMQTT(ucDestinationIP, fnMQTT_callback, ulModeFlags) == 0) {
+                    fnDebugMsg("Connecting...");
+                }
+                else {
+                    fnDebugMsg("Can't connect!");
+                }
+            }
+            else {
+                fnDebugMsg("Invalid IP");
+            }
+        }
+        break;
+    case DO_MQTT_SUBSCRIBE:
+        {
+            CHAR *ptrQoS = ptrInput;
+            int iSubscriptionReference;
+            unsigned char ucQoS;
+            if (*ptrInput == 0) {
+                fnDebugMsg("Missing topic!!");
+                break;
+            }
+            fnJumpWhiteSpace(&ptrQoS);
+            if (*ptrQoS == 0) {                                          // if no QoS specified
+                ucQoS = 2;                                               // default QoS if not supplied
+            }
+            else {
+                *(ptrQoS - 1) = 0;                                       // terminate the topic string
+                ucQoS = (unsigned char)fnDecStrHex(ptrQoS);              // QoS to use
+            }
+            iSubscriptionReference = fnSubscribeMQTT(ptrInput, ucQoS);
+            if (iSubscriptionReference >= 0) {
+                fnDebugMsg("Subscribing (ref=");
+                fnDebugDec(iSubscriptionReference, 0);
+                fnDebugMsg(")...");
+            }
+            else {
+                fnDebugMsg("MQTT error!");
+            }
+        }
+        break;
+    case DO_MQTT_TOPICS:                                                 // list the topics that we are presently subscribed to
+        {
+           int iRef = 1;
+           int iResult;
+           int iNotEmpty = 0;
+           while ((iResult = fnShowMQTT_subscription(iRef++)) != ERROR_MQTT_INVALID_SUBSCRIPTION) { // print out details of each mqtt subscription
+               if (MQTT_RESULT_OK == iResult) {
+                   iNotEmpty = 1;
+               }
+           }
+           if (iNotEmpty == 0) {
+               fnDebugMsg("No MQTT substriptions");
+           }
+        }
+        break;
+    case DO_MQTT_UNSUBSCRIBE:
+        {
+            unsigned char ucSubscriptionRef = (unsigned char)fnDecStrHex(ptrInput); // the subscription reference to be unsubscribed
+            if (fnUnsubscribeMQTT(ucSubscriptionRef) >= 0) {
+                fnDebugMsg("Unsubscribing...");
+            }
+            else {
+                fnDebugMsg("MQTT error!");
+            }
+        }
+        break;
+    case DO_MQTT_PUB_LONG:
+    case DO_MQTT_PUB:
+        {
+            CHAR *ptrTopic = 0;
+            unsigned char ucSubscriptionRef = 0;                         // default will call-back to insert the publish topic
+            signed char cQoS;
+            if (*ptrInput == '"') {                                      // we want to insert a one-off publish topic instead of using a subscribed reference
+                ptrTopic = (ptrInput + 1);
+                fnJumpWhiteSpace(&ptrInput);
+                if (*ptrInput == 0) {
+                    *(ptrInput - 1) = 0;                                 // terminate the topic string in the input buffer
+                }
+                else {
+                    *(ptrInput - 2) = 0;                                 // terminate the topic string in the input buffer
+                }
+            }
+            else {
+                if (*ptrInput != 0) {
+                    ucSubscriptionRef = (unsigned char)fnDecStrHex(ptrInput); // use the publish topic defined
+                    fnJumpWhiteSpace(&ptrInput);
+                }
+            }
+            if (*ptrInput == 0) {                                        // if no QoS is specified
+                cQoS = -1;                                               // a QoS value fo -1 causes the subscription to be used or else 2 for one-off-topics
+            }
+            else {
+                cQoS = (signed char)fnDecStrHex(ptrInput);               // QoS to use
+            }
+            if (ucType == DO_MQTT_PUB_LONG) {
+                usPubLength = 1024;
+            }
+            else {
+                usPubLength = 10;
+            }
+            if (fnPublishMQTT(ucSubscriptionRef, ptrTopic, cQoS) == 0) {
+                fnDebugMsg("Publishing...");
+            }
+            else {
+                fnDebugMsg("MQTT error!");
+            }
+        }
+        break;
+    case DO_MQTT_DISCONNECT:
+        if (fnDisconnectMQTT() == 0) {
+            fnDebugMsg("Disconnecting...");
+        }
+        else {
+            fnDebugMsg("Not connected!");
+        }
+        break;
+    #endif
     }
 }
 #endif
@@ -5039,7 +6808,7 @@ static unsigned char fnGetID_Data(int iActions, CHAR *ptrInput, unsigned char *u
     unsigned char ucLength = 0;
     unsigned char ucBlockLength = 0;
     unsigned char ucTemp;
-    while (1) {                                                          // extract first an optional ID from 0 -- 7ff or extended from 0 -- 1fffffff, followed by data
+    FOREVER_LOOP() {                                                     // extract first an optional ID from 0 -- 7ff or extended from 0 -- 1fffffff, followed by data
         while ((*ptrInput != ' ') && (*ptrInput != 0)) {
             ulID <<= 4;
             ucTemp = (*ptrInput - '0');
@@ -5208,7 +6977,7 @@ static int fnDoCommand(unsigned char ucFunction, unsigned char ucType, CHAR *ptr
             ucMenu = MENU_HELP_DISK;                                     // set SD-card disk menu
             return (fnDisplayHelp(0));                                   // large menu may require special handling
         }
-        else if (DO_MENU_HELP_FTP_TELNET == ucType) {                    // {37}
+        else if (DO_MENU_HELP_FTP_TELNET_MQTT == ucType) {               // {37}
             ucMenu = MENU_HELP_FTP;                                      // set FTP/TELNET client menu
             return (fnDisplayHelp(0));                                   // large menu may require special handling
         }
@@ -5216,6 +6985,17 @@ static int fnDoCommand(unsigned char ucFunction, unsigned char ucType, CHAR *ptr
             ucMenu = MENU_HELP_CAN;                                      // set CAN menu
             return (fnDisplayHelp(0));                                   // large menu may require special handling
         }
+    #if defined TEST_FLEXIO                                              // {91}
+        else if (DO_MENU_HELP_FLEXIO == ucType) {
+            ucMenu = MENU_HELP_FLEXIO;                                   // set flexio menu
+            return (fnDisplayHelp(0));
+        }
+    #elif defined CMSIS_DSP_CFFT || defined CRYPTOGRAPHY || defined MMDVSQ_AVAILABLE // {84}
+        else if (DO_MENU_HELP_ADVANCED == ucType) {
+            ucMenu = MENU_HELP_ADVANCED;                                 // set advanced menu
+            return (fnDisplayHelp(0));
+        }
+    #endif
         else if (DO_HELP_UP == ucType) {
             ucMenu = 0;                                                  // set top menu level
             return (fnDisplayHelp(0));                                   // large menu may require special handling
@@ -5244,9 +7024,9 @@ static int fnDoCommand(unsigned char ucFunction, unsigned char ucType, CHAR *ptr
     case DO_TELNET:
         fnDoTelnet(ucType, ptrInput);
         break;
-#if defined USE_FTP_CLIENT || defined USE_TELNET_CLIENT                  // {37}{72}
-    case DO_FTP_TELNET:                                                  // FTP/TELNET client group
-        fnDoFTP_TELNET(ucType, ptrInput);
+#if defined USE_FTP_CLIENT || defined USE_TELNET_CLIENT || defined USE_MQTT_CLIENT // {37}{72}
+    case DO_FTP_TELNET_MQTT:                                             // FTP/TELNET/MQTT client group
+        fnDoFTP_TELNET_MQTT(ucType, ptrInput);
         break;
 #endif
 #if defined CAN_INTERFACE                                                // {38}
@@ -5308,13 +7088,13 @@ static int fnDoDebug(CHAR *ptr_input, unsigned short usInputLen, int iSource)
 
     if (iSource == SOURCE_SERIAL) {
         if ((usData_state == ES_NO_CONNECTION) || (usData_state & ES_SERIAL_SUSPENDED)) {
-            return 0;                                                    // we can not treat commands
+            return 0;                                                    // we cannot treat commands
         }
     }
 #if defined USE_USB_CDC                                                  // {8}
     else if (iSource == SOURCE_USB) {
         if (usUSB_state == ES_NO_CONNECTION) {
-            return 0;                                                    // we can not treat commands
+            return 0;                                                    // we cannot treat commands
         }
     }
 #endif
@@ -5461,28 +7241,82 @@ static int fnTELNETListener(USOCKET Socket, unsigned char ucEvent, unsigned char
 #if defined TEST_TCP_SERVER                                              // {30}
 static int fnTestTCP(USOCKET Socket, unsigned char ucTestCase)
 {
+    int iSent = 0;
     switch (ucTestCase) {
     case 0x01:                                                           // we should send data blocks as fast as possible
         {
             int i;
-            int iSent = 0;
             unsigned char test_buffer[26];
             for (i = 0; i < 26; i++) {
                 test_buffer[i] = 'a' + i;
             }
-            while (fnSendBufTCP(Socket, 0, 26, TCP_BUF_CHECK)) {         // while space in output buffer              
+            while (fnSendBufTCP(Socket, 0, 26, TCP_BUF_CHECK) != 0) {    // while space in output buffer              
                 iSent += fnSendBufTCP(Socket, test_buffer, 26, (TCP_BUF_SEND | TCP_BUF_SEND_REPORT_COPY));
             }
-            return iSent;
         }
         break;
     }
-    return 0;
+    return iSent;
 }
+
+//#define FAST_PEER_DROPED_FRAME_TEST                                    // temp test
+#if defined FAST_PEER_DROPED_FRAME_TEST
+static unsigned char test_buffer[1500] = {0};
+
+static int fnFastRxTest(USOCKET Socket)
+{
+    static unsigned char ucRtn[] = {
+        32,0, 76,0,  24,0,  52,52, 20,0, 64,0, 52,0, 64,0, 36,52, 52,52, 52,0, 64,52, 52,0, 64,0, 52,0, 64,0, 52,52, 52,64, 52,0, 64,0, 
+        52,0, 48,52, 52,88, 48,0, 48,0, 88,0, 48,0, 36,52, 48,0, 48,0, 48,52, 48,0, 20,0, 20,0, 20,0, 20,52, 20,0, 20,0, 20,24, 20,0, 
+        52,52, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 20,20, 0,0, 
+        0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 36,48, 
+    };
+    static int iCnt = 0;
+    int iRtn = 0;
+
+    if (ucRtn[iCnt] != 0) {
+        fnSendBufTCP(Socket, test_buffer, ucRtn[iCnt], (TCP_BUF_SEND | TCP_BUF_SEND_REPORT_COPY));
+        iRtn = APP_SENT_DATA;
+    }
+    iCnt++;
+    if (ucRtn[iCnt] != 0) {
+        fnSendBufTCP(Socket, test_buffer, ucRtn[iCnt], (TCP_BUF_SEND | TCP_BUF_SEND_REPORT_COPY));
+        iRtn = APP_SENT_DATA;
+    }
+    iCnt++;
+    return iRtn;
+}
+
+static int fnFastRxTestAck(USOCKET Socket)
+{
+    static unsigned short ucRtn[] = {
+        0,0,0,36,0,0,0,0,0,0,64,0,0,52,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,52+88,0,0,0,52,0,0,0,0,0,52,0,0,0,0,0,36+52,52+52,52+52,52+52,52+36,
+        52+52,52+52,52+52,52+52,36+52,52+24,52+52,16+16,16+16,16+1400+120,52,52+52,52+36,52+52,52+52,52+52,52+52,36+52,52+52,52,0,20+20,20+60,
+        0, 88+48, 48+272, 
+    };
+    static int iCnt = 0;
+    int iRtn = 0;
+
+    if (ucRtn[iCnt] != 0) {
+        if (ucRtn[iCnt] == (16 + 1400 + 120)) {
+            fnSendBufTCP(Socket, test_buffer, (16 + 1400), (TCP_BUF_SEND | TCP_BUF_SEND_REPORT_COPY));
+            fnSendBufTCP(Socket, test_buffer, (120 + 52), (TCP_BUF_SEND | TCP_BUF_SEND_REPORT_COPY));
+        }
+        else {
+            fnSendBufTCP(Socket, test_buffer, ucRtn[iCnt], (TCP_BUF_SEND | TCP_BUF_SEND_REPORT_COPY));
+        }
+        iRtn = APP_SENT_DATA;
+    }
+    iCnt++;
+    return iRtn;
+}
+#endif
 
 static int fnServerTestListener(USOCKET Socket, unsigned char ucEvent, unsigned char *ucIp_Data, unsigned short usPortLen)
 {
+    #if !defined FAST_PEER_DROPED_FRAME_TEST
     static unsigned char ucTestMode = 0;
+    #endif
     switch (ucEvent) {
     case TCP_EVENT_CONREQ:                                               // session request received on the TCP port
         fnDebugMsg("Connection request\n\r");
@@ -5491,6 +7325,9 @@ static int fnServerTestListener(USOCKET Socket, unsigned char ucEvent, unsigned 
         fnDebugMsg("Connection established\n\r");
         break;
     case TCP_EVENT_DATA:
+    #if defined FAST_PEER_DROPED_FRAME_TEST
+        return fnFastRxTest(Socket);
+    #else
         if (ucTestMode == 0) {                                           // the first data indicates the test mode
             ucTestMode = *ucIp_Data;
             if (fnTestTCP(Socket, ucTestMode) > 0) {
@@ -5498,11 +7335,16 @@ static int fnServerTestListener(USOCKET Socket, unsigned char ucEvent, unsigned 
             }
         }
         break;
+    #endif
     case TCP_EVENT_ACK:
+    #if defined FAST_PEER_DROPED_FRAME_TEST
+        return fnFastRxTestAck(Socket);
+    #else
         if (fnTestTCP(Socket, ucTestMode) > 0) {
             return APP_SENT_DATA;
         }
         break;
+    #endif
     }
     return APP_ACCEPT;                                                   // default is to accept a connection
 }
@@ -5515,6 +7357,71 @@ extern CHAR *fnSkipWhiteSpace(CHAR *ptr_input)
     }
     return (ptr_input);
 }
+
+#if (defined USE_TELNET && defined USE_TELNET_LOGIN)
+static unsigned char fnCheckUserPass(CHAR *ptrData, unsigned char ucInputLength)
+{
+    switch (ucPasswordState) {
+    case TELNET_LOGIN:
+    case START_PASSWORD:
+        // The user has just entered the present user name and password in the form "user:pass"
+        *(ptrData + ucInputLength) = '&';                                // terminate input in the form we require
+        if (fnVerifyUser(ptrData, (DO_CHECK_USER_NAME | DO_CHECK_PASSWORD | HTML_PASS_CHECK)) != 0) {
+            fnDebugMsg("\n\rError - false user details!\n\r");
+            if (usTelnet_state == ES_NETWORK_LOGIN){
+                fnTelnet(Telnet_socket, LEAVE_ECHO_MODE);
+                usTelnet_state = ES_TERMINATE_CONNECTION;                // quit an active Telnet session
+            }
+            else {
+                fnGotoNextState(ES_NO_CONNECTION);
+            }
+            return PASSWORD_IDLE;
+        }
+        if (ucPasswordState == TELNET_LOGIN) {                           // the user has successfully logged in
+            fnLoginSuccess();
+            return PASSWORD_IDLE;
+        }
+        fnDebugMsg("\n\rPlease enter new user name (4..8 characters): ");
+        return ENTER_USER_NAME;
+
+    case ENTER_USER_NAME:
+        if ((ucInputLength < 4) || (ucInputLength > 8)) {
+            fnDebugMsg("\n\rError - invalid length\n\r");
+            return PASSWORD_IDLE;
+        }
+        uMemcpy(temp_pars->temp_parameters.cUserName, ptrData, ucInputLength);
+        if (ucInputLength < 8) {
+            temp_pars->temp_parameters.cUserName[ucInputLength] = '&';
+        }
+        fnDebugMsg("\n\rPlease enter new password (4..8 characters): ");
+        return ENTER_NEW_PASSWORD;
+
+    case ENTER_NEW_PASSWORD:
+        if ((ucInputLength < 4) || (ucInputLength > 8)) {
+            fnDebugMsg("\n\rError - invalid length\n\r");
+            return PASSWORD_IDLE;
+        }
+        uMemcpy(temp_pars->temp_parameters.cUserPass, ptrData, ucInputLength);
+        if (ucInputLength < 8) {
+            temp_pars->temp_parameters.cUserPass[ucInputLength] = '&';
+        }
+        fnDebugMsg("\n\rPlease confirm the new password: ");
+        return CONFIRM_NEW_PASS;
+
+    case CONFIRM_NEW_PASS:
+        *(ptrData + ucInputLength) = '&';                                // Terminate input in the form we require
+        if (!fnCheckPass(temp_pars->temp_parameters.cUserPass, ptrData)) {
+            fnDebugMsg("\n\rNew user data set\n\r");
+            fnSaveNewPars(SAVE_NEW_PARAMETERS);
+        }
+        else {
+            fnDebugMsg("\n\rError - false password!\n\r");
+        }
+        break;
+    }
+    return PASSWORD_IDLE;
+}
+#endif
 
 
 extern int fnCommandInput(unsigned char *ptrData, unsigned short usLen, int iSource)
@@ -5537,8 +7444,8 @@ extern int fnCommandInput(unsigned char *ptrData, unsigned short usLen, int iSou
         return 0;
     }
 #endif
-#if defined USE_USB_HID_KEYBOARD
-    if (usUSB_state & ES_USB_KEYBOARD_MODE) {                            // {77} if the input is connected to the USB keyboard connection
+#if defined USE_USB_HID_KEYBOARD && defined SUPPORT_FIFO_QUEUES
+    if ((usUSB_state & ES_USB_KEYBOARD_MODE) != 0) {                     // {77} if the input is connected to the USB keyboard connection
         if (keyboardQueue != NO_ID_ALLOCATED) {                          // if there is a FIFO queue to put the input ino
             fnWrite(keyboardQueue, ptrData, usLen);                      // put the received input to the USB keyboard FIFO
     #if defined IN_COMPLETE_CALLBACK
@@ -5549,11 +7456,11 @@ extern int fnCommandInput(unsigned char *ptrData, unsigned short usLen, int iSou
     }
 #endif
 #if defined USE_FTP_CLIENT                                               // {37}
-    if (iFTP_data_state & (FTP_DATA_STATE_GETTING | FTP_DATA_STATE_PUTTING)) { // if getting or putting a file
+    if ((iFTP_data_state & (FTP_DATA_STATE_GETTING | FTP_DATA_STATE_PUTTING)) != 0) { // if getting or putting a file
     #if defined FTP_CLIENT_BUFFERED_SOCKET_MODE
         unsigned short usLengthToSend = usLen;                           // backup the buffer length
     #endif
-        while (usLen--) {
+        while (usLen-- != 0) {
             switch (*ptrData) {
             case ASCII_ETX:                                              // (ctrl + C) abort a get or terminate a put
                 fnTCP_close(uFtpClientDataSocket);
@@ -5572,8 +7479,8 @@ extern int fnCommandInput(unsigned char *ptrData, unsigned short usLen, int iSou
                 //
             default:
     #if defined FTP_SIMPLE_DATA_SOCKET
-                if (iFTP_data_state & FTP_DATA_STATE_PUTTING) {          // input is sent to FTP server when putting
-                    if (iFTP_data_state & FTP_DATA_STATE_SENDING) {
+                if ((iFTP_data_state & FTP_DATA_STATE_PUTTING) != 0) {   // input is sent to FTP server when putting
+                    if ((iFTP_data_state & FTP_DATA_STATE_SENDING) != 0) {
                         if (ucFTP_buffer_content[1] < FTP_TX_BUFFER_MAX) {
                             FTP_tx[1].ucTCP_Message[ucFTP_buffer_content[1]++] = *ptrData; // collect data in next buffer
                         }
@@ -5601,9 +7508,9 @@ extern int fnCommandInput(unsigned char *ptrData, unsigned short usLen, int iSou
     }
 #endif
 
-    while (usLen--) {
-        if (*ptrData == DELETE_KEY) {
-            if (ucDebugCnt) {
+    while (usLen-- != 0) {
+        if ((DELETE_KEY == *ptrData) || (CONTROL_QUESTION_MARK == *ptrData)) { // {90} putty defaults to using control-? instead of control-H for back space
+            if (ucDebugCnt != 0) {
                 ucDebugCnt--;                                            // we delete it from our local buffer but not from display
                 fnDebugMsg((CHAR *)&cDeleteInput[1]);
             }
@@ -5654,7 +7561,7 @@ extern int fnCommandInput(unsigned char *ptrData, unsigned short usLen, int iSou
                     }
                     fnDebugMsg("\r");
                 }
-                while (iOriginalLength--) {
+                while (iOriginalLength-- != 0) {
                     fnDebugMsg(" ");
                 }
                 fnDebugMsg("\r");
@@ -5672,6 +7579,13 @@ extern int fnCommandInput(unsigned char *ptrData, unsigned short usLen, int iSou
         cDebugIn[iDebugBufferIndex][ucDebugCnt] = *ptrData;
         if (*ptrData == '\r') {
             cDebugIn[iDebugBufferIndex][ucDebugCnt] = '\n';
+#if (defined USE_TELNET && defined USE_TELNET_LOGIN)
+            if ((ucPasswordState != PASSWORD_IDLE) && ((usTelnet_state != ES_NETWORK_LOGIN) || (iSource == SOURCE_NETWORK))) {
+                ucPasswordState = fnCheckUserPass(cDebugIn[iDebugBufferIndex], ucDebugCnt);
+                ucDebugCnt = 0;
+                return 1;                                                // we will always send something so report that a transmission has been started
+            }
+#endif
             fnSaveDebugHandle(iSource);                                  // save present debug handle and set appropriate
             fnDoDebug(cDebugIn[iDebugBufferIndex], (unsigned char)(ucDebugCnt + 1), iSource); // treat debug messages
             fnRestoreDebugHandle();                                      // return the present debug output
@@ -5719,7 +7633,13 @@ extern int fnInitiateLogin(unsigned short usNextState)
 #endif
     default:                                                             // network login
         usTelnet_state = ES_NETWORK_LOGIN;
+#if (defined USE_TELNET && defined USE_TELNET_LOGIN)
+        ucPasswordState = TELNET_LOGIN;                                  // we request login before continuing
+        fnDebugMsg("\n\rWelcome to the Telnet server.\n\rPlease enter user name and password (user:pass): ");
+        return DO_PASSWORD_ENTRY;
+#else
         break;
+#endif
     }
     fnLoginSuccess();                                                    // no login - go directly to connected state
     return DIRECT_LOGIN;
@@ -5747,7 +7667,7 @@ extern void fnEchoInput(unsigned char *ucInputMessage, QUEUE_TRANSFER Length)
         }
     }
     else {
-#if defined USE_USB_HID_KEYBOARD
+#if defined USE_USB_HID_KEYBOARD && defined SUPPORT_FIFO_QUEUES
         if (usUSB_state & ES_USB_KEYBOARD_MODE) {                        // {77} if the input is connected to the USB keyboard connection we don't echo
             return;
         }
@@ -5760,8 +7680,10 @@ extern void fnEchoInput(unsigned char *ucInputMessage, QUEUE_TRANSFER Length)
 void fnDebug(TTASKTABLE *ptrTaskTable)                                   // dummy task
 {
 }
+    #if !defined REMOVE_PORT_INITIALISATIONS
 static void fnSetPortBit(unsigned short usBit, int iSetClr);
 static int  fnConfigOutputPort(CHAR cPortBit);
+    #endif
 #endif                                                                   // endif not KEEP_DEBUG
 
 
@@ -5787,7 +7709,7 @@ extern void fnConfigureTelnetServer(void)
     #endif
     #if defined TEST_TCP_SERVER                                          // {30}
     if (test_server_socket < 0) {
-        test_server_socket = fnStartTelnet(0x1234, (2 * 60), 0, 0, fnServerTestListener);
+        test_server_socket = fnStartTelnet(3000, (2 * 60), 0, 0, fnServerTestListener);
     }
     #endif
 }
@@ -5819,27 +7741,28 @@ extern void fnResetChanges(void)
     }
     fnGetOurParameters(1);                                               // get original parameters from FLASH, but preserve DHCP defined values
     #if defined SERIAL_INTERFACE && defined DEMO_UART                    // {10}
-    if (iActions & CHANGE_SERIAL_SETTINGS) {
+    if ((iActions & CHANGE_SERIAL_SETTINGS) != 0) {
         fnSetNewSerialMode(MODIFY_CONFIG);                               // return settings to interface
     }
     #endif
-    if (CHANGE_WEB_SERVER & iActions) {
+    if ((CHANGE_WEB_SERVER & iActions) != 0) {
     #if defined USE_HTTP
         fnConfigureAndStartWebServer();
     #endif
     }
-    if (CHANGE_FTP_SERVER & iActions) {
+    if ((CHANGE_FTP_SERVER & iActions) != 0) {
         fnConfigureFtpServer(FTP_TIMEOUT);                               // {3}
     }
     #if defined USE_TELNET
-    if (CHANGE_TELNET_SERVER & iActions) {
+    if ((CHANGE_TELNET_SERVER & iActions) != 0) {
         fnConfigureTelnetServer();
     }
     #endif
 }
 #endif
 
-#if defined USE_PARAMETER_BLOCK
+#if !defined REMOVE_PORT_INITIALISATIONS
+    #if defined USE_PARAMETER_BLOCK
 // Save port setup to flash
 //
 extern void fnSavePorts(void)
@@ -5849,6 +7772,9 @@ extern void fnSavePorts(void)
     unsigned short usTempUserDefinedOutputs = temp_pars->temp_parameters.usUserDefinedOutputs;
     CHAR cPort = '1';
     unsigned char ucBit = 1;
+        #if defined SUPPORT_LCD && defined LCD_CONTRAST_CONTROL          // {88}
+    unsigned char ucContrast = temp_pars->temp_parameters.ucGLCDContrastPWM;
+        #endif
 
     while (cPort < '9') {
         if (fnPortState(cPort++)) {
@@ -5862,10 +7788,12 @@ extern void fnSavePorts(void)
     temp_pars->temp_parameters.ucUserOutputs = ucTempUserOutputs;
     temp_pars->temp_parameters.ucUserOutputValues = ucTempUserOutputValues;
     temp_pars->temp_parameters.usUserDefinedOutputs = usTempUserDefinedOutputs;
+        #if defined SUPPORT_LCD && defined LCD_CONTRAST_CONTROL          // {88}
+    temp_pars->temp_parameters.ucGLCDContrastPWM = ucContrast;
+        #endif
     fnSaveNewPars(SAVE_NEW_PARAMETERS);                                  // save these settings as default
 }
-#endif
-
+    #endif
 
 // Set all port bits to new state
 // The ARM processors tend to use set and clear registers to perform the job
@@ -5880,8 +7808,6 @@ static void fnSetUserPortOut(unsigned short usPortOutputs)
     }
     temp_pars->temp_parameters.usUserDefinedOutputs = usPortOutputs;     // backup the new setting
 }
-
-
 
 // Initialise ports to input/output
 //
@@ -5910,7 +7836,7 @@ extern void fnInitialisePorts(void)
     }
     fnSetUserPortOut(temp_pars->temp_parameters.usUserDefinedOutputs);   // set all user outputs to default states
 }
-
+#endif
 
 #if defined USE_USB_CDC && defined ACTIVE_FILE_SYSTEM                    // {8}
     typedef struct stUPLOAD_HEADER                                       // the start of a uTasker boot binary file
@@ -5998,12 +7924,7 @@ extern void fnDownload(unsigned char *ptrData, QUEUE_TRANSFER Length)
                     iDownloadState = DOWNLOAD_ERROR_STATE;
                     return;
                 }
-#if defined KL43Z_256_32_CL
-                if (file_header->ulCodeLength >= (SIZE_OF_FLASH))
-#else
-                if (file_header->ulCodeLength >= (SIZE_OF_FLASH/2))
-#endif
-                {                                                        // simple check that the length is valid
+                if (file_header->ulCodeLength >= (SIZE_OF_FLASH/2)) {    // simple check that the length is valid
                     fnDebugMsg("\r\nBAD LENGTH - quitting\r\n");
                     iDownloadState = DOWNLOAD_ERROR_STATE;
                     return;
@@ -6061,7 +7982,7 @@ extern void fnDownload(unsigned char *ptrData, QUEUE_TRANSFER Length)
         uFileClose(ptrFile);                                             // this will cause the file length to be written in the file
         #endif
         fnDebugMsg("\r\nTerminated, resetting...");
-        uTaskerMonoTimer(TASK_APPLICATION, (DELAY_LIMIT)(2*SEC), E_TIMER_SW_DELAYED_RESET);
+        uTaskerMonoTimer(TASK_APPLICATION, (DELAY_LIMIT)(2 * SEC), E_TIMER_SW_DELAYED_RESET);
     }
 }
 
@@ -6226,12 +8147,28 @@ extern int fnCommandInput(unsigned char *ptrData, unsigned short usLen, int iSou
     #endif
 #endif
 
+extern void fnDisplayMemoryUsage(void)
+{
+    STACK_REQUIREMENTS stackUsed;                                        // {79}
+    fnDebugMsg("\n\rSystem memory use:\n\r");
+    fnDebugMsg("==================\n\r");
+    fnDebugMsg("Free heap = ");
+    fnDebugHex(fnHeapFree(), (sizeof(HEAP_REQUIREMENTS) | WITH_LEADIN));
+    fnDebugMsg(" from ");
+    fnDebugHex(fnHeapAvailable(), (sizeof(HEAP_REQUIREMENTS) | WITH_LEADIN));
+    fnDebugMsg("\n\rUnused stack = ");
+    fnDebugHex(fnStackFree(&stackUsed), (sizeof(unsigned long) | WITH_LEADIN)); // {79}
+    fnDebugMsg(" (");
+    fnDebugHex(stackUsed, (sizeof(unsigned long) | WITH_LEADIN));        // {79}
+    fnDebugMsg(")\n\r");
+}
+
 #if defined USE_PARAMETER_BLOCK
 // When this routine is called, the parameter block is set to a new valid block and the old block is deleted
 //
 extern int fnSaveNewPars(int iTemp)
 {
-    #if defined ETH_INTERFACE || defined USB_CDC_RNDIS
+    #if defined ETH_INTERFACE || defined USB_CDC_RNDIS || defined USE_PPP
     // Network variables
     //
     if (iTemp == SAVE_NEW_PARAMETERS_CHECK_CRITICAL) {                   // we check to see whether network parameters have been changed
@@ -6244,7 +8181,7 @@ extern int fnSaveNewPars(int iTemp)
     fnDelPar(INVALIDATE_PARAMETER_BLOCK);                                // delete parameter block before continuing
     iTemp = SAVE_NEW_PARAMETERS;
     #endif
-    #if defined ETH_INTERFACE || defined USB_CDC_RNDIS
+    #if defined ETH_INTERFACE || defined USB_CDC_RNDIS || defined USE_PPP
     fnSetPar((unsigned short)(PAR_NETWORK | TEMPORARY_PARAM_SET), (unsigned char *)&temp_pars->temp_network[DEFAULT_NETWORK], sizeof(temp_pars->temp_network)); // network parameters
     #endif
 
@@ -6319,9 +8256,9 @@ extern void fnSetNewValue(int iType, CHAR *ptr_input)                    // {6}
 extern void fnConfigureFtpServer(unsigned short usTimeout)               // {3}{6}
 {
 #if defined USE_FTP
-    if (temp_pars->temp_parameters.usServers[DEFAULT_NETWORK] & ACTIVE_FTP_SERVER) { // should the FTP server be started?
+    if ((temp_pars->temp_parameters.usServers[DEFAULT_NETWORK] & ACTIVE_FTP_SERVER) != 0) { // should the FTP server be started?
         unsigned char ucFTP_mode = 0;
-        if (temp_pars->temp_parameters.usServers[DEFAULT_NETWORK] & ACTIVE_FTP_LOGIN) {
+        if ((temp_pars->temp_parameters.usServers[DEFAULT_NETWORK] & ACTIVE_FTP_LOGIN) != 0) {
             ucFTP_mode = FTP_AUTHENTICATE;
         }
         fnStartFtp(usTimeout, ucFTP_mode);                               // start the FTP server

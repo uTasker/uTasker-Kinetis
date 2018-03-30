@@ -11,7 +11,7 @@
     File:      webInterface.c
     Project:   uTasker project
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2018
     *********************************************************************
     26.02.2007 Added SMTP parameter support
     17.03.2007 Corrected SMTP login flag so that it is not cleared when Ethernet settings are changed {1}
@@ -61,6 +61,7 @@
     07.10.2012 Allow SPECIAL_LCD_DEMO to be used together with TFT_GLCD_MODE {42}
     12.08.2013 Add ST7565S_GLCD_MODE                                     {43}
     06.11.2015 Adjust fnStackFree() parameters                           {44}
+    11.02 2016 Parameters for fnStartHTTP() modified                     {45}
 
 */
 
@@ -75,8 +76,9 @@
 /*                             constants                               */
 /* =================================================================== */
 
-const CHAR  cSoftwareVersion[] = SOFTWARE_VERSION;                       // software version for general purpose display use
-
+#if defined USE_MAINTENANCE || defined USE_HTTP
+    const CHAR  cSoftwareVersion[] = SOFTWARE_VERSION;                   // software version for general purpose display use
+#endif
 
 #if defined USE_HTTP
 
@@ -141,7 +143,9 @@ static unsigned char  fnIsSelected(unsigned char *ptrBuffer);
     static CHAR      *fnInsertString(unsigned char *ptrBuffer, LENGTH_CHUNK_COUNT TxLength, unsigned short *usLengthToSend);
 #endif
 static int            fnHandleWeb(unsigned char ucType, CHAR *ptrData, HTTP *http_session);
-
+#if defined SUPPORT_WEBSOCKET
+    static int        fnWebSocketHandler(unsigned char *ptrPayload, unsigned long ulPayloadLength, unsigned char ucOpCode, HTTP *http_session);
+#endif
 
 static unsigned short fnGetSerialMode(unsigned char ucMode, unsigned char *ucForceCheck);
 static unsigned short fnGetNetworkMode(unsigned char ucMode, unsigned char *ucForceCheck);
@@ -171,22 +175,27 @@ static const CHAR cOffColor[] = "gray";
         #endif
     #endif
 
-
 extern void fnConfigureAndStartWebServer(void)
 {
-    if (ACTIVE_WEB_SERVER & temp_pars->temp_parameters.usServers[DEFAULT_NETWORK]) {
-        unsigned char ucHttpProperties = (WEB_SUPPORT_PARAM_GEN | WEB_SUPPORT_HANDLER);
-        if (AUTHENTICATE_WEB_SERVER & temp_pars->temp_parameters.usServers[DEFAULT_NETWORK]) {
-            ucHttpProperties |= WEB_AUTHENTICATE;;                       // activate authentication
+    if ((ACTIVE_WEB_SERVER & temp_pars->temp_parameters.usServers[DEFAULT_NETWORK]) != 0) {
+        HTTP_FUNCTION_SET FunctionSet;                                   // {45}
+        FunctionSet.ucParameters = (WEB_SUPPORT_PARAM_GEN | WEB_SUPPORT_HANDLER);
+        if ((AUTHENTICATE_WEB_SERVER & temp_pars->temp_parameters.usServers[DEFAULT_NETWORK]) != 0) {
+            FunctionSet.ucParameters |= WEB_AUTHENTICATE;                // activate authentication
         }
-        if (uMemcmp(temp_pars->temp_parameters.ucTrustedIP, cucNullMACIP, IPV4_LENGTH)) {
-            ucHttpProperties |= WEB_TRUSTED_IP;                          // activate trusted IP address checking
+        if (uMemcmp(temp_pars->temp_parameters.ucTrustedIP, cucNullMACIP, IPV4_LENGTH) != 0) {
+            FunctionSet.ucParameters |= WEB_TRUSTED_IP;                  // activate trusted IP address checking
         }
-    #if defined _VARIABLE_HTTP_PORT
-        fnStartHTTP(fnHandleWeb, fnIsSelected, fnInsertString, ucHttpProperties, HTTP_SERVERPORT); // {27} pass the port number to be used, which can be variable of required
-    #else
-        fnStartHTTP(fnHandleWeb, fnIsSelected, fnInsertString, ucHttpProperties);
+        FunctionSet.fnWebHandler = fnHandleWeb;
+        FunctionSet.fnInsertRoutine = fnInsertString;
+        FunctionSet.fnGenerator = fnIsSelected;
+    #if defined SUPPORT_WEBSOCKET
+        FunctionSet.fnWebSocketHandler = fnWebSocketHandler;
     #endif
+    #if defined _VARIABLE_HTTP_PORT
+        FunctionSet.usPort = HTTP_SERVERPORT;                            // {27} pass the port number to be used, which can be variable of required
+    #endif
+        fnStartHTTP(&FunctionSet);                                       // {45}
     }
     else {
         fnStopHTTP();
@@ -261,29 +270,29 @@ static unsigned char fnIsSelected(unsigned char *ptrBuffer)
         return ucCheck;
 
     case 'S':                                                            // set various Server enabled states
-        if (temp_pars->temp_parameters.usServers[DEFAULT_NETWORK] & fnGetServerType(*ptrBuffer)) {
+        if ((temp_pars->temp_parameters.usServers[DEFAULT_NETWORK] & fnGetServerType(*ptrBuffer)) != 0) {
             return IS_CHECKED;                                           // check server state
         }
         break;
-#if defined USE_MAINTENANCE                                              // {12}
+#if defined USE_MAINTENANCE && !defined REMOVE_PORT_INITIALISATIONS      // {12}
     case 'I':                                                            // port input configuration
-        if (fnPortInputConfig(*ptrBuffer)) {
+        if (fnPortInputConfig(*ptrBuffer) != 0) {
             return IS_CHECKED;
         }
         break;
     case 'O':                                                            // port output configuration
-        if (!(fnPortInputConfig(*ptrBuffer))) {
+        if ((fnPortInputConfig(*ptrBuffer)) == 0) {
             return IS_CHECKED;
         }
         break;
     case 'P':                                                            // port value
-        if (fnPortState(*ptrBuffer)) {
+        if (fnPortState(*ptrBuffer) != 0) {
             return IS_CHECKED;
         }
         break;
 #endif
     case 'M':                                                            // modified
-        if (fnModified(*ptrBuffer)) {
+        if (fnModified(*ptrBuffer) != 0) {
             return IS_CHECKED;
         }
         break;
@@ -372,7 +381,7 @@ static int fnHandleWeb(unsigned char ucType, CHAR *ptrData, HTTP *http_session)
     #if defined LCD_WEB_INTERFACE                                        // {19}{20}{25}
     case POSTING_DATA_TO_APP:                                            // a new bit map for the GLCD is being received
         fnDisplayBitmap((unsigned char *)ptrData, (unsigned short)(http_session->FileLength));
-        #if defined SPECIAL_LCD_DEMO && (defined CGLCD_GLCD_MODE || defined TFT_GLCD_MODE) // {30}{} when a bit map is posted to the display, stop the GLCD compatibility mode demo so that the image remains
+        #if defined SPECIAL_LCD_DEMO && (defined CGLCD_GLCD_MODE || defined TFT_GLCD_MODE || defined ST7789S_GLCD_MODE) // {30}{} when a bit map is posted to the display, stop the GLCD compatibility mode demo so that the image remains
         uTaskerStopTimer(TASK_APPLICATION);
         #endif
         break;
@@ -498,14 +507,16 @@ static int fnHandleWeb(unsigned char ucType, CHAR *ptrData, HTTP *http_session)
             }
             break;
 #if defined USE_MAINTENANCE && defined USE_PARAMETER_BLOCK               // {12}
+    #if !defined REMOVE_PORT_INITIALISATIONS
         case 'q':                                                        // save the port setup as default
             fnSavePorts();
             break;
+    #endif
         case 'r':                                                        // reject changes
             fnResetChanges();
             break;
         case 's':                                                        // save changes temporarily and reset awaiting validation
-            if (fnSaveNewPars(SAVE_NEW_PARAMETERS_CHECK_CRITICAL)) {     // save new parameters
+            if (fnSaveNewPars(SAVE_NEW_PARAMETERS_CHECK_CRITICAL) != 0) {// save new parameters
                 fnSaveNewPars(SAVE_NEW_PARAMETERS_VALIDATE);             // temporarily save new parameters
                 fnDelayResetBoard();                                     // reset to test the new parameters
 //              return WARN_BEFORE_SAVE;                                 // the user wants to change a critical parameter so we first show a side warning of this
@@ -583,7 +594,7 @@ static int fnHandleWeb(unsigned char ucType, CHAR *ptrData, HTTP *http_session)
         break;
 
     /********************************************************************/
-#if defined ETH_INTERFACE || defined USB_CDC_RNDIS
+#if defined ETH_INTERFACE || defined USB_CDC_RNDIS || defined USE_PPP
     case 'c':                                                            // set MAC (only possible when zero)
         if (uMemcmp(&temp_pars->temp_network[DEFAULT_NETWORK].ucOurMAC[0], cucNullMACIP, MAC_LENGTH) == 0) {
             fnSetMAC((ptrData + 1), &temp_pars->temp_network[DEFAULT_NETWORK].ucOurMAC[0]);
@@ -613,7 +624,7 @@ static int fnHandleWeb(unsigned char ucType, CHAR *ptrData, HTTP *http_session)
                 fnSetNewValue(TELNET_PORT, (ptrData+2));
             }
             break;
-#if defined USE_MAINTENANCE                                              // {12}
+#if defined USE_MAINTENANCE && !defined REMOVE_PORT_INITIALISATIONS      // {12}
         case 'P':                                                        // port settings (configure as input, output or ADC)
             fnConfigPort(*ptrData, *(ptrData+2));
             break;
@@ -748,7 +759,7 @@ static CHAR *fnInsertString(unsigned char *ptrBuffer, LENGTH_CHUNK_COUNT TxLengt
 
         case 'K':                                                        // we insert the color a key is to be displayed, depending on output setting
             uStrcpy(cValue, cBackgroundColor);
-#if defined USE_MAINTENANCE                                              // {12}
+#if defined USE_MAINTENANCE && !defined REMOVE_PORT_INITIALISATIONS      // {12}
             if (fnUserPortState(*ptrBuffer)) {
                 uStrcpy(&cValue[(sizeof(cBackgroundColor) - 1)], cOnColor);
             }
@@ -955,7 +966,7 @@ static CHAR *fnInsertString(unsigned char *ptrBuffer, LENGTH_CHUNK_COUNT TxLengt
 #if defined USE_PARAMETER_BLOCK
                 if (parameters->usServers[DEFAULT_NETWORK] & ACTIVE_DHCP)
 #else
-                if (temp_pars->temp_parameters.usServers & ACTIVE_DHCP)
+                if (temp_pars->temp_parameters.usServers[DEFAULT_NETWORK] & ACTIVE_DHCP)
 #endif
                 {
                     cPtr = (CHAR *)&network[DEFAULT_NETWORK].ucOurIP[0]; // display working address
@@ -970,7 +981,7 @@ static CHAR *fnInsertString(unsigned char *ptrBuffer, LENGTH_CHUNK_COUNT TxLengt
 #if defined USE_PARAMETER_BLOCK
                 if (parameters->usServers[DEFAULT_NETWORK] & ACTIVE_DHCP)
 #else
-                if (temp_pars->temp_parameters.usServers & ACTIVE_DHCP)
+                if (temp_pars->temp_parameters.usServers[DEFAULT_NETWORK] & ACTIVE_DHCP)
 #endif
                 {
                     cPtr = (CHAR *)&network[DEFAULT_NETWORK].ucNetMask[0]; // display working sub-net mask
@@ -985,7 +996,7 @@ static CHAR *fnInsertString(unsigned char *ptrBuffer, LENGTH_CHUNK_COUNT TxLengt
 #if defined USE_PARAMETER_BLOCK
                 if (parameters->usServers[DEFAULT_NETWORK] & ACTIVE_DHCP)
 #else
-                if (temp_pars->temp_parameters.usServers & ACTIVE_DHCP)
+                if (temp_pars->temp_parameters.usServers[DEFAULT_NETWORK] & ACTIVE_DHCP)
 #endif
                 {
                     cPtr = (CHAR *)&network[DEFAULT_NETWORK].ucDefGW[0]; // display working gateway
@@ -1330,7 +1341,7 @@ static CHAR *fnInsertString(unsigned char *ptrBuffer, LENGTH_CHUNK_COUNT TxLengt
                     extern int iGetPixelState(unsigned long ulPixelNumber);
                     ulPixel = iGetPixelState(((DISPLAY_HEIGHT - Chunk) * DISPLAY_WIDTH) + (x/3)); // generate the BMP content by reading the backup buffer - this method is also used when it is not possible to read from the display
                     if (ulPixel != 0) {
-        #if defined MB785_GLCD_MODE || defined _HX8347 || defined TFT2N0369_GLCD_MODE
+        #if defined MB785_GLCD_MODE || defined _HX8347 || defined TFT2N0369_GLCD_MODE || defined ST7789S_GLCD_MODE
                         cValue[x + 2] = (unsigned char)((LCD_PIXEL_COLOUR & RED)  >> 8);
                         cValue[x + 1] = (unsigned char)((LCD_PIXEL_COLOUR & GREEN) >> 3);
                         cValue[x]     = (unsigned char)((LCD_PIXEL_COLOUR & BLUE) << 3);
@@ -1345,7 +1356,7 @@ static CHAR *fnInsertString(unsigned char *ptrBuffer, LENGTH_CHUNK_COUNT TxLengt
         #endif
                     }
                     else {
-        #if defined MB785_GLCD_MODE || defined _HX8347 || defined TFT2N0369_GLCD_MODE
+        #if defined MB785_GLCD_MODE || defined _HX8347 || defined TFT2N0369_GLCD_MODE || defined ST7789S_GLCD_MODE
                         cValue[x + 2] = (unsigned char)((LCD_ON_COLOUR & RED)  >> 8);
                         cValue[x + 1] = (unsigned char)((LCD_ON_COLOUR & GREEN) >> 3);
                         cValue[x]     = (unsigned char)((LCD_ON_COLOUR & BLUE) << 3);
@@ -1609,6 +1620,24 @@ static int fnCheckMailAddress(void)
     }
     *cPtrOut = 0;
     return iaT_Notfound;
+}
+#endif
+
+
+#if defined SUPPORT_WEBSOCKET
+static int fnWebSocketHandler(unsigned char *ptrPayload, unsigned long ulPayloadLength, unsigned char ucOpCode, HTTP *http_session)
+{
+    if ((ucOpCode & WEBSOCKET_CONTROL_FRAME) != 0) {                     // control frame
+        switch (ucOpCode & WEB_SOCKET_OPCODE_MASK) {
+        case WEB_SOCKET_OPCODE_CONNECTION_CLOSE:                         // when a close handshake is receive (which can also have a message body) a close it returned in response and the server closes the connection (possibly after completing a fragmented message that is in progress)
+            break;
+        case WEB_SOCKET_OPCODE_PING:
+            break;
+        case WEB_SOCKET_OPCODE_PONG:
+            break;
+        }
+    }
+    return (fnWebSocketSend(ptrPayload, ulPayloadLength, ucOpCode, http_session)); // echo message back
 }
 #endif
 #endif

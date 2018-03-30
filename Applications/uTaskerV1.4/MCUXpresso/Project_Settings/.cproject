@@ -173,7 +173,7 @@
 						</tool>
 					</fileInfo>
 					<sourceEntries>
-						<entry excluding="Hardware/Kinetis/kinetis_boot.c|FreeRTOS/Source/portable/GCC/ARM_CM7|FreeRTOS/Source/portable/GCC/ARM_CM4_MPU|FreeRTOS/Source/portable/GCC/ARM_CM3_MPU|FreeRTOS/Source/portable/GCC/ARM_CM3|FreeRTOS/Source/portable/GCC/ARM_CM0|FreeRTOS/Source/portable/RVDS|FreeRTOS/Source/portable/MSVC-MingW|FreeRTOS/Source/portable/MemMang|FreeRTOS/Source/portable/Keil|FreeRTOS/Source/portable/IAR|FreeRTOS/Source/portable/Common|Hardware/Kinetis/kinetis_asm.s|Hardware/Kinetis/kinetisSim.c|Applications/uTaskerSerialBoot|Applications/uTaskerBoot|Tools|WinSim" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Hardware/IIC_devices|Hardware/Kinetis/kinetis_boot.c|FreeRTOS/Source/portable/GCC/ARM_CM7|FreeRTOS/Source/portable/GCC/ARM_CM4_MPU|FreeRTOS/Source/portable/GCC/ARM_CM3_MPU|FreeRTOS/Source/portable/GCC/ARM_CM3|FreeRTOS/Source/portable/GCC/ARM_CM0|FreeRTOS/Source/portable/RVDS|FreeRTOS/Source/portable/MSVC-MingW|FreeRTOS/Source/portable/MemMang|FreeRTOS/Source/portable/Keil|FreeRTOS/Source/portable/IAR|FreeRTOS/Source/portable/Common|Hardware/Kinetis/kinetis_asm.s|Hardware/Kinetis/kinetisSim.c|Applications/uTaskerSerialBoot|Applications/uTaskerBoot|Tools|WinSim" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -351,7 +351,7 @@
 						</tool>
 					</fileInfo>
 					<sourceEntries>
-						<entry excluding="Hardware/Kinetis/kinetis_boot.c|FreeRTOS/Source/portable/GCC/ARM_CM7|FreeRTOS/Source/portable/GCC/ARM_CM4_MPU|FreeRTOS/Source/portable/GCC/ARM_CM3_MPU|FreeRTOS/Source/portable/GCC/ARM_CM3|FreeRTOS/Source/portable/GCC/ARM_CM0|FreeRTOS/Source/portable/RVDS|FreeRTOS/Source/portable/MSVC-MingW|FreeRTOS/Source/portable/MemMang|FreeRTOS/Source/portable/Keil|FreeRTOS/Source/portable/IAR|FreeRTOS/Source/portable/Common|Hardware/Kinetis/kinetis_asm.s|Hardware/Kinetis/kinetisSim.c|Applications/uTaskerSerialBoot|Applications/uTaskerBoot|Tools|WinSim" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Hardware/IIC_devices|Hardware/Kinetis/kinetis_boot.c|FreeRTOS/Source/portable/GCC/ARM_CM7|FreeRTOS/Source/portable/GCC/ARM_CM4_MPU|FreeRTOS/Source/portable/GCC/ARM_CM3_MPU|FreeRTOS/Source/portable/GCC/ARM_CM3|FreeRTOS/Source/portable/GCC/ARM_CM0|FreeRTOS/Source/portable/RVDS|FreeRTOS/Source/portable/MSVC-MingW|FreeRTOS/Source/portable/MemMang|FreeRTOS/Source/portable/Keil|FreeRTOS/Source/portable/IAR|FreeRTOS/Source/portable/Common|Hardware/Kinetis/kinetis_asm.s|Hardware/Kinetis/kinetisSim.c|Applications/uTaskerSerialBoot|Applications/uTaskerBoot|Tools|WinSim" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -530,7 +530,7 @@
 						</tool>
 					</fileInfo>
 					<sourceEntries>
-						<entry excluding="Hardware/Kinetis/kinetis_boot.c|FreeRTOS/Source/portable/GCC/ARM_CM7|FreeRTOS/Source/portable/GCC/ARM_CM4_MPU|FreeRTOS/Source/portable/GCC/ARM_CM3_MPU|FreeRTOS/Source/portable/GCC/ARM_CM3|FreeRTOS/Source/portable/GCC/ARM_CM0|FreeRTOS/Source/portable/RVDS|FreeRTOS/Source/portable/MSVC-MingW|FreeRTOS/Source/portable/MemMang|FreeRTOS/Source/portable/Keil|FreeRTOS/Source/portable/IAR|FreeRTOS/Source/portable/Common|Hardware/Kinetis/kinetis_asm.s|Hardware/Kinetis/kinetisSim.c|Applications/uTaskerSerialBoot|Applications/uTaskerBoot|Tools|WinSim" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Hardware/IIC_devices|Hardware/Kinetis/kinetis_boot.c|FreeRTOS/Source/portable/GCC/ARM_CM7|FreeRTOS/Source/portable/GCC/ARM_CM4_MPU|FreeRTOS/Source/portable/GCC/ARM_CM3_MPU|FreeRTOS/Source/portable/GCC/ARM_CM3|FreeRTOS/Source/portable/GCC/ARM_CM0|FreeRTOS/Source/portable/RVDS|FreeRTOS/Source/portable/MSVC-MingW|FreeRTOS/Source/portable/MemMang|FreeRTOS/Source/portable/Keil|FreeRTOS/Source/portable/IAR|FreeRTOS/Source/portable/Common|Hardware/Kinetis/kinetis_asm.s|Hardware/Kinetis/kinetisSim.c|Applications/uTaskerSerialBoot|Applications/uTaskerBoot|Tools|WinSim" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -708,7 +708,7 @@
 						</tool>
 					</fileInfo>
 					<sourceEntries>
-						<entry excluding="FreeRTOS|Applications/uTaskerSerialBoot/Simulator|Applications/uTaskerV1.4|Hardware/Kinetis/kinetis_boot.c|FreeRTOS/Source/portable/GCC/ARM_CM7|FreeRTOS/Source/portable/GCC/ARM_CM4_MPU|FreeRTOS/Source/portable/GCC/ARM_CM3_MPU|FreeRTOS/Source/portable/GCC/ARM_CM3|FreeRTOS/Source/portable/GCC/ARM_CM0|FreeRTOS/Source/portable/RVDS|FreeRTOS/Source/portable/MSVC-MingW|FreeRTOS/Source/portable/MemMang|FreeRTOS/Source/portable/Keil|FreeRTOS/Source/portable/IAR|FreeRTOS/Source/portable/Common|Hardware/Kinetis/kinetis_asm.s|Hardware/Kinetis/kinetisSim.c|Applications/uTaskerBoot|Tools|WinSim" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Hardware/IIC_devices|FreeRTOS|Applications/uTaskerSerialBoot/Simulator|Applications/uTaskerV1.4|Hardware/Kinetis/kinetis_boot.c|FreeRTOS/Source/portable/GCC/ARM_CM7|FreeRTOS/Source/portable/GCC/ARM_CM4_MPU|FreeRTOS/Source/portable/GCC/ARM_CM3_MPU|FreeRTOS/Source/portable/GCC/ARM_CM3|FreeRTOS/Source/portable/GCC/ARM_CM0|FreeRTOS/Source/portable/RVDS|FreeRTOS/Source/portable/MSVC-MingW|FreeRTOS/Source/portable/MemMang|FreeRTOS/Source/portable/Keil|FreeRTOS/Source/portable/IAR|FreeRTOS/Source/portable/Common|Hardware/Kinetis/kinetis_asm.s|Hardware/Kinetis/kinetisSim.c|Applications/uTaskerBoot|Tools|WinSim" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -886,7 +886,7 @@
 						</tool>
 					</fileInfo>
 					<sourceEntries>
-						<entry excluding="uTasker|uTasker/Driver.c|Applications/uTaskerV1.4|uTasker/utFAT|uTasker/uGLCDLIB|uTasker/MODBUS|stack|FreeRTOS|Hardware/Kinetis/Crypto|Hardware/Kinetis/CMSIS_DSP|Hardware/Kinetis/kinetis.c|Applications/uTaskerBoot/Simulator|FreeRTOS/Source/portable/GCC/ARM_CM7|FreeRTOS/Source/portable/GCC/ARM_CM4_MPU|FreeRTOS/Source/portable/GCC/ARM_CM3_MPU|FreeRTOS/Source/portable/GCC/ARM_CM3|FreeRTOS/Source/portable/GCC/ARM_CM0|FreeRTOS/Source/portable/RVDS|FreeRTOS/Source/portable/MSVC-MingW|FreeRTOS/Source/portable/MemMang|FreeRTOS/Source/portable/Keil|FreeRTOS/Source/portable/IAR|FreeRTOS/Source/portable/Common|Hardware/Kinetis/kinetis_asm.s|Hardware/Kinetis/kinetisSim.c|Applications/uTaskerSerialBoot|Tools|WinSim" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Hardware/IIC_devices|uTasker|uTasker/Driver.c|Applications/uTaskerV1.4|uTasker/utFAT|uTasker/uGLCDLIB|uTasker/MODBUS|stack|FreeRTOS|Hardware/Kinetis/Crypto|Hardware/Kinetis/CMSIS_DSP|Hardware/Kinetis/kinetis.c|Applications/uTaskerBoot/Simulator|FreeRTOS/Source/portable/GCC/ARM_CM7|FreeRTOS/Source/portable/GCC/ARM_CM4_MPU|FreeRTOS/Source/portable/GCC/ARM_CM3_MPU|FreeRTOS/Source/portable/GCC/ARM_CM3|FreeRTOS/Source/portable/GCC/ARM_CM0|FreeRTOS/Source/portable/RVDS|FreeRTOS/Source/portable/MSVC-MingW|FreeRTOS/Source/portable/MemMang|FreeRTOS/Source/portable/Keil|FreeRTOS/Source/portable/IAR|FreeRTOS/Source/portable/Common|Hardware/Kinetis/kinetis_asm.s|Hardware/Kinetis/kinetisSim.c|Applications/uTaskerSerialBoot|Tools|WinSim" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

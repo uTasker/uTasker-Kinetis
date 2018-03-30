@@ -11,7 +11,7 @@
     File:      application.h
     Project:   uTasker project
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2018
     *********************************************************************
     18.02.2006 Add SMTP parameter settings                               {1}
     03.06.2007 Add FTP user definable FTP timeout and ACTIVE_FTP_LOGIN   {2}
@@ -47,6 +47,7 @@
     12.12.2015 Modify parameter of fnSetDefaultNetwork()                 {31}
     12.12.2015 Changed PAR_DEVICE and PAR_MODBUS to respect the number of networks present {32}
     12.12.2015 usServer added for each network                           {33}
+    26.06.2017 Add fnDisplayMemoryUsage()                                {34}
 
 */
 
@@ -92,7 +93,7 @@ extern void fnFlushSerialRx(void);
 extern void fnSaveDebugHandle(int iState);
 extern void fnRestoreDebugHandle(void);
 extern void fnSetUSB_debug(void);                                        // {3}
-extern void fnSetBacklight(void);        
+extern void fnSetBacklight(void);
 extern int  fnCommandInput(unsigned char *ptrData, unsigned short usLen, int iSource);
     #define SOURCE_SERIAL      0
     #define SOURCE_NETWORK     1
@@ -128,6 +129,7 @@ extern int  fnAreWeValidating(void);
 extern void fnWeHaveBeenValidated(void);
 extern int  fnSaveNewPars(int iTemp);
 extern CHAR *fnShowSN(CHAR *cValue);
+extern void fnDisplayMemoryUsage(void);                                       // {34}
 extern void fnDoLCD_com_text(unsigned char ucType, unsigned char *ptrInput, unsigned char ucLength);
 extern unsigned char fnAddResetCause(CHAR *ptrBuffer);                   // {5}
 extern int  fnDisplayBitmap(unsigned char *ptrData, unsigned short usLength); // {8}
@@ -147,6 +149,12 @@ extern void fnInitialiseSNMP(void);                                      // {21}
 extern void fnDisplayIP(unsigned char *ptrIP);                           // {22}
 extern void fnShowLowPowerMode(void);                                    // {24}
 extern void fnHandleFreeMaster(QUEUE_HANDLE comHandle, unsigned char *ptr_ucBuffer, QUEUE_TRANSFER Length);
+#if defined SUPPORT_SLCD && defined STOP_WATCH_APPLICATION
+    extern void fnStopWatchApplication(void);
+#endif
+#if defined USE_USB_AUDIO && defined AUDIO_FFT && defined BLAZE_K22
+    extern void fnDisplayFFT(float *fft_magnitude_buffer, signed short *sRawInput);
+#endif
 #if defined FREEMASTER_UART
     extern QUEUE_HANDLE fnOpenFreeMasterUART(void);
 #endif
@@ -155,11 +163,17 @@ extern void fnHandleFreeMaster(QUEUE_HANDLE comHandle, unsigned char *ptr_ucBuff
     extern void fnInit_nRF24L01(void);
     extern void fnHandle_nRF24L01_event(void);
     extern void fnTest_nRF24L01_Write(int iPingPong);
+    #if defined USE_MQTT_CLIENT && defined USE_MAINTENANCE
+        extern unsigned char *fnSetLast_nRF24201_data(unsigned char *ptrData);
+    #endif
+#endif
+#if defined USE_MAINTENANCE && defined USB_INTERFACE && defined USE_USB_CDC
+    extern int fnUSB_CDC_TX(int iStart);
 #endif
 
 typedef struct stPARS
 {
-    unsigned char  ucParVersion;                                         // Versions number to avoid loading incorrect structure after major changes
+    unsigned char  ucParVersion;                                         // version number to avoid loading incorrect structure after major changes
     unsigned short telnet_timeout;                                       // TELNET timeout in seconds (0xffff means no timeout) - max 18 hours
     UART_MODE_CONFIG SerialMode;                                         // serial settings
     unsigned short usTelnetPort;                                         // the port number of our TELNET service
@@ -221,12 +235,15 @@ typedef struct stPARS
 #if defined DUSK_AND_DAWN
     LOCATION ourLocation;                                                // our geographical coordinates
 #endif
+#if defined USE_USB_HID_KEYBOARD && defined USB_KEYBOARD_DELAY
+    unsigned char ucKeyboardInterCharacterDelay;                         // minimum inter-character delay between keyboard inputs (ms)
+#endif
 } PARS;
 
 
 typedef struct stTEMPPARS
 {
-#if defined ETH_INTERFACE || defined USB_CDC_RNDIS
+#if defined ETH_INTERFACE || defined USB_CDC_RNDIS || defined USE_PPP
     NETWORK_PARAMETERS temp_network[IP_NETWORK_COUNT];                   // {17}
 #endif
     PARS               temp_parameters;
@@ -303,7 +320,7 @@ extern int iUpTilt;
 extern int iDownTilt;
 extern int iAccelOutput;
 
-#if defined USE_USB_HID_KEYBOARD
+#if defined USE_USB_HID_KEYBOARD && defined SUPPORT_FIFO_QUEUES
     extern QUEUE_HANDLE keyboardQueue;
 #endif
 #if defined MODBUS_DELAYED_RESPONSE && defined USE_MODBUS
@@ -389,7 +406,6 @@ extern int iAccelOutput;
 //
 #define EVENT_USB_KEYBOARD_INPUT  1                                      // {30}
 
-
 // Key pad events
 // Keypad to application - sent as interrupt events!!
 //
@@ -431,7 +447,7 @@ extern int iAccelOutput;
 
 //..... up to KEY_EVENT_COL_16_ROW_16_RELEASED 128!!
 
-// Application events
+// Application events (timer and interrupt
 //
 #define E_TIMER_1                  1                                     // local events
 #define E_TIMER_SEND_ETHERNET      2
@@ -444,6 +460,7 @@ extern int iAccelOutput;
 #define E_SHIFT_DISPLAY            9
 #define E_NEXT_PIC                 10
 #define E_NEXT_PHOTO               11
+#define E_TIMER_START_USB_TX       12
 
 #define E_TIMER_TEST_10S           20
 #define E_TIMER_TEST_10MS          E_TIMER_TEST_10S                      // use same event number as 10s timer
@@ -516,5 +533,8 @@ extern int iAccelOutput;
 #define E_TEST_MODBUS_DELAY        133
 #define E_nRF24L01_PERIOD          134
 #define E_nRF24L01_EVENT           135
+
+#define E_USB_TX_CONTINUE          136
+
 
 

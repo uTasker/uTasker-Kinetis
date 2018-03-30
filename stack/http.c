@@ -11,7 +11,7 @@
     File:      http.c
     Project:   Single Chip Embedded Internet
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2018
     *********************************************************************
     16.05.2007 Rename variable from i to iSessionNumber and remove unnecessary zeroing {1}
     16.05.2007 Add iWebHandlerCommand variable for clarity.                            {2}
@@ -31,7 +31,7 @@
     07.01.2008 Simulator flag iFetchingInternalMemory reset on completion (no longer in driver) {15}
     08.01.2008 Rework dynamic insertion parameter solution                             {16}
     09.01.2008 Allow frame length increase when inserting strings                      {17}
-    11.01.2008 Improvement when generated frames can not grow more                     {18}
+    11.01.2008 Improvement when generated frames cannot grow more                      {18}
     12.01.2008 Additional management information to aid dynamic generation             {19}
     12.01.2008 Optionally pass HTTP session information to fnInsertValue()             {20}
     12.01.2008 Apply INSERT_SHORT_STRINGS support always (define removed)
@@ -93,6 +93,8 @@
     28.04.2014 Correct file length when SUPPORT_CHROME is used without HTTP_HEADER_CONTENT_INFO option {75}
     04.06.2014 Modify HTTP_FILE_REFERENCE to use a local string of definable length    {76}
     28.03.2015 Enable content caching                                                  {77}
+    07.02.2016 Add web socket support                                                  {78}
+    11.02 2016 Parameters for fnStartHTTP() modified                                   {79}
 
 */
 
@@ -110,7 +112,6 @@
 #if !defined HTTP_MALLOC                                                 // {67}
     #define HTTP_MALLOC(x) uMalloc((MAX_MALLOC)(x))
 #endif
-
 #if !defined WEB_ESCAPE_LEN                                              // {9}
     #define WEB_ESCAPE_LEN 4                                             // standard escape length, eg. "£xyz"
 #endif
@@ -191,6 +192,10 @@ static unsigned short fnWebParGen(unsigned char ptrBuffer[], HTTP *http_session,
     static CHAR *(*fnInsertValue)(unsigned char *, LENGTH_CHUNK_COUNT, unsigned short *); // {24}
     #define PASS_SESSION_INFO
     #define PASS_SESSION_INFO_TYPE
+#endif
+#if defined SUPPORT_WEBSOCKET                                            // {78}
+    static int fnWebSocketRx(HTTP *http_session, unsigned char *ptrData, unsigned short usDataLength);
+    static int (*fnWebSocketHandler)(unsigned char *, unsigned long, unsigned char, HTTP *);
 #endif
 static int fnDoWebPage(CHAR *cFileName, HTTP *http_session);
 static int (*fnHandleWeb)(unsigned char, CHAR *, HTTP *);
@@ -307,43 +312,15 @@ static unsigned char ucWebServerMode = 0;                                // the 
     static POST_HEADER_SEARCH_PROGRESS header_search_state = {0};
 #endif
 
-#if NO_OF_HTTPS_SESSIONS > 0
-
-#include <openssl/rsa.h>       /* SSLeay stuff */
-#include <openssl/crypto.h>
-#include <openssl/x509.h>
-#include <openssl/pem.h>
-#include <openssl/ssl.h>
-#include <openssl/err.h>
-
-    /*
-extern ASN1_TYPE *ASN1_TYPE_new(void)
-{
-    // allocate a type and return a pointer to it
-    return 0;
-}
-
-extern void ASN1_TYPE_free(ASN1_TYPE *a)
-{
-    // free the asn1 type
-}
-*/
-#endif
-
-
 
 // The user calls this to start the HTTP server
 // The user specifies call back functions for optionally handle HTTP parameters and generating its own web site information
 //
-#if defined _VARIABLE_HTTP_PORT
-extern void fnStartHTTP(int (*fnWebHandler)(unsigned char, CHAR *, HTTP *), FGEN_PROTO, CHAR *(*fnInsertRoutine)(unsigned char *, LENGTH_CHUNK_COUNT, unsigned short * PASS_SESSION_INFO_TYPE), unsigned char ucParameters, unsigned short usPort) // {24}{50}{53}
-#else
-extern void fnStartHTTP(int (*fnWebHandler)(unsigned char, CHAR *, HTTP *), FGEN_PROTO, CHAR *(*fnInsertRoutine)(unsigned char *, LENGTH_CHUNK_COUNT, unsigned short * PASS_SESSION_INFO_TYPE), unsigned char ucParameters) // {24}{50}
-#endif
+extern void fnStartHTTP(HTTP_FUNCTION_SET *ptrFunctionSet)               // {79}
 {
     int i;
 #if defined _VARIABLE_HTTP_PORT                                          // {53}
-    unsigned short usServerPort = usPort;
+    unsigned short usServerPort = ptrFunctionSet->usPort;
 #else
     unsigned short usServerPort = HTTP_SERVERPORT;
 #endif
@@ -355,7 +332,8 @@ extern void fnStartHTTP(int (*fnWebHandler)(unsigned char, CHAR *, HTTP *), FGEN
             ptrHTTP->OwnerTCPSocket = fnGetTCP_Socket(TOS_MAXIMISE_THROUGHPUT, TCP_DEFAULT_TIMEOUT, fnHTTPListener);
 #if NO_OF_HTTPS_SESSIONS > 0
             if (i >= NO_OF_HTTP_SESSIONS) {
-                usServerPort = HTTPS_SERVERPORT;
+                usServerPort = HTTPS_SERVERPORT;                         // listen on secure HTTP port number (443)
+                ptrHTTP->OwnerTCPSocket |= SECURE_SOCKET_MODE;
             }
 #endif
             fnTCP_Listen(ptrHTTP->OwnerTCPSocket, usServerPort, 0);
@@ -365,19 +343,9 @@ extern void fnStartHTTP(int (*fnWebHandler)(unsigned char, CHAR *, HTTP *), FGEN
 #if defined HTTP_UTFAT                                                   // {47}
         if (ptr_utDirectory == 0) {
             ptr_utDirectory = utAllocateDirectory(DISK_D, 0);            // allocate a directory for use by this module associated with D: - no path string
-            if ((ucParameters & WEB_UTFAT_OFF) == 0) {                   // {58}
+            if ((ptrFunctionSet->ucParameters & WEB_UTFAT_OFF) == 0) {   // {58}
                 utServer(0, UTFAT_HTTP_SERVER_ON);                       // enable http server operation with utFAT
             }
-        }
-#endif
-#if NO_OF_HTTPS_SESSIONS > 0
-        {
-            SSL_CTX* ctx;
-            SSL_METHOD *meth;
-            SSL_load_error_strings();
-            SSL_library_init();
-            meth = SSLv23_server_method();
-            ctx = SSL_CTX_new (meth);
         }
 #endif
     }
@@ -388,6 +356,7 @@ extern void fnStartHTTP(int (*fnWebHandler)(unsigned char, CHAR *, HTTP *), FGEN
 #if NO_OF_HTTPS_SESSIONS > 0
                 if (i >= NO_OF_HTTP_SESSIONS) {
                     usServerPort = HTTPS_SERVERPORT;
+                    ptrHTTP->OwnerTCPSocket |= SECURE_SOCKET_MODE;
                 }
 #endif
                 http_session->OwnerTCPSocket = fnGetTCP_Socket(TOS_MAXIMISE_THROUGHPUT, TCP_DEFAULT_TIMEOUT, fnHTTPListener);
@@ -396,11 +365,14 @@ extern void fnStartHTTP(int (*fnWebHandler)(unsigned char, CHAR *, HTTP *), FGEN
             http_session++;
         }
     }
-    ucWebServerMode   = ucParameters;                                    // parameters to be used when operating a web site
+    ucWebServerMode    = ptrFunctionSet->ucParameters;                   // parameters to be used when operating a web site
 
-    fnHandleWeb       = fnWebHandler;                                    // set optional call back function to handle web parameter changes
-    fnIsSelected      = fnGenerator;
-    fnInsertValue     = fnInsertRoutine;
+    fnHandleWeb        = ptrFunctionSet->fnWebHandler;                   // set optional call back function to handle web parameter changes
+    fnIsSelected       = ptrFunctionSet->fnGenerator;
+    fnInsertValue      = ptrFunctionSet->fnInsertRoutine;
+#if defined SUPPORT_WEBSOCKET
+    fnWebSocketHandler = ptrFunctionSet->fnWebSocketHandler;
+#endif
 }
 
 // Call to stop a Web server
@@ -409,7 +381,7 @@ extern void fnStopHTTP(void)
 {
     int i;
     HTTP *http_session = ptrHTTP;
-    if (!http_session) {
+    if (http_session == 0) {
         return;                                                          // http use not yet defined so don't try to stop
     }
 
@@ -590,19 +562,28 @@ static unsigned short fnGenerateHTTP_header(unsigned char *pucTCP_Message, HTTP 
 {
     unsigned short usHTTP_HeaderLength = SIMPLE_HTTP_HEADER_LENGTH;
     unsigned short usLen;
-    uMemcpy(pucTCP_Message, cucHTTP_header, SIMPLE_HTTP_HEADER_LENGTH);  // copy the HTTP header to start of each file to be transferred
+    #if defined SUPPORT_WEBSOCKET
+    if (http_session->ucState == HTTP_STATE_WEB_SOCKET_CONNECTION) {
+        usHTTP_HeaderLength = 0;
+    }
+    else {
+    #endif
+        uMemcpy(pucTCP_Message, cucHTTP_header, SIMPLE_HTTP_HEADER_LENGTH);  // copy the HTTP header to start of each file to be transferred
     #if defined _EXTENDED_HTTP_MIME_CONTENT_SUPPORT                      // {66}
-    usHTTP_HeaderLength += fnAddMimeContent((pucTCP_Message + (SIMPLE_HTTP_HEADER_LENGTH - 2)), http_session->ucMimeType);
+        usHTTP_HeaderLength += fnAddMimeContent((pucTCP_Message + (SIMPLE_HTTP_HEADER_LENGTH - 2)), http_session->ucMimeType);
     #else
-    if (PLAIN_TEXTCONTENT(http_session->ucMimeType)) {                   // check whether this type should be declared as plain text content
-        uMemcpy((pucTCP_Message + (SIMPLE_HTTP_HEADER_LENGTH - 2)), cucHTTP_plain_text, TEXT_PLAIN_HTTP_HEADER_LENGTH);
-        usHTTP_HeaderLength += (TEXT_PLAIN_HTTP_HEADER_LENGTH - 2);
+        if (PLAIN_TEXTCONTENT(http_session->ucMimeType)) {                   // check whether this type should be declared as plain text content
+            uMemcpy((pucTCP_Message + (SIMPLE_HTTP_HEADER_LENGTH - 2)), cucHTTP_plain_text, TEXT_PLAIN_HTTP_HEADER_LENGTH);
+            usHTTP_HeaderLength += (TEXT_PLAIN_HTTP_HEADER_LENGTH - 2);
+        }
+        #endif
+        if (iRepeat != 0) {                                                  // repetition so correct the file information with header compensation
+            http_session->ptrFileStart += usHTTP_HeaderLength;
+            http_session->FileLength -= usHTTP_HeaderLength;
+        }
+    #if defined SUPPORT_WEBSOCKET
     }
     #endif
-    if (iRepeat != 0) {                                                  // repetition so correct the file information with header compensation
-        http_session->ptrFileStart += usHTTP_HeaderLength;
-        http_session->FileLength -= usHTTP_HeaderLength;
-    }
     if (http_session->FileLength <= (unsigned short)(HTTP_BUFFER_LENGTH_ - usHTTP_HeaderLength)) {
         usLen = (unsigned short)(http_session->FileLength);              // the transmission is complete after one frame
         *ptrPush = TCP_FLAG_PUSH;
@@ -637,7 +618,6 @@ static int fnDoWebPage(CHAR *cFileName, HTTP *http_session)
     unsigned short usLen = HTTP_BUFFER_LENGTH_;
     unsigned char ucPush = TCP_FLAG_PUSH;
     MEMORY_RANGE_POINTER ucFile;
-
 
 #if defined SUPPORT_INTERNAL_HTML_FILES
     if (cFileName != 0) {                                                // predefined internal file is to be displayed
@@ -798,7 +778,7 @@ static int fnDoWebPage(CHAR *cFileName, HTTP *http_session)
             ucFile -= FILE_HEADER;
         }
     #elif defined ACTIVE_FILE_SYSTEM
-        fnGetParsFile((ucFile + sizeof(MAX_FILE_LENGTH)), &http_session->ucMimeType, 1);// get file type
+        fnGetParsFile((ucFile + sizeof(MAX_FILE_LENGTH)), &http_session->ucMimeType, 1); // get file type
     #endif
     }
 #endif
@@ -808,7 +788,7 @@ static int fnDoWebPage(CHAR *cFileName, HTTP *http_session)
     usLen = fnGenerateHTTP_header(HTTP_Tx->ucTCP_Message, http_session, &ucPush, 0);
     #else
     uMemcpy(HTTP_Tx->ucTCP_Message, cucHTTP_header, SIMPLE_HTTP_HEADER_LENGTH); // copy the HTTP header to start of each file to be transferred
-        #if defined HTTP_UTFAT                                           // {47}
+    #if defined HTTP_UTFAT                                               // {47}
     if ((ptr_utDirectory->usDirectoryFlags & UTDIR_VALID) && (http_session->utFile.ulFileSize != 0)) {
         utReadFile(&http_session->utFile, (pucTCP_Message + usHTTP_HeaderLength), usLen); // read from the file on the SD card
     }
@@ -816,11 +796,11 @@ static int fnDoWebPage(CHAR *cFileName, HTTP *http_session)
         fnGetParsFile(http_session->ptrFileStart, (HTTP_Tx->ucTCP_Message + SIMPLE_HTTP_HEADER_LENGTH), (usLen/* - SIMPLE_HTTP_HEADER_LENGTH*/)); // when not working with SD-card use standard uFileSystem call {70}
         usLen += SIMPLE_HTTP_HEADER_LENGTH;                              // {70}
     }
-        #else
+    #else
     fnGetParsFile(http_session->ptrFileStart, (HTTP_Tx->ucTCP_Message + SIMPLE_HTTP_HEADER_LENGTH), (usLen/* - SIMPLE_HTTP_HEADER_LENGTH*/)); // get a frame to send {70}
     usLen += SIMPLE_HTTP_HEADER_LENGTH;                                  // {70}
-        #endif
-    http_session->ptrFileStart -= SIMPLE_HTTP_HEADER_LENGTH;             // offset for the added header
+    #endif
+    http_session->ptrFileStart -= SIMPLE_HTTP_HEADER_LENGTH;              // offset for the added header
     #endif
 #else
     #if defined HTTP_UTFAT                                               // {47}
@@ -835,7 +815,7 @@ static int fnDoWebPage(CHAR *cFileName, HTTP *http_session)
     #endif
 #endif
     http_session->usUnacked = usLen;                                     // save the length of the frame
-    if (ucWebServerMode & WEB_SUPPORT_PARAM_GEN) {                       // if the web server is enabled with generator support
+    if ((ucWebServerMode & WEB_SUPPORT_PARAM_GEN) != 0) {                // if the web server is enabled with generator support
 #if defined HTTP_WINDOWING_BUFFERS                                       // {21}
         unsigned short usWindow = HTTP_BUFFER_LENGTH_;
         if (present_tcp->usTxWindowSize < HTTP_BUFFER_LENGTH_) {
@@ -968,13 +948,13 @@ static int fnPostFrame(HTTP *http_session, unsigned char *ucIp_Data, unsigned sh
                                 break;
                             case CONTENT_LENGTH_FOUND:
                                 {
-                                    CHAR *ptrLength = (CHAR *)(ucIp_Data+2);
+                                    CHAR *ptrLength = (CHAR *)(ucIp_Data + 2);
                                     header_search_state.ucState |= CONTENT_LENGTH_KNOWN;
                                     http_session->FileLength = (MAX_FILE_LENGTH)fnDecStrHex(ptrLength); // size of data content
                                 }
                                 break;
                             case FIRST_BOUNDARY_FOUND:
-                                if (header_search_state.ucState & CONTENT_LENGTH_KNOWN) {
+                                if ((header_search_state.ucState & CONTENT_LENGTH_KNOWN) != 0) {
         #if defined PLAIN_TEXT_POST                                      //  allow post of parameters
                                     if (http_session->ucBoundaryLength == 0) {
                                         return (fnParameterPost(http_session, (CHAR *)(ucIp_Data + 1), (unsigned short)(usPortLen - 1), &header_search_state.ucState));
@@ -982,8 +962,8 @@ static int fnPostFrame(HTTP *http_session, unsigned char *ucIp_Data, unsigned sh
         #endif
                                     header_search_state.ucState |= EXPECTING_BOUNDARY;
                                 }
-                                if (header_search_state.ucState & (EXPECTING_DATA | EXPECTING_CONTENT_TYPE)) {
-                                    http_session->FileLength -= 2*(sizeof(cFirstBoundary)); // subtract the opening and closing boundary lengths
+                                if ((header_search_state.ucState & (EXPECTING_DATA | EXPECTING_CONTENT_TYPE)) != 0) {
+                                    http_session->FileLength -= (2 * (sizeof(cFirstBoundary))); // subtract the opening and closing boundary lengths
 
                                     http_session->FileLength -= http_session->ucBoundaryLength; // remove closing boundary length
         #if defined WEB_PARAMETER_HANDLING
@@ -993,7 +973,7 @@ static int fnPostFrame(HTTP *http_session, unsigned char *ucIp_Data, unsigned sh
                                     }
         #endif
         #if defined RESTRICT_POST_CONTENT_TYPE
-                                    if (EXPECTING_DATA & header_search_state.ucState) {
+                                    if ((EXPECTING_DATA & header_search_state.ucState) != 0) {
                                         http_session->ucState = HTTP_STATE_POSTING_DATA;
                                     }
                                     else {
@@ -1024,7 +1004,7 @@ static int fnPostFrame(HTTP *http_session, unsigned char *ucIp_Data, unsigned sh
                             case IMAGE_BMP_CONTENT_RECOGNISED:
             #endif
                             case BINARY_CONTENT_RECOGNISED:
-                                if (EXPECTING_CONTENT_TYPE & header_search_state.ucState) {
+                                if ((EXPECTING_CONTENT_TYPE & header_search_state.ucState) != 0) {
                                     header_search_state.ucState &= ~EXPECTING_CONTENT_TYPE;
                                     header_search_state.ucState |= EXPECTING_DATA;
                                 }
@@ -1142,8 +1122,87 @@ _handle_post_data_content:
 #endif                                                                   // end SUPPORT_HTTP_POST
 
 
+#if defined SUPPORT_WEBSOCKET
+static int fnWebSocketReception(HTTP *http_session, WEB_SOCKET_FRAME_16_MASKED *WebSocket_data, unsigned short usPortLen)
+{
+    unsigned long ulPayloadLength;
+    unsigned long ulPayloadLengthCountdown;
+    unsigned char *ptrPayloadData;
+    unsigned char *ptrPayloadDataStart;
+    unsigned char *ptrMaskKey;
+    if ((WebSocket_data->ucPayloadLength[0] & WEB_SOCKET_MASK) == 0) {   // the client must mask all frames - if an unmasked one is detection it is an error
+        return APP_ACCEPT;
+    }
+    ulPayloadLength = (WebSocket_data->ucPayloadLength[0] & WEB_SOCKET_PAYLOAD_LEN_MASK);
+    if (ulPayloadLength == 126) {                                        // extended 16 bit length
+        ulPayloadLength = ((WebSocket_data->ucPayloadLength[1] << 8) | (WebSocket_data->ucPayloadLength[2]));
+        ptrPayloadData = WebSocket_data->ucPayload;
+        ptrMaskKey = WebSocket_data->ucMaskingKey;
+    }
+    else if (ulPayloadLength == 127) {                                   // extended 64 bit length
+      //ullPayloadLength = ((((WEB_SOCKET_FRAME_64_MASKED *)WebSocket_data)->ucPayloadLength[1] << 24) | (((WEB_SOCKET_FRAME_64_MASKED *)WebSocket_data)->ucPayloadLength[2] << 16) | (((WEB_SOCKET_FRAME_64_MASKED *)WebSocket_data)->ucPayloadLength[3] << 8) | (((WEB_SOCKET_FRAME_64_MASKED *)WebSocket_data)->ucPayloadLength[4]));
+      //ullPayloadLength <<= 32;
+      //ullPayloadLength |= ((((WEB_SOCKET_FRAME_64_MASKED *)WebSocket_data)->ucPayloadLength[5] << 24) | (((WEB_SOCKET_FRAME_64_MASKED *)WebSocket_data)->ucPayloadLength[6] << 16) | (((WEB_SOCKET_FRAME_64_MASKED *)WebSocket_data)->ucPayloadLength[7] << 8) | (((WEB_SOCKET_FRAME_64_MASKED *)WebSocket_data)->ucPayloadLength[8]));
+        return APP_ACCEPT;                                               // this length is not supported
+    }
+    else {
+        ptrPayloadData = ((WEB_SOCKET_FRAME_MASKED *)WebSocket_data)->ucPayload;
+        ptrMaskKey = ((WEB_SOCKET_FRAME_MASKED *)WebSocket_data)->ucMaskingKey;
+    }
+    ptrPayloadDataStart = ptrPayloadData;
+    ulPayloadLengthCountdown = ulPayloadLength;
+    while (ulPayloadLengthCountdown >= 4) {                              // unmask the content
+        *ptrPayloadData++ ^= *ptrMaskKey++;
+        *ptrPayloadData++ ^= *ptrMaskKey++;
+        *ptrPayloadData++ ^= *ptrMaskKey++;
+        *ptrPayloadData++ ^= *ptrMaskKey++;
+        ptrMaskKey -= 4;
+        ulPayloadLengthCountdown -= 4;
+    }
+    switch (ulPayloadLengthCountdown) {
+    case 3:
+        *ptrPayloadData++ ^= *ptrMaskKey++;
+    case 2:
+        *ptrPayloadData++ ^= *ptrMaskKey++;
+    case 1:
+        *ptrPayloadData++ ^= *ptrMaskKey++;
+        break;
+    }
+    if (fnWebSocketHandler != 0) {
+        return (fnWebSocketHandler(ptrPayloadDataStart, ulPayloadLength, WebSocket_data->ucFinOpcode, http_session));
+    }
+    return APP_ACCEPT;
+}
 
-// The HTTP lister, supporting a user defined number of sessions
+extern int fnWebSocketSend(unsigned char *ptrPayload, unsigned long ulPayloadLength, unsigned char ucOpCode, HTTP *http_session)
+{
+    WEB_SOCKET_FRAME_UNMASKED *ptrTxMessage = (WEB_SOCKET_FRAME_UNMASKED *)HTTP_Tx->ucTCP_Message;
+    unsigned char *ptrDataCopy;
+    int iHeaderLength;
+    ptrTxMessage->ucFinOpcode = ucOpCode;
+    if (ulPayloadLength < 126) {
+        ptrTxMessage->ucPayloadLength = (unsigned char)ulPayloadLength;
+        iHeaderLength = (sizeof(WEB_SOCKET_FRAME_UNMASKED) - 1);
+        ptrDataCopy = ptrTxMessage->ucPayload;
+    }
+    else {
+        ptrTxMessage->ucPayloadLength = 126;                             // use 16 bit length
+        ((WEB_SOCKET_FRAME_16_UNMASKED *)ptrTxMessage)->ucPayloadLength[1] = (unsigned char)(ulPayloadLength >> 8);
+        ((WEB_SOCKET_FRAME_16_UNMASKED *)ptrTxMessage)->ucPayloadLength[2] = (unsigned char)(ulPayloadLength);
+        iHeaderLength = (sizeof(WEB_SOCKET_FRAME_16_UNMASKED) - 1);
+        ptrDataCopy = ((WEB_SOCKET_FRAME_16_UNMASKED *)ptrTxMessage)->ucPayload;
+    }
+    uMemcpy(ptrDataCopy, ptrPayload, ulPayloadLength);
+    ulPayloadLength += iHeaderLength;        
+    if (fnSendTCP(http_session->OwnerTCPSocket, (unsigned char *)&HTTP_Tx->tTCP_Header, (unsigned short)ulPayloadLength, TCP_FLAG_PUSH) > 0) {
+        return APP_SENT_DATA;
+    }
+    return APP_ACCEPT;
+}
+#endif
+
+
+// The HTTP listener, supporting a user defined number of sessions
 //
 static int fnHTTPListener(USOCKET Socket, unsigned char ucEvent, unsigned char *ucIp_Data, unsigned short usPortLen)
 {
@@ -1156,7 +1215,7 @@ static int fnHTTPListener(USOCKET Socket, unsigned char ucEvent, unsigned char *
             case TCP_EVENT_CONREQ:                                       // session requested
                 if (http_session->ucState == HTTP_STATE_FREE) {
                     if ((ucWebServerMode & WEB_TRUSTED_IP) != 0) {       // we only allow connection(s) from a trusted address
-                        if (fnIsSelected) {
+                        if (fnIsSelected != 0) {
                             *(--ucIp_Data) = 'a';                        // request whether trusted address
                             if (fnIsSelected(ucIp_Data PASS_HTTP_SESSION_POINTER) != IS_SELECTED) {
                                 return APP_REJECT;                       // signal TCP to send a RST back to the connection request
@@ -1210,6 +1269,11 @@ static int fnHTTPListener(USOCKET Socket, unsigned char ucEvent, unsigned char *
                 }
                 else {
                     http_session->usPeerMSS = present_tcp->usPeerMSS;    // set the peer's MSS for this connection
+                }
+#endif
+#if NO_OF_HTTPS_SESSIONS > 0
+                if (Socket >= NO_OF_HTTP_SESSIONS) {
+                    return APP_SECURITY_CONNECTED;                       // signal to the TCP level that it should now insert the secure socket layer for further operation
                 }
 #endif
                 break;
@@ -1278,10 +1342,6 @@ _continue_ack:
     #if defined HTTP_REPEAT_DOUBLE_ACKS                                  // {69}
 _regenerate:
     #endif
-              //if (TCP_EVENT_REGENERATE == ucEvent) {
-                  //present_tcp->ulNextTransmissionNumber -= present_tcp->usOpenCnt;
-                  //present_tcp->ulSendUnackedNumber -= present_tcp->usOpenCnt;
-              //}
                 http_session->ucOpenWindows = 0;
                 present_tcp->usOpenCnt = 0;
 #endif
@@ -1293,7 +1353,7 @@ _regenerate:
                 if (http_session->ucState < HTTP_STATE_ACTIVE) {         // ignore if the server has closed in the meantime {6}
                     return APP_ACCEPT; 
                 }
-                if (http_session->FileLength > http_session->FilePoint) {
+                if (http_session->FileLength > http_session->FilePoint) { // if the complete content has been served and acknowledged
                     MAX_FILE_LENGTH Len = (http_session->FileLength - http_session->FilePoint);
                     unsigned char ucPush = 0;
                     if (Len > HTTP_BUFFER_LENGTH_) {
@@ -1364,7 +1424,7 @@ _probe_jumped:
                     fnGetParsFile((http_session->ptrFileStart + http_session->FilePoint), HTTP_Tx->ucTCP_Message, Len);
     #endif
 #endif
-                    if (ucWebServerMode & WEB_SUPPORT_PARAM_GEN) {
+                    if ((ucWebServerMode & WEB_SUPPORT_PARAM_GEN) != 0) {
 #if defined HTTP_WINDOWING_BUFFERS
                         unsigned short usWindow = HTTP_BUFFER_LENGTH_;
                         if (present_tcp->usTxWindowSize < HTTP_BUFFER_LENGTH_) {
@@ -1373,7 +1433,7 @@ _probe_jumped:
                         Len = fnWebParGen(HTTP_Tx->ucTCP_Message, http_session, 0, usWindow); // {12}{21}
                         if (Len == 0) {                                  // couldn't insert generated string since window too small
     #if defined HTTP_DYNAMIC_CONTENT
-                            if (!(http_session->ucDynamicFlags & GENERATING_DYNAMIC_BINARY)) { // {32}
+                            if ((http_session->ucDynamicFlags & GENERATING_DYNAMIC_BINARY) == 0) { // {32}
                                 *HTTP_Tx->ucTCP_Message = ' ';           // send a space as probe because this doesn't influence HTML
                                 Len = 1;
                             }
@@ -1396,6 +1456,11 @@ _probe_jumped:
 #endif
                 }
                 else {
+#if defined SUPPORT_WEBSOCKET
+                    if (http_session->ucState == HTTP_STATE_WEB_SOCKET_CONNECTION) {
+                        return APP_ACCEPT;                               // don't close the connection in web socket mode (persistent connection)
+                    }
+#endif
                     fnTCP_close(http_session->OwnerTCPSocket);
                 }
                 return APP_REQUEST_CLOSE;
@@ -1404,23 +1469,10 @@ _probe_jumped:
                 {
                 int iWebHandlerCommand;                                  // {2}
                 if (http_session->ptrFileStart == 0) {
-                    if (http_session->ucState < HTTP_STATE_PROCESSING) { // first command after connection
-#if NO_OF_HTTPS_SESSIONS > 0
-                        if (iSessionNumber >= NO_OF_HTTP_SESSIONS) {
-                            // HTTPS connection - test Client Hello
-                            //
-                            SSL_TLS_RECORD *ptrRecord = (SSL_TLS_RECORD *)ucIp_Data;
-                            if (ptrRecord->content_type == SSL_TLS_CONTENT_HANDSHAKE) {
-                                SSL_TLS_HANDSHAKE_PROTOCOL *ptrHandshake = &ptrRecord->handshake;
-                                if (ptrHandshake->handshake_type == 0x01) {
-                                    ptrHandshake->handshake_type = 0;
-                                }
-                            }
-                        }
-#endif
+                    if (http_session->ucState < HTTP_STATE_PROCESSING) { // first command after TCP connection
 #if defined SUPPORT_HTTP_POST
-                        if (uMemcmp(ucIp_Data, (unsigned char *)cGet, sizeof(cGet))) {
-                            if (uMemcmp(ucIp_Data, (unsigned char *)cPost, sizeof(cPost))) {
+                        if (uMemcmp(ucIp_Data, (unsigned char *)cGet, sizeof(cGet)) != 0) {
+                            if (uMemcmp(ucIp_Data, (unsigned char *)cPost, sizeof(cPost)) != 0) {
                                 return APP_REJECT_DATA;                  // we expect the GET command or the POST if not already in a http block [any thing else is ignored]
                             }
                             http_session->ucState = HTTP_STATE_START_POST; // POST command
@@ -1440,7 +1492,7 @@ _probe_jumped:
                     }
 
 #if defined SUPPORT_HTTP_POST
-                    if (http_session->ucState >= HTTP_STATE_START_POST) { // POST handling
+                    if (http_session->ucState >= HTTP_STATE_START_POST) {// POST handling
                         if (HTTP_STATE_START_POST == http_session->ucState) {
                             MEMORY_RANGE_POINTER ucFile;
     #if defined SUPPORT_HTTP_POST_TO_APPLICATION
@@ -1506,6 +1558,10 @@ _probe_jumped:
                             http_session->ucState = HTTP_STATE_DELAYED_SERVING;
                             return APP_ACCEPT;
 #endif
+#if defined SUPPORT_WEBSOCKET                                            // {78}
+                        case WEB_SOCKET_HANDSHAKE:                       // a web socket handshake has been detected
+                            return (fnDoWebPage(0, http_session));       // display internal page defined by application
+#endif
                         default:
                             {
                                 CHAR cAppPage = (CHAR)iWebHandlerCommand;// convert to file name reference in file system
@@ -1517,6 +1573,11 @@ _probe_jumped:
                         return (fnDoWebPage((CHAR *)ucIp_Data, http_session)); // the standard file from file system should be displayed according to the file name
                     }
                 }
+#if defined SUPPORT_WEBSOCKET
+                else if (http_session->ucState == HTTP_STATE_WEB_SOCKET_CONNECTION) {
+                    return (fnWebSocketReception(http_session, (WEB_SOCKET_FRAME_16_MASKED *)ucIp_Data, usPortLen)); // handle content received
+                }
+#endif
 #if defined SUPPORT_HTTP_POST
                 else if (http_session->ucState >= HTTP_STATE_START_POST) { // POSTING data
                     return (fnPostFrame(http_session, ucIp_Data, usPortLen));
@@ -1726,10 +1787,10 @@ static unsigned short fnWebParGen(unsigned char ptrBuffer[], HTTP *http_session,
 #if defined HTTP_DYNAMIC_CONTENT                                         // {61}
     http_session->ucDynamicFlags &= ~(MAXIMUM_DYNAMIC_INSERTS | QUIT_FRAME_DURING_GENERATION); // {60}
 #endif
-    while (1) {                           
+    FOREVER_LOOP() {
         unsigned short usUnacked = (http_session->usUnacked + usFrameLength); // backup the original total content length
         unsigned short usOriginalLength = usFrameLength;                 // backup the original frame length
-        unsigned short usThisLength;                                     // {18} allow loop quit when buffer can not grow any more 
+        unsigned short usThisLength;                                     // {18} allow loop quit when buffer cannot grow any more 
         usFrameLength -= usContentShrink;
         http_session->usUnacked = usContentShrink;                       // for compatibility with fnWebParGenerator (the length to be processed) - it will be changed accoring to inserts made
         usFrameLength += (usThisLength = fnWebParGenerator(&ptrBuffer[usFrameLength], http_session, &ptrBuffer[usTx_window])); // parse the raw data contents {13}
@@ -1743,7 +1804,7 @@ static unsigned short fnWebParGen(unsigned char ptrBuffer[], HTTP *http_session,
     #endif
         if ((usContentShrink == 0) || (usThisLength == 0) || ((usFrameLength + usContentShrink) >= usTx_window)
     #if defined HTTP_DYNAMIC_CONTENT
-            || (http_session->ucDynamicFlags & QUIT_FRAME_DURING_GENERATION) // when a frame buffer can not accept more dynamic chunks quit immediately
+            || (http_session->ucDynamicFlags & QUIT_FRAME_DURING_GENERATION) // when a frame buffer cannot accept more dynamic chunks quit immediately
     #endif
             ) {                                                          // frame buffer completely full (or shrunk content will have no room)
     #if defined HTTP_DYNAMIC_CONTENT
@@ -1887,7 +1948,13 @@ static int fnWebParHandler(unsigned char *ptrptrFile, unsigned short usDataLengt
         #endif
     #endif
 
-    if (!(ucWebServerMode & WEB_SUPPORT_HANDLER)) {                      // if we are not configured to handle web parameters just accept the page demanded
+    #if defined SUPPORT_WEBSOCKET                                        // {78}
+    if ((iReturn = fnWebSocketRx(http_session, ptrFile, usDataLength)) < 0) { // allow the web socket protocol to handle the reception
+        return iReturn;                                                  // web socket content handled
+    }
+    #endif
+
+    if ((ucWebServerMode & WEB_SUPPORT_HANDLER) == 0) {                  // if we are not configured to handle web parameters just accept the page demanded
         return APP_ACCEPT; 
     }
 
@@ -1897,7 +1964,7 @@ static int fnWebParHandler(unsigned char *ptrptrFile, unsigned short usDataLengt
         return iReturn;                                                  // if the initial connection is not accepted
     }
     while (*(++ptrFile) != ' ') {
-        if (!(--usDataLength)) {
+        if ((--usDataLength) == 0) {
             break;                                                       // end of data - terminate
         }
 
@@ -1911,4 +1978,191 @@ static int fnWebParHandler(unsigned char *ptrptrFile, unsigned short usDataLengt
 #endif
     return APP_ACCEPT;                                                   // APP_ACCEPT (zero) means show requested page
 }
+
+#if defined SUPPORT_WEBSOCKET                                            // {78}
+
+
+#define SHA1_SIZE 20
+
+#if _MSC_VER
+# define _sha1_restrict __restrict
+#else
+# define _sha1_restrict __restrict__
+#endif
+
+static /*inline*/ void sha1mix(unsigned *_sha1_restrict r, unsigned *_sha1_restrict w) {
+	unsigned a = r[0];
+	unsigned b = r[1];
+	unsigned c = r[2];
+	unsigned d = r[3];
+	unsigned e = r[4];
+	unsigned t, i = 0;
+
+#define rol(x,s) ((x) << (s) | (unsigned) (x) >> (32 - (s)))
+#define mix(f,v) do { \
+		t = (f) + (v) + rol(a, 5) + e + w[i & 0xf]; \
+		e = d; \
+		d = c; \
+		c = rol(b, 30); \
+		b = a; \
+		a = t; \
+	} while (0)
+
+	for (; i < 16; ++i)
+		mix(d ^ (b & (c ^ d)), 0x5a827999);
+
+	for (; i < 20; ++i) {
+		w[i & 0xf] = rol(w[i + 13 & 0xf] ^ w[i + 8 & 0xf] ^ w[i + 2 & 0xf] ^ w[i & 0xf], 1);
+		mix(d ^ (b & (c ^ d)), 0x5a827999);
+	}
+
+	for (; i < 40; ++i) {
+		w[i & 0xf] = rol(w[i + 13 & 0xf] ^ w[i + 8 & 0xf] ^ w[i + 2 & 0xf] ^ w[i & 0xf], 1);
+		mix(b ^ c ^ d, 0x6ed9eba1);
+	}
+
+	for (; i < 60; ++i) {
+		w[i & 0xf] = rol(w[i + 13 & 0xf] ^ w[i + 8 & 0xf] ^ w[i + 2 & 0xf] ^ w[i & 0xf], 1);
+		mix((b & c) | (d & (b | c)), 0x8f1bbcdc);
+	}
+
+	for (; i < 80; ++i) {
+		w[i & 0xf] = rol(w[i + 13 & 0xf] ^ w[i + 8 & 0xf] ^ w[i + 2 & 0xf] ^ w[i & 0xf], 1);
+		mix(b ^ c ^ d, 0xca62c1d6);
+	}
+
+#undef mix
+#undef rol
+
+	r[0] += a;
+	r[1] += b;
+	r[2] += c;
+	r[3] += d;
+	r[4] += e;
+}
+
+static void sha1(unsigned char h[SHA1_SIZE], const void *_sha1_restrict p, size_t n) {
+	size_t i = 0;
+	unsigned w[16], r[5] = {0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0};
+
+	for (; i < (n & ~0x3f);) {
+		do w[i >> 2 & 0xf] =
+			((const unsigned char *) p)[i + 3] << 0x00 |
+			((const unsigned char *) p)[i + 2] << 0x08 |
+			((const unsigned char *) p)[i + 1] << 0x10 |
+			((const unsigned char *) p)[i + 0] << 0x18;
+		while ((i += 4) & 0x3f);
+		sha1mix(r, w);
+	}
+
+	uMemset(w, 0, sizeof w);
+
+	for (; i < n; ++i)
+		w[i >> 2 & 0xf] |= ((const unsigned char *) p)[i] << ((3 ^ i & 3) << 3);
+
+	w[i >> 2 & 0xf] |= 0x80 << ((3 ^ i & 3) << 3);
+
+	if ((n & 0x3f) > 56) {
+		sha1mix(r, w);
+		uMemset(w, 0, sizeof w);
+	}
+
+	w[15] = n << 3;
+	sha1mix(r, w);
+
+	for (i = 0; i < 5; ++i)
+		h[(i << 2) + 0] = (unsigned char) (r[i] >> 0x18),
+		h[(i << 2) + 1] = (unsigned char) (r[i] >> 0x10),
+		h[(i << 2) + 2] = (unsigned char) (r[i] >> 0x08),
+		h[(i << 2) + 3] = (unsigned char) (r[i] >> 0x00);
+}
+
+
+static int fnWebSocketRx(HTTP *http_session, unsigned char *ptrData, unsigned short usDataLength)
+{
+    static CHAR cWebSocketTest1[] = "HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: "; // this needs to be constructed and remain stable for each web socket until the connection has been confirmed
+  //static CHAR cWebSocketTest2[] = "\r\nSec-WebSocket-Protocol: chat\r\n\r\n";                                   // this needs to be constructed and remain stable for each web socket until the connection has been confirmed
+    static CHAR cWebSocketTest2[] = "\r\nSec-WebSocket-Protocol: ";                                   // this needs to be constructed and remain stable for each web socket until the connection has been confirmed
+    static CHAR cWebSocketTest3[] = "\r\n\r\n";
+    static CHAR cWebResponseTest[512];
+    static MAX_FILE_LENGTH responseLength;
+    static CHAR subProtocol[64];
+    int iReturn = 0;
+    unsigned char *ptrStart = ptrData;
+    if (http_session->ucState < HTTP_STATE_WEB_SOCKET_CONNECTION) {      // depending on the connection state
+        while (usDataLength-- >= 4) {                                    // limit to the received frame length
+            if (uMemcmp("\r\n\r\n", ptrData, 4) == 0) {                  // locate the end of the header
+                while (ptrStart < ptrData) {                             // scan the header for web socket details
+                    if (uMemcmp(ptrStart, "Sec-WebSocket-", 14) == 0) {
+                        ptrStart += 14;
+                        if (uMemcmp(ptrStart, "Version:", 8) == 0) {
+                            ptrStart += 8;
+                        }
+                        else if (uMemcmp(ptrStart, "Protocol:", 9) == 0) {
+                            int iSubProtLen = 0;
+                            ptrStart += 10;                              // jump the protocol and a single space                
+                            while (*ptrStart != '\r') {
+                                subProtocol[iSubProtLen++] = *ptrStart++;
+                            }
+                            subProtocol[iSubProtLen] = 0;
+                        }
+                        else if (uMemcmp(ptrStart, "Extensions:", 11) == 0) {
+                            ptrStart += 11;
+                        }
+                        else if (uMemcmp(ptrStart, "Key:", 4) == 0) {
+#if defined _WINDOWS_
+                            CHAR test[] = "dGhlIHNhbXBsZSBub25jZQ== "; // RFC 6455 reference input
+#endif
+                            static const CHAR cGUID[] = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"; // globally unique identfier in string form
+                            int iStrLen = 0;
+                            unsigned char shaHash[20];
+                            CHAR tempKey[64];
+                            CHAR *ptrBuf;
+                            ptrStart += 5;                               // jump the key string and initial space
+#if defined _WINDOWS_
+                            ptrStart = test;
+#endif
+                            while ((*ptrStart != '\r') && (*ptrStart != ' ')) {
+                                tempKey[iStrLen++] = *ptrStart++;        // copy the key value (base64 coded), ignoring any trailing space
+                            }
+                            uMemcpy(&tempKey[iStrLen], cGUID, sizeof(cGUID)); // concatenate the decoded string with the GUID
+                            // - a SHA-1 hash of this string is returned (encoded as base64) in the server's handshake
+                            uMemset(shaHash, 0, sizeof(shaHash));
+                            sha1(shaHash, tempKey, (iStrLen + sizeof(cGUID) - 1));
+                            // expected value 0xb3 0x7a 0x4f 0x2c 0xc0 0x62 0x4f 0x16 0x90 0xf6 0x46 0x06 0xcf 0x38 0x59 0x45 0xb2 0xbe 0xc4 0xea
+                            iStrLen = (int)fnEncode64(shaHash, tempKey, sizeof(shaHash));  // encode the hash
+                            tempKey[iStrLen] = 0;                        // terminate string
+                            // expected value s3pPLMBiTxaQ9kYGzzhZRbK+xOo=
+    ptrBuf = uStrcpy(cWebResponseTest, cWebSocketTest1);
+    ptrBuf = uStrcpy(ptrBuf, tempKey);
+    ptrBuf = uStrcpy(ptrBuf, cWebSocketTest2);
+    ptrBuf = uStrcpy(ptrBuf, subProtocol);
+    ptrBuf = uStrcpy(ptrBuf, cWebSocketTest3);
+    responseLength = (ptrBuf - cWebResponseTest);
+                        }
+                    }
+                    else if (uMemcmp(ptrStart, "Upgrade: websocket", 18) == 0) {
+                        ptrStart += 18;
+                        http_session->ucState = HTTP_STATE_WEB_SOCKET_CONNECTION; // connected state
+                        iReturn = WEB_SOCKET_HANDSHAKE;                  // this is a web socket connection handshake which is to be accepted in case of no other errors
+                    }
+                    ptrStart++;
+                }
+            }
+            ptrData++;
+        }
+        if (iReturn == WEB_SOCKET_HANDSHAKE) {
+            http_session->ptrFileStart = (unsigned char*)cWebResponseTest;
+            http_session->FileLength   = responseLength;
+            #if defined SUPPORT_MIME_IDENTIFIER
+            http_session->ucMimeType   = MIME_HTML;                      // force HTML type
+            #endif
+        }
+    }
+    else {                                                               // when connected handle the content as messages
+    }
+    return iReturn;
+}
+#endif
+
 #endif                                                                   // end USE_HTTP

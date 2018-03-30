@@ -285,8 +285,8 @@ extern void fnTaskUSB_host(TTASKTABLE *ptrTaskTable)
                     fnConfigureApplicationEndpoints(ucEndpointConfiguration); // configure endpoints according to configuration
                     iUSB_MSD_OpCode = 0;
                     fnRequestLUN();                                      // the first thing that the MSD host does is request the number of logical units that the disk drive has
+                    break;
                 }
-                break;
             }
             break;
 

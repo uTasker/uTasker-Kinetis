@@ -2139,6 +2139,9 @@
     <ClCompile Include="..\..\..\Hardware\Kinetis\kinetisSim.c">
       <Filter>WinSim\SIMKinetis</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\stack\mqtt.c">
+      <Filter>TCP/IP</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ADC_Timers.h">

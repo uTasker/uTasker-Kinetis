@@ -11,7 +11,7 @@
     File:      webutils.c
     Project:   Single Chip Embedded Internet
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2018
     *********************************************************************
     16.02.2007 Added fnEncode64() to support SMTP login
     01.06.2007 Changed use of user name and password checking            {1}
@@ -29,6 +29,8 @@
     11.03.2010 Don't accept partical password matches with unrestricted reference length {12}
     25.06.2010 Modify fnWebStrcpy() to accept ? as terminator            {13}
     13.10.2013 Allow use of uReverseMemcpy() for buffer right shifting   {14}
+    10.02.2016 Add string length return value to fnDecode64()            {15}
+    13.12.2017 Correct fnBase64DecodeAlphabet() when input is '?'        {16}
 
 */
 
@@ -39,7 +41,7 @@
     #define WEB_ESCAPE_LEN 4                                             // standard escape length, eg. "£xyz"
 #endif
 
-#if defined (HTTP_AUTHENTICATION) || defined (USE_SMTP_AUTHENTICATION)
+#if defined HTTP_AUTHENTICATION || defined USE_SMTP_AUTHENTICATION || defined SUPPORT_WEBSOCKET
 
 #define USER_NAME_AND_PASS
 
@@ -49,12 +51,18 @@
 
 static CHAR fnBase64DecodeAlphabet(CHAR cInput, CHAR *cRes)
 {
-    if ((cInput == '/') || (cInput == '+')) {
+    if (cInput == '/') {
         *cRes = '?';
         return B64_NEW_VALUE_READY;
     }
+    else if (cInput == '+') {                                            // {16}
+        *cRes = '>';
+        return B64_NEW_VALUE_READY;
+    }
 
-    if ((cInput < '0') || (cInput > 'z'))  return B64_INVALID;           // invalid - ignore
+    if ((cInput < '0') || (cInput > 'z')) {
+        return B64_INVALID;                                              // invalid - ignore (this may be white space at the beginning or end of the string)
+    }
 
     if (cInput <= '9') {                                                 // Input is '0'..'9'
         *cRes = cInput + ('>' - '0' - 10);
@@ -66,35 +74,39 @@ static CHAR fnBase64DecodeAlphabet(CHAR cInput, CHAR *cRes)
         return B64_NEW_VALUE_READY;
     }
 
-    if (cInput > 'Z') return B64_INVALID;                                // invalid - ignore
+    if (cInput > 'Z') {
+        return B64_INVALID;                                              // invalid - ignore
+    }
 
     if (cInput >= 'A') {                                                 // Input is 'A'..'Z'
         *cRes = cInput + ('>' - ('Z' - 'A' + 12 + 'Z'));
         return B64_NEW_VALUE_READY;
     }
 
-    if (cInput == '=') return B64_PADDING_FOUND;                         // padding (often found at the end)
+    if (cInput == '=') {
+        return B64_PADDING_FOUND;                                        // padding (often found at the end)
+    }
 
     return B64_INVALID;
 }
 
-#if defined (USE_SMTP_AUTHENTICATION)
+#if defined USE_SMTP_AUTHENTICATION || defined SUPPORT_WEBSOCKET
 
 static CHAR fnBase64EncodeAlphabet(CHAR cInputByte)
 {
-    if (cInputByte <= 25) {
+    if (cInputByte <= 25) {                                              // 0..25
         return (cInputByte + 'A');
     }
-    if (cInputByte <= 51) {
+    if (cInputByte <= 51) {                                              // 26..51
         return ((cInputByte - 26) + 'a');
     }
-    if (cInputByte <= 61) {
+    if (cInputByte <= 61) {                                              // 52..61
         return ((cInputByte - 52) + '0');
     }
-    if (cInputByte == 62) {
+    if (cInputByte == 62) {                                              // 62
         return ('+');
     }
-    return ('/');
+    return ('/');                                                        // 63
 }
 
 // Perform base 64 encoding of input string, which is terminated by <= '&' character. Return the number of bytes in output buffer.
@@ -139,7 +151,7 @@ extern MAX_FILE_LENGTH fnEncode64(unsigned char *ptrInput, CHAR *ptrOutput, MAX_
         *ptrOutput++ = fnBase64EncodeAlphabet(cNewByte);
         len--;
     }
-    while (Length & 0x3) {                                               // pad if necessary
+    while ((Length & 0x3) != 0) {                                        // pad if necessary
         *ptrOutput++ = '=';
         Length++;
     }
@@ -147,19 +159,20 @@ extern MAX_FILE_LENGTH fnEncode64(unsigned char *ptrInput, CHAR *ptrOutput, MAX_
 }
 #endif
 
-#if defined (HTTP_AUTHENTICATION)
+#if defined HTTP_AUTHENTICATION
 // Perform base 64 decoding of input string. A '&' is added at end of decoded string as terminator
 //
-extern void fnDecode64(CHAR *ptrInput, CHAR *ptrOutput)
+extern int fnDecode64(CHAR *ptrInput, CHAR *ptrOutput)                   // {15}
 {
     CHAR cNewByte = 0;
     unsigned long ulCollect = 0;
     unsigned char ucResult;
     unsigned char ucCollectCnt = 0;
     unsigned char ucPaddingCnt = 0;
+    int iStringLength = 0;
 
     while (*ptrInput != '\r') {
-        if (B64_INVALID !=(ucResult = fnBase64DecodeAlphabet(*ptrInput++, &cNewByte))) {
+        if (B64_INVALID != (ucResult = fnBase64DecodeAlphabet(*ptrInput++, &cNewByte))) {
             ulCollect <<= 6;                                             // make room for 6 new bits
             ulCollect += cNewByte;                                       // insert 6 new bits
 
@@ -168,15 +181,22 @@ extern void fnDecode64(CHAR *ptrInput, CHAR *ptrOutput)
             }
 
             if (ucCollectCnt >= 3) {                                     // 4 input bytes interpreted
-                *ptrOutput++ = (unsigned char)(ulCollect>>16);           // 3 decoded bytes available
+                *ptrOutput++ = (unsigned char)(ulCollect >> 16);         // 3 decoded bytes available
 
-                if (ucPaddingCnt >= 2) break;                            // only one byte has been collected - rest padding and we assume end already found
+                if (ucPaddingCnt >= 2) {
+                    iStringLength++;
+                    break;                                               // only one byte has been collected - rest padding and we assume end already found
+                }
 
-                *ptrOutput++ = (unsigned char)(ulCollect>>8);
+                *ptrOutput++ = (unsigned char)(ulCollect >> 8);
 
-                if (ucPaddingCnt >= 1) break;                            // only 2 bytes have been collected - last is padding and we assume end already found
+                if (ucPaddingCnt >= 1) {
+                    iStringLength += 2;
+                    break;                                               // only 2 bytes have been collected - last is padding and we assume end already found
+                }
 
                 *ptrOutput++ = (unsigned char)(ulCollect);
+                iStringLength += 3;
                 ucCollectCnt = 0;
             }
             else {
@@ -185,6 +205,7 @@ extern void fnDecode64(CHAR *ptrInput, CHAR *ptrOutput)
         }
     }
     *ptrOutput = '&';                                                    // terminate the decoded string
+    return iStringLength;                                                // {15} length of decoded string
 }
 #endif
 #endif
@@ -298,16 +319,16 @@ extern int fnVerifyUser(CHAR *cDecodedUser, unsigned char ucCheckUser)   // {1}
     }
 
     *cPass++ = '&';                                                      // terminate
-    if (!(HTML_PASS_CHECK & ucCheckUser)) {
+    if ((HTML_PASS_CHECK & ucCheckUser) == 0) {
         cPass = cDecodedUser;
     }
-    if (DO_CHECK_USER_NAME & ucCheckUser) {                              // {1}
+    if ((DO_CHECK_USER_NAME & ucCheckUser) != 0) {                       // {1}
         if (fnCheckPass(POINTER_USER_NAME, cDecodedUser)) {
             return CREDENTIALS_REQUIRED;                                 // return if user name match not valid {4}
         }
     }
-    if (DO_CHECK_PASSWORD & ucCheckUser) {                               // {1}
-        if (fnCheckPass(POINTER_USER_PASS, cPass)) {
+    if ((DO_CHECK_PASSWORD & ucCheckUser) != 0) {                        // {1}
+        if (fnCheckPass(POINTER_USER_PASS, cPass) != 0) {
             return CREDENTIALS_REQUIRED;                                 // return if user password is not good {4}
         }
     }
@@ -324,7 +345,7 @@ extern CHAR *fnWebStrcpy(CHAR *cStrOut, CHAR *cStrIn)
         cStrOut = cStrIn;                                                // automatically use input buffer as output buffer
         iNullTerminate = 1;                                              // in this case we switch to pure null termination mode
     }
-    while (1) {
+    FOREVER_LOOP() {
     #if !defined WEB_PLUS_NO_CODING                                      // it has been found that + is not always coded so using this define allows it to be used directly
         if (*cStrIn == '+') {                                            // space
             *cStrOut = ' ';

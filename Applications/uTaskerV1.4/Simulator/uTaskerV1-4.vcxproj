@@ -162,6 +162,7 @@ Build_Kinetis.bat
     <ClCompile Include="..\..\..\Hardware\Kinetis\kinetis_ports.cpp" />
     <ClCompile Include="..\..\..\stack\ftp_client.c" />
     <ClCompile Include="..\..\..\stack\igmp.c" />
+    <ClCompile Include="..\..\..\stack\mqtt.c" />
     <ClCompile Include="..\..\..\stack\openssl\crypto\aes\aes_cbc.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='uTasker Kinetis|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='uTasker Kinetis plus GNU build|Win32'">true</ExcludedFromBuild>

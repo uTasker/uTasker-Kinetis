@@ -22,6 +22,7 @@
     25.04.2016 Correct buffer wrap direction for K parts                 {3}
     02.03.2017 Set the DMA_TCD_CITER_ELINK value earlier to protect initial part of code from interrupts {4}
     02.03.2017 Add optional alternative DMA channel for use by interrupts when the main one is in use {5}
+    30.03.2018 Change uMemset() to match memset() parameters             {6}
 
 */
 
@@ -832,9 +833,10 @@ extern void *uReverseMemcpy(void *ptrTo, const void *ptrFrom, size_t Size)
 
 // memset implementation
 //
-extern void *uMemset(void *ptrTo, unsigned char ucValue, size_t Size)    // {9}
+extern void *uMemset(void *ptrTo, int iValue, size_t Size)               // {6}
 {
     register unsigned char *ptr = (unsigned char *)ptrTo;
+    register unsigned char ucValue = (unsigned char)iValue;              // {6}
 
     if (Size >= SMALLEST_DMA_COPY) {                                     // if large enough to be worthwhile 
     #if defined KINETIS_KL                                               // {80}

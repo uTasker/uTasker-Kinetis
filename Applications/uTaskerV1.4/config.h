@@ -127,12 +127,12 @@
 
 //#define EMCRAFT_K61F150M                                               // K processors Cortex M4 with Ethernet, USB, encryption, tamper, key storage protection area
 
-#define FRDM_K64F                                                        // next generation K processors Cortex M4 with Ethernet, USB, encryption, tamper, key storage protection area - freedom board http://www.utasker.com/kinetis/FRDM-K64F.html
+//#define FRDM_K64F                                                      // next generation K processors Cortex M4 with Ethernet, USB, encryption, tamper, key storage protection area - freedom board http://www.utasker.com/kinetis/FRDM-K64F.html
 //#define TWR_K64F120M                                                   // tower board http://www.utasker.com/kinetis/TWR-K64F120M.html
 //#define TEENSY_3_5                                                     // USB development board with K64FX512 - http://www.utasker.com/kinetis/TEENSY_3.5.html
 //#define FreeLON                                                        // K64 based with integrated LON
 //#define TWR_K65F180M                                                   // tower board http://www.utasker.com/kinetis/TWR-K65F180M.html
-//#define FRDM_K66F                                                      // freedom board http://www.utasker.com/kinetis/FRDM-K66F.html
+#define FRDM_K66F                                                        // freedom board http://www.utasker.com/kinetis/FRDM-K66F.html
 //#define TEENSY_3_6                                                     // USB development board with K66FX1M0 - http://www.utasker.com/kinetis/TEENSY_3.6.html
 
 //#define TWR_K70F120M                                                   // K processors Cortex M4 with graphical LCD, Ethernet, USB, encryption, tamper
@@ -1150,7 +1150,7 @@
     #define FREEMASTER_STORAGE_ACCESS                                    // use storage interface rather than direct memory mapping so that SPI flash content can be addressed and also flash can be written
 #endif
 
-#if defined FRDM_K64F || defined FRDM_K22F || defined FRDM_KL25Z || defined FRDM_KL46Z || defined FRDM_KL03Z || defined FRDM_KL43Z // during development only - these boards have been configured and tested
+#if defined FRDM_K64F || defined FRDM_K66F || defined FRDM_K22F || defined FRDM_KL25Z || defined FRDM_KL46Z || defined FRDM_KL03Z || defined FRDM_KL43Z // during development only - these boards have been configured and tested
   //#define nRF24L01_INTERFACE                                           // nRF24L01+ interface - low power RF
     #if defined FRDM_K64F
       //#define ENC424J600_INTERFACE                                     // 10/100 Ethernet connected via SPI (also ENC624J600 in larger package with more parallel modes)
@@ -1161,7 +1161,7 @@
 #endif
 
 #if !defined DEVICE_WITHOUT_ETHERNET && !defined K70F150M_12M && !defined TEENSY_3_5 && !defined TEENSY_3_6
-  //#define ETH_INTERFACE                                                // enable Ethernet interface driver
+    #define ETH_INTERFACE                                                // enable Ethernet interface driver
 #elif defined TEENSY_3_1 || defined TEENSY_LC
   //#define ETH_INTERFACE                                                // enable external Ethernet interface driver
     #if defined ETH_INTERFACE
@@ -1305,6 +1305,10 @@
           //#define USE_TIME_SERVER                                      // enable time server support - presently demo started in application
                 #define NUMBER_OF_TIME_SERVERS 3                         // number of time servers that are used
           //#define MODBUS_TCP                                           // support MODBUS TCP protocol
+            #define USE_MQTT_CLIENT                                      // enable MQTT (message queuing telemetry transport) client support
+          //#define USE_MQTT_BROKER                                      // enable MQTT (message queuing telemetry transport) broker support
+              //#define SECURE_MQTT                                      // MQTTS support
+              //#define SUPPORT_CLIENT_SIDE_CERTIFICATE                  // support client certificate and private key
 
           //#define TEST_CLIENT_SERVER                                   // TCP client/server test (see debug.c)
           //#define TEST_TCP_SERVER                                      // TCP server (see debug.c) - uses also a TELNET session
@@ -1474,6 +1478,12 @@
             #define SMTP_SOCKET 0                                        // no TCP socket needed
         #endif
 
+        #if defined USE_MQTT_CLIENT
+            #define MQTT_CLIENT_SOCKET 1
+        #else
+            #define MQTT_CLIENT_SOCKET 0
+        #endif
+
         #if defined USE_TELNET || defined USE_TELNET_CLIENT
             #define USE_BUFFERED_TCP                                     // always use buffered TCP for telnet
         #endif
@@ -1566,7 +1576,7 @@
 
         #define USER_NAME_AND_PASS                                       // routines for user name and password support
 
-        #define NO_OF_TCPSOCKETS (NO_OF_HTTP_SESSIONS + NO_OF_HTTPS_SESSIONS + FTP_SOCKETS + POP3_SOCKET + SMTP_SOCKET + NO_OF_TELNET_SESSIONS + TIME_SERVER_SOCKET + MODBUS_TCP_SOCKETS + FTP_CLIENT_SOCKETS + USER_TCP_SOCKETS) // reserve the number of TCP sockets necessary for our configuration
+        #define NO_OF_TCPSOCKETS (NO_OF_HTTP_SESSIONS + NO_OF_HTTPS_SESSIONS + FTP_SOCKETS + POP3_SOCKET + SMTP_SOCKET + NO_OF_TELNET_SESSIONS + TIME_SERVER_SOCKET + MODBUS_TCP_SOCKETS + FTP_CLIENT_SOCKETS + MQTT_CLIENT_SOCKET + USER_TCP_SOCKETS) // reserve the number of TCP sockets necessary for our configuration
     #endif
 #else                                                                    // else no LAN support
     #define NUMBER_LAN     0                                             // no physical queue needed

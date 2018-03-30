@@ -11,7 +11,7 @@
     File:      tcp.c
     Project:   Single Chip Embedded Internet
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2018
     **********************************************************************
     03.06.2007 fnGetFreeTCP_Port() made external                         {1}
     03.06.2007 Extend REUSE_TIME_WAIT_SOCKETS to rx connection use       {2}
@@ -80,6 +80,13 @@
     23.11.2014 Removed fnGetTCP_state() and made fnGetSocketControl() extern {64}
     25.05.2015 Add optional out-of-order reception buffer                {65}
     01.10.2015 Start testing MJBC_TEST5
+    31.05.2016 Modify MJB_TEST5 case to accept FIN together with final data content {66}
+    13.10.2016 Simultaneous close correction                             {67}
+    02.02.2017 Adapt for us tick resolution                              {68}
+    09.01.2018 Add secure socket layer support                           {69}
+    09.01.2018 Add fnInsertTCPHeader()                                   {70}
+    06.02.2018 Only callback with TCP_EVENT_CLOSED event when socket is reused from the TCP_STATE_FIN_WAIT_2 state {71}
+    20.02.2018 Allow preparing data in the output buffer of an open connection but not start its transmission yet {72}
 
 */
 
@@ -252,7 +259,7 @@ extern void fnTaskTCP(TTASKTABLE *ptrTaskTable)
                             present_tcp = ptr_TCP;                       // set global pointer to the present receive socket TCP control structure
 #endif
 
-                            ptr_TCP->event_listener(socket/*ptr_TCP->MySocketNumber*/, TCP_EVENT_REGENERATE, 0, usRepeatLength); // {56}
+                            ptr_TCP->event_listener(socket, TCP_EVENT_REGENERATE, 0, usRepeatLength); // {56}
                         }
                         else {
                             // This occurs when a reset message is sent to an external IP address which must first be resolved
@@ -268,7 +275,7 @@ extern void fnTaskTCP(TTASKTABLE *ptrTaskTable)
 #endif
                 case ARP_RESOLUTION_FAILED:
                     if (ptr_TCP->event_listener) {                       // inform listener of problem
-                        ptr_TCP->event_listener(socket/*ptr_TCP->MySocketNumber*/, TCP_EVENT_ARP_RESOLUTION_FAILED, ptr_TCP->ucRemoteIP, ptr_TCP->usRemport); // {56}
+                        ptr_TCP->event_listener(socket, TCP_EVENT_ARP_RESOLUTION_FAILED, ptr_TCP->ucRemoteIP, ptr_TCP->usRemport); // {56}
                     }
                     break;
                 }
@@ -516,6 +523,12 @@ extern signed short fnSendTCP(USOCKET TCP_socket, unsigned char *ptrBuf, unsigne
     if ((ptr_TCP = fnGetSocketControl(TCP_socket)) == 0) {
         return SOCKET_NOT_FOUND;                                         // {17} get a pointer to the TCP socket control structure
     }
+
+#if defined USE_SECURE_SOCKET_LAYER                                      // {69}
+    if ((TCP_socket & SECURE_SOCKET_MODE) != 0) {                        // if we are operating in secure mode
+        return (fnSecureLayerTransmission(_TCP_SOCKET_MASK(TCP_socket), ptrBuf, usDataLen, ucTempFlags));
+    }
+#endif
 #if defined USE_IPV6
     if (ptr_TCP->ucTCPInternalFlags & TCP_OVER_IPV6) {                   // {41} send over IPv6 and not IPv4
         iIPv6 = 1;
@@ -707,7 +720,7 @@ static int fnWindowTimeOut(TCP_CONTROL *ptr_TCP)
 
     i = tcp_tx->ucGetFrame;
 
-    while (x--) {
+    while (x-- != 0) {
         if ((i == tcp_tx->ucPutFrame) && (tcp_tx->ucOpenAcks != WINDOWING_BUFFERS)) { // no more open windows
             return 0;                                                    // no timeout
         }
@@ -725,7 +738,7 @@ static int fnWindowTimeOut(TCP_CONTROL *ptr_TCP)
 
 static void fnResetWindowing(TCP_TX_BUFFER *tcp_tx)
 {
-    if (!tcp_tx) {
+    if (tcp_tx == 0) {
         return;
     }
     tcp_tx->ucGetFrame    = 0;
@@ -763,7 +776,7 @@ extern QUEUE_TRANSFER fnSendBufTCP(USOCKET TCP_socket, unsigned char *ptrBuf, un
     }
 
     #if defined _EXTENDED_BUFFERED_TCP                                   // {38} - allow data to be queued before connection is established
-    if ((ptr_TCP->ucTCP_state != TCP_STATE_ESTABLISHED) && (!(Command & TCP_BUF_QUEUE))) {
+    if ((ptr_TCP->ucTCP_state != TCP_STATE_ESTABLISHED) && ((Command & TCP_BUF_QUEUE) == 0)) {
         return 0;
     }
     #else
@@ -812,7 +825,7 @@ extern QUEUE_TRANSFER fnSendBufTCP(USOCKET TCP_socket, unsigned char *ptrBuf, un
         }
     }
     #endif
-    ptrEnd = tcp_tx->ucTCP_tx + _TCP_BUFFER;                             // add data to buffer as long as there is space for it
+    ptrEnd = (tcp_tx->ucTCP_tx + _TCP_BUFFER);                           // add data to buffer as long as there is space for it
 
     if (ptrBuf != 0) {                                                   // data pointer available
         QUEUE_TRANSFER Remaining_space = (_TCP_BUFFER - (tcp_tx->usWaitingSize + tcp_tx->usPacketSize));
@@ -832,9 +845,9 @@ extern QUEUE_TRANSFER fnSendBufTCP(USOCKET TCP_socket, unsigned char *ptrBuf, un
         tcp_tx->ucDataEnd += usDataLen;                                  // set the end of the waiting data
 
     #if defined _EXTENDED_BUFFERED_TCP
-        if (ptr_TCP->ucTCP_state != TCP_STATE_ESTABLISHED) {
-            tcp_tx->usWaitingSize += usDataLen;
-            return 0;                                                    // data added to buffer but no transmission started since the connectionis not (yet) open
+        if ((ptr_TCP->ucTCP_state != TCP_STATE_ESTABLISHED) || ((Command & TCP_BUF_PREPARE) != 0)) { // if the connection has not yet been established {72} or the caller wishes to prepare the buffer before sending
+            tcp_tx->usWaitingSize += usDataLen;                          // extra waiting data size
+            return 0;                                                    // data added to buffer but no transmission started since the connection is not (yet) open
         }
     #endif
     }
@@ -854,7 +867,7 @@ extern QUEUE_TRANSFER fnSendBufTCP(USOCKET TCP_socket, unsigned char *ptrBuf, un
         if (usDataLen == 0) {                                            // no further outstanding data to be acknowledged
             if (ptr_TCP->ucTCPInternalFlags & SILLY_WINDOW_AVOIDANCE) {  // if acknowledgement to all outstanding data before entering the silly window avoidance state
                 ptr_TCP->usTransmitTimer = TCP_SILLY_WINDOW_DELAY;       // probe after this delay if the peer doesn't inform of its reception window opening
-                if (TCP_BUF_SEND & Command) {                            // unconditional probe when we are in the silly window avoidance state
+                if ((TCP_BUF_SEND & Command) != 0) {                     // unconditional probe when we are in the silly window avoidance state
                     return 0;                                            // normally a window probe would be sent here this is not implemented
                 }
             }
@@ -867,14 +880,14 @@ extern QUEUE_TRANSFER fnSendBufTCP(USOCKET TCP_socket, unsigned char *ptrBuf, un
         tcp_tx->usWaitingSize = 0;                                       // reset the waiting size, assuming that all will be sent (will be corrected if not possible to send all)
     #if defined WAKE_BLOCKED_TCP_BUF
         if (DataCopied == 0) {                                           // if the buffer is already empty
-            if (tcp_tx->WakeTask) {                                      // and the application is waiting for confirmation of the buffer being free
-                //unsigned char tx_continue_message[ HEADER_LENGTH ] = { INTERNAL_ROUTE, INTERNAL_ROUTE, tcp_tx->WakeTask, INTERRUPT_EVENT, TX_FREE};
-                unsigned char tx_continue_message[ HEADER_LENGTH ];
-                tx_continue_message[ MSG_DESTINATION_NODE ] = INTERNAL_ROUTE;
-                tx_continue_message[ MSG_SOURCE_NODE ] = INTERNAL_ROUTE;
-                tx_continue_message[ MSG_DESTINATION_TASK ] = tcp_tx->WakeTask;
-                tx_continue_message[ MSG_SOURCE_TASK ] = INTERRUPT_EVENT;
-                tx_continue_message[ MSG_INTERRUPT_EVENT ] = TX_FREE;
+            if (tcp_tx->WakeTask != 0) {                                 // and the application is waiting for confirmation of the buffer being free
+                //unsigned char tx_continue_message[HEADER_LENGTH] = {INTERNAL_ROUTE, INTERNAL_ROUTE, tcp_tx->WakeTask, INTERRUPT_EVENT, TX_FREE};
+                unsigned char tx_continue_message[HEADER_LENGTH];
+                tx_continue_message[MSG_DESTINATION_NODE] = INTERNAL_ROUTE;
+                tx_continue_message[MSG_SOURCE_NODE] = INTERNAL_ROUTE;
+                tx_continue_message[MSG_DESTINATION_TASK] = tcp_tx->WakeTask;
+                tx_continue_message[MSG_SOURCE_TASK] = INTERRUPT_EVENT;
+                tx_continue_message[MSG_INTERRUPT_EVENT] = TX_FREE;
                 fnWrite(INTERNAL_ROUTE, tx_continue_message, HEADER_LENGTH); // inform the blocked task
             }
         }
@@ -892,11 +905,11 @@ extern QUEUE_TRANSFER fnSendBufTCP(USOCKET TCP_socket, unsigned char *ptrBuf, un
             //
             int iRepeatSimple = 0;
             unsigned short ucTheseWindowSizes = 0;
-            while (tcp_tx->ucOpenAcks--) {
+            while (tcp_tx->ucOpenAcks-- != 0) {
                 if (tcp_tx->ucPutFrame-- == 0) {
                     tcp_tx->ucPutFrame = (WINDOWING_BUFFERS-1);
                 }
-                if ((iRepeatSimple) || (tcp_tx->tx_window[tcp_tx->ucPutFrame].ucNegotiate & TCP_CONTENT_NEGOTIATION)) {
+                if ((iRepeatSimple != 0) || ((tcp_tx->tx_window[tcp_tx->ucPutFrame].ucNegotiate & TCP_CONTENT_NEGOTIATION) != 0)) {
                     tcp_tx->tx_window[tcp_tx->ucPutFrame].usWindowTimeout = 1; // repeat as soon as possible if necessary
                     iRepeatSimple++;
                 }
@@ -911,7 +924,7 @@ extern QUEUE_TRANSFER fnSendBufTCP(USOCKET TCP_socket, unsigned char *ptrBuf, un
             else {
                 QUEUE_TRANSFER rtnSent = 0;
                 tcp_tx->usWaitingSize += ucTheseWindowSizes;
-                while ((iRepeatSimple--) && ((DataCopied = fnSendBufTCP(TCP_socket, 0, 0, (TCP_BUF_REP | TCP_REPEAT_WINDOW))) != 0)) {
+                while ((iRepeatSimple-- != 0) && ((DataCopied = fnSendBufTCP(TCP_socket, 0, 0, (TCP_BUF_REP | TCP_REPEAT_WINDOW))) != 0)) {
                     rtnSent |= DataCopied;
                 }
                 BUFFERED_TCP_LEAVE_CRITICAL();                           // leave potentially critical region
@@ -1023,7 +1036,7 @@ extern QUEUE_TRANSFER fnSendBufTCP(USOCKET TCP_socket, unsigned char *ptrBuf, un
             }
         }
     #else
-        while (DataCopied--) {                                           // copy from circular buffer to linear output buffer
+        while (DataCopied-- != 0) {                                      // copy from circular buffer to linear output buffer
             *ptrTxBuffer++ = *ptrIn++;                                   // without doing any IAC stuffing
             if (ptrIn >= ptrEnd) {
                 ptrIn = tcp_tx->ucTCP_tx;
@@ -1049,7 +1062,7 @@ extern QUEUE_TRANSFER fnSendBufTCP(USOCKET TCP_socket, unsigned char *ptrBuf, un
 
     tcp_tx->usWaitingSize += DataCopied;                                 // no data transmitted but waiting queue size increased accordingly
     BUFFERED_TCP_LEAVE_CRITICAL();                                       // leave potentially critical region
-    if (TCP_BUF_SEND_REPORT_COPY & Command) {                            // if the user wants to know how many bytes have been queued we return the value
+    if ((TCP_BUF_SEND_REPORT_COPY & Command) != 0) {                     // if the user wants to know how many bytes have been queued we return the value
         return DataCopied;
     }
     return 0;                                                            // we haven't sent a TCP frame
@@ -1094,7 +1107,11 @@ extern unsigned short fnDefineTCPBufferSize(USOCKET TCP_socket, unsigned short u
 static signed short fnSendTCPControl(TCP_CONTROL *ptr_TCP)
 {
     unsigned char ucTCP_control_buf[MIN_TCP_HLEN];                       // temporary control buffer space
-    return (fnSendTCP(ptr_TCP->MySocketNumber, ucTCP_control_buf, 0, 0));// send a control frame without data
+#if defined USE_SECURE_SOCKET_LAYER                                      // {69}
+    return (fnSendTCP((ptr_TCP->MySocketNumber & ~(SECURE_SOCKET_MODE)), ucTCP_control_buf, 0, 0)); // send a control frame without data
+#else
+    return (fnSendTCP(ptr_TCP->MySocketNumber, ucTCP_control_buf, 0, 0)); // send a control frame without data
+#endif
 }
 
 static void fnRestartTCP_timer(void)                                     // {58}
@@ -1169,7 +1186,11 @@ static unsigned long fnGetTCP_init_seq(void)
 {
     static unsigned char ucSequenceUses = 0;                             // this variable ensures different sequence numbers for multiple connections started in one tick interval
                                                                          // in this period the counter would count RESms/4us == RES*1000/4 or RES*250
-    return (((uTaskerSystemTick + ucSequenceUses++) * (TICK_RESOLUTION * 250)));
+#if TICK_RESOLUTION >= 1000                                              // {68}
+    return (((uTaskerSystemTick + ucSequenceUses++) * ((TICK_RESOLUTION/1000) * 250)));
+#else
+    return (((uTaskerSystemTick + ucSequenceUses++) * (250/(1000/TICK_RESOLUTION))));
+#endif
 }
 
 // Client connect
@@ -1195,6 +1216,15 @@ static unsigned long fnGetTCP_init_seq(void)
         }
     }
 
+#if defined USE_SECURE_SOCKET_LAYER                                      // {69}
+    if ((TCP_socket & SECURE_SOCKET_MODE) != 0) {                        // if the connection is over secure socket layer
+        ptr_TCP->event_listener = (int(*)(USOCKET, unsigned char, unsigned char *, unsigned short))fnInsertSecureLayer(TCP_socket, ptr_TCP->event_listener, 1); // insert the secure socket layer between TCP and the application                   
+    }
+    else {                                                               // else bypass secure layer
+        ptr_TCP->event_listener = (int(*)(USOCKET, unsigned char, unsigned char *, unsigned short))fnInsertSecureLayer(TCP_socket, ptr_TCP->event_listener, 0); // remove secure layer in case it was previously installed
+    }
+#endif
+
     if ((ptr_TCP->ucTCP_state & (TCP_STATE_RESERVED | TCP_STATE_LISTEN | TCP_STATE_CLOSED)) == 0) { // are we in an invalid state?
 #if defined REUSE_TIME_WAIT_SOCKETS
         // It has been observed that if a final FIN is missed while in the TCP_STATE_FIN_WAIT_2, the socket
@@ -1203,8 +1233,11 @@ static unsigned long fnGetTCP_init_seq(void)
         // So that the socket is not blocked forever we also allow it to be reused here...
         //
         if (ptr_TCP->ucTCP_state & (TCP_STATE_FIN_WAIT_2 | TCP_STATE_TIME_WAIT)) {
+            int iTimeWait2 = ((ptr_TCP->ucTCP_state & TCP_STATE_FIN_WAIT_2) != 0);
             fnNewTCPState(ptr_TCP, TCP_STATE_CLOSED);
-            ptr_TCP->event_listener(_TCP_SOCKET_MASK(ptr_TCP->MySocketNumber), TCP_EVENT_CLOSED, ptr_TCP->ucRemoteIP, ptr_TCP->usRemport); // {56}
+            if (iTimeWait2 != 0) {                                       // {71} only inform of close if the socket was is the TCP_STATE_FIN_WAIT_2 state
+                ptr_TCP->event_listener(_TCP_SOCKET_MASK(ptr_TCP->MySocketNumber), TCP_EVENT_CLOSED, ptr_TCP->ucRemoteIP, ptr_TCP->usRemport); // {56}
+            }
         }
         else {
             return (SOCKET_STATE_INVALID);
@@ -1233,7 +1266,7 @@ static unsigned long fnGetTCP_init_seq(void)
     ptr_TCP->usRemport = usRemotePort;
     ptr_TCP->usLocport = usOurPort;
 #if defined CONTROL_WINDOW_SIZE
-    if (!usMaxWindow) {
+    if (0 == usMaxWindow) {
         ptr_TCP->usRxWindowSize = TCP_MAX_WINDOW_SIZE;                   // set standard window size if application doesn't care
     }
     else {
@@ -1285,6 +1318,9 @@ extern USOCKET fnTCP_close(USOCKET TCP_Socket)
         case TCP_STATE_ESTABLISHED:
             if (ptr_TCP->ulSendUnackedNumber == ptr_TCP->ulNextTransmissionNumber) { // is there unacked data?
                 ptr_TCP->ulNextTransmissionNumber++;                     // there is no unacked data so we close immediately
+                if ((ptr_TCP->ucSendFlags & TCP_FLAG_FIN_RECEIVED) != 0) { // {67}
+                    ptr_TCP->ulNextReceptionNumber++;                    // acknowledge the peer's FIN during a simultaneous close
+                }
                 ptr_TCP->ucSendFlags = (TCP_FLAG_ACK | TCP_FLAG_FIN);    // we set the ACK flag to ensure that any unacked data which led to us closing is acknowledged
                 fnSendTCPControl(ptr_TCP);
                 fnNewTCPState(ptr_TCP, TCP_STATE_FIN_WAIT_1);
@@ -1370,7 +1406,7 @@ _syn_frame_rpt:
                 }
 #endif
                 if (ptr_TCP->usRemport == tcp_frame->usSourcePort) {     // check that the source port corresponds
-                    if (!(uMemcmp(ptr_TCP->ucRemoteIP, source_IP_address, ipLength))) { // and the source IP
+                    if ((uMemcmp(ptr_TCP->ucRemoteIP, source_IP_address, ipLength)) == 0) { // and the source IP
                         return (ptr_TCP);                                // return pointer to the active socket
                     }
                 }
@@ -1478,7 +1514,7 @@ static void fnTCP_send_reset(TCP_PACKET *rx_tcp_packet, ETHERNET_FRAME *ptrRx_fr
 //
 static int fnCheckFIN(TCP_PACKET *rx_tcp_packet, TCP_CONTROL *ptr_TCP, unsigned short usLength, unsigned char ucFlags)
 {
-    if (rx_tcp_packet->usHeaderLengthAndFlags & TCP_FLAG_FIN) {          // repeated FIN
+    if ((rx_tcp_packet->usHeaderLengthAndFlags & TCP_FLAG_FIN) != 0) {   // repeated FIN
         ptr_TCP->ulNextReceptionNumber = (rx_tcp_packet->ulSeqNr + 1);   // peer's sequence number
         ptr_TCP->ulNextReceptionNumber += usLength;
         ptr_TCP->ucSendFlags = ucFlags;
@@ -1561,6 +1597,9 @@ extern void fnHandleTCP(ETHERNET_FRAME *ptrRx_frame)                     // {41}
 #if defined SUPPORT_RX_TCP_OPTIONS
     unsigned char *tcp_options;
 #endif
+#if defined MJBC_TEST5
+    unsigned long ulOriginalNextReceptionNumber;                         // {66}
+#endif
 #if !defined IP_RX_CHECKSUM_OFFLOAD || defined IP_INTERFACE_WITHOUT_CS_OFFLOADING || defined _WINDOWS
     #if IP_INTERFACE_COUNT > 1
     unsigned char ucRxInterfaceHandling = (ptrRx_frame->ucInterfaceHandling & INTERFACE_NO_RX_CS_OFFLOADING);
@@ -1613,6 +1652,12 @@ extern void fnHandleTCP(ETHERNET_FRAME *ptrRx_frame)                     // {41}
     rx_tcp_packet.ulSeqNr                 |= *tcp_data++;
     rx_tcp_packet.ulSeqNr                <<= 8;
     rx_tcp_packet.ulSeqNr                 |= *tcp_data++;
+
+#if defined _WINDOWS                                                     // use as breakpoint location to stop on a known sequence number
+    if (rx_tcp_packet.ulSeqNr == 0x18aa1716) {
+        rx_tcp_packet.ulSeqNr = rx_tcp_packet.ulSeqNr;
+    }
+#endif
 
 	rx_tcp_packet.ulAckNo                  = *tcp_data++;
     rx_tcp_packet.ulAckNo                <<= 8;
@@ -1698,7 +1743,7 @@ extern void fnHandleTCP(ETHERNET_FRAME *ptrRx_frame)                     // {41}
 
     if ((rx_tcp_packet.usHeaderLengthAndFlags & TCP_FLAG_RESET) != 0) {  // check whether we are receiving a RST
         fnNewTCPState(ptr_TCP, TCP_STATE_CLOSED);                        // move to the closed state and inform the application
-        ptr_TCP->event_listener(tcp_socket/*ptr_TCP->MySocketNumber*/, TCP_EVENT_ABORT, ptr_TCP->ucRemoteIP, ptr_TCP->usRemport); // {56}
+        ptr_TCP->event_listener(tcp_socket, TCP_EVENT_ABORT, ptr_TCP->ucRemoteIP, ptr_TCP->usRemport); // {56}
         return;
     }
 
@@ -1731,7 +1776,8 @@ extern void fnHandleTCP(ETHERNET_FRAME *ptrRx_frame)                     // {41}
                   return;                                                // we ignore it since the application may want to accept a repetition later
               }
               else {
-                                                                         // the application accepts the connection
+                  // The application accepts the connection
+                  //
 #if defined HTTP_WINDOWING_BUFFERS || defined FTP_DATA_WINDOWS           // {10}
                   ptr_TCP->usOpenCnt = 0;                                // {7}
 #endif
@@ -1739,7 +1785,7 @@ extern void fnHandleTCP(ETHERNET_FRAME *ptrRx_frame)                     // {41}
                   ptr_TCP->usPeerMSS = fnExtractMSS(tcp_options, (unsigned char)(ucHeadLen - MIN_TCP_HLEN));
 #endif
                   fnNewTCPState(ptr_TCP, TCP_STATE_SYN_RCVD);            // next state is SYN_RCVD where an ACK will establish the connection
-                  ptr_TCP->ulNextReceptionNumber = (rx_tcp_packet.ulSeqNr + 1); // synchronise sequence number (Syn counts as 1)
+                  ptr_TCP->ulNextReceptionNumber = (rx_tcp_packet.ulSeqNr + 1); // synchronise sequence number (SYN counts as 1)
                   ptr_TCP->ulSendUnackedNumber = fnGetTCP_init_seq();    // get a sequence number for our acks
 #if defined ANNOUNCE_MAX_SEGMENT_SIZE
                   fnSendSyn(ptr_TCP, (TCP_FLAG_SYN | TCP_FLAG_ACK));     // send SYN, ACK with MSS announcement
@@ -1752,7 +1798,7 @@ extern void fnHandleTCP(ETHERNET_FRAME *ptrRx_frame)                     // {41}
         }
         break;
 
-        case TCP_STATE_SYN_RCVD:
+        case TCP_STATE_SYN_RCVD:                                         // server TCP connection established
             if (rx_tcp_packet.usHeaderLengthAndFlags & TCP_FLAG_ACK) {   // ACK from our SYN
 #if defined ETHEREAL
                 ptr_TCP->ulNextTransmissionNumber = rx_tcp_packet.ulAckNo; // synchronise when simulating
@@ -1769,14 +1815,21 @@ extern void fnHandleTCP(ETHERNET_FRAME *ptrRx_frame)                     // {41}
                     ptr_TCP->ucSendFlags = TCP_FLAG_ACK;                 // ACK without SYN flag
                     ptr_TCP->ulSendUnackedNumber = ptr_TCP->ulNextTransmissionNumber; // synchronise
                     fnNewTCPState(ptr_TCP, TCP_STATE_ESTABLISHED);       // we are connected and in data transfer state - inform application
-                    ptr_TCP->event_listener(tcp_socket/*ptr_TCP->MySocketNumber*/, TCP_EVENT_CONNECTED, ptr_TCP->ucRemoteIP, ptr_TCP->usRemport); // {56}
+#if defined USE_SECURE_SOCKET_LAYER
+                    if (ptr_TCP->event_listener(tcp_socket, TCP_EVENT_CONNECTED, ptr_TCP->ucRemoteIP, ptr_TCP->usRemport) == APP_SECURITY_CONNECTED) { // if server uses secure layer
+                        ptr_TCP->MySocketNumber |= SECURE_SOCKET_MODE;   // flag that the socket is secure
+                        ptr_TCP->event_listener = (int(*)(USOCKET, unsigned char, unsigned char *, unsigned short))fnInsertSecureLayer(ptr_TCP->MySocketNumber, ptr_TCP->event_listener, 1); // insert the secure socket layer between TCP and the application                   
+                    }
+#else
+                    ptr_TCP->event_listener(tcp_socket, TCP_EVENT_CONNECTED, ptr_TCP->ucRemoteIP, ptr_TCP->usRemport); // {56}
+#endif
                 }
             }
             break;
 
         case TCP_STATE_ESTABLISHED:                                      // we have an active connection, in data transfer state
-            if (rx_tcp_packet.usHeaderLengthAndFlags & TCP_FLAG_SYN) {   // reception of SYN during established connection
-                if (rx_tcp_packet.usHeaderLengthAndFlags & TCP_FLAG_ACK) { // SYN + ACK
+            if ((rx_tcp_packet.usHeaderLengthAndFlags & TCP_FLAG_SYN) != 0) { // reception of SYN during established connection
+                if ((rx_tcp_packet.usHeaderLengthAndFlags & TCP_FLAG_ACK) != 0) { // SYN + ACK
                     if ((rx_tcp_packet.ulSeqNr + 1) == ptr_TCP->ulNextReceptionNumber) { // we are receiving a SYN ACK which means the peer probably didn't receive our original ACK to its SYN
                         if (rx_tcp_packet.ulAckNo == ptr_TCP->ulNextTransmissionNumber) {
                             ptr_TCP->ucSendFlags = TCP_FLAG_ACK;
@@ -1786,11 +1839,13 @@ extern void fnHandleTCP(ETHERNET_FRAME *ptrRx_frame)                     // {41}
                 }
                 else {                                                   // {47} SYN on an active connection means that the client closed the original connection and is trying to establish a new connection on the same port pair
                     fnNewTCPState(ptr_TCP, TCP_STATE_CLOSED);            // move to the closed state and inform the application (we handle this as a RST)
-                    ptr_TCP->event_listener(tcp_socket/*ptr_TCP->MySocketNumber*/, TCP_EVENT_ABORT, ptr_TCP->ucRemoteIP, ptr_TCP->usRemport); // {56}
+                    ptr_TCP->event_listener(tcp_socket, TCP_EVENT_ABORT, ptr_TCP->ucRemoteIP, ptr_TCP->usRemport); // {56}
                 }
                 return;
             }
-
+#if defined MJBC_TEST5
+            ulOriginalNextReceptionNumber = ptr_TCP->ulNextReceptionNumber; // {66}
+#endif
             if (ptr_TCP->ulSendUnackedNumber != ptr_TCP->ulNextTransmissionNumber) { // do we have unacked data and expect an ACK ?
                 if ((rx_tcp_packet.usHeaderLengthAndFlags & TCP_FLAG_ACK) == 0) { // ignore everything apart from an ACK when we are waiting for one
                     return;
@@ -1808,8 +1863,11 @@ extern void fnHandleTCP(ETHERNET_FRAME *ptrRx_frame)                     // {41}
 //#endif
                     ptr_TCP->ulSendUnackedNumber = ptr_TCP->ulNextTransmissionNumber; // no more unacked data
                                                                          // inform application that data has been successfully acked
-                    if (APP_REQUEST_CLOSE & (iAppTCP |= ptr_TCP->event_listener(tcp_socket/*ptr_TCP->MySocketNumber*/, TCP_EVENT_ACK, ptr_TCP->ucRemoteIP, ptr_TCP->usRemport))) { // {56}
-                        if (rx_tcp_packet.usHeaderLengthAndFlags & TCP_FLAG_FIN) { // the application has commanded the close of the connection
+                    if ((rx_tcp_packet.usHeaderLengthAndFlags & TCP_FLAG_FIN) != 0) { // {67}
+                        ptr_TCP->ucSendFlags = TCP_FLAG_FIN_RECEIVED;    // if the application closes (simultaneous close) we must increment the ack counter to also accept the received FIN
+                    }
+                    if ((APP_REQUEST_CLOSE & (iAppTCP |= ptr_TCP->event_listener(tcp_socket, TCP_EVENT_ACK, ptr_TCP->ucRemoteIP, ptr_TCP->usRemport))) != 0) { // {56}
+                        if ((rx_tcp_packet.usHeaderLengthAndFlags & TCP_FLAG_FIN) != 0) { // the application has commanded the close of the connection
                                                                          // we have just received FIN + ACK, meaning that the other side has also initiated a close
                             fnNewTCPState(ptr_TCP, TCP_STATE_CLOSING);   // this a simultaneous close, so we go to state closing and wait for the last ack
                         }
@@ -1835,11 +1893,11 @@ extern void fnHandleTCP(ETHERNET_FRAME *ptrRx_frame)                     // {41}
                     unsigned short usPartialDataLength = (unsigned short)(ptr_TCP->ulNextTransmissionNumber - rx_tcp_packet.ulAckNo); // the length of the data being acknowledged
                     if (usPartialDataLength != 0) {                      // {29}
                         ptr_TCP->usTxWindowSize -= usPartialDataLength;  // {32} since there is still data underway to the peer respect this in the window size
-                        if (APP_REQUEST_CLOSE & (iAppTCP |= ptr_TCP->event_listener(tcp_socket/*>->MySocketNumber*/, TCP_EVENT_PARTIAL_ACK, ptr_TCP->ucRemoteIP, usPartialDataLength))) { // {56} usPartialDataLength is the number of bytes that are still unaccounted for
-                            if (rx_tcp_packet.usHeaderLengthAndFlags & TCP_FLAG_FIN) { // the application has commanded the close of the connection
+                        if ((APP_REQUEST_CLOSE & (iAppTCP |= ptr_TCP->event_listener(tcp_socket, TCP_EVENT_PARTIAL_ACK, ptr_TCP->ucRemoteIP, usPartialDataLength))) != 0) { // {56} usPartialDataLength is the number of bytes that are still unaccounted for
+                            if ((rx_tcp_packet.usHeaderLengthAndFlags & TCP_FLAG_FIN) != 0) { // the application has commanded the close of the connection
                                 // We have just received FIN + ACK, meaning that the other side has also initiated a close
                                 //
-                                fnNewTCPState(ptr_TCP, TCP_STATE_CLOSING);   // this a simultaneous close, so we go to state closing and wait for the last ack
+                                fnNewTCPState(ptr_TCP, TCP_STATE_CLOSING); // this a simultaneous close, so we go to state closing and wait for the last ack
                             }
                             return;
                         }
@@ -1850,11 +1908,11 @@ extern void fnHandleTCP(ETHERNET_FRAME *ptrRx_frame)                     // {41}
             }
 #if defined SUPPORT_PEER_WINDOW || defined HTTP_WINDOWING_BUFFERS || defined FTP_DATA_WINDOWS // {3}{10}{35}
             else {
-                if (rx_tcp_packet.usHeaderLengthAndFlags & TCP_FLAG_ACK) { // TCP window update
+                if ((rx_tcp_packet.usHeaderLengthAndFlags & TCP_FLAG_ACK) != 0) { // TCP window update
     #if defined HTTP_WINDOWING_BUFFERS || defined FTP_DATA_WINDOWS       // {35}
                       ptr_TCP->ucPersistentTimer = ptr_TCP->ucProbeCount = 0; // disable persistent timer since we have a window update
     #endif
-                      ptr_TCP->event_listener(tcp_socket/*ptr_TCP->MySocketNumber*/, TCP_WINDOW_UPDATE, ptr_TCP->ucRemoteIP, ptr_TCP->usRemport); // {56}
+                      ptr_TCP->event_listener(tcp_socket, TCP_WINDOW_UPDATE, ptr_TCP->ucRemoteIP, ptr_TCP->usRemport); // {56}
                 }
             }
 #endif
@@ -1862,10 +1920,10 @@ extern void fnHandleTCP(ETHERNET_FRAME *ptrRx_frame)                     // {41}
                 if (ptr_TCP->ulNextReceptionNumber == rx_tcp_packet.ulSeqNr) { // data content and not a possible repetition
                                                                          // data received which must be acked
                     ptr_TCP->ucSendFlags = TCP_FLAG_ACK;                 // prepare the ACK
-                    ptr_TCP->ulNextReceptionNumber += (usLen - ucHeadLen); // the data that we have now acked
+                    ptr_TCP->ulNextReceptionNumber += (usLen - ucHeadLen); // the data that we will have acked
                                                                          // pass the data to the application (if it sends data it also ACKs so we don't have to ack here)
-                    iAppTCP |= ptr_TCP->event_listener(tcp_socket/*ptr_TCP->MySocketNumber*/, TCP_EVENT_DATA, tcp_data, (unsigned short)(usLen - ucHeadLen)); // {56} pass the received data to the listerer
-                    if (iAppTCP & (APP_REQUEST_CLOSE | APP_REJECT_DATA)) { // has the application just closed the connection? If so we don't need to send ACK (also if application doesn't want to acknowledge)
+                    iAppTCP |= ptr_TCP->event_listener(tcp_socket, TCP_EVENT_DATA, tcp_data, (unsigned short)(usLen - ucHeadLen)); // {56} pass the received data to the listerer
+                    if ((iAppTCP & (APP_REQUEST_CLOSE | APP_REJECT_DATA)) != 0) { // has the application just closed the connection? If so we don't need to send ACK (also if application doesn't want to acknowledge)
                         ptr_TCP->ulNextReceptionNumber -= (usLen - ucHeadLen); // correct in case we forced the ack to be ignored (otherwise we will ignore the repetition)
                         return;
                     }
@@ -1909,8 +1967,8 @@ extern void fnHandleTCP(ETHERNET_FRAME *ptrRx_frame)                     // {41}
                             return;                                      // this frame needs to be ignored since an ack would cause previous lost content to be acked and lost forever
                         }
                         ptr_TCP->ulNextReceptionNumber += usExtraData;
-                        iAppTCP |= ptr_TCP->event_listener(tcp_socket/*ptr_TCP->MySocketNumber*/, TCP_EVENT_DATA, (tcp_data + (usPayload - usExtraData)), usExtraData); // {56} pass the extra data
-                        if (iAppTCP & (APP_REQUEST_CLOSE | APP_REJECT_DATA)) { // has the application just closed the connection? If so we don't need to send ACK (also if application doesn't want to acknowledge)
+                        iAppTCP |= ptr_TCP->event_listener(tcp_socket, TCP_EVENT_DATA, (tcp_data + (usPayload - usExtraData)), usExtraData); // {56} pass the extra data
+                        if ((iAppTCP & (APP_REQUEST_CLOSE | APP_REJECT_DATA)) != 0) { // has the application just closed the connection? If so we don't need to send ACK (also if application doesn't want to acknowledge)
                             ptr_TCP->ulNextReceptionNumber -= usExtraData; // correct in case we forced the ack to be ignored (otherwise we will ignore the repetition)
                             return;
                         }
@@ -1921,18 +1979,18 @@ extern void fnHandleTCP(ETHERNET_FRAME *ptrRx_frame)                     // {41}
                 ucHeadLen = 0;                                           // use this to ensure no unnecessary ACKs are returned
             }
 #if defined _WORKAROUND_CW_7_1_2                                         // {15}
-            if (_usHeaderLengthAndFlags & TCP_FLAG_FIN)                  // use the backup value from the register
+            if ((_usHeaderLengthAndFlags & TCP_FLAG_FIN) != 0)           // use the backup value from the register
 #else
-            if (rx_tcp_packet.usHeaderLengthAndFlags & TCP_FLAG_FIN)     // CW7.1.2 otherwise takes the variable from SP + 30, which is 5 bytes from its real location and no TCP FINs are ever recognised!!
+            if ((rx_tcp_packet.usHeaderLengthAndFlags & TCP_FLAG_FIN) != 0) // CW7.1.2 otherwise takes the variable from SP + 30, which is 5 bytes from its real location and no TCP FINs are ever recognised!!
 #endif
             {                                                            // check whether FIN flag is set
                                                                          // inform application then we have received a close request
 #if defined MJBC_TEST5
-                if (ptr_TCP->ulNextReceptionNumber != rx_tcp_packet.ulSeqNr) { // data content and not a possible repetition
+                if (ulOriginalNextReceptionNumber != rx_tcp_packet.ulSeqNr) { // {66} data content and not a possible repetition
                     return;                                              // if the FIN's sequence counter doesn't match what we expect it means that we have probably not seen some data that was sent before it - therefore we ignore it until the data data has been received
                 }
 #endif
-                iAppTCP = ptr_TCP->event_listener(tcp_socket/*ptr_TCP->MySocketNumber*/, TCP_EVENT_CLOSE, ptr_TCP->ucRemoteIP, ptr_TCP->usRemport); // {56}{60}
+                iAppTCP = ptr_TCP->event_listener(tcp_socket, TCP_EVENT_CLOSE, ptr_TCP->ucRemoteIP, ptr_TCP->usRemport); // {56}{60}
                 if (APP_ACCEPT == iAppTCP) {                             // application is accepting the close request
                     ptr_TCP->ucSendFlags = (TCP_FLAG_ACK + TCP_FLAG_FIN);// ack the received FIN and send our own FIN
                     fnNewTCPState(ptr_TCP, TCP_STATE_LAST_ACK);          // go to state LAST ACK doing passive close. We wait for a final ack
@@ -1962,14 +2020,14 @@ extern void fnHandleTCP(ETHERNET_FRAME *ptrRx_frame)                     // {41}
             break;
 
         case TCP_STATE_SYN_SENT:                                         // we have sent SYN and are hoping for a SYN ACK
-            if ((rx_tcp_packet.usHeaderLengthAndFlags & (TCP_FLAG_SYN | TCP_FLAG_ACK)) == (TCP_FLAG_SYN | TCP_FLAG_ACK)) {
+            if ((rx_tcp_packet.usHeaderLengthAndFlags & (TCP_FLAG_SYN | TCP_FLAG_ACK)) == (TCP_FLAG_SYN | TCP_FLAG_ACK)) { // client TCP connection established
 #if defined ETHEREAL
                 ptr_TCP->ulNextTransmissionNumber = rx_tcp_packet.ulAckNo; // synchronise counters when simulating
 #endif
                 if (rx_tcp_packet.ulAckNo != ptr_TCP->ulNextTransmissionNumber) {
                     return;                                              // incorrect ACK so ignore
                 }
-                ptr_TCP->ulNextReceptionNumber = rx_tcp_packet.ulSeqNr + 1; // peer's sequence number
+                ptr_TCP->ulNextReceptionNumber = (rx_tcp_packet.ulSeqNr + 1); // peer's sequence number
                 ptr_TCP->ulSendUnackedNumber = ptr_TCP->ulNextTransmissionNumber; // synchronise
 #if defined SUPPORT_PEER_MSS
                 ptr_TCP->usPeerMSS = fnExtractMSS(tcp_options, (unsigned char)(ucHeadLen - MIN_TCP_HLEN));
@@ -1979,9 +2037,9 @@ extern void fnHandleTCP(ETHERNET_FRAME *ptrRx_frame)                     // {41}
 
                 fnSendTCPControl(ptr_TCP);                               // send an ack and the TCP connection is established
                                                                          // inform application that a link has been established
-                ptr_TCP->event_listener(tcp_socket/*ptr_TCP->MySocketNumber*/, TCP_EVENT_CONNECTED, ptr_TCP->ucRemoteIP, ptr_TCP->usRemport); // {56}
+                ptr_TCP->event_listener(tcp_socket, TCP_EVENT_CONNECTED, ptr_TCP->ucRemoteIP, ptr_TCP->usRemport); // {56}
             }
-            else if (rx_tcp_packet.usHeaderLengthAndFlags & TCP_FLAG_ACK) {
+            else if ((rx_tcp_packet.usHeaderLengthAndFlags & TCP_FLAG_ACK) != 0) {
                 fnAbortTCPSession(ptr_TCP);                              // this happens when we have a previous non-correctly disconnected session - we will try to close it
             }
             break;
@@ -1989,7 +2047,7 @@ extern void fnHandleTCP(ETHERNET_FRAME *ptrRx_frame)                     // {41}
         case TCP_STATE_FIN_WAIT_1:
             if (((rx_tcp_packet.usHeaderLengthAndFlags & (TCP_FLAG_FIN | TCP_FLAG_ACK)) == (TCP_FLAG_FIN | TCP_FLAG_ACK)) // sometimes we receive a FIN + ACK but the ACK is not valid - we handle this as FIN (below) and don't just ignore
                   && (rx_tcp_packet.ulAckNo == ptr_TCP->ulNextTransmissionNumber)) {
-                ptr_TCP->ulNextReceptionNumber =  rx_tcp_packet.ulSeqNr + 1; // peer's sequence number
+                ptr_TCP->ulNextReceptionNumber =  (rx_tcp_packet.ulSeqNr + 1); // peer's sequence number
                 ptr_TCP->ulNextReceptionNumber += (unsigned short)(usLen - ucHeadLen);
                 ptr_TCP->ulSendUnackedNumber = ptr_TCP->ulNextTransmissionNumber; // synchronise
                 ptr_TCP->ucSendFlags = TCP_FLAG_ACK;
@@ -2003,14 +2061,14 @@ extern void fnHandleTCP(ETHERNET_FRAME *ptrRx_frame)                     // {41}
                 return;
             }
 
-            if (rx_tcp_packet.usHeaderLengthAndFlags & TCP_FLAG_ACK) {
+            if ((rx_tcp_packet.usHeaderLengthAndFlags & TCP_FLAG_ACK) != 0) {
                 if( rx_tcp_packet.ulAckNo != ptr_TCP->ulNextTransmissionNumber) {
                     return;                                              // invalid ACK so ignore the frame
                 }
                 // we have been acked but the peer doesn't want to disconnect just yet
 #if defined DISCARD_DATA_WHILE_CLOSING                                   // {5} if the reception frame is carrying data we acknowledge it but don't pass it to the application.
                 if (usLen > ucHeadLen) {
-                    ptr_TCP->ulNextReceptionNumber = rx_tcp_packet.ulSeqNr + (usLen - ucHeadLen);
+                    ptr_TCP->ulNextReceptionNumber = (rx_tcp_packet.ulSeqNr + (usLen - ucHeadLen));
                     ptr_TCP->ucSendFlags = TCP_FLAG_ACK;
                     fnSendTCPControl(ptr_TCP);                           // send ack to data just received, while waiting for FIN
                 }
@@ -2026,7 +2084,7 @@ extern void fnHandleTCP(ETHERNET_FRAME *ptrRx_frame)                     // {41}
             }
 #if defined DISCARD_DATA_WHILE_CLOSING                                   // {5} if the reception frame is carrying data we acknowledge it but don't pass it to the application.
             else if (usLen > ucHeadLen) {
-                ptr_TCP->ulNextReceptionNumber = rx_tcp_packet.ulSeqNr + (usLen - ucHeadLen);
+                ptr_TCP->ulNextReceptionNumber = (rx_tcp_packet.ulSeqNr + (usLen - ucHeadLen));
                 ptr_TCP->ucSendFlags = TCP_FLAG_ACK;
                 fnSendTCPControl(ptr_TCP);                               // send ack to data just received, while waiting for FIN
             }
@@ -2034,7 +2092,7 @@ extern void fnHandleTCP(ETHERNET_FRAME *ptrRx_frame)                     // {41}
             break;
 
         case TCP_STATE_CLOSING:
-            if (rx_tcp_packet.usHeaderLengthAndFlags & TCP_FLAG_ACK) {
+            if ((rx_tcp_packet.usHeaderLengthAndFlags & TCP_FLAG_ACK) != 0) {
                 if( rx_tcp_packet.ulAckNo != ptr_TCP->ulNextTransmissionNumber) {
                     return;                                              // invalid ACK so ignore the frame
                 }
@@ -2054,9 +2112,10 @@ extern void fnHandleTCP(ETHERNET_FRAME *ptrRx_frame)                     // {41}
                 }
 
                 ptr_TCP->ulSendUnackedNumber = ptr_TCP->ulNextTransmissionNumber; // synchronise
-                // inform application that the connection has been close. It is up to the application to command listen again if it so desires
+                // Inform application that the connection has been close. It is up to the application to command listen again if it so desires
+                //
                 fnNewTCPState(ptr_TCP, TCP_STATE_CLOSED);
-                ptr_TCP->event_listener(tcp_socket/*ptr_TCP->MySocketNumber*/, TCP_EVENT_CLOSED, ptr_TCP->ucRemoteIP, ptr_TCP->usRemport); // {56}
+                ptr_TCP->event_listener(tcp_socket, TCP_EVENT_CLOSED, ptr_TCP->ucRemoteIP, ptr_TCP->usRemport); // {56}
                 return;
             }
             fnCheckFIN(&rx_tcp_packet, ptr_TCP, (unsigned short)(usLen - ucHeadLen), (TCP_FLAG_FIN | TCP_FLAG_ACK)); // check FIN and return FIN ACK if correct
@@ -2073,11 +2132,11 @@ extern void fnHandleTCP(ETHERNET_FRAME *ptrRx_frame)                     // {41}
 //
 static int fnDoCountDown(TCP_CONTROL *ptr_TCP)
 {
-    if (ptr_TCP->usTransmitTimer) {
+    if (ptr_TCP->usTransmitTimer != 0) {
         ptr_TCP->usTransmitTimer--;
     }
     else {
-        if (ptr_TCP->ucRetransmissions) {                                // timeout
+        if (ptr_TCP->ucRetransmissions != 0) {                           // timeout
             ptr_TCP->ucRetransmissions--;
             ptr_TCP->usTransmitTimer = TCP_STANDARD_RETRY_TOUT;
             return 1;
@@ -2157,7 +2216,7 @@ static void fnPollTCP(void)
                                 if (ptr_TCP->usTransmitTimer != 0) {     // no transmission timeout timeout yet
                                     ptr_TCP->usTransmitTimer--;          // count down
                                 }
-                                else {                                   // persist timer fired while waiting of a winow update from peer with closed receive window
+                                else {                                   // persist timer fired while waiting of a window update from peer with closed receive window
                                     ptr_TCP->event_listener(Socket, TCP_EVENT_REGENERATE, 0, 0); // regenerate zero data size - to be understood as probe request
                                 }
                             }
@@ -2186,7 +2245,7 @@ static void fnPollTCP(void)
 
             case TCP_STATE_SYN_SENT:
             case TCP_STATE_SYN_RCVD:
-                if (fnDoCountDown(ptr_TCP)) {
+                if (fnDoCountDown(ptr_TCP) != 0) {
                     if (ptr_TCP->ucTCP_state == TCP_STATE_SYN_SENT) {
                         ptr_TCP->usTransmitTimer = TCP_SYN_RETRY_TOUT;
 #if defined ANNOUNCE_MAX_SEGMENT_SIZE
@@ -2206,7 +2265,7 @@ static void fnPollTCP(void)
                 break;
 
             case TCP_STATE_TIME_WAIT:
-                if (ptr_TCP->usTransmitTimer) {
+                if (ptr_TCP->usTransmitTimer != 0) {
                     ptr_TCP->usTransmitTimer--;
                 }
                 else {
@@ -2217,7 +2276,7 @@ static void fnPollTCP(void)
             case TCP_STATE_LAST_ACK:
             case TCP_STATE_FIN_WAIT_1:
             case TCP_STATE_CLOSING:
-                if (fnDoCountDown(ptr_TCP)) {
+                if (fnDoCountDown(ptr_TCP) != 0) {
                     ptr_TCP->ucSendFlags = (TCP_FLAG_FIN | TCP_FLAG_ACK);
                     fnSendTCPControl(ptr_TCP);
                 }
@@ -2269,6 +2328,19 @@ extern USOCKET fnTCP_IdleTimeout(USOCKET TCPSocket, unsigned short usIdleTimeout
     return TCPSocket;
 }
 
+// Adjust the application's buffer payload location by inerting space for a TCP header (optionally with secure layer header)
+//
+extern unsigned char *fnInsertTCPHeader(USOCKET TCPSocket, unsigned char *ptrBuffer) // {70}
+{
+    ptrBuffer += MIN_TCP_HLEN;                                           // advance the buffer over the fixed TCP header length
+#if defined USE_SECURE_SOCKET_LAYER                                      // {69}
+    if ((TCPSocket & SECURE_SOCKET_MODE) != 0) {                         // when using secure socket operation
+        ptrBuffer += MAX_SECURE_SOCKET_HEADER;                           // leave additional space for the secure header
+    }
+#endif
+    return ptrBuffer;                                                    // return the payload location that the appication should use
+}
+
 
 #if defined ANNOUNCE_MAX_SEGMENT_SIZE
 static void fnSendSyn(TCP_CONTROL *ptr_TCP, unsigned char ucFlags)
@@ -2281,8 +2353,11 @@ static void fnSendSyn(TCP_CONTROL *ptr_TCP, unsigned char ucFlags)
     ucTCP_control_buf[MIN_TCP_HLEN + 1] = MSS_LENGTH;
     ucTCP_control_buf[MIN_TCP_HLEN + 2] = (unsigned char)(TCP_DEF_MTU >> 8);
     ucTCP_control_buf[MIN_TCP_HLEN + 3] = (unsigned char)(TCP_DEF_MTU);
-
+    #if defined USE_SECURE_SOCKET_LAYER
+    fnSendTCP((ptr_TCP->MySocketNumber & ~(SECURE_SOCKET_MODE)), ucTCP_control_buf, MSS_OPTION_LENGTH, 0); // send a control frame without data but with options
+    #else
     fnSendTCP(ptr_TCP->MySocketNumber, ucTCP_control_buf, MSS_OPTION_LENGTH, 0); // send a control frame without data but with options
+    #endif
 }
 #endif
 
