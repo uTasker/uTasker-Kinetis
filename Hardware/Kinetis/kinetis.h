@@ -8428,6 +8428,20 @@ typedef struct stKINETIS_ADMA2_BD
         #define SIM_SOPT4_FTM3TRG1SRC        0x80000000                  // FTM2 channel match trigger drives FTM3 hardware trigger 1 (rather than PDB output trigger 3)
       #endif
     #define SIM_SOPT5                        *(unsigned long*)(SIM_BLOCK + 0x1010) // System Options Register 5
+      #if defined KINETIS_K64
+        #define SIM_SOPT5_UART0TXSRC_NORMAL  0x00000000                  // UART0 transmit data on TX pin
+        #define SIM_SOPT5_UART0TXSRC_FTM1_0  0x00000001                  // UART0 transmit data on TX pin - modulated with FTM1 channel 0
+        #define SIM_SOPT5_UART0TXSRC_FTM2_0  0x00000002                  // UART0 transmit data on TX pin - modulated with FTM2 channel 0
+        #define SIM_SOPT5_UART0RXSRC_NORMAL  0x00000000                  // UART0 receive data from RX pin
+        #define SIM_SOPT5_UART0RXSRC_CMP0    0x00000004                  // UART0 receive data from CMP0
+        #define SIM_SOPT5_UART0RXSRC_CMP1    0x00000008                  // UART0 receive data from CMP1
+        #define SIM_SOPT5_UART1TXSRC_NORMAL  0x00000000                  // UART1 transmit data on TX pin
+        #define SIM_SOPT5_UART1TXSRC_FTM1_0  0x00000010                  // UART1 transmit data on TX pin - modulated with FTM1 channel 0
+        #define SIM_SOPT5_UART1TXSRC_FTM2_0  0x00000020                  // UART1 transmit data on TX pin - modulated with FTM2 channel 0
+        #define SIM_SOPT5_UART1RXSRC_NORMAL  0x00000000                  // UART1 receive data from RX pin
+        #define SIM_SOPT5_UART1RXSRC_CMP0    0x00000040                  // UART1 receive data from CMP0
+        #define SIM_SOPT5_UART1RXSRC_CMP1    0x00000080                  // UART1 receive data from CMP1
+      #endif
     #if !defined KINETIS_KL
         #define SIM_SOPT6                    *(unsigned long*)(SIM_BLOCK + 0x1014) // System Options Register 6
     #endif

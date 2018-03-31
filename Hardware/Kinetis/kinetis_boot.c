@@ -2,7 +2,7 @@
     Mark Butcher    Bsc (Hons) MPhil MIET
 
     M.J.Butcher Consulting
-    Birchstrasse 20f,    CH-5406, Rütihof
+    Birchstrasse 20f,    CH-5406, Rï¿½tihof
     Switzerland
 
     www.uTasker.com    Skype: M_J_Butcher
@@ -103,10 +103,11 @@ extern void fnDelayLoop(unsigned long ulDelay_us)
 
 // memset implementation
 //
-extern void *uMemset(void *ptrTo, unsigned char ucValue, size_t Size)
+extern void *uMemset(void *ptrTo, int iValue, size_t Size)
 {
     void *buffer = ptrTo;
     unsigned char *ptr = (unsigned char *)ptrTo;
+    unsigned char ucValue = (unsigned char)iValue;
 
     while (Size--) {
         *ptr++ = ucValue;

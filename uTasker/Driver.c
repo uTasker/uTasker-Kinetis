@@ -2,7 +2,7 @@
     Mark Butcher    Bsc (Hons) MPhil MIET
 
     M.J.Butcher Consulting
-    Birchstrasse 20f,    CH-5406, Rütihof
+    Birchstrasse 20f,    CH-5406, Rï¿½tihof
     Switzerland
 
     www.uTasker.com    Skype: M_J_Butcher
@@ -1151,13 +1151,14 @@ extern void *uReverseMemcpy(void *ptrTo, const void *ptrFrom, size_t Size)
     #if !defined uMemset                                                 // {7}
         #if defined RUN_LOOPS_IN_RAM                                     // execute this routine from RAM to optimise its speed
 void (*uMemset)(void *ptrTo, unsigned char ucValue, size_t Size);
-static void *_uMemset(void *ptrTo, unsigned char ucValue, size_t Size)
+static void *_uMemset(void *ptrTo, int iValue, size_t Size)
         #else
-extern void *uMemset(void *ptrTo, unsigned char ucValue, size_t Size)
+extern void *uMemset(void *ptrTo, int iValue, size_t Size)
         #endif
 {
     void *buffer = ptrTo;
     unsigned char *ptr = (unsigned char *)ptrTo;
+    unsigned char ucValue = (unsigned char)iValue;
 
     while (Size--) {
         *ptr++ = ucValue;
