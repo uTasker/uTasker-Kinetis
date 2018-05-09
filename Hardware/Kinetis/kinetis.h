@@ -228,6 +228,10 @@ extern int fnSwapMemory(int iCheck);                                     // {70}
     #endif
 #endif
 
+#if !defined KINETIS_KL && !defined KINETIS_KE
+    #define FLEXBUS_AVAILABLE
+#endif
+
 #if defined KINETIS_KE || defined KINETIS_KV10 || (defined KINETIS_KL && !defined KINETIS_KL82)
     #define BUS_FLASH_CLOCK_SHARED                                       // bus and flash clocks are shared and so have the same speed
 #endif
@@ -9153,7 +9157,7 @@ typedef struct stKINETIS_ADMA2_BD
     #define PE_3_TRACE_D1                PORT_MUX_ALT5
     #define PE_4_TRACE_D0                PORT_MUX_ALT5
 #endif
-#if defined KINETIS_K40
+#if defined KINETIS_K40 || defined KINETIS_K53
     #define PA_9_FB_AD16                 PORT_MUX_ALT5                   // Flex-Bus
     #define PA_10_FB_AD15                PORT_MUX_ALT5
     #define PA_24_FB_AD14                PORT_MUX_ALT5
