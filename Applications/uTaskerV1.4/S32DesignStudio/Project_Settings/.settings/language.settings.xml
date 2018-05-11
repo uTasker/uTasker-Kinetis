@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project>
+	<configuration id="com.freescale.s32ds.cross.gnu.arm.cortexm.exe.debug.402329150" name="uTaskerV1.4_FLASH">
+		<extension point="org.eclipse.cdt.core.LanguageSettingsProvider">
+			<provider copy-of="extension" id="org.eclipse.cdt.ui.UserLanguageSettingsProvider"/>
+			<provider-reference id="org.eclipse.cdt.core.ReferencedProjectsLanguageSettingsProvider" ref="shared-provider"/>
+			<provider-reference id="org.eclipse.cdt.managedbuilder.core.MBSLanguageSettingsProvider" ref="shared-provider"/>
+			<provider class="com.freescale.s32ds.cross.gnu.CrossGCCBuiltinSpecsDetector" console="false" env-hash="-590177812711094218" id="com.freescale.s32ds.cross.gnu.CrossGCCBuiltinSpecsDetector" keep-relative-paths="false" name="CDT S32DS Built-in Compiler Settings" parameter="${COMMAND} ${FLAGS} -E -P -v -dD &quot;${INPUTS}&quot;" prefer-non-shared="true">
+				<language-scope id="org.eclipse.cdt.core.gcc"/>
+				<language-scope id="org.eclipse.cdt.core.g++"/>
+			</provider>
+		</extension>
+	</configuration>
+	<configuration id="com.freescale.s32ds.cross.gnu.arm.cortexm.exe.debug.402329150.638943713" name="uTaskerV1.4_BM_FLASH">
+		<extension point="org.eclipse.cdt.core.LanguageSettingsProvider">
+			<provider copy-of="extension" id="org.eclipse.cdt.ui.UserLanguageSettingsProvider"/>
+			<provider-reference id="org.eclipse.cdt.core.ReferencedProjectsLanguageSettingsProvider" ref="shared-provider"/>
+			<provider-reference id="org.eclipse.cdt.managedbuilder.core.MBSLanguageSettingsProvider" ref="shared-provider"/>
+			<provider class="com.freescale.s32ds.cross.gnu.CrossGCCBuiltinSpecsDetector" console="false" env-hash="-590177812711094218" id="com.freescale.s32ds.cross.gnu.CrossGCCBuiltinSpecsDetector" keep-relative-paths="false" name="CDT S32DS Built-in Compiler Settings" parameter="${COMMAND} ${FLAGS} -E -P -v -dD &quot;${INPUTS}&quot;" prefer-non-shared="true">
+				<language-scope id="org.eclipse.cdt.core.gcc"/>
+				<language-scope id="org.eclipse.cdt.core.g++"/>
+			</provider>
+		</extension>
+	</configuration>
+	<configuration id="com.freescale.s32ds.cross.gnu.arm.cortexm.exe.debug.402329150.1856885784" name="uTaskerSerialLoader_FLASH">
+		<extension point="org.eclipse.cdt.core.LanguageSettingsProvider">
+			<provider copy-of="extension" id="org.eclipse.cdt.ui.UserLanguageSettingsProvider"/>
+			<provider-reference id="org.eclipse.cdt.core.ReferencedProjectsLanguageSettingsProvider" ref="shared-provider"/>
+			<provider-reference id="org.eclipse.cdt.managedbuilder.core.MBSLanguageSettingsProvider" ref="shared-provider"/>
+			<provider class="com.freescale.s32ds.cross.gnu.CrossGCCBuiltinSpecsDetector" console="false" env-hash="-590177812711094218" id="com.freescale.s32ds.cross.gnu.CrossGCCBuiltinSpecsDetector" keep-relative-paths="false" name="CDT S32DS Built-in Compiler Settings" parameter="${COMMAND} ${FLAGS} -E -P -v -dD &quot;${INPUTS}&quot;" prefer-non-shared="true">
+				<language-scope id="org.eclipse.cdt.core.gcc"/>
+				<language-scope id="org.eclipse.cdt.core.g++"/>
+			</provider>
+		</extension>
+	</configuration>
+	<configuration id="com.freescale.s32ds.cross.gnu.arm.cortexm.exe.debug.402329150.572284049" name="uTaskerBM_Loader">
+		<extension point="org.eclipse.cdt.core.LanguageSettingsProvider">
+			<provider copy-of="extension" id="org.eclipse.cdt.ui.UserLanguageSettingsProvider"/>
+			<provider-reference id="org.eclipse.cdt.core.ReferencedProjectsLanguageSettingsProvider" ref="shared-provider"/>
+			<provider-reference id="org.eclipse.cdt.managedbuilder.core.MBSLanguageSettingsProvider" ref="shared-provider"/>
+			<provider class="com.freescale.s32ds.cross.gnu.CrossGCCBuiltinSpecsDetector" console="false" env-hash="-590177812711094218" id="com.freescale.s32ds.cross.gnu.CrossGCCBuiltinSpecsDetector" keep-relative-paths="false" name="CDT S32DS Built-in Compiler Settings" parameter="${COMMAND} ${FLAGS} -E -P -v -dD &quot;${INPUTS}&quot;" prefer-non-shared="true">
+				<language-scope id="org.eclipse.cdt.core.gcc"/>
+				<language-scope id="org.eclipse.cdt.core.g++"/>
+			</provider>
+		</extension>
+	</configuration>
+	<configuration id="com.freescale.s32ds.cross.gnu.arm.cortexm.exe.debug.402329150.1271462992" name="uTaskerV1.4_RAM">
+		<extension point="org.eclipse.cdt.core.LanguageSettingsProvider">
+			<provider copy-of="extension" id="org.eclipse.cdt.ui.UserLanguageSettingsProvider"/>
+			<provider-reference id="org.eclipse.cdt.core.ReferencedProjectsLanguageSettingsProvider" ref="shared-provider"/>
+			<provider-reference id="org.eclipse.cdt.managedbuilder.core.MBSLanguageSettingsProvider" ref="shared-provider"/>
+			<provider class="com.freescale.s32ds.cross.gnu.CrossGCCBuiltinSpecsDetector" console="false" env-hash="-590177812711094218" id="com.freescale.s32ds.cross.gnu.CrossGCCBuiltinSpecsDetector" keep-relative-paths="false" name="CDT S32DS Built-in Compiler Settings" parameter="${COMMAND} ${FLAGS} -E -P -v -dD &quot;${INPUTS}&quot;" prefer-non-shared="true">
+				<language-scope id="org.eclipse.cdt.core.gcc"/>
+				<language-scope id="org.eclipse.cdt.core.g++"/>
+			</provider>
+		</extension>
+	</configuration>
+</project>
