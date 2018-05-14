@@ -7634,12 +7634,14 @@ extern int fnSimTimers(void)
         // Check for ADC triggers
         //
         if ((SIM_SOPT7 & SIM_SOPT7_ADC0ALTTRGEN) == 0) {                 // if the default hardware trigger source is used
+            #if defined SUPPORT_ADC
             if (FTM1_CNT >= FTM0_C0V) {                                  // TPM1 channel 0 can trigger ADC0 input A
                 fnTriggerADC(0, 1);
             }
             if (FTM1_CNT >= FTM0_C1V) {                                  // TPM1 channel 1 can trigger ADC0 input B
                 fnTriggerADC(0, 1);
             }
+            #endif
         }
         #endif
     }

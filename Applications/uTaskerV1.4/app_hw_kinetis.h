@@ -7018,11 +7018,22 @@ static inline void QSPI_HAL_ClearSeqId(QuadSPI_Type * base, qspi_command_seq_t s
 #else
     #define USER_PORT_1_BIT        PORTD_BIT8                             // use free PA pins on Eval board
     #define USER_PORT_2_BIT        PORTD_BIT9
-    #define USER_PORT_3_BIT        PORTD_BIT10
-    #define USER_PORT_4_BIT        PORTD_BIT11
-    #define USER_PORT_5_BIT        PORTD_BIT12
-    #define USER_PORT_6_BIT        PORTD_BIT13
-    #define USER_PORT_7_BIT        PORTD_BIT14
+    #if defined TWR_K53N512 && defined TFT2N0369_GLCD_MODE
+        #define USER_PORT_3_BIT    0
+    #else
+        #define USER_PORT_3_BIT    PORTD_BIT10
+    #endif
+    #if (defined TWR_K60D100M && defined SPI_FILE_SYSTEM) || (defined TWR_K53N512 && defined TFT2N0369_GLCD_MODE) // avoid reconfiguring SPI Flash lines and TFT signals
+        #define USER_PORT_4_BIT    0
+        #define USER_PORT_5_BIT    0
+        #define USER_PORT_6_BIT    0
+        #define USER_PORT_7_BIT    0
+    #else
+        #define USER_PORT_4_BIT    PORTD_BIT11
+        #define USER_PORT_5_BIT    PORTD_BIT12
+        #define USER_PORT_6_BIT    PORTD_BIT13
+        #define USER_PORT_7_BIT    PORTD_BIT14
+    #endif
     #if defined TWR_K64F120M
         #define USER_PORT_8_BIT    0                                     // avoid PHY interrupt line
     #else
@@ -7056,11 +7067,22 @@ static inline void QSPI_HAL_ClearSeqId(QuadSPI_Type * base, qspi_command_seq_t s
         #define _CONFIG_OUTPUT_PORT_1()    _CONFIG_PORT_OUTPUT(D, PORTD_BIT8,  (PORT_SRE_SLOW))
         #define _CONFIG_OUTPUT_PORT_2()    _CONFIG_PORT_OUTPUT(D, PORTD_BIT9,  (PORT_SRE_SLOW))
     #endif
-    #define _CONFIG_OUTPUT_PORT_3()    _CONFIG_PORT_OUTPUT(D, PORTD_BIT10, (PORT_SRE_SLOW))
-    #define _CONFIG_OUTPUT_PORT_4()    _CONFIG_PORT_OUTPUT(D, PORTD_BIT11, (PORT_SRE_SLOW))
-    #define _CONFIG_OUTPUT_PORT_5()    _CONFIG_PORT_OUTPUT(D, PORTD_BIT12, (PORT_SRE_SLOW))
-    #define _CONFIG_OUTPUT_PORT_6()    _CONFIG_PORT_OUTPUT(D, PORTD_BIT13, (PORT_SRE_SLOW))
-    #define _CONFIG_OUTPUT_PORT_7()    _CONFIG_PORT_OUTPUT(D, PORTD_BIT14, (PORT_SRE_SLOW))
+    #if defined TWR_K53N512 && defined TFT2N0369_GLCD_MODE
+        #define _CONFIG_OUTPUT_PORT_3()
+    #else
+        #define _CONFIG_OUTPUT_PORT_3()    _CONFIG_PORT_OUTPUT(D, PORTD_BIT10, (PORT_SRE_SLOW))
+    #endif
+    #if (defined TWR_K60D100M && defined SPI_FILE_SYSTEM) || (defined TWR_K53N512 && defined TFT2N0369_GLCD_MODE) // avoid reconfiguring SPI Flash lines and TFT signals
+        #define _CONFIG_OUTPUT_PORT_4()
+        #define _CONFIG_OUTPUT_PORT_5()
+        #define _CONFIG_OUTPUT_PORT_6()
+        #define _CONFIG_OUTPUT_PORT_7()
+    #else
+        #define _CONFIG_OUTPUT_PORT_4()    _CONFIG_PORT_OUTPUT(D, PORTD_BIT11, (PORT_SRE_SLOW))
+        #define _CONFIG_OUTPUT_PORT_5()    _CONFIG_PORT_OUTPUT(D, PORTD_BIT12, (PORT_SRE_SLOW))
+        #define _CONFIG_OUTPUT_PORT_6()    _CONFIG_PORT_OUTPUT(D, PORTD_BIT13, (PORT_SRE_SLOW))
+        #define _CONFIG_OUTPUT_PORT_7()    _CONFIG_PORT_OUTPUT(D, PORTD_BIT14, (PORT_SRE_SLOW))
+    #endif
     #if defined TWR_K64F120M
         #define _CONFIG_OUTPUT_PORT_8()                                  // avoid PHY interrupt line
     #else
@@ -8601,7 +8623,7 @@ typedef unsigned long LCD_CONTROL_PORT_SIZE;
     // Tower kit uses 16 bit FlexBus interface on CS0. The address range is set to 128K because the DC signal is connected on address wire. FlexBus setup as fast as possible in multiplexed mode
     // the 16 bit data appears at AD0..AD15 when the BLS bit is set (rather than AD16..AD31)
     //
-    #if defined TWR_K40X256 || defined TWR_K40D100M
+    #if defined TWR_K40X256 || defined TWR_K40D100M || defined TWR_K53N512
         #define CONFIGURE_GLCD()      _CONFIG_PERIPHERAL(A, 9,  (PA_9_FB_AD16  | PORT_DSE_HIGH | PORT_PS_DOWN_ENABLE)); \
                                       _CONFIG_PERIPHERAL(A, 10, (PA_10_FB_AD15 | PORT_DSE_HIGH | PORT_PS_DOWN_ENABLE)); \
                                       _CONFIG_PERIPHERAL(A, 24, (PA_24_FB_AD14 | PORT_DSE_HIGH | PORT_PS_DOWN_ENABLE)); \

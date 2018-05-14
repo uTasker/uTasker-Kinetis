@@ -25,7 +25,7 @@
 
 /////////////////////////////////////////////////////////////////////////
 //                                                                       // new users who would like to see just a blinking LED before enabling the project's many powerful features can set this
-//#define BLINKEY                                                        // it give simplest scheduling of a single task called at 200ms rate that retriggers the watchdog and toggles respective the board's heartbeat LED
+//#define BLINKY                                                         // it give simplest scheduling of a single task called at 200ms rate that retriggers the watchdog and toggles respective the board's heartbeat LED
 //                                                                       // 
 /////////////////////////////////////////////////////////////////////////
 //#define QUICK_DEV_TASKS                                                // add 4 additional tasks for simple and quick development use (located at the end of appication.c)
@@ -873,7 +873,7 @@
 #endif
 
 #define SERIAL_INTERFACE                                                 // enable serial interface driver
-#if !defined BLINKEY && defined SERIAL_INTERFACE
+#if !defined BLINKY && defined SERIAL_INTERFACE
   //#define FREEMASTER_UART                                              // UART for run-time debugging use
   //#define UART_EXTENDED_MODE                                           // required for 9-bit mode
   //    #define SERIAL_MULTIDROP_TX                                      // enable 9-bit support in the transmission direction
@@ -993,7 +993,7 @@
               //#define FREEMASTER_CDC                                   // CDC instance for run-time debugging use (if USB_CDC_COUNT is 1 the single USB-CDC connection is used, otherwise the last instance is used)
                 #if defined USB_CDC_RNDIS
                     #define USB_CDC_RNDIS_COUNT       1                  // the number of RNDIS virtual network interfaces
-                    #define USB_CDC_VCOM_COUNT        0                  // the number of CDC virtual COM ports in ompsoite device
+                    #define USB_CDC_VCOM_COUNT        0                  // the number of CDC virtual COM ports in composite device
                     #define USB_CDC_COUNT             (USB_CDC_VCOM_COUNT + USB_CDC_RNDIS_COUNT) // number of USB-CDC interfaces
                     #if !defined DEVICE_WITHOUT_ETHERNET
                         #define USB_TO_ETHERNET                          // allow RNDIS to Ethernet operation (this doesn't need the TCP/IP stack but does activate the Ethernet driver)
@@ -1095,7 +1095,7 @@
 //#define FLASH_FAT                                                      // FAT in internal flash interface
 //#define SPI_FLASH_FAT                                                  // SPI flash
     #define SIMPLE_FLASH                                                 // don't perform block management and wear-leveling
-#if defined SDCARD_SUPPORT || defined SPI_FLASH_FAT || defined FLASH_FAT || defined USB_MSD_HOST
+#if (defined SDCARD_SUPPORT || defined SPI_FLASH_FAT || defined FLASH_FAT || defined USB_MSD_HOST) && !defined BLINKY
     #if defined SPI_FLASH_FAT
         #undef ONLY_INTERNAL_FLASH_STORAGE                               // allow multiple flash storage support
     #endif
@@ -1168,7 +1168,7 @@
         #define ENC424J600_INTERFACE                                     // using ENC424J600
     #endif
 #endif
-#if (defined ETH_INTERFACE || defined USB_CDC_RNDIS) && !defined BLINKEY
+#if (defined ETH_INTERFACE || defined USB_CDC_RNDIS) && !defined BLINKY
     #define MAC_DELIMITER  '-'                                           // used for display and entry of mac addresses
     #define IPV6_DELIMITER ':'                                           // used for display and entry of IPV6 addresses
     #define NUMBER_LAN     1                                             // one physical interface needed for LAN
@@ -1825,7 +1825,7 @@
 //#define PERIODIC_TIMER_EVENT                                           // delayed and periodic tasks are schedule with timer events if enabled (otherwise they are simply scheduled)
 
 
-#if defined BLINKEY                                                      // if the BLINKEY operation is defined we ensure that the following are disabled to give simplest configuration
+#if defined BLINKY                                                       // if the BLINKY operation is defined we ensure that the following are disabled to give simplest configuration
     #undef USE_MAINTENANCE
     #undef USB_INTERFACE
     #undef USB_HOST_SUPPORT
@@ -1855,8 +1855,11 @@
     #undef UTMANAGED_FILE_COUNT
     #undef GLOBAL_TIMER_TASK
     #undef USE_MODBUS
+    #undef RANDOM_NUMBER_GENERATOR
     #undef QUICK_DEV_TASKS
     #define NO_FLASH_SUPPORT
+    #define REMOVE_PORT_INITIALISATIONS
+    #define NO_PERIPHERAL_DEMONSTRATIONS
 #endif
 
 // Project includes are set here for all files in the correct order
