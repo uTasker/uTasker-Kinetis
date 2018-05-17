@@ -931,10 +931,9 @@ extern int fnConfigEthernet(ETHTABLE *pars)
     _CONFIG_PERIPHERAL(A, 16, PA_16_MII0_TXD0);                          // MII0_TXD0 on PA.16 (alt. function 4)
     _CONFIG_PERIPHERAL(A, 17, PA_17_MII0_TXD1);                          // MII0_TXD1 on PA.17 (alt. function 4)
     #if defined ETHERNET_RMII && defined ETHERNET_RMII_CLOCK_INPUT       // {14}
-    // Add pin connection if it becomes available
-    //
-        #if defined KINETIS_K65 || defined KINETIS_K66
-    _CONFIG_PERIPHERAL(E, 26,  PE_26_ENET_1588_CLKIN);
+        #if defined KINETIS_K64 || defined KINETIS_K65 || defined KINETIS_K66
+    _CONFIG_PERIPHERAL(E, 26,  PE_26_ENET_1588_CLKIN);                   // select the pin function for external 50MHz clock input
+    SIM_SOPT2 |= (SIM_SOPT2_RMIISRC_ENET_1588_CLKIN);                    // select the ENET_1588_CLKIN as clock source (rather than EXTAL)
         #endif
     #endif
     #if !defined ETHERNET_RMII                                           // additional signals used in MII mode

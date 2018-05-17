@@ -8372,8 +8372,10 @@ typedef struct stKINETIS_ADMA2_BD
             #define SIM_SOPT2_EMVSIMSRC_MCG  0xc0000000                  // EMVSIM module clock source - MCGIRCLK
         #else
             #if defined KINETIS_HAS_IRC48M                               // {58}
-                #define SIM_SOPT2_RMIISRC_EXTAL      0x00000000          // select Ethernet RMII clock source from EXTAL clock
-                #define SIM_SOPT2_RMIISRC_EXT_BYPASS 0x00080000          // select Ethernet RMII clock source from external bypass clock (ENET_1588_CLKIN)
+                #if defined KINETIS_K64 || defined KINETIS_K65 || defined KINETIS_K66
+                    #define SIM_SOPT2_RMIISRC_EXTAL  0x00000000          // select the clock source for the Ethernet RMII interface from EXTAL clock input (default)
+                    #define SIM_SOPT2_RMIISRC_ENET_1588_CLKIN  0x00080000// select the clock source for the Ethernet RMII interface from ENET_1588_CLKIN
+                #endif
                 #define SIM_SOPT2_TIMESRC_CORE       0x00000000
                 #define SIM_SOPT2_TIMESRC_MCG_IRC48M 0x00100000
                 #define SIM_SOPT2_TIMESRC_OSCERCLK   0x00200000
@@ -9224,6 +9226,10 @@ typedef struct stKINETIS_ADMA2_BD
 #define PA_29_MII0_COL                   PORT_MUX_ALT4
 
 #if defined KINETIS_K65 || defined KINETIS_K66
+    #define PA_7_MII0_MDIO               PORT_MUX_ALT5
+    #define PA_8_MII0_MDC                PORT_MUX_ALT5
+#endif
+#if defined KINETIS_K64 || defined KINETIS_K65 || defined KINETIS_K66
     #define PE_26_ENET_1588_CLKIN        PORT_MUX_ALT2
 #endif
 
