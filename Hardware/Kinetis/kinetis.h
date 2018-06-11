@@ -1064,7 +1064,7 @@ typedef struct stRESET_VECTOR
      #define NON_INITIALISED_RAM_SIZE    (4 + PERSISTENT_RAM_SIZE)
 #endif
 
-#if ((defined KINETIS_KL && !defined KINETIS_KL02) || defined KINETIS_K22)
+#if ((defined KINETIS_KL && !defined KINETIS_KL02) || defined KINETIS_K22 || defined KINETIS_K64  || defined KINETIS_K65  || defined KINETIS_K66)
     #define CLKOUT_AVAILABLE
 #endif
 

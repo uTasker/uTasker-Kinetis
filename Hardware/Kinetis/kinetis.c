@@ -1364,19 +1364,19 @@ extern void fnResetBoard(void)
 #endif
 }
 
-#if defined KINETIS_KL
+#if defined CLKOUT_AVAILABLE && !defined KINETIS_WITH_PCC
 extern int fnClkout(int iClockSource)                                    // {120}
 {
     unsigned long ulSIM_SOPT2 = (SIM_SOPT2 & ~(SIM_SOPT2_CLKOUTSEL_MASK)); // original control register value with clock source masked
     switch (iClockSource) {                                              // set the required clock source to be output on CLKOUT
     case FLASH_CLOCK_OUT:
     case BUS_CLOCK_OUT:
-        ulSIM_SOPT2 |= SIM_SOPT2_CLKOUTSEL_BUS;
+        ulSIM_SOPT2 |= SIM_SOPT2_CLKOUTSEL_FLASH;
         break;
     case LOW_POWER_OSCILLATOR_CLOCK_OUT:
         ulSIM_SOPT2 |= SIM_SOPT2_CLKOUTSEL_LPO;
         break;
-    case INTERNAL_LIRC_CLOCK_OUT:
+    case INTERNAL_LIRC_CLOCK_OUT:                                        // same as INTERNAL_MCGIRCLK_CLOCK_OUT
         ulSIM_SOPT2 |= SIM_SOPT2_CLKOUTSEL_MCGIRCLK;
         break;
     case EXTERNAL_OSCILLATOR_CLOCK_OUT:
@@ -1387,14 +1387,31 @@ extern int fnClkout(int iClockSource)                                    // {120
         ulSIM_SOPT2 |= SIM_SOPT2_CLKOUTSEL_IRC48M;
         break;
     #endif
-    case FLEXBUS_CLOCK_OUT:
     case RTC_CLOCK_OUT:
+    #if defined KINETIS_KL03
+        _CONFIG_PERIPHERAL(B, 13, (PB_13_RTC_CLKOUT | PORT_SRE_SLOW | PORT_DSE_LOW)); // configure the RTC_CLKOUT pin
+    #elif defined KINETIS_K64 || defined KINETIS_K65 || defined KINETIS_K66
+        #if defined RTC_CLKOUT_ON_PTE_LOW
+            _CONFIG_PERIPHERAL(E, 0, (PE_0_RTC_CLKOUT | PORT_SRE_SLOW | PORT_DSE_LOW)); // configure the RTC_CLKOUT pin (alt. 7)
+        #else
+            _CONFIG_PERIPHERAL(E, 26, (PE_26_RTC_CLKOUT | PORT_SRE_SLOW | PORT_DSE_LOW)); // configure the RTC_CLKOUT pin (alt. 6)
+        #endif
+    #endif
+        return 0;
+    #if defined KINETIS_K64
+    case FLEXBUS_CLOCK_OUT:
+        ulSIM_SOPT2 &= ~(SIM_SOPT2_CLKOUTSEL_IRC48M);
+    #endif
     default:
         return -1;                                                       // invalid clock source
     }
     SIM_SOPT2 = ulSIM_SOPT2;                                             // select the clock source to be driven to the CLKOUT pin
     #if defined KINETIS_KL03
     _CONFIG_PERIPHERAL(A, 12, (PA_12_CLKOUT | PORT_SRE_FAST | PORT_DSE_HIGH)); // configure the CLKOUT pin (PA_4_CLKOUT would be an alternative possibility)
+    #elif defined KINETIS_KL05
+    _CONFIG_PERIPHERAL(A, 15, (PA_15_CLKOUT | PORT_SRE_FAST | PORT_DSE_HIGH)); // configure the CLKOUT pin (PA_4_CLKOUT would be an alternative possibility)
+    #elif defined KINETIS_K64 && (PIN_COUNT == PIN_COUNT_144_PIN)
+    _CONFIG_PERIPHERAL(A, 6, (PA_6_CLKOUT | PORT_SRE_FAST | PORT_DSE_HIGH)); // configure the CLKOUT pin
     #else
     _CONFIG_PERIPHERAL(C, 3, (PC_3_CLKOUT | PORT_SRE_FAST | PORT_DSE_HIGH)); // configure the CLKOUT pin
     #endif
@@ -2052,8 +2069,17 @@ static void _LowLevelInit(void)
         #endif
     #endif
 #endif
-#if defined KINETIS_KL
-  //fnClkout(BUS_CLOCK_OUT);                                             // select the bus clock to monitor on CLKOUT
+#if defined CLKOUT_AVAILABLE && !defined KINETIS_WITH_PCC                // select the clock signal to be driven on CLKOUT pin
+    #if defined KINETIS_K64
+      //fnClkout(FLEXBUS_CLOCK_OUT);                                     // select the clock to monitor on CLKOUT
+    #endif
+    #if defined LOW_POWER_OSCILLATOR_CLOCK_OUT
+      //fnClkout(LOW_POWER_OSCILLATOR_CLOCK_OUT);
+    #endif
+  //fnClkout(INTERNAL_IRC48M_CLOCK_OUT);
+  //fnClkout(INTERNAL_LIRC_CLOCK_OUT);                                   // equivalent to INTERNAL_MCGIRCLK_CLOCK_OUT
+  //fnClkout(EXTERNAL_OSCILLATOR_CLOCK_OUT);
+    fnClkout(RTC_CLOCK_OUT);
 #endif
 #if defined INTERRUPT_VECTORS_IN_FLASH                                   // {111}
     VECTOR_TABLE_OFFSET_REG = ((unsigned long)&__vector_table);
