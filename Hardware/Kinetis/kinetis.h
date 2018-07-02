@@ -14524,6 +14524,7 @@ typedef struct stADC_SETUP
 #define ADC_SW_TRIGGERED                0x00000000
 #define ADC_HW_TRIGGERED                0x00004000                       // (ADC_SC2_ADTRG_HW << 8)
 #define ADC_FULL_BUFFER_DMA_AUTO_REPEAT 0x00010000
+#define ADC_CHECK_CONVERSION            0x00080000
 #define ADC_CALIBRATE                   0x00100000
 #define ADC_READ_ONLY                   0x00200000
 #define ADC_CONFIGURE_CHANNEL           0x00400000

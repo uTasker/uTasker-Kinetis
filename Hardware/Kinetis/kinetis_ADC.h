@@ -509,7 +509,7 @@ static unsigned short fnConvertADCvalue(KINETIS_ADC_REGS *ptrADC, unsigned short
                 ptrADC->ADC_SC1A = ucChannelConfig;                      // start conversion if software mode or enable triggered conversion
     #endif
             }
-            if (((ptrADC_settings->int_adc_mode & (ADC_GET_RESULT)) != 0) && (ptrADC_settings->int_adc_result != 0)) { // if there is a result structure
+            if (((ptrADC_settings->int_adc_mode & (ADC_GET_RESULT | ADC_CHECK_CONVERSION)) != 0) && (ptrADC_settings->int_adc_result != 0)) { // if there is a result structure
     #if defined _WINDOWS
                 switch (ptrADC_settings->int_adc_controller) {
                 case 0:
@@ -540,13 +540,18 @@ static unsigned short fnConvertADCvalue(KINETIS_ADC_REGS *ptrADC, unsigned short
         #endif
                 }
     #endif
-                if (((ptrADC_settings->int_adc_mode & ADC_READ_ONLY) == 0) && ((ptrADC->ADC_SC1A & ADC_SC1A_AIEN) == 0)) { // no interrupt and not simple read
+                if ((((ptrADC_settings->int_adc_mode & ADC_CHECK_CONVERSION) != 0) || ((ptrADC_settings->int_adc_mode & ADC_READ_ONLY) == 0)) && ((ptrADC->ADC_SC1A & ADC_SC1A_AIEN) == 0)) { // no interrupt and not simple read
                     while ((ptrADC->ADC_SC1A & ADC_SC1A_COCO) == 0) {    // wait for conversion to complete
     #if defined _WINDOWS
                         ptrADC->ADC_SC1A |= ADC_SC1A_COCO;               // set conversion complete flag
     #endif
+                        if ((ptrADC_settings->int_adc_mode & ADC_CHECK_CONVERSION) != 0) { // if we are not to wait
+                            ptrADC_settings->int_adc_result->ucADC_status[0] = ADC_RESULT_NOT_READY; // result is presently not ready
+                            return;
+                        }
                     }
                 }
+                ptrADC_settings->int_adc_result->ucADC_status[0] = ADC_RESULT_VALID; // mark that the result is valid
                 ptrADC_settings->int_adc_result->sADC_value[0] = (signed short)ptrADC->ADC_RA; // return the read value
             }
         }

@@ -11,7 +11,7 @@
     File:      ADC_Timers.h
     Project:   uTasker project
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2018
     *********************************************************************
     29.08.2009 Add timer frequency and PWM output tests                  {1}
     08.09.2009 Add INTERNAL_TEMP option for Luminary                     {2}
@@ -36,7 +36,10 @@
     04.01.2016 Add KL support for ping-pong buffer operation             {21}
     05.01.2016 Clear PWM interrupt entry                                 {22}
 
+    09.02.2018 Add ADC polling reference (rather than using end of conversion interrupt) {25}
+
     The file is otherwise not specifically linked in to the project since it is included by application.c when needed.
+    The reason for ADC and timer configurations in a single file is that a HW timer is very often used togther with and ADC.
 
 */
 
@@ -44,7 +47,8 @@
     #define _ADC_TIMER_CONFIG
 
     #if defined SUPPORT_ADC                                              // if HW support is enabled
-      //#define TEST_ADC                                                 // enable test of ADC operation
+        #define TEST_ADC                                                 // enable test of ADC operation
+          //#define TEST_POLL_ADC                                        // {25} poll ADC conversion complete rather than use end of conversion interrupt
       //#define TEST_AD_DA                                               // {14} enable test of reading ADC and writing (after delay) to DAC
           //#define VOICE_RECORDER                                       // {15} needs TEST_AD_DA and mass-storage and saves sampled input to SD card
       //#define INTERNAL_TEMP                                            // {2} read also internal temperature (Luminary Micro)
@@ -84,7 +88,7 @@
         #define GPT_CAPTURES     5                                       // when testing captures, collect this many values
     #endif
     #if defined SUPPORT_TIMER                                            // standard timers
-      //#define TEST_TIMER                                               // test a user defined timer interrupt
+        #define TEST_TIMER                                               // test a user defined timer interrupt
         #if defined TEST_TIMER
           //#define TEST_SINGLE_SHOT_TIMER                               // test single-shot mode
           //#define TEST_PERIODIC_TIMER                                  // test periodic interrupt mode
@@ -139,6 +143,9 @@
             static void fnStartWaveDisk(void);
         #endif
     #endif
+    #if defined SUPPORT_ADC && defined TEST_ADC && defined TEST_POLL_ADC // {25}
+        static int fnCheckADC(int iChannel);
+    #endif
     #if defined TEST_PIT || defined TEST_DMA_DAC
         static void fnConfigurePIT(void);
     #endif
@@ -164,6 +171,7 @@
         static void fnConfigureRIT(void);
     #endif
 
+
 /* =================================================================== */
 /*                      local variable definitions                     */
 /* =================================================================== */
@@ -180,6 +188,9 @@
             #define ADC_SEQUENCES  2
             #define ADC_SAMPLES_LM3SXXXX (ADC_CHANNELS_LM3S * ADC_SEQUENCES)  // 2 x all channel sample sequences (3 with temperature)
             static unsigned short usADC_samples[ADC_SAMPLES_LM3SXXXX];
+        #endif
+        #if defined TEST_ADC && defined TEST_POLL_ADC                    // {25}
+            static unsigned char ucADC_converting[ADC_CONTROLLERS] = {0};
         #endif
     #elif defined TEST_AD_DA && !defined KINETIS_KE                      // {14}
         #if defined KINETIS_KL
@@ -225,6 +236,14 @@
     #endif
     #if defined RIT_TEST
         fnConfigureRIT();
+    #endif
+#endif
+
+#if defined _ADC_POLL_CODE                                               // {25} ADC polling code
+    #if defined SUPPORT_ADC && defined TEST_ADC && defined TEST_POLL_ADC
+        if (fnCheckADC(0) == 0) {                                        // if the ADC channel 0 conversion has completed
+            fnInterruptMessage(OWN_TASK, (unsigned char)(ADC_TRIGGER));  // generate trigger event to display the result
+        }
     #endif
 #endif
 
@@ -595,7 +614,31 @@ static void fnConfigureADC(void)
     fnConfigureInterrupt((void *)&adc_setup);                            // configure and start sequence
 }
     #else                                                                // M5223X / Kinetis
-
+#if defined TEST_ADC && defined TEST_POLL_ADC                            // {25}
+static int fnCheckADC(int iChannel)
+{
+    if (ucADC_converting[iChannel] != 0) {                               // if an ADC conversion has been started
+        ADC_RESULTS adc_results;
+        ADC_SETUP adc_setup;                                             // interrupt configuration parameters
+        adc_setup.int_type = ADC_INTERRUPT;                              // identifier
+        adc_setup.int_adc_mode = (ADC_READ_ONLY | ADC_CHECK_CONVERSION); // check whether the conversion has completed and don't wait for it to become ready
+        adc_setup.int_adc_controller = 0;
+        adc_setup.int_adc_result = &adc_results;
+        fnConfigureInterrupt((void *)&adc_setup);
+        if (adc_results.ucADC_status[0] == ADC_RESULT_VALID) {           // if the conversion is ready
+    #if !defined FREE_RUNNING_RX_DMA_RECEPTION
+            uTaskerStateChange(OWN_TASK, UTASKER_STOP);                  // stop polling operation
+    #endif
+            ucADC_converting[iChannel] = 0;                              // conversion has completed
+            return 0;
+        }
+        else {
+            return 1;                                                    // ADC is still busy
+        }
+    }
+    return 2;                                                            // not active
+}
+#else
 // This interrupt is called when the ADC level changes above programmed threshold (on one of the enabled channels)
 //
 static void adc_level_change_high(ADC_INTERRUPT_RESULT *adc_result)
@@ -615,6 +658,7 @@ static void adc_level_change_high(ADC_INTERRUPT_RESULT *adc_result)
     }
     #endif
 }
+#endif
 
 #if defined _KINETIS && (ADC_CONTROLLERS > 1)
 static void adc_ready_1(ADC_INTERRUPT_RESULT *adc_result)
@@ -720,9 +764,15 @@ static void fnConfigureADC(void)
     #if !defined KINETIS_KE
     adc_setup.pga_gain = PGA_GAIN_OFF;                                   // {13} PGA gain can be specified for certain inputs
     #endif
-    adc_setup.int_handler = adc_level_change_high;                       // handling function
     adc_setup.int_priority = PRIORITY_ADC;                               // ADC interrupt priority
     adc_setup.int_adc_controller = 0;                                    // ADC controller 0
+    #if defined TEST_POLL_ADC                                            // {25}
+    adc_setup.int_handler = 0;                                           // no interrupt used
+    ucADC_converting[adc_setup.int_adc_controller] = 1;                  // conversion is in progress
+    uTaskerStateChange(OWN_TASK, UTASKER_POLLING);                       // set the task to polling mode to regularly check the receive buffer
+    #else
+    adc_setup.int_handler = adc_level_change_high;                       // handling function
+    #endif
     adc_setup.int_adc_int_type = (ADC_SINGLE_SHOT_TRIGGER_INT);          // interrupt type
     adc_setup.int_adc_offset = 0;                                        // no offset
     #if defined TWR_K20D50M || defined TWR_K20D72M || defined TWR_K21D50M
