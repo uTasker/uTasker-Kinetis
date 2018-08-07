@@ -1057,7 +1057,7 @@ extern unsigned long fnHexStrHex(CHAR *cNewAdd)
     }
 
     while ((*cNewAdd >= '0')
-    #if MAC_DELIMITER >= '0'
+    #if defined MAC_DELIMITER && MAC_DELIMITER >= '0'
         && (*cNewAdd != MAC_DELIMITER)
     #endif
     #if (defined USE_IPV6 || defined IPV6_STRING_ROUTINES) && IPV6_DELIMITER >= '0' // {17}{27}

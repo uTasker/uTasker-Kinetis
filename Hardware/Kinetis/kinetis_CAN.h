@@ -11,8 +11,12 @@
     File:      kinetis_CAN.c
     Project:   Single Chip Embedded Internet
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2018
     *********************************************************************
+    11.01.2013 Set CAN controller clock source before moving to freeze mode {65}
+    04.03.2014 Correct CAN time stamp request option                     {70}
+    02.03.2017 Move controller clock source configuration to after setting freeze mode (due to problems with at least some parts) {3}
+    14.03.2017 Set CAN clock before entering freeze mode but write further setting after moving to freeze mode {4}
 
 */
 
@@ -44,6 +48,8 @@ typedef struct stCANQue
 static void fnCAN_Message(int iChannel)
 {
 #if defined MSCAN_CAN_INTERFACE
+    // To do...
+    //
 #else
     static unsigned char can_int_message[HEADER_LENGTH] = {INTERNAL_ROUTE, INTERNAL_ROUTE, 0, INTERRUPT_EVENT, 0};
     KINETIS_CAN_CONTROL *ptrCAN_control;
@@ -62,7 +68,7 @@ static void fnCAN_Message(int iChannel)
     ptrCAN_control = (KINETIS_CAN_CONTROL *)CAN0_BASE_ADD;
     #endif
     while (ptrCAN_control->CAN_IFLAG1 != 0) {                            // while message buffers flagged
-        if (ptrCAN_control->CAN_IFLAG1 & ulBufferFlag) {                 // this buffer is signalling a successful transmission or reception
+        if ((ptrCAN_control->CAN_IFLAG1 & ulBufferFlag) != 0) {          // this buffer is signalling a successful transmission or reception
             ptrCanQue = &can_queue[iChannel][iBufferID];
             can_int_message[MSG_DESTINATION_TASK] = ptrCanQue->TaskToWake; // the task that should be woken when this buffer is ready
             if (ptrCanQue->ucMode & CAN_TX_BUF) {                        // determine whether it is an rx or tx buffer
@@ -76,7 +82,7 @@ static void fnCAN_Message(int iChannel)
                         ptrCanQue->ucMode = (CAN_TX_BUF | CAN_RX_REMOTE_RX | CAN_RX_BUF_FULL); // indicate message waiting
                     }
                 }
-                else if (CAN_TX_BUF_REMOTE & ptrCanQue->ucMode) {
+                else if ((CAN_TX_BUF_REMOTE & ptrCanQue->ucMode) != 0) {
                     if (ptrCanQue->ucMode & CAN_TX_ACK_ON) {
                         can_int_message[MSG_INTERRUPT_EVENT] = CAN_TX_REMOTE_ACK;// remote frame transmission message successfully acked
                     }
@@ -86,7 +92,7 @@ static void fnCAN_Message(int iChannel)
                     ptrCanQue->ucMode &= ~CAN_TX_ACK_ON;                 // we only ack once
                 }
                 else {
-                    if (CAN_TX_ACK_ON & ptrCanQue->ucMode) {
+                    if ((CAN_TX_ACK_ON & ptrCanQue->ucMode) != 0) {
                         can_int_message[MSG_INTERRUPT_EVENT] = CAN_TX_ACK; // tx message successfully acked
                     }
                     else {
@@ -136,6 +142,8 @@ static void fnCAN_Message(int iChannel)
 static void fnCAN_error(int iChannel)
 {
 #if defined MSCAN_CAN_INTERFACE
+    // To do...
+    //
 #else
     unsigned char can_error_int_message[HEADER_LENGTH];
     KINETIS_CAN_CONTROL *ptrCAN_control;
@@ -161,20 +169,20 @@ static void fnCAN_error(int iChannel)
     ptrMessageBuffer = MBUFF0_ADD_0;
     #endif
 
-    while ((ulError = ptrCAN_control->CAN_ESR1) & (BIT1ERROR | BIT0ERROR | CAN_CRC_ERR | CAN_ACK_ERR | CAN_FRM_ERR | CAN_STF_ERR)) { // read the error status register, clearing error bits
+    while (((ulError = ptrCAN_control->CAN_ESR1) & (BIT1ERROR | BIT0ERROR | CAN_CRC_ERR | CAN_ACK_ERR | CAN_FRM_ERR | CAN_STF_ERR)) != 0) { // read the error status register, clearing error bits
     #if defined _WINDOWS
         ptrCAN_control->CAN_ESR1 &= ~ (BIT1ERROR | BIT0ERROR | CAN_CRC_ERR | CAN_ACK_ERR | CAN_FRM_ERR | CAN_STF_ERR);
     #endif
-        if (ulError & CAN_ACK_ERR) {                                     // a transmission received no ack
+        if ((ulError & CAN_ACK_ERR) != 0) {                              // a transmission received no ack
             CANQUE *ptrCanQue = can_queue[iChannel];                     // we need to search for buffers which are transmitting
             int i = NUMBER_CAN_MESSAGE_BUFFERS;
             can_error_int_message[MSG_INTERRUPT_EVENT] = 0;
-            while (i--) {
-                if (ptrCanQue->ucMode & CAN_TX_BUF_ACTIVE) {             // this buffer is presently transmitting a message
+            while (i-- != 0) {
+                if ((ptrCanQue->ucMode & CAN_TX_BUF_ACTIVE) != 0) {      // this buffer is presently transmitting a message
                     if (++(ptrCanQue->ucErrors) >= MAX_TX_CAN_TRIES) {   // we allow a few attempts before quitting (it also filters counting normal active buffers)
                         ptrMessageBuffer->ulCode_Len_TimeStamp = ((ptrMessageBuffer->ulCode_Len_TimeStamp & ~CAN_CODE_FIELD) | MB_TX_INACTIVE); // stop transmission
                         can_error_int_message[MSG_DESTINATION_TASK] = ptrCanQue->TaskToWake;
-                        if (ptrCanQue->ucMode & CAN_TX_BUF_REMOTE) {
+                        if ((ptrCanQue->ucMode & CAN_TX_BUF_REMOTE) != 0) {
                             can_error_int_message[MSG_INTERRUPT_EVENT] = CAN_TX_REMOTE_ERROR;
                             ptrCanQue->ucMode = (CAN_TX_BUF | CAN_RX_BUF_FULL | CAN_TX_BUF_REMOTE); // mark that it is an errored transmission buffer
                         }
@@ -190,7 +198,7 @@ static void fnCAN_error(int iChannel)
             }
         }
         else {
-            ptrMessageBuffer->ulCode_Len_TimeStamp = (MB_TX_INACTIVE | (ptrMessageBuffer->ulCode_Len_TimeStamp & CAN_KEEP_CONTENTS)); // free th ebuffer
+            ptrMessageBuffer->ulCode_Len_TimeStamp = (MB_TX_INACTIVE | (ptrMessageBuffer->ulCode_Len_TimeStamp & CAN_KEEP_CONTENTS)); // free the buffer
             can_error_int_message[MSG_INTERRUPT_EVENT] = CAN_OTHER_ERROR;
         }
         ptrCAN_control->CAN_ESR1 = ERRINT;                               // clear the error interrupt
@@ -207,6 +215,8 @@ static void fnCAN_error(int iChannel)
 }
 
 #if defined MSCAN_CAN_INTERFACE
+// To do...
+//
 #else
 static __interrupt void _CAN0_Message_Interrupt(void)
 {
@@ -272,7 +282,7 @@ static __interrupt void _CAN1_IMEU_Interrupt(void)
 // The choice of clock source is user-defined but this routine tries to achieve best settings using highest time quanta resolution. 
 //
 // There are up to 25 time quanta in a CAN bit time and the bit frequency is equal to the clock frequency divided by the quanta number (8..25 time quanta range)
-// There is always a single time quanta at the start of a bit period called the SYNC_SEG which can not be changed (transitions are expected to occur on the bus during this period)
+// There is always a single time quanta at the start of a bit period called the SYNC_SEG which cannot be changed (transitions are expected to occur on the bus during this period)
 // The sampling occurs after time segment 1, which is made up of a propagation segment (1..8 time quanta) plus a phase buffer segment 1 (1..8 time quanta),
 // followed by time segment 2, made up of phase buffer segment 2 (2..8 time quanta)
 //
@@ -295,16 +305,23 @@ static unsigned long fnOptimalCAN_clock(unsigned short usMode, unsigned long ulS
     unsigned long ulPrescaler;
     int iTimeQuanta = 25;                                                // highest value for highest control resolution
     int iBestTimeQuanta = 25;
-    unsigned long ulBestPrescaler;
-    if (CAN_USER_SETTINGS & usMode) {
+    unsigned long ulBestPrescaler = 0;
+    if ((CAN_USER_SETTINGS & usMode) != 0) {
         return ulSpeed;                                                  // the user is passing optimal configuration settings directly
     }
-    if (CAN_PLL_CLOCK & usMode) {                                        // use the bus clock rather than crystal input directly
+    if ((CAN_PLL_CLOCK & usMode) != 0) {                                 // use the bus clock rather than crystal input directly
         ulClockSpeed = (BUS_CLOCK);                                      // the clock speed for calculation use is the bus speed
         ulClockSourceFlag = CLK_SRC_PERIPH_CLK;                          // peripheral clock will be used as clock source
     }
     else {
         ulClockSpeed = _EXTERNAL_CLOCK;                                  // the clock speed for calculation use is the external/crystal clock speed
+        // If the oscillator clock is used its frequency must be lower than the bus clock
+        //
+    #if defined _WINDOWS
+        if (ulClockSpeed > BUS_CLOCK) {
+            _EXCEPTION("Oscillator clock must be lower than the bus clock!!");
+        }
+    #endif
     }
     while (iTimeQuanta >= 8) {                                           // test for best time quanta
         ulCanSpeed = (ulClockSpeed/iTimeQuanta);                         // speed without prescaler
@@ -355,7 +372,7 @@ static unsigned long fnOptimalCAN_clock(unsigned short usMode, unsigned long ulS
         ulBestPrescaler |= PHASE_BUF_SEG2_LEN3;
         iBestTimeQuanta -= (3 + 1);
     }
-    if (iBestTimeQuanta & 0x1) {                                         // odd
+    if ((iBestTimeQuanta & 0x1) != 0) {                                  // odd
         iBestTimeQuanta /= 2;                                            // PROP_SEG and PSEG1 to achieve time segment 1
         ulBestPrescaler |= iBestTimeQuanta;                              // set propogation bit time (1 more than phase buffer segment 1)
         iBestTimeQuanta--;
@@ -374,17 +391,20 @@ static unsigned long fnOptimalCAN_clock(unsigned short usMode, unsigned long ulS
 extern void fnInitCAN(CANTABLE *pars)
 {
 #if defined MSCAN_CAN_INTERFACE
+    // To do...
+    //
 #else
+    unsigned long ulCanCtrValue;
     KINETIS_CAN_BUF *ptrMessageBuffer;
     KINETIS_CAN_CONTROL *ptrCAN_control;
 
-    #if !defined ERRATA_E2583_SOLVED                                     // in early silicon the CAN controllers only work when the OSC is enabled
+    #if defined ERRATA_ID_2583                                           // in early silicon the CAN controllers only work when the OSC is enabled
     if ((OSC0_CR & OSC_CR_ERCLKEN) == 0) {
         OSC0_CR = OSC_CR_ERCLKEN;                _SIM_PER_CHANGE;        // enable the external reference clock source whether the bus clock or external clock is to be used
     }
     #else
     if ((CAN_PLL_CLOCK & pars->usMode) == 0) {                           // if the external clock is to be used enable it
-        if ((OSC0_CR & OSC_CR_ERCLKEN) == 0) {
+        if ((OSC0_CR & OSC_CR_ERCLKEN) == 0) {                           // if the clock has not been enabled
             OSC0_CR = OSC_CR_ERCLKEN;            _SIM_PER_CHANGE;        // enable the external reference clock source for CAN use
         }
     }
@@ -408,11 +428,11 @@ extern void fnInitCAN(CANTABLE *pars)
         ptrCAN_control = (KINETIS_CAN_CONTROL *)CAN0_BASE_ADD;
         ptrMessageBuffer = MBUFF0_ADD_0;                                 // the first of 16 message buffers in the FlexCan module
     #if defined CAN0_ON_PB
-        _CONFIG_PERIPHERAL(B ,18, PB_18_CAN0_TX);                        // CAN0_TX on PB18 (alt. function 2)
-        _CONFIG_PERIPHERAL(B ,19, PB_19_CAN0_RX);                        // CAN0_RX on PB19 (alt. function 2)
+        _CONFIG_PERIPHERAL(B, 18, PB_18_CAN0_TX);                        // CAN0_TX on PB18 (alt. function 2)
+        _CONFIG_PERIPHERAL(B, 19, PB_19_CAN0_RX);                        // CAN0_RX on PB19 (alt. function 2)
     #else
         _CONFIG_PERIPHERAL(A, 12, PA_12_CAN0_TX);                        // CAN0_TX on PA12 (alt. function 2)
-        _CONFIG_PERIPHERAL(A ,13, PA_13_CAN0_RX);                        // CAN0_RX on PA13 (alt. function 2)
+        _CONFIG_PERIPHERAL(A, 13, PA_13_CAN0_RX);                        // CAN0_RX on PA13 (alt. function 2)
     #endif
     #if NUMBER_OF_CAN_INTERFACES > 1
     }
@@ -420,16 +440,18 @@ extern void fnInitCAN(CANTABLE *pars)
 
     uMemset(ptrMessageBuffer, 0x00, (sizeof(KINETIS_CAN_BUF) * NUMBER_CAN_MESSAGE_BUFFERS)); // the buffers are not reset so clear here
                                                                          // calculate the settings for the required speed
-    ptrCAN_control->CAN_CTRL1 = fnOptimalCAN_clock(pars->usMode, pars->ulSpeed); // {65} write the clock setting and source before freeze mode
+    ulCanCtrValue = fnOptimalCAN_clock(pars->usMode, pars->ulSpeed);
+    ptrCAN_control->CAN_CTRL1 = (CLK_SRC_PERIPH_CLK & ulCanCtrValue);    // {4}{3}{65} select the clock source while the module is in disable mode
                                                                          // note that the crystal can be used and has better jitter performance than the PLL
-    ptrCAN_control->CAN_MCR &= ~CAN_MDIS;                                // move from disabled to freeze mode
-    while (ptrCAN_control->CAN_MCR & CAN_LPMACK) {                       // wait for CAN controller to leave disabled mode
+    ptrCAN_control->CAN_MCR &= ~CAN_MDIS;                                // move from disabled to freeze mode (un-synchronised to the CAN bus)
+    while ((ptrCAN_control->CAN_MCR & CAN_LPMACK) != 0) {                // wait for CAN controller to leave disabled mode
     #if defined _WINDOWS
         ptrCAN_control->CAN_MCR &= ~(CAN_LPMACK);
     #endif
     }
+    ptrCAN_control->CAN_CTRL1 = ulCanCtrValue;                           // {4} write the clock setting
 
-    if (pars->usMode & CAN_LOOPBACK) {
+    if ((pars->usMode & CAN_LOOPBACK) != 0) {
         ptrCAN_control->CAN_CTRL1 |= LPB;                                // set loopback mode
     }
 
@@ -533,7 +555,7 @@ extern void fnConfigCAN(QUEUE_HANDLE DriverID, CANTABLE *pars)
             ptrCanQue->DriverID = DriverID;
             ptrCanQue->TaskToWake = pars->Task_to_wake;
             ptrCanQue->ucMode = (CAN_TX_BUF | CAN_TX_BUF_FREE);
-            if (pars->ulTxID & CAN_EXTENDED_ID) {
+            if ((pars->ulTxID & CAN_EXTENDED_ID) != 0) {
                 ptrCanQue->ulPartnerID = pars->ulTxID;                   // enter default destination ID
                 ptrMessageBuffer->ulCode_Len_TimeStamp = (MB_TX_INACTIVE | IDE); // enable extended ID transmission
             }
@@ -541,7 +563,7 @@ extern void fnConfigCAN(QUEUE_HANDLE DriverID, CANTABLE *pars)
                 ptrCanQue->ulPartnerID = ((pars->ulTxID << CAN_STANDARD_SHIFT) & CAN_STANDARD_BITMASK); // enter reception ID for the buffer
                 ptrMessageBuffer->ulCode_Len_TimeStamp = MB_TX_INACTIVE;
             }
-            if (pars->ulRxID & CAN_EXTENDED_ID) {
+            if ((pars->ulRxID & CAN_EXTENDED_ID) != 0) {
                 ptrCanQue->ulOwnID = pars->ulRxID;
             }
             else {
@@ -571,11 +593,11 @@ extern void fnConfigCAN(QUEUE_HANDLE DriverID, CANTABLE *pars)
         if (ucRxCnt == 0) {
             break;
         }
-        if (!(ptrCanQue->DriverID)) {                                    // not yet allocated
+        if (0 == ptrCanQue->DriverID) {                                  // not yet allocated
             ucRxCnt--;
             ptrCanQue->DriverID = DriverID;
             ptrCanQue->TaskToWake = pars->Task_to_wake;
-            if (pars->ulRxID & CAN_EXTENDED_ID) {
+            if ((pars->ulRxID & CAN_EXTENDED_ID) != 0) {
                 if (ptrFirstAllocated == ptrMessageBuffer) {
                     ptrCAN_control->CAN_RX15MASK = pars->ulRxIDMask;     // first allocated receiver buffer has special mask
                 }
@@ -588,7 +610,7 @@ extern void fnConfigCAN(QUEUE_HANDLE DriverID, CANTABLE *pars)
                 ptrMessageBuffer->ulID = (pars->ulRxID & CAN_EXTENDED_MASK); // enter reception ID for the buffer
                 ptrMessageBuffer->ulCode_Len_TimeStamp = (MB_RX_EMPTY | IDE); // enable extended ID reception
             }
-            else {
+            else {                                                       // standard ID
                 unsigned long ulMask = ((pars->ulRxIDMask << CAN_STANDARD_SHIFT) & CAN_STANDARD_BITMASK);
                 if (ptrFirstAllocated == ptrMessageBuffer) {
                     ptrCAN_control->CAN_RX15MASK = ulMask;               // first allocated receiver buffer has special mask
@@ -615,6 +637,8 @@ extern void fnConfigCAN(QUEUE_HANDLE DriverID, CANTABLE *pars)
 extern unsigned char fnCAN_tx(QUEUE_HANDLE Channel, QUEUE_HANDLE DriverID, unsigned char *ptBuffer, QUEUE_TRANSFER Counter)
 {
 #if defined MSCAN_CAN_INTERFACE
+    // To do...
+    //
 #else
     int i = 0;
     KINETIS_CAN_BUF *ptrMessageBuffer;
@@ -766,6 +790,8 @@ extern unsigned char fnCAN_tx(QUEUE_HANDLE Channel, QUEUE_HANDLE DriverID, unsig
 extern unsigned char fnCAN_get_rx(QUEUE_HANDLE Channel, QUEUE_HANDLE DriverID, unsigned char *ptBuffer, QUEUE_TRANSFER Counter)
 {
 #if defined MSCAN_CAN_INTERFACE
+    // To do...
+    //
 #else
     int i;
     unsigned char ucLength;
@@ -824,7 +850,7 @@ extern unsigned char fnCAN_get_rx(QUEUE_HANDLE Channel, QUEUE_HANDLE DriverID, u
                         else {                                                 
                             *ptBuffer++ |= CAN_MSG_RX;
                         }
-                        if (GET_CAN_RX_TIME_STAMP & ucCommand) {         // {70}
+                        if ((GET_CAN_RX_TIME_STAMP & ucCommand) != 0) {  // {70}
                             *ptBuffer++ = (unsigned char)(ptrMessageBuffer->ulCode_Len_TimeStamp >> 8); // write time stamp to input buffer
                             *ptBuffer++ = (unsigned char)(ptrMessageBuffer->ulCode_Len_TimeStamp);
                         }
