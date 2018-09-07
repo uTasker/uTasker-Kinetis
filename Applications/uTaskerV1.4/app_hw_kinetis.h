@@ -358,7 +358,7 @@
         #endif
         #define USB_CLOCK_GENERATED_INTERNALLY                           // use USB clock from internal source rather than external pin
     #endif
-#elif defined TWR_KV31F120M
+#elif defined TWR_KV31F120M || defined FRDM_KV31F
   //#define RUN_FROM_DEFAULT_CLOCK                                       // default mode is FLL Engaged Internal - the 32kHz IRC is multiplied by FLL factor of 640 to obtain 20.9715MHz nominal frequency (20MHz..25MHz)
     #if !defined RUN_FROM_DEFAULT_CLOCK
         #define OSC_LOW_GAIN_MODE
@@ -954,7 +954,7 @@
   //#define PACKAGE_TYPE        PACKAGE_QFN
     #define SIZE_OF_FLASH       (32 * 1024)                              // 32k program Flash
     #define SIZE_OF_RAM         (8 * 1024)                               // 8k SRAM
-#elif defined TWR_KV31F120M
+#elif defined TWR_KV31F120M || defined FRDM_KV31F
   //#define PIN_COUNT           PIN_COUNT_64_PIN
     #define PIN_COUNT           PIN_COUNT_100_PIN                        // 48 pin package
     #define SIZE_OF_FLASH       (512 * 1024)                             // 512k program Flash
@@ -1380,7 +1380,7 @@
 #endif
 
 
-#define SUPPORT_TIMER                                                    // support hardware timer interrupt configuration (FlexTimer or TPM)
+//#define SUPPORT_TIMER                                                  // support hardware timer interrupt configuration (FlexTimer or TPM)
 
 #if defined KINETIS_KL
   //#define TPM_CLOCKED_FROM_OSCERCLK                                    // TPM clock is connected to OSCERCLK (external crystal or oscillator)
@@ -2184,7 +2184,7 @@ static inline void QSPI_HAL_ClearSeqId(QuadSPI_Type * base, qspi_command_seq_t s
         #define DEMO_UART    2                                           // use UART 2
     #elif defined TWR_K20D50M || defined TWR_K80F150M || defined tinyK20 || defined TWR_K20D72M || defined NET_K60 || defined FRDM_KE02Z || defined FRDM_KE02Z40M || defined FRDM_KE06Z || defined FRDM_K22F || defined TWR_K22F120M || defined TWR_K24F120M || defined TWR_K64F120M || defined TWR_KW21D256 || defined TWR_KW24D512 || defined rcARM_KL26 || defined BLAZE_K22 || defined K22F128_100M // {2}{16}{25}{30}
         #define DEMO_UART    1                                           // use UART 1
-    #elif defined K02F100M || defined FRDM_K20D50M || defined FRDM_KL46Z || defined FRDM_KL43Z || defined FRDM_KL25Z || defined FRDM_KL26Z || defined FRDM_KL27Z || defined FRDM_KL82Z || defined CAPUCCINO_KL27 || defined TEENSY_LC || defined TWR_KL25Z48M || defined FRDM_KL02Z || defined FRDM_KL03Z || defined FRDM_KL05Z || defined TRK_KEA8 || defined TEENSY_3_1 || defined FRDM_KE04Z || defined FRDM_K64F || defined FRDM_K66F || defined TWR_KV10Z32  || defined TWR_KV31F120M || ((defined TWR_K40X256 || defined TWR_K40D100M) && defined DEBUG_ON_VIRT_COM) || defined FreeLON // {21}{22}{24}{25}
+    #elif defined K02F100M || defined FRDM_K20D50M || defined FRDM_KL46Z || defined FRDM_KL43Z || defined FRDM_KL25Z || defined FRDM_KL26Z || defined FRDM_KL27Z || defined FRDM_KL82Z || defined CAPUCCINO_KL27 || defined TEENSY_LC || defined TWR_KL25Z48M || defined FRDM_KL02Z || defined FRDM_KL03Z || defined FRDM_KL05Z || defined TRK_KEA8 || defined TEENSY_3_1 || defined FRDM_KE04Z || defined FRDM_K64F || defined FRDM_K66F || defined TWR_KV10Z32  || defined TWR_KV31F120M || defined FRDM_KV31F || ((defined TWR_K40X256 || defined TWR_K40D100M) && defined DEBUG_ON_VIRT_COM) || defined FreeLON // {21}{22}{24}{25}
         #define DEMO_UART    0                                           // use UART 0
     #elif defined NET_KBED                                               // {16}
         #if defined KBEDM_BOARD
@@ -2254,7 +2254,7 @@ static inline void QSPI_HAL_ClearSeqId(QuadSPI_Type * base, qspi_command_seq_t s
     #elif defined rcARM_KL26
         #define UART1_ON_C                                               // UART1-RX on PTC3
         #define UART1_ON_A_TX                                            // UART1-TX on PTA19 (override)
-    #elif defined FRDM_K20D50M || defined TEENSY_3_1 || defined FRDM_KE04Z || defined FRDM_K64F || defined FRDM_K66F || defined TWR_KV10Z32 || defined TWR_KV31F120M || defined FreeLON // {21}{26}
+    #elif defined FRDM_K20D50M || defined TEENSY_3_1 || defined FRDM_KE04Z || defined FRDM_K64F || defined FRDM_K66F || defined TWR_KV10Z32 || defined TWR_KV31F120M || defined FRDM_KV31F || defined FreeLON // {21}{26}
         #define UART0_ON_B                                               // alternative UART0 pin mapping
         #if defined FRDM_K20D50M
             #define UART1_ON_C
@@ -6537,6 +6537,58 @@ static inline void QSPI_HAL_ClearSeqId(QuadSPI_Type * base, qspi_command_seq_t s
         {RGB(255,0,0),   RGB(20,20,20), 1, {376, 163, 389, 167 }, _PORTD, DEMO_LED_8}, \
 
     #define KEYPAD "KeyPads/TWR_KV10Z32.bmp"
+#elif defined FRDM_KV31F
+    #define DEMO_LED_1             (PORTD_BIT7)                          // (green LED) if the port is changed (eg. A to B) the port macros will require appropriate adjustment too
+    #define DEMO_LED_2             (PORTD_BIT1)                          // (red LED) if the port is changed (eg. A to B) the port macros will require appropriate adjustment too
+    #define DEMO_LED_3             (PORTE_BIT25)                         // (red BLUE) if the port is changed (eg. A to B) the port macros will require appropriate adjustment too
+    #define DEMO_LED_4             (PORTE_BIT1)                          // if the port is changed (eg. A to B) the port macros will require appropriate adjustment too
+    #define BLINK_LED              (DEMO_LED_1)
+    #define SWITCH_2               (PORTA_BIT4)                          // if the port is changed (eg. A to B) the port macros will require appropriate adjustment too
+    #define SWITCH_3               (PORTE_BIT4)                          // if the port is changed (eg. A to B) the port macros will require appropriate adjustment too
+
+    #define SWITCH_2_PORT          _PORTA
+    #define SWITCH_3_PORT          _PORTE
+
+    #if defined USE_MAINTENANCE && !defined REMOVE_PORT_INITIALISATIONS
+        #define INIT_WATCHDOG_LED()                                      // let the port set up do this (the user can disable blinking)
+    #else
+        #define INIT_WATCHDOG_LED() _CONFIG_DRIVE_PORT_OUTPUT_VALUE(D, (BLINK_LED), (BLINK_LED), (PORT_SRE_SLOW | PORT_DSE_HIGH))
+    #endif
+
+    #define SHIFT_DEMO_LED_1        7                                    // since the port bits are spread out shift each to the lowest 4 bits
+    #define SHIFT_DEMO_LED_2        0
+    #define SHIFT_DEMO_LED_3        23
+    #define SHIFT_DEMO_LED_4        2
+
+    #define MAPPED_DEMO_LED_1       (DEMO_LED_1 >> SHIFT_DEMO_LED_1)
+    #define MAPPED_DEMO_LED_2       (DEMO_LED_2 >> SHIFT_DEMO_LED_2)
+    #define MAPPED_DEMO_LED_3       (DEMO_LED_3 >> SHIFT_DEMO_LED_3)
+    #define MAPPED_DEMO_LED_4       (DEMO_LED_4 << SHIFT_DEMO_LED_4)
+
+    #define INIT_WATCHDOG_DISABLE() _CONFIG_PORT_INPUT_FAST_LOW(A, (SWITCH_2), PORT_PS_UP_ENABLE) // configure as input
+    #define WATCHDOG_DISABLE()      (_READ_PORT_MASK(A, SWITCH_2) == 0)  // pull this input down at reset to disable watchdog [hold SW2]
+    #define ACTIVATE_WATCHDOG()     UNLOCK_WDOG(); WDOG_TOVALL = (2000/5); WDOG_TOVALH = 0; WDOG_STCTRLH = (WDOG_STCTRLH_STNDBYEN | WDOG_STCTRLH_WAITEN | WDOG_STCTRLH_STOPEN | WDOG_STCTRLH_WDOGEN) // 1.024s watchdog timeout
+    #define TOGGLE_WATCHDOG_LED()   _TOGGLE_PORT(D, BLINK_LED)
+
+    #define CONFIG_TEST_OUTPUT()                                         // we use DEMO_LED_2 which is configured by the user code (and can be disabled in parameters if required)
+    #define TOGGLE_TEST_OUTPUT()    _TOGGLE_PORT(D, DEMO_LED_2)
+    #define SET_TEST_OUTPUT()       _SETBITS(D, DEMO_LED_2)
+    #define CLEAR_TEST_OUTPUT()     _CLEARBITS(D, DEMO_LED_2)
+
+
+    #define BUTTON_KEY_DEFINITIONS  {SWITCH_2_PORT,    SWITCH_2,  {515, 24,  538, 41  }}, \
+                                    {SWITCH_3_PORT,    SWITCH_3,  {515, 341, 538, 357 }}
+                                    
+
+        // '0'          '1'           input state   center (x,   y)   0 = circle, radius, controlling port, controlling pin 
+    #define KEYPAD_LED_DEFINITIONS  \
+        {RGB(0,   255, 0), RGB(20,20,20), 1, {541, 264, 0, 10 }, _PORTD, BLINK_LED}, \
+        {RGB(255, 0,   0), RGB(20,20,20), 1, {541, 264, 0, 10 }, _PORTD, DEMO_LED_2}, \
+        {RGB(0,   0, 255), RGB(20,20,20), 1, {541, 264, 0, 10 }, _PORTE, DEMO_LED_3}
+
+    #define MULTICOLOUR_LEDS        {0, 2}                               // single LED made up of entries 0, 1 and 6
+
+    #define KEYPAD "KeyPads/FRDM_KV31F.bmp"
 #elif defined TWR_KV31F120M
     #define DEMO_LED_1             (PORTD_BIT7)                          // (green LED) if the port is changed (eg. A to B) the port macros will require appropriate adjustment too
     #define DEMO_LED_2             (PORTB_BIT19)                         // (orange LED) if the port is changed (eg. A to B) the port macros will require appropriate adjustment too

@@ -1194,6 +1194,7 @@ typedef struct stRESET_VECTOR
     #define I2C_AVAILABLE                1
 #elif defined KINETIS_KL02 || defined KINETIS_KL25 || defined KINETIS_KL43 || defined KINETIS_KL46 || defined KINETIS_KE06 || defined KINETIS_KEA64 || defined KINETIS_KEA128 || defined KINETIS_KV31 || defined KINETIS_KL27 || defined KINETIS_KW2X
     #define I2C_AVAILABLE                2
+    #define LPI2C_AVAILABLE              0
 #elif (KINETIS_MAX_SPEED  <= 50000000) || defined KINETIS_KV || defined KINETIS_K02
     #define I2C_AVAILABLE                1
 #else
@@ -4882,7 +4883,7 @@ extern int fnProgramOnce(int iCommand, unsigned long *ptrBuffer, unsigned char u
   #define DMAMUX0_CHCFG_SOURCE_TPM1_OVERFLOW 55                          // 0x37 TPM1 overflow
   #define DMAMUX0_CHCFG_SOURCE_TPM2_OVERFLOW 56                          // 0x38 TPM2 overflow
   #define DMAMUX0_CHCFG_SOURCE_TSI           57                          // 0x39 TSI
-#elif !defined KINETIS_K21
+#elif !defined KINETIS_K21 && !defined KINETIS_K22 && !defined KINETIS_KV31 && !defined KINETIS_K80
   #define DMAMUX0_CHCFG_SOURCE_FTM3_C4       54                          // 0x36 FTM3 channel 4
   #define DMAMUX0_CHCFG_SOURCE_FTM3_C5       55                          // 0x37 FTM3 channel 5
   #define DMAMUX0_CHCFG_SOURCE_FTM3_C6       56                          // 0x38 FTM3 channel 6

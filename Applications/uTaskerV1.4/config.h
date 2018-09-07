@@ -92,7 +92,8 @@
 //#define TWR_KM34Z50M                                                   // M processors Cortex M0+ (metrology)
 
 //#define TWR_KV10Z32                                                    // V processors Cortex M0+/M4 (M0+ - motor control and power conversion - low dynamic control)
-//#define TWR_KV31F120M                                                  // (M4 - high dynamic control)
+#define FRDM_KV31F                                                       // (M4 - high dynamic control) - freedom board http://www.utasker.com/kinetis/FRDM-KV32F.html
+//#define TWR_KV31F120M                                                  // (M4 - high dynamic control) - tower board http://www.utasker.com/kinetis/TWR-KV31F120M.html
 
 //#define TWR_KW21D256                                                   // W processors Cortex M0+/M4 (wireless connectivity)
 //#define TWR_KW24D512
@@ -132,7 +133,7 @@
 //#define TEENSY_3_5                                                     // USB development board with K64FX512 - http://www.utasker.com/kinetis/TEENSY_3.5.html
 //#define FreeLON                                                        // K64 based with integrated LON
 //#define TWR_K65F180M                                                   // tower board http://www.utasker.com/kinetis/TWR-K65F180M.html
-#define FRDM_K66F                                                        // freedom board http://www.utasker.com/kinetis/FRDM-K66F.html
+//#define FRDM_K66F                                                      // freedom board http://www.utasker.com/kinetis/FRDM-K66F.html
 //#define TEENSY_3_6                                                     // USB development board with K66FX1M0 - http://www.utasker.com/kinetis/TEENSY_3.6.html
 
 //#define TWR_K70F120M                                                   // K processors Cortex M4 with graphical LCD, Ethernet, USB, encryption, tamper
@@ -340,8 +341,12 @@
     #define DEVICE_WITHOUT_USB
     #define DEVICE_WITHOUT_CAN
     #define DEVICE_WITHOUT_ETHERNET
-#elif defined TWR_KV31F120M
-    #define TARGET_HW            "TWR-KV31F120M"
+#elif defined TWR_KV31F120M || defined FRDM_KV31F
+    #if defined FRDM_KV31F
+        #define TARGET_HW        "FRDM-KV31F"
+    #else
+        #define TARGET_HW        "TWR-KV31F120M"
+    #endif
     #define OUR_HEAP_SIZE        (HEAP_REQUIREMENTS)((32 * 1024) * MEM_FACTOR)
     #define KINETIS_MAX_SPEED    120000000
     #define KINETIS_K_FPU                                                // part with floating point unit
@@ -1161,7 +1166,7 @@
 #endif
 
 #if !defined DEVICE_WITHOUT_ETHERNET && !defined K70F150M_12M && !defined TEENSY_3_5 && !defined TEENSY_3_6
-    #define ETH_INTERFACE                                                // enable Ethernet interface driver
+  //#define ETH_INTERFACE                                                // enable Ethernet interface driver
 #elif defined TEENSY_3_1 || defined TEENSY_LC
   //#define ETH_INTERFACE                                                // enable external Ethernet interface driver
     #if defined ETH_INTERFACE
