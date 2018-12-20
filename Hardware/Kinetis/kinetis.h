@@ -10089,7 +10089,7 @@ typedef struct stKINETIS_ADMA2_BD
         #define PC_3_CLKOUT              PORT_MUX_ALT5
     #endif
 #else
-    #if defined KINETIS_K64 && (PIN_COUNT == PIN_COUNT_144_PIN)
+    #if defined KINETIS_K64 && (PIN_COUNT == PIN_COUNT_144_PIN)          // 144 pin K64 option
         #define PA_6_CLKOUT              PORT_MUX_ALT5
    #endif
     #define PC_3_CLKOUT                  PORT_MUX_ALT5
