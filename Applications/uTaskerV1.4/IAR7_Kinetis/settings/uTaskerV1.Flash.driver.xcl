@@ -2,17 +2,17 @@
 
 "--cpu=Cortex-M4" 
 
-"--fpu=VFPv4_SP" 
+"--fpu=None" 
 
 "-p" 
 
-"D:\Programs\IAR Systems\Embedded Workbench 7.5\arm\CONFIG\debugger\NXP\MK66FN2M0xxx18.ddf" 
+"D:\Programs\IAR Systems\Embedded Workbench 7.5\arm\CONFIG\debugger\NXP\MK20DN128xxx5.ddf" 
 
 "--drv_verify_download" 
 
 "--semihosting=none" 
 
-"--device=MK66FN2M0xxx18" 
+"--device=MK20DN128xxx5" 
 
 
 

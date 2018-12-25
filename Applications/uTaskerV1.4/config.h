@@ -92,7 +92,7 @@
 //#define TWR_KM34Z50M                                                   // M processors Cortex M0+ (metrology)
 
 //#define TWR_KV10Z32                                                    // V processors Cortex M0+/M4 (M0+ - motor control and power conversion - low dynamic control)
-#define FRDM_KV31F                                                       // (M4 - high dynamic control) - freedom board http://www.utasker.com/kinetis/FRDM-KV32F.html
+//#define FRDM_KV31F                                                     // (M4 - high dynamic control) - freedom board http://www.utasker.com/kinetis/FRDM-KV32F.html
 //#define TWR_KV31F120M                                                  // (M4 - high dynamic control) - tower board http://www.utasker.com/kinetis/TWR-KV31F120M.html
 
 //#define TWR_KW21D256                                                   // W processors Cortex M0+/M4 (wireless connectivity)
@@ -101,7 +101,7 @@
 //#define K02F100M                                                       // development board with 100MHz K02F
 //#define FRDM_K20D50M                                                   // K processors Cortex M4 (performance and integration) with USB
 //#define tinyK20                                                        // USB memory stick format board with SD card and 50MHz K20DX128
-//#define TWR_K20D50M
+#define TWR_K20D50M
 //#define TWR_K20D72M
 //#define TEENSY_3_1                                                     // USB development board with K20DX256
 //#define K20FX512_120                                                   // development board with 120MHz K20
@@ -429,7 +429,7 @@
     #define DEVICE_WITHOUT_ETHERNET                                      // K20 doesn't have Ethernet controller
     #define OUR_HEAP_SIZE        (HEAP_REQUIREMENTS)((10 * 1024) * MEM_FACTOR)
 #elif defined TWR_K20D50M
-    #define TARGET_HW            "TWR-K20N50M"
+    #define TARGET_HW            "TWR-K20D50M"
     #define DEVICE_WITHOUT_CAN                                           // 50MHz K20 doesn't have CAN controller
     #define KINETIS_MAX_SPEED    50000000
     #define KINETIS_K20                                                  // specify the sub-family

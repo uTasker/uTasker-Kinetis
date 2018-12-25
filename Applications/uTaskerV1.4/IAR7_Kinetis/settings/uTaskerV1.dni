@@ -1,5 +1,5 @@
 [DebugChecksum]
-Checksum=346956947
+Checksum=-683706102
 [DisAssemblyWindow]
 NumStates=_ 1
 State 1=_ 1
@@ -90,7 +90,7 @@ CyclonePro_PowerDownDelay=_ "250"
 CyclonePro_PowerUpDelay=_ "250"
 Multilink_PowerDownDelay=_ "250"
 Multilink_PowerUpDelay=_ "1000"
-USE_SWD=_ "1"
+USE_SWD=_ "0"
 IO_DELAY_CNT=_ "0"
 FREQ_FX=_ "4"
 FREQ_NORMAL=_ "0"
@@ -100,30 +100,31 @@ FREQ_TRACELINK=_ "3"
 FREQ_LIGHTNING=_ "1"
 FREQ_OPENSDA=_ "3"
 RESET_DELAY=_ "0"
-PORT=_ "181"
-PORT_NAME_STRING=_ ""
-interface_selection=_ "7"
+PORT=_ "21"
+PORT_NAME_STRING=_ "SER01"
+interface_selection=_ "1"
 SHOWDIALOG=_ "1"
 TraceLink_MaxBufferSize=_ "1"
 [PE_STORED_DEVICES]
-device0=_ "Freescale_KL2x_KL25Z128M4"
-device1=_ "Freescale_KEx_KEAZ128M4"
-device2=_ "Freescale_KEx_KE02Z64M2"
-device3=_ "Freescale_K6x_K64FN1M0M12"
-device4=_ "Freescale_KL4x_KL43Z256M4"
+device0=_ "Freescale_K6x_K64FN1M0M12"
+device1=_ "Freescale_KL4x_KL43Z256M4"
+device2=_ "NXP_K6x_K66FN2M0M18"
+device3=_ "NXP_KL0x_KL03Z32M4"
+device4=_ "NXP_K2x_K20DN128M5"
 [PE_PEDEBUG]
-CURRENTDEVICE=_ "Freescale_KL4x_KL43Z256M4"
+CURRENTDEVICE=_ "NXP_K2x_K20DN128M5"
 ERASE_PROGRAM_WITHOUT_ASKING=_ "1"
 CURRENTMODE=_ "4"
 [PE_DEVICE]
-CHIPMODE=_ "Freescale_KL4x_KL43Z256M4"
+CHIPMODE=_ "NXP_K2x_K20DN128M5"
 [PE_SETTINGS]
 MEMORYSTART1=_ "0"
 MEMORYSTART2=_ "0"
 MEMORYSTART3=_ "0"
-DEFAULT_SOURCE_PATH=_ "C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.2_2\arm\bin\pemicro\P&E"
+DEFAULT_SOURCE_PATH=_ "D:\Programs\IAR Systems\Embedded Workbench 7.5\arm\bin\pemicro\P&E"
 [PE_STARTUP12]
 show_hstep_assembly_details=_ "0"
+show_hstep_assembly_details_new=_ "0"
 [PE_ARM]
 FILE1=_ ""
 BINTORAM=_ "1"
@@ -131,6 +132,7 @@ BINTOFLASH=_ "0"
 BINTOFLASHDEFAULT=_ "0"
 GOTILMAIN=_ "0"
 KEEPCPROGOPEN=_ "0"
+GOTILMAINDEFAULTON=_ "1"
 [struct_types]
 Fmt0=TTIMETABLE-taskDelay	4	0
 [array_types]
@@ -182,13 +184,6 @@ PEM_LeaveTargetRunning=0x00000000
 [Trace1]
 Enabled=0
 ShowSource=1
-[Log file]
-LoggingEnabled=_ 0
-LogFile=_ ""
-Category=_ 0
-[TermIOLog]
-LoggingEnabled=_ 0
-LogFile=_ ""
 [DriverProfiling]
 Enabled=0
 Mode=1
@@ -201,8 +196,13 @@ Enabled=0
 ShowTiming=1
 [Breakpoints2]
 Bp0=_ 0 "EMUL_CODE" "0x000005AC" 0 0 1 "" 0 "" 0
-Bp1=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\uTasker\uTasker.c}.133.16" 0 0 1 "" 0 "" 0
-Count=2
+Bp1=_ 0 "EMUL_CODE" "0x00003874" 0 0 1 "" 0 "" 0
+Bp2=_ 0 "EMUL_CODE" "0x00001102" 0 0 1 "" 0 "" 0
+Bp3=_ 0 "EMUL_CODE" "0x0000111A" 0 0 1 "" 0 "" 0
+Bp4=_ 0 "EMUL_CODE" "0x0000114E" 0 0 1 "" 0 "" 0
+Bp5=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\Hardware\Kinetis\kinetis_USB_HS_Device.h}.775.9" 0 0 1 "" 0 "" 0
+Bp6=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\Hardware\Kinetis\kinetis_USB_HS_Device.h}.839.1" 0 0 1 "" 0 "" 0
+Count=7
 [Disassemble mode]
 mode=3
 [Breakpoints]
@@ -219,8 +219,16 @@ Bp9=_ "STD_CODE" "0x0000054A" 0 0 0 0 "" 0 "" 0
 Bp10=_ "STD_CODE" "0x0000056C" 0 0 0 0 "" 0 "" 0
 Bp11=_ "STD_CODE" "{C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Hardware\Kinetis\kinetis_DAC.h}.205.1" 0 0 0 0 "" 0 "" 0
 Bp12=_ "STD_CODE" "0x000038E6" 0 0 0 0 "" 0 "" 0
-Bp13=_ "STD_CODE" "{C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Hardware\Kinetis\kinetis_ADC.h}.502.1" 1 0 0 0 "" 0 "" 0
-Count=14
+Bp13=_ "STD_CODE" "{C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Hardware\Kinetis\kinetis_ADC.h}.502.1" 0 0 0 0 "" 0 "" 0
+Bp14=_ "STD_CODE" "0x00001208" 0 0 0 0 "" 0 "" 0
+Count=15
+[Log file]
+LoggingEnabled=_ 0
+LogFile=_ ""
+Category=_ 0
+[TermIOLog]
+LoggingEnabled=_ 0
+LogFile=_ ""
 [Aliases]
 Count=0
 SuppressDialog=0

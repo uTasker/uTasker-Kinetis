@@ -11,7 +11,7 @@
     File:      WinSimMain.cpp
     Project:   uTasker project
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2017
+    Copyright (C) M.J.Butcher Consulting 2004..2018
     *********************************************************************
     18.01.2007 Correct array size                                        {1}
     26.01.2007 Increase ucDoList[10000]; to ensure no overrun {2} and OVERLAPPED data structure in fnSendSerialMessage
@@ -130,6 +130,9 @@
     02.02.2017 Allow sub-ms tick setting                                 {109}
     19.02.2017 Add FT800 emulation                                       {110}
     28.02.2017 Add UARTs 6 and 7                                         {111}
+    28.08.2018 Modify multicolour LED handling to allow multiple ones in any order {112}
+    06.10.2018 Allow display of mixed port widths for processor and external ports {113}
+    25.12.2018 Only update processor image when its rectangle has been invalidated {114}
 
     */
 
@@ -187,6 +190,11 @@ HINSTANCE hInst;                                                         // pres
 TCHAR szTitle[MAX_LOADSTRING];
 TCHAR szWindowClass[MAX_LOADSTRING];
 HWND ghWnd = NULL;
+
+extern "C"
+{
+    int catchKey = 0;
+}
 
 // Prototypes
 //
@@ -259,9 +267,9 @@ static int iLastBit;
 static int iPrevBit = -1;
 
 #if defined SUPPORT_LCD || defined SUPPORT_GLCD  || defined SUPPORT_OLED || defined SUPPORT_TFT || defined GLCD_COLOR // {104}
-static HDC clientDeviceContext = 0;
-static HDC lcd_device_context = 0;
-unsigned long *pPixels = 0;
+    static HDC clientDeviceContext = 0;
+    static HDC lcd_device_context = 0;
+    unsigned long *pPixels = 0;
 #endif
 
 #define TOGGLE_PORT    0
@@ -272,13 +280,15 @@ unsigned long *pPixels = 0;
     #define _EXTERNAL_PORT_COUNT   0
 #endif
 #if defined _KINETIS
-    #if defined KINETIS_KE
+    #if defined KINETIS_KE && !defined KINETIS_KE15 && !defined KINETIS_KE18
         #define _PORTS_AVAILABLE PORTS_AVAILABLE_8_BIT                   // 8 bit ports
     #else
         #define _PORTS_AVAILABLE (PORTS_AVAILABLE + 1)                   // add dedicated ADC port
     #endif
+#elif defined _LM3SXXXX
+    #define _PORTS_AVAILABLE (__PORTS_AVAILABLE + 1)                     // add dedicated ADC port
 #else
-    #define _PORTS_AVAILABLE PORTS_AVAILABLE
+    #define _PORTS_AVAILABLE      PORTS_AVAILABLE
 #endif
 
 #if defined _HW_NE64
@@ -453,7 +463,7 @@ unsigned long *pPixels = 0;
         #if defined _EXE
             #define CHIP_PACKAGE "M5222X.bmp"
         #else
-            #define CHIP_PACKAGE "..//..//..//Hardware//M5223X//GUI//M5222X.bmp"
+            #define CHIP_PACKAGE "..//..//..//Hardware//Coldfire//GUI//M5222X.bmp"
         #endif
         #define USB_LEFT   180 
         #define USB_TOP    96
@@ -463,13 +473,13 @@ unsigned long *pPixels = 0;
         #if defined _EXE
             #define CHIP_PACKAGE "m5216.bmp"
         #else
-            #define CHIP_PACKAGE "..//..//..//Hardware//M5223X//GUI//m5216.bmp"
+            #define CHIP_PACKAGE "..//..//..//Hardware//Coldfire//GUI//m5216.bmp"
         #endif
     #elif defined _M520X                                                 // {53}
         #if defined _EXE
             #define CHIP_PACKAGE "m5208.bmp"
         #else
-            #define CHIP_PACKAGE "..//..//..//Hardware//M5223X//GUI//m5208.bmp"
+            #define CHIP_PACKAGE "..//..//..//Hardware//Coldfire//GUI//m5208.bmp"
         #endif
         static  RECT rect_LAN_LED = {282, 63, 333, 118};
         #undef PORT_TEXT_LENGTH
@@ -478,7 +488,7 @@ unsigned long *pPixels = 0;
         #if defined _EXE
             #define CHIP_PACKAGE "m5235.bmp"
         #else
-            #define CHIP_PACKAGE "..//..//..//Hardware//M5223X//GUI//m5235.bmp"
+            #define CHIP_PACKAGE "..//..//..//Hardware//Coldfire//GUI//m5235.bmp"
         #endif
         static  RECT rect_LAN_LED = {282, 63, 333, 118};
         #undef PORT_TEXT_LENGTH
@@ -487,7 +497,7 @@ unsigned long *pPixels = 0;
         #if defined _EXE
             #define CHIP_PACKAGE "m5282.bmp"
         #else
-            #define CHIP_PACKAGE "..//..//..//Hardware//M5223X//GUI//m5282.bmp"
+            #define CHIP_PACKAGE "..//..//..//Hardware//Coldfire//GUI//m5282.bmp"
         #endif
         #undef PORT_TEXT_LENGTH
         #define PORT_TEXT_LENGTH 13
@@ -496,7 +506,7 @@ unsigned long *pPixels = 0;
         #if defined _EXE
             #define CHIP_PACKAGE "m5282.bmp"
         #else
-            #define CHIP_PACKAGE "..//..//..//Hardware//M5223X//GUI//m5282.bmp"
+            #define CHIP_PACKAGE "..//..//..//Hardware//Coldfire//GUI//m5282.bmp"
         #endif
         #define DOUBLE_COLUMN_PORTS
         #define SECOND_PORT_COLUMN_OFFSET  170
@@ -505,19 +515,19 @@ unsigned long *pPixels = 0;
         #if defined _EXE
             #define CHIP_PACKAGE "M521XX.bmp"
         #else
-            #define CHIP_PACKAGE "..//..//..//Hardware//M5223X//GUI//M521XX.bmp"
+            #define CHIP_PACKAGE "..//..//..//Hardware//Coldfire//GUI//M521XX.bmp"
         #endif
     #elif defined _M521X                                                 // {32}
         #if defined _EXE
             #define CHIP_PACKAGE "M521X.bmp"
         #else
-            #define CHIP_PACKAGE "..//..//..//Hardware//M5223X//GUI//M521X.bmp"
+            #define CHIP_PACKAGE "..//..//..//Hardware//Coldfire//GUI//M521X.bmp"
         #endif
     #elif defined _M5221X
         #if defined _EXE
             #define CHIP_PACKAGE "M5221X.bmp"
         #else
-            #define CHIP_PACKAGE "..//..//..//Hardware//M5223X//GUI//M5221X.bmp"
+            #define CHIP_PACKAGE "..//..//..//Hardware//Coldfire//GUI//M5221X.bmp"
         #endif
         #define USB_LEFT   180 
         #define USB_TOP    96
@@ -527,7 +537,7 @@ unsigned long *pPixels = 0;
         #if defined _EXE
             #define CHIP_PACKAGE "kirin3.bmp"
         #else
-            #define CHIP_PACKAGE "..//..//..//Hardware//M5223X//GUI//kirin3.bmp"
+            #define CHIP_PACKAGE "..//..//..//Hardware//Coldfire//GUI//kirin3.bmp"
         #endif
         #define USB_LEFT   225 
         #define USB_TOP    111
@@ -538,7 +548,7 @@ unsigned long *pPixels = 0;
         #if defined _EXE
             #define CHIP_PACKAGE "M5223X.bmp"
         #else
-            #define CHIP_PACKAGE "..//..//..//Hardware//M5223X//GUI//M5223X.bmp"
+            #define CHIP_PACKAGE "..//..//..//Hardware//Coldfire//GUI//M5223X.bmp"
         #endif
         static  RECT rect_LAN_LED = {173, 85, 220, 140};
     #endif
@@ -599,27 +609,55 @@ unsigned long *pPixels = 0;
         #define PORT_FIRST_LINE   270
         #define PORT_DISPLAY_LEFT 149
     #else                                                                // connectivity line
-        #if defined _STM32F7XX
+        #if defined _STM32L4XX
+            #if defined _EXE
+                #define CHIP_PACKAGE "stm32L4.bmp"
+            #else
+                #define CHIP_PACKAGE "..//..//..//Hardware//STM32//GUI//stm32L4.bmp"
+            #endif
+            #define PORT_FIRST_LINE     320
+            #define PORT_DISPLAY_LEFT   154
+        #elif defined _STM32F0
+            #if defined _EXE
+                #define CHIP_PACKAGE "stm32F0.bmp"
+            #else
+                #define CHIP_PACKAGE "..//..//..//Hardware//STM32//GUI//stm32F0.bmp"
+            #endif
+            #define PORT_FIRST_LINE     340
+            #define PORT_DISPLAY_LEFT   154
+        #elif defined _STM32L0
+            #if defined _EXE
+                #define CHIP_PACKAGE "stm32L0.bmp"
+            #else
+                #define CHIP_PACKAGE "..//..//..//Hardware//STM32//GUI//stm32L0.bmp"
+            #endif
+            #define PORT_FIRST_LINE     260
+            #define PORT_DISPLAY_LEFT   154
+        #elif defined _STM32F7XX
             #if defined _EXE
                 #define CHIP_PACKAGE "stm32f746.bmp"
             #else
                 #define CHIP_PACKAGE "..//..//..//Hardware//STM32//GUI//stm32f746.bmp"
             #endif
+            #define PORT_FIRST_LINE     320
+            #define PORT_DISPLAY_LEFT   154
         #elif defined _STM32F4XX                                         // {76}
             #if defined _EXE
                 #define CHIP_PACKAGE "stm32f407.bmp"
             #else
                 #define CHIP_PACKAGE "..//..//..//Hardware//STM32//GUI//stm32f407.bmp"
             #endif
+            #define PORT_FIRST_LINE     320
+            #define PORT_DISPLAY_LEFT   154
         #else
             #if defined _EXE
                 #define CHIP_PACKAGE "stm32f107.bmp"
             #else
                 #define CHIP_PACKAGE "..//..//..//Hardware//STM32//GUI//stm32f107.bmp"
             #endif
+            #define PORT_FIRST_LINE     320
+            #define PORT_DISPLAY_LEFT   154
         #endif
-        #define PORT_FIRST_LINE   320
-        #define PORT_DISPLAY_LEFT 154
     #endif
     #define START_PORTS_X (PORT_DISPLAY_LEFT)
     #define PORT_TEXT_LENGTH 8
@@ -769,12 +807,12 @@ unsigned long *pPixels = 0;
         #endif
     #else
         #if defined _LM3S10X
-            #define CHIP_PACKAGE "..//..//..//Hardware//LM3SXXXX//GUI//lm3s10x.bmp"
+            #define CHIP_PACKAGE "..//..//..//Hardware//Luminary//GUI//lm3s10x.bmp"
         #else
             #if defined DEVICE_WITHOUT_ETHERNET
-                #define CHIP_PACKAGE "..//..//..//Hardware//LM3SXXXX//GUI//lm3sxxxx.bmp"
+                #define CHIP_PACKAGE "..//..//..//Hardware//Luminary//GUI//lm3sxxxx.bmp"
             #else
-                #define CHIP_PACKAGE "..//..//..//Hardware//LM3SXXXX//GUI//lm3sxxxxEth.bmp"
+                #define CHIP_PACKAGE "..//..//..//Hardware//Luminary//GUI//lm3sxxxxEth.bmp"
             #endif
         #endif   
     #endif
@@ -814,6 +852,15 @@ unsigned long *pPixels = 0;
     #define START_PORTS_X (PORT_DISPLAY_LEFT)
     #define PORT_TEXT_LENGTH 8
     static  RECT rect_LAN_LED = {227, 234, 274, 289};
+#endif
+#if defined _EXT_PORT_32_BIT && PORT_WIDTH < 32                          // {113}
+    #define BLANK_PROCESSOR_PORTS (32 - PORT_WIDTH)
+#elif defined _EXT_PORT_28_BIT && PORT_WIDTH < 28
+    #define BLANK_PROCESSOR_PORTS (28 - PORT_WIDTH)
+#elif defined _EXT_PORT_16_BIT && PORT_WIDTH < 16
+    #define BLANK_PROCESSOR_PORTS (16 - PORT_WIDTH)
+#else
+    #define BLANK_PROCESSOR_PORTS 0
 #endif
 
 #if defined SUPPORT_LCD || defined SUPPORT_GLCD || defined SUPPORT_OLED || defined SUPPORT_TFT || defined GLCD_COLOR || defined SLCD_FILE // {35}
@@ -895,7 +942,7 @@ static void fnSimPortInputToggle(int iPort, int iPortBit);
 #elif defined _AT32UC3C && defined CHIP_64_PIN                           // {87}
     #define UTASKER_WIN_HEIGHT 480
 #elif defined _STM32
-    #define UTASKER_WIN_HEIGHT  (381 + (24 * _PORTS_AVAILABLE))          // {71}
+    #define UTASKER_WIN_HEIGHT  (PORT_FIRST_LINE + 61 + (24 * _PORTS_AVAILABLE)) // {71}
 #else
     #define UTASKER_WIN_HEIGHT 580
 #endif
@@ -928,6 +975,7 @@ static int fnJumpPort(int i)
     return 0;
 }
 #endif
+
 
 static void fnDisplayPorts(HDC hdc)
 {
@@ -1040,7 +1088,7 @@ static void fnDisplayPorts(HDC hdc)
         #endif
     #endif
 #endif
-#if defined KINETIS_K00 || defined KINETIS_K20 || defined KINETIS_K60 || defined KINETIS_K61 || defined KINETIS_K64 || defined KINETIS_K64 || defined KINETIS_K70 || defined KINETIS_K80 || defined KINETIS_KL || defined KINETIS_KE || defined KINETIS_KV || defined KINETIS_KW2X // {74}{82}{92}{96}
+#if defined KINETIS_K00 || defined KINETIS_K20 || defined KINETIS_K60 || defined KINETIS_K61 || defined KINETIS_K64 || defined KINETIS_K64 || defined KINETIS_K70 || defined KINETIS_K80 || defined KINETIS_KL || defined KINETIS_KE || defined KINETIS_KV || defined KINETIS_KM || defined KINETIS_KW2X || (defined KINETIS_K12 && (PIN_COUNT == PIN_COUNT_48_PIN)) // {74}{82}{92}{96}
     #undef PORT_NAME_LENGTH
     #define PORT_NAME_LENGTH 9
     unsigned long ulMSB = (1 << (PORT_WIDTH - 1));
@@ -1271,7 +1319,7 @@ static void fnDisplayPorts(HDC hdc)
     #elif defined _HW_AVR32 || defined _VYBRID                           // {34}
     signed char cPorts[PORT_WIDTH + PORT_NAME_LENGTH] = "PORT 0   ";
     #else                                                                // SAM7X
-    signed char cPorts[PORT_WIDTH + PORT_NAME_LENGTH] = "PORT A   ";
+    signed char cPorts[32 + PORT_NAME_LENGTH] = "PORT A   ";
     #endif
 #endif
     unsigned char ucPortWidth = PORT_WIDTH;
@@ -1284,13 +1332,13 @@ static void fnDisplayPorts(HDC hdc)
     present_ports_rect = present_windows_rect;
     present_windows_rect.top += (PORT_FIRST_LINE + (18 * (IP_NETWORK_COUNT - 1)));
     present_ports_rect.top = present_windows_rect.top;
-    present_windows_rect.left = PORT_DISPLAY_LEFT;       
+    present_windows_rect.left = (PORT_DISPLAY_LEFT - (BLANK_PROCESSOR_PORTS * (Port_tm.tmAveCharWidth / 2)));
     for (i = 0; i < (_PORTS_AVAILABLE + _EXTERNAL_PORT_COUNT); i++) {     // {81}
 #if defined _M5222X || defined _M5221X || defined _M521XX || defined _M521X // {32}
         if (fnJumpPort(i)) {
             goto _jump_entry;
         }
-#elif defined _STM32 || defined LPC1788 || defined _HW_SAM3X || defined KINETIS_K00 || defined KINETIS_K20 || defined KINETIS_K60 || defined KINETIS_K61 || defined KINETIS_K64 || defined KINETIS_K70 || defined KINETIS_K80 || defined KINETIS_KL || defined KINETIS_KE || defined KINETIS_KV || defined KINETIS_KW2X // {72}{73}{74}{82}{92}{96}
+#elif defined _STM32 || defined LPC1788 || defined _HW_SAM3X || defined KINETIS_K00 || defined KINETIS_K20 || defined KINETIS_K60 || defined KINETIS_K61 || defined KINETIS_K64 || defined KINETIS_K70 || defined KINETIS_K80 || defined KINETIS_KL || defined KINETIS_KE || defined KINETIS_KV || defined KINETIS_KM || defined KINETIS_KW2X || (defined KINETIS_K12 && (PIN_COUNT == PIN_COUNT_48_PIN)) // {72}{73}{74}{82}{92}{96}
         ulPortMask = fnGetPortMask(i);                                   // {71}
 #elif defined _HW_SAM7X                                                  // {21}
     #if defined _HW_SAM7S                                                // {48}
@@ -1312,23 +1360,35 @@ static void fnDisplayPorts(HDC hdc)
             ulPortMask = 0xff000000;
         }
     #endif
-#elif defined _LM3SXXXX && ((_PORTS_AVAILABLE + _EXTERNAL_PORT_COUNT) != _PORTS_AVAILABLE) // {33}{81} ADC is seperate from GPIO
-        if (i == ((_PORTS_AVAILABLE + _EXTERNAL_PORT_COUNT) - 1)) {       // {81}
+        /*
+#elif defined _LM3SXXXX && (PORTS_AVAILABLE != __PORTS_AVAILABLE)        // {33}{81} ADC is seperate from GPIO
+        if (i == __PORTS_AVAILABLE) {                                    // {81}
             ulPortMask = (0xff << ADC_CHANNELS);
             cPorts[0] = 'A';
             cPorts[1] = 'D';
             cPorts[2] = 'C';
             memset(&cPorts[3], ' ', (sizeof(cPorts) - 3)); 
-        }
+        }*/
 #endif
         ulBit = ulMSB;
-        for (y = 0; y < ucPortWidth; y++) {                              // draw each port state
-            if (ulPortMask & ulBit) {
+        y = 0;
+#if BLANK_PROCESSOR_PORTS > 0
+        if (i < _PORTS_AVAILABLE) {
+            for (y = 0; y < BLANK_PROCESSOR_PORTS; y++) {
+                cPorts[y + PORT_NAME_LENGTH] = ' ';
+            }
+        }
+        else {
+            ulBit <<= BLANK_PROCESSOR_PORTS;
+        }
+#endif
+        for (; y < (ucPortWidth + BLANK_PROCESSOR_PORTS); y++) {         // draw each port state
+            if ((ulPortMask & ulBit) != 0) {
                 cPorts[y + PORT_NAME_LENGTH] = '-';                      // bit with no function
             }
             else {
-                if (ulPortPeripheral[i] & ulBit) {
-                    if (ulPortStates[i] & ulBit) {
+                if ((ulPortPeripheral[i] & ulBit) != 0) {
+                    if ((ulPortStates[i] & ulBit) != 0) {
                         cPorts[y + PORT_NAME_LENGTH] = 'P';              // used for peripheral function ('1' state)
                     }
                     else {
@@ -1336,8 +1396,8 @@ static void fnDisplayPorts(HDC hdc)
                     }
                 }
                 else {
-                    if (ulPortFunction[i] & ulBit) {                     // defined as an output
-                        if (ulPortStates[i] & ulBit) {
+                    if ((ulPortFunction[i] & ulBit) != 0) {              // defined as an output
+                        if ((ulPortStates[i] & ulBit) != 0) {
                             cPorts[y + PORT_NAME_LENGTH] = '1';
                         }
                         else {
@@ -1345,7 +1405,7 @@ static void fnDisplayPorts(HDC hdc)
                         }
                     }
                     else {
-                        if (ulPortStates[i] & ulBit) {                   // display the input state
+                        if ((ulPortStates[i] & ulBit) != 0) {            // display the input state
                             cPorts[y + PORT_NAME_LENGTH] = '^';
                         }
                         else {
@@ -1356,7 +1416,7 @@ static void fnDisplayPorts(HDC hdc)
             }
             ulBit >>= 1;
         }
-#if defined _KINETIS && !defined KINETIS_KE
+#if defined _KINETIS && (!defined KINETIS_KE || defined KINETIS_KE15)
         if (i == PORTS_AVAILABLE) {                                      // handle dedicated ADC inputs
             int b;
             cPorts[0] = 'A';
@@ -1365,6 +1425,20 @@ static void fnDisplayPorts(HDC hdc)
             cPorts[3] = ' ';
             cPorts[5] = ' ';
             for (b = 9; b < (9 + 32); b++) {
+                if (cPorts[b] != '-') {
+                    cPorts[b] = 'A';                                     // mark that the pin has a dedicated analogue function
+                }
+            }
+        }
+#elif defined _LM3SXXXX && (_PORTS_AVAILABLE != __PORTS_AVAILABLE)
+        if (i == __PORTS_AVAILABLE) {                                    // handle dedicated ADC inputs
+            int b;
+            cPorts[0] = 'A';
+            cPorts[1] = 'D';
+            cPorts[2] = 'C';
+            cPorts[3] = ' ';
+            cPorts[5] = ' ';
+            for (b = (BLANK_PROCESSOR_PORTS + PORT_NAME_LENGTH); b < ((BLANK_PROCESSOR_PORTS + PORT_NAME_LENGTH) + 8); b++) {
                 if (cPorts[b] != '-') {
                     cPorts[b] = 'A';                                     // mark that the pin has a dedicated analogue function
                 }
@@ -1380,10 +1454,14 @@ static void fnDisplayPorts(HDC hdc)
             cPorts[2] = 'T';
             cPorts[3] = '-';
             cPorts[4] = ((i - _PORTS_AVAILABLE) + '0');                  // supports 10 external 8 bit ports
-    #if defined _EXT_PORT_16_BIT                                         // {91}
+    #if defined _EXT_PORT_32_BIT
+            ulPortMask = 0x00000000;
+    #elif defined _EXT_PORT_28_BIT
+            ulPortMask = 0xf0000000;
+    #elif defined _EXT_PORT_16_BIT                                       // {91}
             ulPortMask = 0xffff0000;
     #else
-            ulPortMask = 0xffffff00;
+            ulPortMask = 0xffffff00;                                     // 8 bit external ports
     #endif
             while (cPorts[iSpaces] != ' ') {                             // clear out any port name
                 cPorts[iSpaces++] = ' ';
@@ -1391,7 +1469,7 @@ static void fnDisplayPorts(HDC hdc)
             while (cPorts[iSpaces] == ' ') {                             // find the start of the port bit display
                 iSpaces++;
             }
-            if (cPorts[iSpaces + 1] == ' ') {                            // this is used to find an port number that has been incremented which we don't want to happen for extended ports
+            if (cPorts[iSpaces + 1] == ' ') {                            // this is used to find a port number that has been incremented which we don't want to happen for extended ports
                 cPorts[iSpaces] = ' ';
             }
             goto _next_port;
@@ -1415,9 +1493,13 @@ static void fnDisplayPorts(HDC hdc)
         }
     #endif
 #endif
-#if defined _KINETIS && !(defined KINETIS_K00 || defined KINETIS_K20 || defined KINETIS_K60 || defined KINETIS_K61 || defined KINETIS_K64 || defined KINETIS_K70 || defined KINETIS_K80 || defined KINETIS_KL || defined KINETIS_KE || defined KINETIS_KV || defined KINETIS_KW2X) // {70}{74}{82}{92}{96}
+#if defined _KINETIS && !(defined KINETIS_K00 || defined KINETIS_K20 || defined KINETIS_K60 || defined KINETIS_K61 || defined KINETIS_K64 || defined KINETIS_K70 || defined KINETIS_K80 || defined KINETIS_KL || defined KINETIS_KE || defined KINETIS_KV || defined KINETIS_KM || defined KINETIS_KW2X) && !(defined KINETIS_K12 && (PIN_COUNT == PIN_COUNT_48_PIN)) // {70}{74}{82}{92}{96}
         if (i >= (_PORTS_AVAILABLE - 1)) {                               // {91}
-    #if defined _EXT_PORT_16_BIT    
+    #if defined _EXT_PORT_32_BIT
+            ulPortMask = 0x00000000;
+    #elif defined _EXT_PORT_28_BIT
+            ulPortMask = 0xf0000000;
+    #elif defined _EXT_PORT_16_BIT    
             ulPortMask = 0xffff0000;
     #else
             ulPortMask = 0xffffff00;
@@ -2061,7 +2143,7 @@ static void fnDisplayPorts(HDC hdc)
             ulPortMask = 0xc0000000;
         }
 #endif
-        DrawText(hdc, (const char*)cPorts, (PORT_WIDTH + PORT_NAME_LENGTH), &present_windows_rect, 0);
+        DrawText(hdc, (const char*)cPorts, (PORT_WIDTH + BLANK_PROCESSOR_PORTS + PORT_NAME_LENGTH), &present_windows_rect, 0);
         present_windows_rect.top += PORT_LINE_SPACE;
 #if defined _M5222X || defined _M5221X || defined _M521XX || defined _M521X // {32}
 _jump_entry:
@@ -2194,24 +2276,27 @@ _jump_entry:
 
 // Allow the keypad/inputs to define which port information should be displayed
 //
-extern void fnSetLastPort(int iInputLastPort, int iInputPortBit)
+extern void fnSetLastPort(int iInputLastPort, unsigned long ulInputPortBit)
 {
-    static int iLastBitLocation = -1;
-    int iPortBitCount = (1 << (PORT_WIDTH - 1));
+    static unsigned long ulLastBitLocation = 0;
+    unsigned long ulPortBit = (1 << (PORT_WIDTH - 1));
     int iPortBitRef = 0;
-    if ((iLastPort == iInputLastPort) && (iLastBitLocation == iInputPortBit)) { // filter stable input position
+    if ((iLastPort == iInputLastPort) && (ulLastBitLocation == ulInputPortBit)) { // filter stable input position
         return;
     }
     iLastPort = iInputLastPort;
-    iLastBitLocation = iInputPortBit;
+    ulLastBitLocation = ulInputPortBit;
     if (iInputLastPort == -1) {                                          // mouse moved away from an input so invalidate display
         return;
     }
-    if (iInputPortBit == 0) {
+    if (ulInputPortBit > ulPortBit) {                                    // ignore references to bits beyond the processor's port width
+        return;
+    }
+    if (ulInputPortBit == 0) {
         _EXCEPTION("Invalid port bit - please correct!!");
     }
-    while ((iInputPortBit & iPortBitCount) == 0) {                       // convert input reference format
-        iPortBitCount >>= 1;
+    while ((ulInputPortBit & ulPortBit) == 0) {                          // convert input reference format
+        ulPortBit >>= 1;
         iPortBitRef++;
     }
     iLastBit = iPortBitRef;
@@ -2238,7 +2323,7 @@ static int fnToggleInput(int x, int y, int iCheck)
 
     x -= (PORT_TEXT_LENGTH * Port_tm.tmAveCharWidth);
 
-    if (x < START_PORTS_X) {                                             // check whether the mouse was on a port
+    if (x < (START_PORTS_X - (BLANK_PROCESSOR_PORTS * Port_tm.tmAveCharWidth / 2))) {             // check whether the mouse was on a port
         iLastPort = -1;
         return 0;
     }
@@ -2246,8 +2331,8 @@ static int fnToggleInput(int x, int y, int iCheck)
         iLastPort = -1;
         return 0;
     }
-    x -= START_PORTS_X;
-    if (x > (PORT_WIDTH * Port_tm.tmAveCharWidth))  {
+    x -= (START_PORTS_X - (BLANK_PROCESSOR_PORTS * Port_tm.tmAveCharWidth/2));
+    if (x > ((PORT_WIDTH + BLANK_PROCESSOR_PORTS) * Port_tm.tmAveCharWidth))  {
 #if defined DOUBLE_COLUMN_PORTS                                          // {50}
         x -= SECOND_PORT_COLUMN_OFFSET;
         if ((x < 0) || (x > (PORT_WIDTH * Port_tm.tmAveCharWidth))) {
@@ -2279,7 +2364,7 @@ static int fnToggleInput(int x, int y, int iCheck)
 
     iSizeX = Port_tm.tmAveCharWidth;
 
-    while (iPortBit < PORT_WIDTH) {                                      // which input ?
+    while (iPortBit < (PORT_WIDTH + BLANK_PROCESSOR_PORTS)) {            // which input ?
         if (x < iSizeX) {                                                // port row found
 #if defined DOUBLE_COLUMN_PORTS
             iPort = iPortColumn;
@@ -2307,8 +2392,15 @@ static int fnToggleInput(int x, int y, int iCheck)
                         }
                     }
 #endif
+                    if (iPort < _PORTS_AVAILABLE) {
+                        if (iPortBit < BLANK_PROCESSOR_PORTS) {
+                            iLastPort = -1;
+                            return 0;
+                        }
+                        iPortBit -= BLANK_PROCESSOR_PORTS;
+                    }
                     iLastPort = iPort;
-                    iLastBit  = iPortBit;
+                    iLastBit = iPortBit;
                     if (PORT_LOCATION == iCheck) {
                         return 0;
                     }
@@ -2426,7 +2518,7 @@ extern "C" void fnChangeUSBState(int iNewState)
 static void fnDisplayUSB(HDC hdc, RECT refresh_rect)                     // {14}
 {
     if ((refresh_rect.right < rect_USB_sign.left) || (refresh_rect.bottom < rect_USB_sign.top)) {
-        if (!iUSB_state_changed) {
+        if (iUSB_state_changed == 0) {
             return;
         }
     }
@@ -2577,6 +2669,24 @@ static void fnCheckSDCard(int x, int y)
 }
 #endif
 
+static int fnUpdateAreaEnclosed(RECT rt, RECT refresh_rect)
+{
+    if (refresh_rect.left > rt.left) {
+        return 0;
+    }
+    if (refresh_rect.right < rt.right) {
+        return 0;
+    }
+    if (refresh_rect.top > rt.top) {
+        return 0;
+    }
+    /*
+    if (refresh_rect.bottom < rt.bottom) {
+        return 0;
+    }*/
+    return 1;
+}
+
 static char szIPDetails[IP_NETWORK_COUNT][100];                          // {99}
 static char szProjectName[100] = "PROJECT";
 static void fnDoDraw(HWND hWnd, HDC hdc, PAINTSTRUCT ps, RECT &rect)
@@ -2592,6 +2702,7 @@ static void fnDoDraw(HWND hWnd, HDC hdc, PAINTSTRUCT ps, RECT &rect)
     int iWindowsWidth;
     int i;
     
+    static RECT chip_rect = { 0,0,0,0 };
     RECT rt;
     HGDIOBJ hFont = GetStockObject(SYSTEM_FIXED_FONT);
     GetClientRect(hWnd, &rt);
@@ -2646,12 +2757,15 @@ static void fnDoDraw(HWND hWnd, HDC hdc, PAINTSTRUCT ps, RECT &rect)
                 cyDib = abs(pbmi->bmiHeader.biHeight);
             }
         }
-
         nInit = 1;
     }
-    if (pbmfh != 0) {
-        posx = iWindowsWidth - cxDib/2;
-        SetDIBitsToDevice(hdc, posx, (42 + (IP_NETWORK_COUNT * 18)), cxDib, cyDib, 0,0,0, cyDib, pBits, pbmi, DIB_RGB_COLORS);
+    if ((pbmfh != 0) && (fnUpdateAreaEnclosed(chip_rect, rect) != 0)) { // {114}
+        posx = (iWindowsWidth - (cxDib/2));
+        chip_rect.left = posx;
+        chip_rect.top = (42 + (IP_NETWORK_COUNT * 18));
+        chip_rect.right = (chip_rect.left + cxDib);
+        chip_rect.bottom = (chip_rect.top + cyDib);
+        SetDIBitsToDevice(hdc, chip_rect.left, chip_rect.top, cxDib, cyDib, 0, 0, 0, cyDib, pBits, pbmi, DIB_RGB_COLORS);
     }
 #if defined ETH_INTERFACE
     fnDisplayLAN_LEDs(hdc, rect);
@@ -2794,11 +2908,25 @@ extern "C" void fnSound(int iFrequency)
 }
 #endif
 
+#if defined MULTICOLOUR_LEDS
+static int fnFindMulticolour(int led, int *ptrMultiLEDs)                 // {112}
+{
+    int iMulticolorLed = 0;
+    while (iMulticolorLed < sizeof(_multiLEDs) / sizeof(_multiLEDs[iMulticolorLed])) {
+        if (_multiLEDs[iMulticolorLed].iLED_start == led) {
+            *ptrMultiLEDs = iMulticolorLed;
+            return 0;
+        }
+        iMulticolorLed++;
+    }
+    return -1;                                                           // not found
+}
+#endif
 
 extern void fnDisplayKeypadLEDs(HDC hdc)
 {
 #if defined MULTICOLOUR_LEDS
-    int _led_multi_colour[3] = {0,0,0};
+    int _led_multi_colour[3];
     int iMultiLEDs = 0;
     int iCollectColour = 0;
     int iMultiStop = 0;
@@ -2808,21 +2936,16 @@ extern void fnDisplayKeypadLEDs(HDC hdc)
     int led = 0;
     while (led < _KEYPAD_LEDS) {                                         // for each LED in the list
 #if defined MULTICOLOUR_LEDS
-        if (_multiLEDs[iMultiLEDs].iLED_start == led) {                  // this LED is a mixture LED so we start collecting colours and only draw the final LED
-            _led_multi_colour[0] = 0;
-            _led_multi_colour[1] = 0;
-            _led_multi_colour[2] = 0;
-            iCollectColour = 1;                                          // we are collecting the colour
-        }
-        else if (iCollectColour == 0) {
-            _led_multi_colour[0] = 0;
-            _led_multi_colour[1] = 0;
-            _led_multi_colour[2] = 0;
-        }
-        else {
-            if (_multiLEDs[iMultiLEDs].iLED_end == led) {
-                iMultiStop = 1;
+        if (iCollectColour == 0) {                                       // not collecting a colour
+            if (fnFindMulticolour(led, &iMultiLEDs) == 0) {              // this LED is a mixture LED so we start collecting colours and only draw the final LED when all have been found
+                iCollectColour = 1;                                      // start collecting the colour
+                _led_multi_colour[0] = 0;
+                _led_multi_colour[1] = 0;
+                _led_multi_colour[2] = 0;
             }
+        }
+        else if (_multiLEDs[iMultiLEDs].iLED_end == led) {               // if collecting a colour we check whether we have reached the final one
+            iMultiStop = 1;
         }
         _ulPortFunction = ulPortFunction[keypad_leds[led].led_port];     // port pins defined as outputs
         _ulPortStates = ulPortStates[keypad_leds[led].led_port];         // port pin state (high or low)
@@ -2881,8 +3004,8 @@ extern void fnDisplayKeypadLEDs(HDC hdc)
 #endif
             _ulPortFunction = ulPortFunction[keypad_leds[led].led_port]; // port pins defined as outputs
             _ulPortStates = ulPortStates[keypad_leds[led].led_port];     // port pin state (high or low)
-            if ((_ulPortFunction & keypad_leds[led].led_port_bit)) {     // {97} port pin is an output
-                if (_ulPortStates & keypad_leds[led].led_port_bit) {     // port driving a '1'
+            if ((_ulPortFunction & keypad_leds[led].led_port_bit) != 0) {// {97} port pin is an output
+                if ((_ulPortStates & keypad_leds[led].led_port_bit) != 0) { // port driving a '1'
                     SelectObject(hdc, keypad_leds[led].led_1_colour);    // select the brush style for the '1' LED
                 }
                 else {                                                   // port driving a '0'
@@ -3041,7 +3164,13 @@ static void fnSaveUserFiles()
 
 #if defined SERIAL_INTERFACE
     #if defined LPUARTS_AVAILABLE
+        #if defined USARTS_AVAILABLE
+static char cUART[UARTS_AVAILABLE + USARTS_AVAILABLE + LPUARTS_AVAILABLE][BUFSSIZE] = {{0}};
+        #else
 static char cUART[UARTS_AVAILABLE + LPUARTS_AVAILABLE][BUFSSIZE] = {{0}};
+        #endif
+    #elif defined USARTS_AVAILABLE
+static char cUART[UARTS_AVAILABLE + USARTS_AVAILABLE][BUFSSIZE] = {{0}};
     #else
 static char cUART[UARTS_AVAILABLE][BUFSSIZE] = {{0}};
     #endif
@@ -3149,7 +3278,7 @@ static void fnUART_string(int iUART, int iCOM, DWORD com_port_speed, UART_MODE_C
 
 #define USE_DIB
 
-int APIENTRY WinMain(HINSTANCE hInstance,
+extern int APIENTRY WinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
                      LPSTR     lpCmdLine,
                      int       nCmdShow )
@@ -3436,10 +3565,10 @@ int APIENTRY WinMain(HINSTANCE hInstance,
     #endif
 #endif
         if (iInputChange != 0) {
-            if (KEY_CHANGED & iInputChange) {
+            if ((KEY_CHANGED & iInputChange) != 0) {
                 fnProcessKeyChange();
             }
-            if (INPUT_CHANGED & iInputChange) {
+            if ((INPUT_CHANGED & iInputChange) != 0) {
                 fnProcessInputChange();
             }
             iInputChange = 0;
@@ -3450,10 +3579,10 @@ int APIENTRY WinMain(HINSTANCE hInstance,
             iLastTxActivity = (iTxActivity > 0);
             InvalidateRect(ghWnd, &rect_LAN_LED, FALSE);                 // redraw new LAN activity state
         }
-        if (iRxActivity) {
+        if (iRxActivity != 0) {
             --iRxActivity;
         }
-        if (iTxActivity) {
+        if (iTxActivity != 0) {
             --iTxActivity;
         }
 #endif
@@ -3874,7 +4003,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
                         unsigned short usPortOffset = 1;
                         unsigned char ucPortNumber = 0;
                       //ucNumberOfPorts /= (3 * sizeof(unsigned long));  // {51}
-                        while (ucNumberOfPorts--) {                      // for each port
+                        while (ucNumberOfPorts-- != 0) {                 // for each port
                             ulPort = fnGetValue(doPtr + usPortOffset, sizeof(ulPort));
                             usPortOffset += sizeof(ulPort);
                             ulPortDDR = fnGetValue(doPtr + usPortOffset, sizeof(ulPort));
@@ -3900,7 +4029,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
         fnDoEthereal(0, 0);                                              // {18} if we are playing back ethereal files, inject frames here
 #endif
 #if defined USB_INTERFACE
-        fnInjectUSB(0,0,0);                                              // inject any queued USB data
+        fnInjectUSB(0, 0, 0);                                            // inject any queued USB data
 #endif
     }
 
@@ -4095,6 +4224,11 @@ extern void fnInjectInputChange(unsigned long ulPortRef, unsigned long ulPortBit
     char *ptr[2];
     int iBitRef = (PORT_WIDTH - 1);                                      // MSB
     ulPortBit >>= 1;
+#if BLANK_PROCESSOR_PORTS != 0
+    if (ulPortRef >= _PORTS_AVAILABLE) {
+        iBitRef += BLANK_PROCESSOR_PORTS;
+    }
+#endif
     while (ulPortBit != 0) {                                             // convert to the bit location reference
         iBitRef--;
         ulPortBit >>= 1;
@@ -4154,8 +4288,8 @@ extern void fnInjectPortValue(int iPort, unsigned long ulMask, unsigned long ulV
 #endif
     int iPortBit = 0;
 
-    while (ulPortInputs) {
-        if (ulBit & ulMask) {
+    while (ulPortInputs != 0) {
+        if ((ulBit & ulMask) != 0) {
             if ((ulPortStates[iPort] & ulBit) != (ulValue & ulBit)) {    // if this bit is to be changed
                 fnSimPortInputToggle(iPort, iPortBit);
                 fnProcessInputChange();
@@ -4215,7 +4349,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 #if defined SUPPORT_LCD || defined SUPPORT_GLCD || defined SUPPORT_OLED || defined SUPPORT_TFT || defined GLCD_COLOR || defined SLCD_FILE || defined SUPPORT_KEY_SCAN || defined KEYPAD || defined BUTTON_KEY_DEFINITIONS  // {35}{65}{83}
     int iLCD_Bottom = 0;
 #endif
-
     rt.right = UTASKER_WIN_WIDTH;                                        // basic windows size without LCD or keypad/panel
     rt.bottom = UTASKER_WIN_HEIGHT;
 
@@ -4413,7 +4546,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
     #endif
 #endif
-            if (fnToggleInput(LOWORD(lParam), HIWORD(lParam), POSSIBLE_PORT)) {
+            if (fnToggleInput(LOWORD(lParam), HIWORD(lParam), POSSIBLE_PORT) != 0) {
                 fnToggleInput(LOWORD(lParam), HIWORD(lParam), PORT_LOCATION);
             }
             else if (iLastPort != iPrevPort) {                           // {36} check whether mouse moves away from port area
@@ -4475,6 +4608,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             break;
 
         case WM_KEYDOWN:
+            catchKey = wParam;
             if (0x10 == wParam) {                                        // shift key down {11}
                 iShiftPressed = 1;
             }
@@ -4769,7 +4903,7 @@ static void fnSetComPort(HANDLE m_hComm, DWORD dwBaud, UART_MODE_CONFIG Mode) //
 
     GetCommState(m_hComm, &dcb);                                         // get the present com port settings
 
-    if (dwBaud < 250) {                                                  // often the speed can not be set accurately enough for windows to understand it - se we help out a bit here
+    if (dwBaud < 250) {                                                  // often the speed cannot be set accurately enough for windows to understand it - se we help out a bit here
         dwBaud = 110;
     }
     else if (dwBaud <400) {
@@ -5025,7 +5159,7 @@ static void fnUDP_socket(PVOID pvoid)
     addr.sin_addr.S_un.S_addr = ADDR_ANY;
     rc = bind(remote_simulation_socket_server,(SOCKADDR *)&addr, sizeof(SOCKADDR_IN));
 
-    while (1) {
+    while ((int)1 != (int)0) {
         rc = recv(remote_simulation_socket_server, (char *)ucBuffer, sizeof(ucBuffer), 0); // wait until data is received
         switch (ucBuffer[0]) {
     #if defined nRF24L01_INTERFACE
@@ -5528,8 +5662,6 @@ extern "C" unsigned long fnRemoteSimulationInterface(int iInterfaceReference, un
 
 #if defined FT800_GLCD_MODE && defined FT800_EMULATOR                    // {110}
 
-#define FT8XXEMU_VERSION_API    9                                        // API version is increased for the library whenever FT8XXEMU_EmulatorParameters format changes or functions are modified
-
 static volatile int iEmulatorReady = 0;                                  // variable used to monitor whether the emulator has competed its initialisaion
 
 typedef unsigned long argb8888;
@@ -5668,8 +5800,8 @@ extern "C" {
     extern void FT8XXEMU_run(unsigned long versionApi, const FT8XXEMU_EmulatorParameters *params);
 
     __declspec(dllimport) extern unsigned char (*FT8XXEMU_transfer)(unsigned char data); // transfer data over the imaginary SPI bus. Call from the MCU thread (from the setup/loop callbacks). See FT8XX documentation for SPI transfer protocol
-    __declspec(dllimport) extern void (*FT8XXEMU_cs)(int cs);                     // set cable select. Must be set to 1 to start data transfer, 0 to end. See FT8XX documentation for CS_N
-    __declspec(dllimport) extern int (*FT8XXEMU_int)();                           // returns 1 if there is an interrupt flag set. Depends on mask. See FT8XX documentation for INT_N
+    __declspec(dllimport) extern void (*FT8XXEMU_cs)(int cs);            // set cable select. Must be set to 1 to start data transfer, 0 to end. See FT8XX documentation for CS_N
+    __declspec(dllimport) extern int (*FT8XXEMU_int)();                  // returns 1 if there is an interrupt flag set. Depends on mask. See FT8XX documentation for INT_N
 }
 
 
@@ -5690,21 +5822,24 @@ static void loop(void)
 //
 extern "C" void _FT8XXEMU_cs(int cs)
 {
-    while (iEmulatorReady == 0) {                                        // if the emulator has not yet initistaed we wait
+    while (iEmulatorReady == 0) {                                        // if the emulator has not yet initialised we wait
         Sleep(10);
     }
-    FT8XXEMU_cs(cs);
+    FT8XXEMU_cs(cs);                                                     // from ft8xxemu.lib
 }
 
 // Send a byte to the emulator
 //
 extern "C" unsigned char _FT8XXEMU_transfer(unsigned char data)
 {
-    return FT8XXEMU_transfer(data);
+    return FT8XXEMU_transfer(data);                                      // from ft8xxemu.lib
 }
 
 static void FT800_emulator_thread(void *hArgs)
 {
+  //#define FT8XXEMU_VERSION_API    9                                    // (2012) API version is increased for the library whenever FT8XXEMU_EmulatorParameters format changes or functions are modified
+    #define FT8XXEMU_VERSION_API    10                                   // (2015) API version is increased for the library whenever FT8XXEMU_EmulatorParameters format changes or functions are modified
+
     FT8XXEMU_EmulatorParameters params;
     FT8XXEMU_EmulatorMode       Ft_GpuEmu_Mode;
     #if defined (FT_800_ENABLE)                                           // select the emulation mode
@@ -5727,7 +5862,10 @@ static void FT800_emulator_thread(void *hArgs)
     params.Flags &= (~FT8XXEMU_EmulatorEnableDynamicDegrade & ~FT8XXEMU_EmulatorEnableRegPwmDutyEmulation);
     params.Setup = setup;
     params.Loop = loop;
-    FT8XXEMU_run(FT8XXEMU_VERSION_API, &params);                         // start the emulation - this doesn't return
+    FT8XXEMU_run(FT8XXEMU_VERSION_API, &params);                         // start the emulation - this doesn't return until terminated
+    if (iEmulatorReady == 0) {
+        _EXCEPTION("Mismatch vetween the API version selected and the library linked - please adjust FT8XXEMU_VERSION_API (above) appropriately!");
+    }
 }
 
 static void fnInitFT800_emulator(void)

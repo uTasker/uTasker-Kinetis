@@ -777,7 +777,9 @@ static void fnConfigureADC(void)
     adc_setup.int_adc_offset = 0;                                        // no offset
     #if defined TWR_K20D50M || defined TWR_K20D72M || defined TWR_K21D50M
     adc_setup.int_adc_bit = ADC_DM3_SINGLE;                              // ADC DM3 single-ended
+        #if (ADC_CONTROLLERS > 1)
     adc_setup.int_handler = adc_ready_1;                                 // handling function
+        #endif
     #elif defined TEENSY_3_1
     adc_setup.int_adc_bit = ADC_DP3_SINGLE;                              // ADC DM3 single-ended - pad A12
     adc_setup.int_handler = adc_ready_1;                                 // handling function
@@ -787,7 +789,7 @@ static void fnConfigureADC(void)
     adc_setup.int_adc_bit = ADC_TEMP_SENSOR;                             // ADC internal temperature
     #endif
     #if defined TWR_K20D50M || defined TWR_K20D72M || defined TWR_K21D50M
-    adc_setup.int_adc_mode = (ulCalibrate | ADC_SELECT_INPUTS_A | ADC_CLOCK_BUS_DIV_2 | ADC_CLOCK_DIVIDE_4 | ADC_SAMPLE_ACTIVATE_LONG | ADC_CONFIGURE_ADC | ADC_REFERENCE_VREF | ADC_CONFIGURE_CHANNEL | ADC_SINGLE_ENDED | ADC_SINGLE_SHOT_MODE | ADC_16_BIT_MODE | ADC_SW_TRIGGERED); // note that the first configuration should calibrate the ADC - single shot with interrupt on completion {12}
+    adc_setup.int_adc_mode = (ulCalibrate | ADC_SELECT_INPUTS_A | ADC_CLOCK_BUS_DIV_2 | ADC_CLOCK_DIVIDE_4 | ADC_SAMPLE_ACTIVATE_LONG | ADC_CONFIGURE_ADC | ADC_REFERENCE_VREF | ADC_CONFIGURE_CHANNEL | ADC_SINGLE_ENDED_INPUT | ADC_SINGLE_SHOT_MODE | ADC_16_BIT_MODE | ADC_SW_TRIGGERED); // note that the first configuration should calibrate the ADC - single shot with interrupt on completion {12}
     adc_setup.int_adc_sample = (ADC_SAMPLE_LONG_PLUS_12 | ADC_SAMPLE_AVERAGING_32); // additional sampling clocks
     #else
         #if defined TEST_AD_DA                                           // {14}

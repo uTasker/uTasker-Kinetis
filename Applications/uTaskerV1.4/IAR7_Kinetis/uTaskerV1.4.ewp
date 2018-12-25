@@ -89,7 +89,7 @@
         </option>
         <option>
           <name>OGChipSelectEditMenu</name>
-          <state>MK66FN2M0xxx18	NXP MK66FN2M0xxx18</state>
+          <state>MK20DN128xxx5	NXP MK20DN128xxx5</state>
         </option>
         <option>
           <name>GenLowLevelInterface</name>
@@ -149,17 +149,17 @@
         </option>
         <option>
           <name>GFPUDeviceSlave</name>
-          <state>MK66FN2M0xxx18	NXP MK66FN2M0xxx18</state>
+          <state>MK20DN128xxx5	NXP MK20DN128xxx5</state>
         </option>
         <option>
           <name>FPU2</name>
           <version>0</version>
-          <state>4</state>
+          <state>0</state>
         </option>
         <option>
           <name>NrRegs</name>
           <version>0</version>
-          <state>1</state>
+          <state>0</state>
         </option>
         <option>
           <name>NEON</name>
@@ -727,7 +727,7 @@
         </option>
         <option>
           <name>IlinkIcfFile</name>
-          <state>$PROJ_DIR$\settings\K_2M_256.icf</state>
+          <state>$PROJ_DIR$\settings\K_128_16.icf</state>
         </option>
         <option>
           <name>IlinkIcfFileSlave</name>
