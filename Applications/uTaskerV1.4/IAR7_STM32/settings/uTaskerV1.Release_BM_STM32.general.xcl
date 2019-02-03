@@ -1,0 +1,15 @@
+"D:\Programs\IAR Systems\Embedded Workbench 7.5\arm\bin\armproc.dll" 
+
+"D:\Programs\IAR Systems\Embedded Workbench 7.5\arm\bin\armstlink2.dll" 
+
+"D:\MJBC\Internal\Freescale\Kinetis\workspace\uTasker-Kinetis-Open\Applications\uTaskerV1.4\IAR7_STM32\Release BM STM32\Exe\uTaskerV1.4_BM.out" 
+
+--plugin "D:\Programs\IAR Systems\Embedded Workbench 7.5\arm\bin\armbat.dll" 
+
+--device_macro "D:\Programs\IAR Systems\Embedded Workbench 7.5\arm\config\debugger\ST\STM32F1xx_XL.dmac" 
+
+--flash_loader "D:\Programs\IAR Systems\Embedded Workbench 7.5\arm\config\flashloader\ST\FlashSTM32F10xx8.board" 
+
+
+
+

@@ -1,0 +1,15 @@
+"C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.2_2\arm\bin\armproc.dll" 
+
+"C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.2_2\arm\bin\armstlink2.dll" 
+
+"C:\MJBC\Internal\ST Micro\STM32\workspace_STM32\STM32F2XX\Applications\uTaskerV1.4\IAR7_STM32\Release STM32\Exe\uTaskerV1.4.out" 
+
+--plugin "C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.2_2\arm\bin\armbat.dll" 
+
+--device_macro "C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.2_2\arm\config\debugger\ST\STM32F7xx.dmac" 
+
+--flash_loader "C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.2_2\arm\config\flashloader\ST\FlashSTM32F756xG.board" 
+
+
+
+

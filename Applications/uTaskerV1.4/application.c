@@ -2370,7 +2370,7 @@ static void fnPrepareEmulatedFAT(void)
     dataFile[3].ulDataFileLength *= FORMATTING_FACTOR;                   // the increase in size of the file due to the ASCII formatting
     dataFile[3].ucFormatType = FORMAT_TYPE_CSV_FORMATTED;
     #endif
-    dataFile[4].ptrFileLocation  = FLASH_START_ADDRESS;                  // data file locations in memory
+    dataFile[4].ptrFileLocation  = (const unsigned char *)FLASH_START_ADDRESS; // data file locations in memory
     #if SIZE_OF_FLASH >= (512 * 1024)
     dataFile[4].ulDataFileLength = (unsigned long)(LINEAR_DATA_1 - FLASH_START_ADDRESS); // raw data length
     #else

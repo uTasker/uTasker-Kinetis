@@ -17,6 +17,7 @@
 # 04.06.2015 Add FreeMaster.c and nRF24201.c
 # 21.11.2015 Exchanged HW dependency to kinetis_USB_OTG.h
 # 30.03.2018 Add mqtt.c
+# 03.02.2019 Rename debug_hal.h to debug_hal_kinetis.h
 
 
 #
@@ -106,7 +107,7 @@ all: uTaskerV1.4.elf uTaskerV1.4_BM.elf
 Build/application.o: ../application.c $(DEPENDS) ../application.h ../application_lcd.h ../app_user_files.h ../Port_Interrupts.h ../ADC_Timers.h ../can_tests.h ../widgets.h ../iic_tests.h ../slcd_time.h
 		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../application.c -o Build/application.o
 
-Build/debug.o: ../debug.c $(DEPENDS) ../application.h ../debug_hal.h
+Build/debug.o: ../debug.c $(DEPENDS) ../application.h ../debug_hal_kinetis.h
 		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../debug.c -o Build/debug.o
 
 Build/webInterface.o: ../webInterface.c $(DEPENDS) ../application.h

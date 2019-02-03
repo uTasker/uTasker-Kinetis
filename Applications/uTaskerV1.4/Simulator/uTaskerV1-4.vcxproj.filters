@@ -43,6 +43,12 @@
     <Filter Include="Source Files\Resource Files">
       <UniqueIdentifier>{0e548044-0a8b-43a6-8623-c4a89e23df2a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Hardware\STM32">
+      <UniqueIdentifier>{8fe930ee-97bc-4e87-a85c-55d1eb59c661}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WinSim\SIMstm32">
+      <UniqueIdentifier>{e91847d0-8a16-4eb0-b4c7-9b7d42554f41}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\application.c">
@@ -2142,6 +2148,15 @@
     <ClCompile Include="..\..\..\WinSim\serial_dev.c">
       <Filter>WinSim</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Hardware\STM32\STM32.c">
+      <Filter>Hardware\STM32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Hardware\STM32\STM32Sim.c">
+      <Filter>WinSim\SIMstm32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Hardware\STM32\STM32_ports.cpp">
+      <Filter>WinSim\SIMstm32</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ADC_Timers.h">
@@ -2291,9 +2306,6 @@
     <ClInclude Include="..\..\..\WinSim\LCD\lcd.h">
       <Filter>WinSim</Filter>
     </ClInclude>
-    <ClInclude Include="..\debug_hal.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\utasker\uglcdlib\glcd_st7565s.h">
       <Filter>uTasker\uGLCDLIB</Filter>
     </ClInclude>
@@ -2414,6 +2426,87 @@
     <ClInclude Include="..\..\..\Hardware\Kinetis\kinetis_port_kw.h">
       <Filter>WinSim\SIMKinetis</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Hardware\STM32\spi_flash_STM32_atmel.h">
+      <Filter>Hardware\STM32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Hardware\STM32\spi_flash_STM32_MX66L.h">
+      <Filter>Hardware\STM32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Hardware\STM32\spi_flash_STM32_sst25.h">
+      <Filter>Hardware\STM32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Hardware\STM32\spi_flash_STM32_stmicro.h">
+      <Filter>Hardware\STM32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Hardware\STM32\STM32.h">
+      <Filter>Hardware\STM32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Hardware\STM32\stm32_ADC.h">
+      <Filter>Hardware\STM32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Hardware\STM32\stm32_CLOCK.h">
+      <Filter>Hardware\STM32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Hardware\STM32\stm32_ENET.h">
+      <Filter>Hardware\STM32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Hardware\STM32\stm32_FLASH.h">
+      <Filter>Hardware\STM32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Hardware\STM32\stm32_I2C.h">
+      <Filter>Hardware\STM32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Hardware\STM32\stm32_PORTS.h">
+      <Filter>Hardware\STM32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Hardware\STM32\stm32_TIMER.h">
+      <Filter>Hardware\STM32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Hardware\STM32\stm32_UART.h">
+      <Filter>Hardware\STM32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Hardware\STM32\stm32_USB_device.h">
+      <Filter>Hardware\STM32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Hardware\STM32\stm32_USB_OTG.h">
+      <Filter>Hardware\STM32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\app_hw_stm32.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\debug_hal_stm32.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Hardware\STM32\STM32F7XX_port.h">
+      <Filter>WinSim\SIMstm32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Hardware\STM32\STM32F031_port.h">
+      <Filter>WinSim\SIMstm32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Hardware\STM32\STM32F41X_port.h">
+      <Filter>WinSim\SIMstm32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Hardware\STM32\STM32F100X_port.h">
+      <Filter>WinSim\SIMstm32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Hardware\STM32\STM32F103X_port.h">
+      <Filter>WinSim\SIMstm32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Hardware\STM32\STM32F105X_107X_port.h">
+      <Filter>WinSim\SIMstm32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Hardware\STM32\STM32F427_429_port.h">
+      <Filter>WinSim\SIMstm32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Hardware\STM32\STM32L4XX_port.h">
+      <Filter>WinSim\SIMstm32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Hardware\STM32\STM32L031_port.h">
+      <Filter>WinSim\SIMstm32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\debug_hal_kinetis.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="cursor1.cur">
@@ -2432,6 +2525,12 @@
     <None Include="cursor7.cur">
       <Filter>Source Files\Resource Files</Filter>
     </None>
+    <None Include="..\..\..\Hardware\STM32\STM32_keil_asm.s">
+      <Filter>Hardware\STM32</Filter>
+    </None>
+    <None Include="..\GNU_STM32\make_uTaskerV1.4_GNU_STM32" />
+    <None Include="..\GNU_STM32\Build_STM32.bat" />
+    <None Include="..\GNU_Kinetis\Build_Kinetis.bat" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="uTasker.rc">

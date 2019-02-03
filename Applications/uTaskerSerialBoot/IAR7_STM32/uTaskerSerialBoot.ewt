@@ -2322,15 +2322,6 @@
   </group>
   <group>
     <name>TCP/IP</name>
-    <group>
-      <name>SSL</name>
-      <group>
-        <name>mbedtls-1.3.10</name>
-        <file>
-          <name>$PROJ_DIR$\..\..\..\stack\SSL\mbedtls-1.3.10\aes_mbedTLS.c</name>
-        </file>
-      </group>
-    </group>
     <file>
       <name>$PROJ_DIR$\..\..\..\stack\arp.c</name>
     </file>
@@ -2374,16 +2365,13 @@
       </file>
     </group>
     <file>
-      <name>$PROJ_DIR$\..\..\..\uTasker\crypto.c</name>
-    </file>
-    <file>
       <name>$PROJ_DIR$\..\..\..\uTasker\Driver.c</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\uTasker\eth_drv.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\..\uTasker\i2c_drv.c</name>
+      <name>$PROJ_DIR$\..\..\..\uTasker\iic_drv.c</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\uTasker\Tty_drv.c</name>
@@ -2405,7 +2393,7 @@
     </file>
   </group>
   <file>
-    <name>$PROJ_DIR$\..\app_hw_stm32.h</name>
+    <name>$PROJ_DIR$\..\app_hw_STM32.h</name>
   </file>
   <file>
     <name>$PROJ_DIR$\..\config.h</name>

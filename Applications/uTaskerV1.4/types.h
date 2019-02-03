@@ -102,23 +102,31 @@ typedef unsigned short    LENGTH_CHUNK_COUNT;                            // http
 // Ix = flags for each interface that the socket can use I0, I1, I2, I3 and I4 means that there are 5 physical sockets available in this example
 // Vx = virtual lan membership reference (0 is standard virtual LAN and 1, 2, 3 are alternative VLANs)
 // S = socket number from 0..0x3f (maximum 64 TCP and 64 UDP sockets possible)
-// note that USOCKET would be chosen as signed short to give adequate width for this example
-
-#if IP_NETWORK_COUNT > 1                                                 // {12}
+// Note that USOCKET would be chosen as signed short to give adequate width for this example
+// Beware that SECURE_SOCKET_MODE is 0x40, 0x4000 or 0x40000000, depending on USOCKET width and should be left free in case secure socket layer is used
+//
+#if defined IP_NETWORK_COUNT && (IP_NETWORK_COUNT > 1)                   // {12}
     #if defined USE_SNMP
         typedef signed short         USOCKET;
-        #define NETWORK_SHIFT        10
-        #define NETWORK_MASK         0x01
-        #define USER_INFO_SHIFT      8
+        #if defined IP_INTERFACE_COUNT && (IP_INTERFACE_COUNT > 1)       // multiple interfaces
+            #define INTERFACE_SHIFT  11
+            #define INTERFACE_MASK   0x03                                // two interfaces supported
+        #else
+            #define INTERFACE_SHIFT  0
+            #define INTERFACE_MASK   0
+        #endif
+        #define NETWORK_MASK         0x01                                // two networks possible
+        #define NETWORK_SHIFT        14
         #define USER_INFO_MASK       0x0003
+        #define USER_INFO_SHIFT      8
         #define SOCKET_NUMBER_MASK   0x00ff                              // dual-network, 256 UDP and 256 TCP sockets possible - up to 4 user functions
     #else
         #define NETWORK_MASK         0x01                                // 2 networks possible
         #define SOCKET_NUMBER_MASK   0x3f                                // dual-network, 128 UDP and 128 TCP sockets possible
         #define NETWORK_SHIFT        6
-        #if IP_INTERFACE_COUNT > 1                                       // multiple interfaces
-            typedef signed short     USOCKET;                            // socket support from 0..32k (negative values are errors)            #define INTERFACE_SHIFT  7
-            #define INTERFACE_SHIFT  7                                   // single interface
+        #if defined IP_INTERFACE_COUNT && (IP_INTERFACE_COUNT > 1)       // multiple interfaces
+            typedef signed short     USOCKET;                            // socket support from 0..32k (negative values are errors)
+            #define INTERFACE_SHIFT  7
             #define INTERFACE_MASK   0x07                                // three interfaces supported
         #else
             typedef signed char      USOCKET;                            // socket support from 0..127 (negative values are errors)
@@ -128,7 +136,7 @@ typedef unsigned short    LENGTH_CHUNK_COUNT;                            // http
     #endif
 #else                                                                    // single network
     #if defined USE_SNMP                                                 // {11}
-        #if IP_INTERFACE_COUNT > 1
+        #if defined IP_INTERFACE_COUNT && (IP_INTERFACE_COUNT > 1)
             typedef signed short     USOCKET;                            // socket support from 0..32k (negative values are errors)
             #define INTERFACE_SHIFT  7
             #define INTERFACE_MASK   0x07                                // three interfaces supported
@@ -141,14 +149,14 @@ typedef unsigned short    LENGTH_CHUNK_COUNT;                            // http
         #define USER_INFO_MASK       0x03                                // 4 users supported
         #define SOCKET_NUMBER_MASK   0x1f                                // single network and interface with up to 4 user functions (USOCKET can be single byte width)
     #else
-        #if IP_INTERFACE_COUNT > 1
-            typedef signed char          USOCKET;                        // socket support from 0..63 (negative values are errors)
-            #define SOCKET_NUMBER_MASK   0x1f                            // socket mask for 0..31
+        #if defined IP_INTERFACE_COUNT && (IP_INTERFACE_COUNT > 1)
+            typedef signed short         USOCKET;                        // socket support from 0..63 (negative values are errors)
+            #define SOCKET_NUMBER_MASK   0x001f                          // socket mask for 0..31
             #define INTERFACE_SHIFT      5                               // interface bit location
-            #define INTERFACE_MASK       0x03                            // two interfaces possible
+            #define INTERFACE_MASK       0x0f                            // four interfaces possible
         #else
-            typedef signed char          USOCKET;                        // socket support from 0..127 (negative values are errors)
-            #define SOCKET_NUMBER_MASK   0x7f                            // default when using a single network and interface (USOCKET can be single byte width)
+            typedef signed char          USOCKET;                        // socket support from 0..63 (negative values are errors)
+            #define SOCKET_NUMBER_MASK   0x3f                            // default when using a single network and interface (USOCKET can be single byte width)
             #define INTERFACE_SHIFT      0                               // single interface
             #define INTERFACE_MASK       0
         #endif
@@ -156,7 +164,6 @@ typedef unsigned short    LENGTH_CHUNK_COUNT;                            // http
     #define NETWORK_SHIFT            0                                   // single network
     #define NETWORK_MASK             0
 #endif
-
 // UART mode
 //
 #define UART_EXTENDED_MODE

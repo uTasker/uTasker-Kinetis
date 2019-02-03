@@ -6,6 +6,7 @@ It can be buid with Visual Studio (eg. VS 2015 Community) - which allows project
 - IAR, Keil uVision, Rowley Crossworks, CooCox, Green Hills, MCUXpresso, KDS, S32 Design Studio, Atollic and GCC make file
 
 *********************************
+STM32 Application support is now included (making Kinetis and STM32 projects compatible), as Visual Studio simulation, IAR, GCC and Atollic targets.
 STM32 Serial Loader support is now included (making Kinetis and STM32 projects compatible), as Visual Studio simulation, IAR and GCC targets.
 Users of the Arduino Blue Pill can see the USB-MSD loader video at: https://youtu.be/dq-m-Dokq7E
 *********************************

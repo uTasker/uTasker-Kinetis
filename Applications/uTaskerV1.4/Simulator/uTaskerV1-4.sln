@@ -1,18 +1,26 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual C++ Express 2010
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "uTaskerKinetis", "uTaskerV1-4.vcxproj", "{F08CCFCE-B19A-4F3C-9FA7-CF907BB6F36F}"
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "uTaskerOpenSource", "uTaskerV1-4.vcxproj", "{F08CCFCE-B19A-4F3C-9FA7-CF907BB6F36F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		uTasker Kinetis plus GNU build|Win32 = uTasker Kinetis plus GNU build|Win32
 		uTasker Kinetis|Win32 = uTasker Kinetis|Win32
+		uTasker STM32 plus GNU build|Win32 = uTasker STM32 plus GNU build|Win32
+		uTasker STM32|Win32 = uTasker STM32|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{F08CCFCE-B19A-4F3C-9FA7-CF907BB6F36F}.uTasker Kinetis plus GNU build|Win32.ActiveCfg = uTasker Kinetis plus GNU build|Win32
 		{F08CCFCE-B19A-4F3C-9FA7-CF907BB6F36F}.uTasker Kinetis plus GNU build|Win32.Build.0 = uTasker Kinetis plus GNU build|Win32
 		{F08CCFCE-B19A-4F3C-9FA7-CF907BB6F36F}.uTasker Kinetis|Win32.ActiveCfg = uTasker Kinetis|Win32
 		{F08CCFCE-B19A-4F3C-9FA7-CF907BB6F36F}.uTasker Kinetis|Win32.Build.0 = uTasker Kinetis|Win32
+		{F08CCFCE-B19A-4F3C-9FA7-CF907BB6F36F}.uTasker STM32 plus GNU build|Win32.ActiveCfg = uTasker STM32 plus GNU build|Win32
+		{F08CCFCE-B19A-4F3C-9FA7-CF907BB6F36F}.uTasker STM32 plus GNU build|Win32.Build.0 = uTasker STM32 plus GNU build|Win32
+		{F08CCFCE-B19A-4F3C-9FA7-CF907BB6F36F}.uTasker STM32|Win32.ActiveCfg = uTasker STM32|Win32
+		{F08CCFCE-B19A-4F3C-9FA7-CF907BB6F36F}.uTasker STM32|Win32.Build.0 = uTasker STM32|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
