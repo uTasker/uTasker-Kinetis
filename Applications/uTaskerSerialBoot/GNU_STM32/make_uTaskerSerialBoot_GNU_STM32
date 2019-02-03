@@ -1,0 +1,173 @@
+# Make file for uTasker serial loader for STM32
+#
+# 24.05.2014 Add additional files for web server uploading capability
+# 09.06.2018 Integrated into uTasker project (new layout and Modbus)
+# 03.07.2018 Add -Wundef in order to discover any undefined definitions
+# 04.07.2018 Add ../../../Hardware/packages.h
+# 15.01.2019 Add peripheral dependences
+
+# All objects (Hardware, application, uTasker, stack)
+#
+OBJS = Build/serial_loader.o Build/usb_device_loader.o Build/disk_loader.o Build/usb_host_loader.o Build/usb_application.o Build/webInterface.o \
+       Build/mass_storage.o \
+       Build/STM32.o \
+       Build/eth_drv.o Build/Driver.o Build/uMalloc.o Build/uTasker.o Build/Tty_drv.o Build/USB_drv.o Build/uFile.o Build/Watchdog.o \
+       Build/Ethernet.o Build/arp.o Build/ip.o Build/tcp.o Build/http.o Build/ip_utils.o Build/webutils.o Build/icmp.o
+
+
+#General dependencies
+#
+DEPENDS = ../config.h ../Loader.h ../app_hw_STM32.h ../types.h ../TaskConfig.h ../../../uTasker/driver.h ../../../uTasker/usb.h ../../../uTasker/uTasker.h \
+       ../../../uTasker/utFAT/mass_storage.h \
+	   ../../../stack/tcpip.h \
+       ../../../Hardware/hardware.h ../../../Hardware/packages.h ../../../Hardware/STM32/STM32.h
+
+INC     = -I../../uTaskerSerialBoot
+OPTS    = -D _GNU -D _STM32 -g -c -Os
+CC      = arm-none-eabi-gcc
+CC_OBJ  = arm-none-eabi-objcopy
+CC_SIZE = arm-none-eabi-size
+
+# Hardware peripheral dependencies
+#
+PERIPH_DEP = ../../../Hardware/STM32/stm32_UART.h \
+             ../../../Hardware/STM32/stm32_ADC.h \
+             ../../../Hardware/STM32/stm32_FLASH.h \
+             ../../../Hardware/STM32/stm32_I2C.h \
+             ../../../Hardware/STM32/stm32_PORTS.h \
+             ../../../Hardware/STM32/stm32_TIMER.h \
+             ../../../Hardware/STM32/stm32_ENET.h \
+			 ../../../Hardware/STM32/stm32_USB_OTG.h \
+			 ../../../Hardware/STM32/stm32_USB_device.h \
+             ../../../Hardware/STM32/stm32_CLOCK.h
+
+# SPI FLASH dependencies
+#
+SPI_FLASH_DEP = ../../../Hardware/STM32/spi_flash_STM32_atmel.h \
+                ../../../Hardware/STM32/spi_flash_STM32_stmicro.h \
+				../../../Hardware/STM32/spi_flash_STM32_sst25.h
+
+
+# Compiler flags (thumb mode - little endian)
+#
+#C_FLAGS = -mcpu=cortex-m0plus -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections -Wundef
+#C_FLAGS = -mcpu=cortex-m3 -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections -Wundef
+C_FLAGS = -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char  -ffunction-sections -fdata-sections -Wundef
+
+all: uTaskerSerialBoot.elf
+
+# Application files
+#
+Build/serial_loader.o: ../serial_loader.c $(DEPENDS) 
+		$(CC) $(C_FLAGS) -I../../uTaskerSerialBoot $(OPTS) ../serial_loader.c -o Build/serial_loader.o
+
+Build/usb_device_loader.o: ../usb_device_loader.c $(DEPENDS)
+		$(CC) $(C_FLAGS) -I../../uTaskerSerialBoot $(OPTS) ../usb_device_loader.c -o Build/usb_device_loader.o
+
+Build/disk_loader.o: ../disk_loader.c $(DEPENDS)
+		$(CC) $(C_FLAGS) -I../../uTaskerSerialBoot $(OPTS) ../disk_loader.c -o Build/disk_loader.o
+
+Build/usb_host_loader.o: ../usb_host_loader.c $(DEPENDS)
+		$(CC) $(C_FLAGS) -I../../uTaskerSerialBoot $(OPTS) ../usb_host_loader.c -o Build/usb_host_loader.o
+
+Build/usb_application.o: ../usb_application.c $(DEPENDS) ../usb_msd_descriptors.h
+		$(CC) $(C_FLAGS) -I../../uTaskerSerialBoot $(OPTS) ../usb_application.c -o Build/usb_application.o
+
+Build/webInterface.o: ../webInterface.c $(DEPENDS)
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../webInterface.c -o Build/webInterface.o
+
+
+# Hardware files
+#
+Build/STM32.o: ../../../Hardware/STM32/STM32.c $(DEPENDS) $(PERIPH_DEP) $(SPI_FLASH_DEP)
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../../../Hardware/STM32/STM32.c -o Build/STM32.o
+
+
+
+# uTasker files
+#
+Build/uTasker.o: ../../../uTasker/uTasker.c $(DEPENDS)
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../../../uTasker/uTasker.c -o Build/uTasker.o
+
+Build/Driver.o: ../../../uTasker/Driver.c $(DEPENDS)
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../../../uTasker/Driver.c -o Build/Driver.o
+
+Build/uMalloc.o: ../../../uTasker/uMalloc.c $(DEPENDS)
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../../../uTasker/uMalloc.c -o Build/uMalloc.o
+
+Build/Tty_drv.o: ../../../uTasker/Tty_drv.c $(DEPENDS)
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../../../uTasker/Tty_drv.c -o Build/Tty_drv.o
+
+Build/USB_drv.o: ../../../uTasker/USB_drv.c $(DEPENDS)
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../../../uTasker/USB_drv.c -o Build/USB_drv.o
+
+Build/uFile.o: ../../../uTasker/uFile.c $(DEPENDS)
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../../../uTasker/uFile.c -o Build/uFile.o
+
+Build/Watchdog.o: ../../../uTasker/Watchdog.c $(DEPENDS)
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../../../uTasker/Watchdog.c -o Build/Watchdog.o
+
+Build/eth_drv.o: ../../../uTasker/eth_drv.c $(DEPENDS)
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../../../uTasker/eth_drv.c -o Build/eth_drv.o
+
+
+# uTasker TCP/IP files
+#
+Build/Ethernet.o: ../../../stack/Ethernet.c $(DEPENDS)
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../../../stack/Ethernet.c -o Build/Ethernet.o
+
+Build/arp.o: ../../../stack/arp.c $(DEPENDS)
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../../../stack/arp.c -o Build/arp.o
+
+Build/http.o: ../../../stack/http.c $(DEPENDS)
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../../../stack/http.c -o Build/http.o
+
+Build/icmp.o: ../../../stack/icmp.c $(DEPENDS)
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../../../stack/icmp.c -o Build/icmp.o
+
+Build/ip_utils.o: ../../../stack/ip_utils.c $(DEPENDS)
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../../../stack/ip_utils.c -o Build/ip_utils.o
+
+Build/ip.o: ../../../stack/ip.c $(DEPENDS)
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../../../stack/ip.c -o Build/ip.o
+
+Build/tcp.o: ../../../stack/tcp.c $(DEPENDS)
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../../../stack/tcp.c -o Build/tcp.o
+
+Build/webutils.o: ../../../stack/webutils.c $(DEPENDS)
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../../../stack/webutils.c -o Build/webutils.o
+
+
+
+# utFAT files
+#
+Build/mass_storage.o: ../../../uTasker/utFAT/mass_storage.c $(DEPENDS) ../../../uTasker/utFAT/mass_storage.h
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../../../uTasker/utFAT/mass_storage.c -o Build/mass_storage.o
+
+
+
+
+# Link
+# Create output file and show its size
+#
+uTaskerSerialBoot.elf: $(OBJS) uTaskerSTM32.ld uTaskerSTM32_F4.ld uTaskerSTM32_F4_16k.ld
+	$(CC) $(C_FLAGS) -D _GNU -D _STM32 -g -Os -Wl,-Map=uTaskerSerialBoot.map -nostartfiles -TuTaskerSTM32_F4_16k.ld -o uTaskerSerialBoot.elf $(OBJS)
+#	$(CC) $(C_FLAGS) -D _GNU -D _STM32 -g -Os -Wl,-Map=uTaskerSerialBoot.map -nostartfiles -TuTaskerSTM32_F4.ld -o uTaskerSerialBoot.elf $(OBJS)
+#	$(CC) $(C_FLAGS) -D _GNU -D _STM32 -g -Os -Wl,-Map=uTaskerSerialBoot.map -nostartfiles -TuTaskerSTM32.ld -o uTaskerSerialBoot.elf $(OBJS)
+	$(CC_OBJ) --only-section=.data --only-section=.init --only-section=.text --only-section=.rodata --only-section=.vectors --output-target=ihex uTaskerSerialBoot.elf uTaskerSerialBoot.hex
+	$(CC_OBJ) --only-section=.data --only-section=.init --only-section=.text --only-section=.rodata --only-section=.vectors --output-target=binary uTaskerSerialBoot.elf uTaskerSerialBoot.bin
+	$(CC_SIZE) uTaskerSerialBoot.elf
+	$(CC) -v
+
+
+.PHONY: clean
+clean:
+	rm uTaskerSerialBoot.map
+	rm uTaskerSerialBoot.elf
+	rm uTaskerSerialBoot.bin
+	rm uTaskerSerialBoot.hex
+
+
+# *** EOF ***
+    
+    

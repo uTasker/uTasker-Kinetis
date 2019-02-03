@@ -33,9 +33,9 @@
     #endif
   //#define TEST_I2C                                                     // test I2C EEPROM
   //#define TEST_I2C_INTENSIVE                                           // intensive transmitter test
-  //#define TEST_DS1307                                                  // test DS1307 RTC via I2C bus
+    #define TEST_DS1307                                                  // test DS1307 RTC via I2C bus
   //#define TEST_SENSIRION                                               // test reading temperature and humidity 
-    #define TEST_MMA8451Q                                                // test monitoring the 3-axis accelerometer
+  //#define TEST_MMA8451Q                                                // test monitoring the 3-axis accelerometer
     #if defined TEST_MMA8451Q
         #define MMA8451Q_14BIT_RES
       //#define INTERRUPT_ON_READY                                       // enable tap detection and interrupt

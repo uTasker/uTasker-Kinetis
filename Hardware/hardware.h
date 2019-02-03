@@ -11,7 +11,7 @@
     File:      hardware.h
     Project:   Single Chip Embedded Internet
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2017
+    Copyright (C) M.J.Butcher Consulting 2004..2019
     *********************************************************************
     01.03.2007 fnGetFlashAdd() added
     30.03.2007 fnPutFlashAdd() added
@@ -74,12 +74,16 @@
     12.01.2016 Add fnSetFragmentMode()                                   {46}
     15.02.2016 Add fnDMA_BufferReset()                                   {47}
     31.01.2017 Add fnVirtualWakeupInterruptHandler()                     {48}
+    04.12.2017 Add special arithmetic                                    {49}
+    08.07.2018 Add fnPowerFailureWarning()                               {50}
+    01.11.2018 Move boot mailbox values to this file                     {51}
 
 */
 
 #if !defined _HARDWARE
 #define _HARDWARE
 
+#define __callback_interrupt                                             // used to better identify user routines that are called from driver interrupts
 
 // It is expected that the hardware support delivers the following functions
 //
@@ -209,15 +213,19 @@ extern void fnSetFragmentMode(int iMode);                                // {46}
 
 // SPI interface support
 //
-extern void fnConfigSPI(SPITABLE *pars);
+extern void fnConfigSPI(SPITABLE *pars, int iAddChipSelect);
 extern void fnSendSPIMessage(unsigned char *ptrData, QUEUE_TRANSFER Length);
  #define PREPARE_READ          0x00
  #define PREPARE_PAGE_WRITE    PREPARE_READ
  #define TERMINATE_WRITE       0x01
 
-extern int  fnTxSPIByte(QUEUE_HANDLE channel, unsigned char ucTxByte);
-extern void fnSPIRxByte(unsigned char ch, QUEUE_HANDLE Channel );
-extern void fnSPITxByte(QUEUE_HANDLE Channel );
+extern int  fnTxSPIByte(QUEUE_HANDLE channel, unsigned short usTxByte, unsigned char ucChipSelect);
+    #define FIRST_SPI_MESSAGE_WORD 0x40
+    #define LAST_SPI_MESSAGE_WORD  0x80
+    #define SPI_CHIP_SELECT_MASK  ~(FIRST_SPI_MESSAGE_WORD | LAST_SPI_MESSAGE_WORD)
+extern void fnSPIRxByte(unsigned char ch, QUEUE_HANDLE Channel);
+extern void fnSPITxByte(QUEUE_HANDLE Channel);
+extern void fnClearSPITxInt(QUEUE_HANDLE channel);
 
 extern void fnGetSPI_bytes(unsigned char *, MAX_FILE_LENGTH);
 
@@ -249,9 +257,10 @@ extern DELAY_LIMIT fnStopHW_Timer(void);                                 // stop
 // Buffer DMA                             
 //
 extern void fnDMA_BufferReset(int iChannel, int iAction);                // {47}
-    #define DMA_BUFFER_RESET     0                                       // disable DMA and reset the buffer (but don't re-enable yet)
-    #define DMA_BUFFER_START     1                                       // start DMA operation (must have been configured previously)
-    #define DMA_BUFFER_RESTART   2                                       // reset buffer and restart immediately
+    #define DMA_BUFFER_RESET         0                                   // disable DMA and reset the buffer (but don't re-enable yet)
+    #define DMA_BUFFER_START         1                                   // start DMA operation (must have been configured previously)
+    #define DMA_BUFFER_RESTART       2                                   // reset buffer and restart immediately
+    #define DMA_BUFFER_START_FINISH  3                                   // start DMA operation (must have been configured previously) and return only after it has terminated
 
 // Low power
 //
@@ -269,6 +278,17 @@ extern void fnResetBoard(void);
 #if !defined start_application
     extern void start_application(unsigned long);                        // {15} assembler jump to application
 #endif
+#if defined SUPPORT_LOW_VOLTAGE_DETECTION
+    extern __callback_interrupt int fnPowerFailureWarning(void);         // {50} power failure interrupt callback to be supplied by the user when enabled
+#endif
+
+// Special Arithmetic                                                    // {49}
+//
+extern unsigned short fnIntegerSQRT(unsigned long ulInput);
+extern unsigned long  fnFastUnsignedModulo(unsigned long ulValue, unsigned long ulMod);
+extern signed long    fnFastSignedModulo(signed long slValue, signed long slMod);
+extern unsigned long  fnFastUnsignedIntegerDivide(unsigned long ulDivide, unsigned long ulBy);
+extern signed long    fnFastSignedIntegerDivide(signed long slDivide, signed long slBy);
 
 // These functions can be called by hardware routines
 //
@@ -284,9 +304,11 @@ extern int  fnWriteBytesFlash(MEMORY_RANGE_POINTER ucDestination, unsigned char 
 extern int  fnReadBytesFlashNonBlocking(unsigned char *ParLocation, unsigned char *ptrValue, MAX_FILE_LENGTH Size); // {35} only available when using MANAGED_FILE_READ - non-blocking read that can return MEDIA_BUSY
 extern int  fnWriteBytesFlashNonBlocking(unsigned char *ucDestination, unsigned char *ucData, MAX_FILE_LENGTH Length); // {35} only available when using MANAGED_FILE_WRITE - non-blocking write that can return MEDIA_BUSY
 extern void fnProtectFlash(unsigned char *ptrSector, unsigned char ucProtection);
-  #define PROTECT_SECTOR   1
-  #define UNPROTECT_SECTOR 0
-extern int fnMassEraseFlash(void);                                       // {14}
+    #define PROTECT_SECTOR   1
+    #define UNPROTECT_SECTOR 0
+    #define FLASH_SECTOR_NOT_PROTECTED  0
+    #define FLASH_SECTOR_PROTECTED      1
+extern int  fnMassEraseFlash(void);                                      // {14}
 
 #if defined _WINDOWS
     extern unsigned char *fnGetFlashAdd(unsigned char *ucAdd);           // routine to map real hardware address to simulated FLASH
@@ -350,6 +372,11 @@ extern unsigned char fnSPI_FlashExt_available(int iExtension);
     #define S25FL132K                 2
     #define S25FL164K                 3
 
+    #define MX25L1645                 1                                  // Macronix MX25L
+    #define MX25L1606                 2
+    #define MX25L3245                 3
+    #define MX25L6445                 4
+    #define MX25L12845                5
 
 typedef struct stSTORAGE_AREA_ENTRY                                      // {28}
 {
@@ -415,7 +442,6 @@ extern void fnClearSLCD(void);                                           // {25}
 #endif
 
 
-
 #define REMOTE_RF_INTERFACE  1
     #define REMOTE_RF_DISABLE_RX_TX       1
     #define REMOTE_RF_ENABLE_RX_TX        2
@@ -435,4 +461,9 @@ extern void fnClearSLCD(void);                                           // {25}
     #define REMOTE_ETH_INTERRUPT          2
 #endif
 
+// Boot mailbox values                                                   {51}
+//
+#define RESET_TO_SERIAL_LOADER      0x89a2                               // pattern set to BOOT_MAIL_BOX to request the serial loader to start
+#define RESET_TO_APPLICATION        0x755d                               // pattern set to BOOT_MAIL_BOX to request the serial loader to jump to the application
+#define RTC_VALID_PATTERN           0xca35                               // pattern set the RTC_VALID_LOCATION when the RTC values are valid
 

@@ -3173,20 +3173,3 @@ extern KINETIS_PERIPH kinetis;
 #define _TOUCH_PORTE            34
 #define _TOUCH_PORTF            35
 
-#define PIN_COUNT_24_PIN        1
-#define PIN_COUNT_32_PIN        2
-#define PIN_COUNT_48_PIN        3
-#define PIN_COUNT_64_PIN        4
-#define PIN_COUNT_80_PIN        5
-#define PIN_COUNT_81_PIN        6
-#define PIN_COUNT_100_PIN       7
-#define PIN_COUNT_121_PIN       8
-#define PIN_COUNT_144_PIN       9
-#define PIN_COUNT_196_PIN       10
-#define PIN_COUNT_256_PIN       11
-
-#define PACKAGE_LQFP            1
-#define PACKAGE_MAPBGA          2
-#define PACKAGE_BGA             PACKAGE_MAPBGA
-#define PACKAGE_QFN             3
-#define PACKAGE_WLCSP           4

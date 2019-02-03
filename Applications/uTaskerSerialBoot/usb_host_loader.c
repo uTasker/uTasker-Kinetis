@@ -499,7 +499,7 @@ static void fnSetSerialNumberString(CHAR *ptrSerialNumber) {             // {12}
 
 // This routine must always be supplied by the user if usb strings are supported
 //
-extern unsigned char *fnGetUSB_string_entry(unsigned short usStringRef, unsigned short *usLength)
+extern unsigned char *fnGetUSB_string_entry(unsigned char ucStringRef, unsigned short *usLength)
 {
     return 0;                                                            // dummy for host
 }

@@ -1417,17 +1417,17 @@ static void fnSetSerialNumberString(CHAR *ptrSerialNumber) {             // {12}
 
 // This routine must always be supplied by the user if usb strings are supported
 //
-extern unsigned char *fnGetUSB_string_entry(unsigned short usStringRef, unsigned short *usLength)
+extern unsigned char *fnGetUSB_string_entry(unsigned char ucStringRef, unsigned short *usLength)
 {
     #if defined USB_HOST_SUPPORT
     return 0;
     #else
-    if (usStringRef > LAST_STRING_INDEX) {
+    if (ucStringRef > LAST_STRING_INDEX) {
         return 0;                                                        // invalid string index
     }
         #if defined USB_RUN_TIME_DEFINABLE_STRINGS                       // if variable strings are supported
-    if (ucStringTable[usStringRef][0] == 0) {                            // no length defined, meaning it is a run-time definabled string
-        switch (usStringRef) {
+    if (ucStringTable[ucStringRef][0] == 0) {                            // no length defined, meaning it is a run-time definabled string
+        switch (ucStringRef) {
         case SERIAL_NUMBER_STRING_INDEX:                                 // USB driver needs to know what string is used as serial number
             *usLength = (unsigned short)SerialNumberDescriptor->bLength; // return length and location of the user defined serial number
             return (unsigned char *)SerialNumberDescriptor;
@@ -1436,12 +1436,12 @@ extern unsigned char *fnGetUSB_string_entry(unsigned short usStringRef, unsigned
         }
     }
     else {
-        *usLength = ucStringTable[usStringRef][0];                       // the length of the string
+        *usLength = ucStringTable[ucStringRef][0];                       // the length of the string
     }
         #else
-    *usLength = ucStringTable[usStringRef][0];                           // the length of the string
+    *usLength = ucStringTable[ucStringRef][0];                           // the length of the string
         #endif
-    return ((unsigned char *)ucStringTable[usStringRef]);                // return a pointer to the string
+    return ((unsigned char *)ucStringTable[ucStringRef]);                // return a pointer to the string
     #endif
 }
 #endif

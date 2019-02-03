@@ -11,7 +11,7 @@
     File:      usb.h
     Project:   Single Chip Embedded Internet
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2018
+    Copyright (C) M.J.Butcher Consulting 2004..2019
     *********************************************************************
     20.09.2008 Add USB host defines                                      {1}
     23.11.2009 Remove little-endian macros and padding defined to driver.h since the same is required for SD cards and other general use
@@ -23,6 +23,7 @@
     15.08.2014 Add interface association descriptor                      {7}
     01.12.2015 Add RNDIS definitions                                     {8}
     13.04.2016 Change parameter of fnGetUSB_string_entry() to unsigned char {9}
+    15.08.2018 Move USB_SPEC_VERSION default to this header              {10}
 
 */
 
@@ -53,6 +54,9 @@ __PACK_ON                                                                // ensu
                                                                          // special packets
 #define PRE_PID   0x0c                                                   // note PRE is the only packet which doesn't have an EOP at the end!
 
+#if !defined USB_SPEC_VERSION                                            // {10}
+    #define USB_SPEC_VERSION               USB_SPEC_VERSION_1_1          // default is to report USB1.1 since it is equivalent to USB2.0 but requires one less descriptor exchange
+#endif
 
 #define USB_DEVICE_SPEED_LOW               0
 #define USB_DEVICE_SPEED_FULL              1

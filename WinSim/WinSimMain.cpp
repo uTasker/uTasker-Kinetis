@@ -11,7 +11,7 @@
     File:      WinSimMain.cpp
     Project:   uTasker project
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2018
+    Copyright (C) M.J.Butcher Consulting 2004..2019
     *********************************************************************
     18.01.2007 Correct array size                                        {1}
     26.01.2007 Increase ucDoList[10000]; to ensure no overrun {2} and OVERLAPPED data structure in fnSendSerialMessage
@@ -133,6 +133,7 @@
     28.08.2018 Modify multicolour LED handling to allow multiple ones in any order {112}
     06.10.2018 Allow display of mixed port widths for processor and external ports {113}
     25.12.2018 Only update processor image when its rectangle has been invalidated {114}
+    26.12.2018 Add iMX                                                   {115}
 
     */
 
@@ -279,7 +280,7 @@ static int iPrevBit = -1;
 #if !defined _EXTERNAL_PORT_COUNT                                        // {81} for compatibility
     #define _EXTERNAL_PORT_COUNT   0
 #endif
-#if defined _KINETIS
+#if defined _KINETIS || defined _iMX
     #if defined KINETIS_KE && !defined KINETIS_KE15 && !defined KINETIS_KE18
         #define _PORTS_AVAILABLE PORTS_AVAILABLE_8_BIT                   // 8 bit ports
     #else
@@ -302,8 +303,7 @@ static int iPrevBit = -1;
     #define START_PORTS_X (PORT_DISPLAY_LEFT)
     #define PORT_TEXT_LENGTH    8
     static  RECT rect_LAN_LED = {174, 85, 221, 140};
-#endif
-#if defined _HW_SAM3X                                                    // {73}
+#elif defined _HW_SAM3X                                                  // {73}
     #if defined _SAM3X                                                   // {94}
         #if defined _EXE
             #define CHIP_PACKAGE "atsam3x.bmp"
@@ -342,8 +342,7 @@ static int iPrevBit = -1;
     #define USB_TOP    186
     #define USB_RIGHT  276
     #define USB_BOTTOM 206
-#endif
-#if defined _HW_SAM7X
+#elif defined _HW_SAM7X
     #if defined _HW_SAM7S                                                // {48}
         #if defined _EXE
             #define CHIP_PACKAGE "atmelsam7s.bmp"
@@ -403,8 +402,7 @@ static int iPrevBit = -1;
         #define USB_RIGHT  205
         #define USB_BOTTOM 111
     #endif
-#endif
-#if defined _HW_AVR32                                                    // {34}
+#elif defined _HW_AVR32                                                  // {34}
     #if defined _AT32UC3B                                                // {45}
         #if defined _EXE
             #define CHIP_PACKAGE "atmelavr32B.bmp"
@@ -456,8 +454,7 @@ static int iPrevBit = -1;
     #else
         static  RECT rect_LAN_LED = {227, 234, 274, 289};
     #endif
-#endif
-#if defined _M5223X
+#elif defined _M5223X
     #define PORT_TEXT_LENGTH 8
     #if defined _M5222X
         #if defined _EXE
@@ -566,8 +563,7 @@ static int iPrevBit = -1;
         #define PORT_DISPLAY_LEFT 187
     #endif
     #define START_PORTS_X (PORT_DISPLAY_LEFT)
-#endif
-#if defined _FLEXIS32                                                    // {47}
+#elif defined _FLEXIS32                                                  // {47}
     #if defined ETH_INTERFACE
         #if defined _EXE
             #define CHIP_PACKAGE "flexis32eth.bmp"
@@ -586,8 +582,7 @@ static int iPrevBit = -1;
     #define PORT_DISPLAY_LEFT 184
     #define START_PORTS_X (PORT_DISPLAY_LEFT + 9)
     #define PORT_TEXT_LENGTH 8
-#endif
-#if defined _STR91XF
+#elif defined _STR91XF
     #if defined _EXE
         #define CHIP_PACKAGE "str91xf.bmp"
     #else
@@ -598,9 +593,8 @@ static int iPrevBit = -1;
     #define START_PORTS_X (PORT_DISPLAY_LEFT)
     #define PORT_TEXT_LENGTH 8
     static  RECT rect_LAN_LED = {301, 85, 348, 140};
-#endif
-#if defined _STM32                                                       // {54}
-    #if defined ST_VALUE                                                 // value line
+#elif defined _STM32                                                     // {54}
+    #if defined _VALUE_LINE || defined _PERFORMANCE_LINE                 // value/performance lines
         #if defined _EXE
             #define CHIP_PACKAGE "stm32f100.bmp"
         #else
@@ -608,6 +602,11 @@ static int iPrevBit = -1;
         #endif
         #define PORT_FIRST_LINE   270
         #define PORT_DISPLAY_LEFT 149
+
+        #define USB_LEFT   (269)
+        #define USB_TOP    (132)
+        #define USB_RIGHT  (321)
+        #define USB_BOTTOM (152)
     #else                                                                // connectivity line
         #if defined _STM32L4XX
             #if defined _EXE
@@ -662,12 +661,13 @@ static int iPrevBit = -1;
     #define START_PORTS_X (PORT_DISPLAY_LEFT)
     #define PORT_TEXT_LENGTH 8
     static  RECT rect_LAN_LED = {303, 84, 350, 139};
-    #define USB_LEFT   (294)                                             // {75}
-    #define USB_TOP    (159)
-    #define USB_RIGHT  (346)
-    #define USB_BOTTOM (179)
-#endif
-#if defined _LPC17XX                                                     // {46}
+    #if !defined _VALUE_LINE && !defined _PERFORMANCE_LINE
+        #define USB_LEFT   (294)                                         // {75}
+        #define USB_TOP    (159)
+        #define USB_RIGHT  (346)
+        #define USB_BOTTOM (179)
+    #endif
+#elif defined _LPC17XX                                                   // {46}
     #if defined _EXE
         #define CHIP_PACKAGE "LPC17XX.bmp"
     #else
@@ -682,8 +682,7 @@ static int iPrevBit = -1;
     #define START_PORTS_X (PORT_DISPLAY_LEFT)
     #define PORT_TEXT_LENGTH 9
     static  RECT rect_LAN_LED = {229, 163, 276, 203};
-#endif
-#if defined _VYBRID
+#elif defined _VYBRID
     #if defined _EXE
         #define CHIP_PACKAGE "vybrid.bmp"
     #else
@@ -713,6 +712,29 @@ static int iPrevBit = -1;
     #define START_PORTS_X (PORT_DISPLAY_LEFT)
     #define PORT_TEXT_LENGTH 9
     static  RECT rect_LAN_LED = {(109), (240), (156), (261)};
+#elif defined _iMX                                                       // {115}
+    #if defined ETH_INTERFACE
+        #if defined _EXE
+            #define CHIP_PACKAGE "iMX_lan.bmp"
+        #else
+            #define CHIP_PACKAGE "..//..//..//Hardware//iMX//GUI//iMX_lan.bmp"
+        #endif
+    #else
+        #if defined _EXE
+            #define CHIP_PACKAGE "iMX.bmp"
+        #else
+            #define CHIP_PACKAGE "..//..//..//Hardware//iMX//GUI//iMX.bmp"
+        #endif
+    #endif
+    #define USB_LEFT   334
+    #define USB_TOP    75
+    #define USB_RIGHT  386
+    #define USB_BOTTOM 95
+    #define PORT_FIRST_LINE 290
+    #define PORT_DISPLAY_LEFT 70
+    #define START_PORTS_X (PORT_DISPLAY_LEFT)
+    #define PORT_TEXT_LENGTH 9
+    static  RECT rect_LAN_LED = {(336), (198), (390), (244)};
 #elif defined _KINETIS                                                   // {58}
     #if defined ETH_INTERFACE                                            // {70}
         #if defined _EXE
@@ -793,8 +815,7 @@ static int iPrevBit = -1;
     #define START_PORTS_X (PORT_DISPLAY_LEFT)
     #define PORT_TEXT_LENGTH 9
     static  RECT rect_LAN_LED = {228, 160, 275, 200};
-#endif
-#if defined _LM3SXXXX
+#elif defined _LM3SXXXX
     #if defined _EXE
         #if defined _LM3S10X
             #define CHIP_PACKAGE "lm3s10x.bmp"
@@ -836,8 +857,7 @@ static int iPrevBit = -1;
         #define USB_RIGHT  223
         #define USB_BOTTOM 102
     #endif
-#endif
-#if defined _RX6XX
+#elif defined _RX6XX
     #if defined _EXE
         #define CHIP_PACKAGE "atmelavr32.bmp"
     #else
@@ -853,6 +873,7 @@ static int iPrevBit = -1;
     #define PORT_TEXT_LENGTH 8
     static  RECT rect_LAN_LED = {227, 234, 274, 289};
 #endif
+
 #if defined _EXT_PORT_32_BIT && PORT_WIDTH < 32                          // {113}
     #define BLANK_PROCESSOR_PORTS (32 - PORT_WIDTH)
 #elif defined _EXT_PORT_28_BIT && PORT_WIDTH < 28
@@ -1311,16 +1332,16 @@ static void fnDisplayPorts(HDC hdc)
     unsigned long ulMSB = 0x00000080;
     signed char cPorts[PORT_WIDTH + PORT_NAME_LENGTH] = "PORT PTA ";
     unsigned long ulPortMask = 0x00;
-#else
-    #if defined (_STR91XF)
+#elif defined (_STR91XF)
     char cPorts[PORT_WIDTH + PORT_NAME_LENGTH] = "GPIO 0   ";
-    #elif defined (_LPC23XX) || defined _LPC17XX
+#elif defined (_LPC23XX) || defined _LPC17XX
     signed char cPorts[PORT_WIDTH + PORT_NAME_LENGTH] = "P0.31..0 ";
-    #elif defined _HW_AVR32 || defined _VYBRID                           // {34}
+#elif defined _HW_AVR32 || defined _VYBRID                               // {34}
     signed char cPorts[PORT_WIDTH + PORT_NAME_LENGTH] = "PORT 0   ";
-    #else                                                                // SAM7X
+#elif defined _iMX
+    char cPorts[PORT_WIDTH + PORT_NAME_LENGTH] = "GPIO1    ";
+#else                                                                    // SAM7X and Kinetis
     signed char cPorts[32 + PORT_NAME_LENGTH] = "PORT A   ";
-    #endif
 #endif
     unsigned char ucPortWidth = PORT_WIDTH;
     char cPortDetails[200];
@@ -1338,7 +1359,7 @@ static void fnDisplayPorts(HDC hdc)
         if (fnJumpPort(i)) {
             goto _jump_entry;
         }
-#elif defined _STM32 || defined LPC1788 || defined _HW_SAM3X || defined KINETIS_K00 || defined KINETIS_K20 || defined KINETIS_K60 || defined KINETIS_K61 || defined KINETIS_K64 || defined KINETIS_K70 || defined KINETIS_K80 || defined KINETIS_KL || defined KINETIS_KE || defined KINETIS_KV || defined KINETIS_KM || defined KINETIS_KW2X || (defined KINETIS_K12 && (PIN_COUNT == PIN_COUNT_48_PIN)) // {72}{73}{74}{82}{92}{96}
+#elif defined _iMX || defined _STM32 || defined LPC1788 || defined _HW_SAM3X || defined KINETIS_K00 || defined KINETIS_K20 || defined KINETIS_K60 || defined KINETIS_K61 || defined KINETIS_K64 || defined KINETIS_K70 || defined KINETIS_K80 || defined KINETIS_KL || defined KINETIS_KE || defined KINETIS_KV || defined KINETIS_KM || defined KINETIS_KW2X || (defined KINETIS_K12 && (PIN_COUNT == PIN_COUNT_48_PIN)) // {72}{73}{74}{82}{92}{96}
         ulPortMask = fnGetPortMask(i);                                   // {71}
 #elif defined _HW_SAM7X                                                  // {21}
     #if defined _HW_SAM7S                                                // {48}
@@ -1416,13 +1437,16 @@ static void fnDisplayPorts(HDC hdc)
             }
             ulBit >>= 1;
         }
-#if defined _KINETIS && (!defined KINETIS_KE || defined KINETIS_KE15)
+#if defined _KINETIS || defined _iMX && (!defined KINETIS_KE || defined KINETIS_KE15)
         if (i == PORTS_AVAILABLE) {                                      // handle dedicated ADC inputs
             int b;
             cPorts[0] = 'A';
             cPorts[1] = 'D';
             cPorts[2] = 'C';
             cPorts[3] = ' ';
+    #if defined _iMX
+            cPorts[4] = ' ';
+    #endif
             cPorts[5] = ' ';
             for (b = 9; b < (9 + 32); b++) {
                 if (cPorts[b] != '-') {
@@ -2247,6 +2271,8 @@ _jump_entry:
         #endif
     #elif defined (_LPC23XX) || defined _LPC17XX
         cPorts[1]++;
+    #elif defined _iMX
+        cPorts[4]++;                                                     // ports 1,2..
     #else
         cPorts[5]++;                                                     // ports A and B
     #endif
@@ -2430,11 +2456,11 @@ static void fnDisplayLAN_LEDs(HDC hdc, RECT refresh_rect)
     // Draw a box with rx and tx LEDs. If active red, or else white
     // RoundRect(hdc, rect_LAN_LED.left, rect_LAN_LED.top, rect_LAN_LED.right, rect_LAN_LED.bottom, 10, 10);
     //
-    if (iLastRxActivity) {
+    if (iLastRxActivity != 0) {
         hBrush = hGreenBrush;                                            // {4}
     }
     else {
-        hBrush = (HBRUSH)GetStockObject(NULL_BRUSH);
+        hBrush = hGrayBrush;
     }
     SelectObject(hdc, hBrush);                                           // select the brush style for the first LED
     #if defined USER_CHIP_PACKAGE                                        // {95}
@@ -2442,17 +2468,17 @@ static void fnDisplayLAN_LEDs(HDC hdc, RECT refresh_rect)
     #else
     Rectangle(hdc, (rect_LAN_LED.left + 2), (rect_LAN_LED.top + 27 + (18 * (IP_NETWORK_COUNT - 1))), (rect_LAN_LED.left + 2 + 10), (rect_LAN_LED.top + 27 + 8 + (18 * (IP_NETWORK_COUNT - 1))));
     #endif
-    if (iLastTxActivity) {
+    if (iLastTxActivity != 0) {
         hBrush = hRedBrush;                                              // {4}
     }
     else {
-        hBrush = (HBRUSH)GetStockObject(NULL_BRUSH);
+        hBrush = hGrayBrush;
     }
     SelectObject(hdc, hBrush);                                           // select the brush style for the second LED
     #if defined USER_CHIP_PACKAGE                                        // {95}
     Rectangle(hdc, (rect_LAN_LED.right - ETH_LED_WIDTH), rect_LAN_LED.top, rect_LAN_LED.right, (rect_LAN_LED.bottom));
     #else
-        #if defined _KINETIS
+        #if defined _KINETIS || defined _iMX
     Rectangle(hdc, (rect_LAN_LED.right - 10), (rect_LAN_LED.top + 27 + (18 * (IP_NETWORK_COUNT - 1))), (rect_LAN_LED.right), (rect_LAN_LED.top + 27 + 8 + (18 * (IP_NETWORK_COUNT - 1))));
         #else
     Rectangle(hdc, (rect_LAN_LED.left + 34), (rect_LAN_LED.top + 27 + (18 * (IP_NETWORK_COUNT - 1))), (rect_LAN_LED.left + 34 + 10), (rect_LAN_LED.top + 27 + 8 + (18 * (IP_NETWORK_COUNT - 1))));
@@ -2523,7 +2549,7 @@ static void fnDisplayUSB(HDC hdc, RECT refresh_rect)                     // {14}
         }
     }
     iUSB_state_changed = 0;
-    if (iUSBEnumerated) {                                                // draw a USB sign
+    if (iUSBEnumerated != 0) {                                           // draw a USB sign
         SelectObject(hdc, hRedPen);
         SelectObject(hdc, hRedBrush);
     }
@@ -4487,14 +4513,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             hPen = (HPEN)CreatePen(0, 0, RGB(180, 180, 180));            // create a pen with the colour for drawing the LAN LEDs {4}
             hGreenBrush = (HBRUSH)CreateSolidBrush(RGB(0, 255, 0));
             hRedBrush = (HBRUSH)CreateSolidBrush(RGB(220, 0, 0));
+            hGrayBrush = (HBRUSH)CreateSolidBrush(RGB(140, 140, 140));
 #if defined USB_INTERFACE                                                // create pens used by USB
             hRedPen = (HPEN)CreatePen(0,(USB_CIRCLE_RADIUS/2), RGB(220, 0, 0));
-            hGrayBrush = (HBRUSH)CreateSolidBrush(RGB(140, 140, 140));
             hGrayPen = (HPEN)CreatePen(0, (USB_CIRCLE_RADIUS/2), RGB(140, 140, 140));
             hGreenPen = (HPEN)CreatePen(0, (3), RGB(0, 255, 0));
 #elif defined SDCARD_SUPPORT                                             // create pens used by SD card (if not created by USB)
             hRedPen = (HPEN)CreatePen(0, 2, RGB(220, 0, 0));
-            hGrayBrush = (HBRUSH)CreateSolidBrush(RGB(140, 140, 140));
             hGrayPen = (HPEN)CreatePen(0, 2, RGB(140, 140, 140));
             hGreenPen = (HPEN)CreatePen(0,(3), RGB(0, 255, 0));
 #endif
@@ -4740,7 +4765,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             break;
 
         case WM_PAINT:
-            if (GetUpdateRect(hWnd, rect, FALSE)) {
+            if (GetUpdateRect(hWnd, rect, FALSE) != 0) {
                 hdc = BeginPaint(hWnd, &ps);
                 fnDoDraw(hWnd, hdc, ps, rt);                             // we do user specific stuff here
                 EndPaint(hWnd, &ps);

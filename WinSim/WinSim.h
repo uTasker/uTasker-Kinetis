@@ -11,7 +11,7 @@
     File:      WinSim.h
     Project:   uTasker project
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2017
+    Copyright (C) M.J.Butcher Consulting 2004..2019
     *********************************************************************
     28.04.2007 Add function fnGetEEPROMSize(void)                        {1}
     11.08.2007 Add fnInitSPI_DataFlash(), fnGetDataFlashStart(), fnGetDataFlashSize() and fnSimAT45DBXXX() {2}
@@ -68,7 +68,9 @@
     02.09.2016 Add TOGGLE_INPUT_POS, TOGGLE_INPUT_ANALOG and INPUT_TOGGLE_POS {50}
     24.12.2016 Add SIM_I2C_OUT and fnInjectI2C()                         {51}
     28.02.2017 Add UARTs 6 and 7                                         {52}
-
+    18.05.2017 Add fnLogRx()                                             {53}
+    03.08.2018 Add fnInitI2C_FRAM(), fnGetI2CFRAMStart() and fnGetI2CFRAMSize() {54}
+ 
 */
  
 #include <stdlib.h>	
@@ -86,18 +88,22 @@
 #define RX_COM3              5                                           // {11}
 #define RX_COM4              6
 #define RX_COM5              7 
-#define RX_ETHERNET          8
-#define EXITING_CALL         9
-#define KEY_CHANGE           10
-#define INPUT_TOGGLE         11
-#define INITIALISE_OP_SYS_2  12 
-#define RX_SPI0              13                                          // {7}
-#define RX_SPI1              14
-#define INPUT_TOGGLE_NEG     15                                          // {15}
-#define RX_EXT_COM0          16
-#define RX_EXT_COM1          17
-#define RX_EXT_COM2          18
-#define RX_EXT_COM3          19
+#define RX_COM6              8
+#define RX_COM7              9
+#define RX_ETHERNET          10
+#define EXITING_CALL         11
+#define KEY_CHANGE           12
+#define INPUT_TOGGLE         13
+#define INITIALISE_OP_SYS_2  14 
+#define RX_SPI0              15                                          // {7}
+#define RX_SPI1              16
+#define RX_SPI2              17
+#define RX_SPI3              18
+#define INPUT_TOGGLE_NEG     19                                          // {15}
+#define RX_EXT_COM0          20
+#define RX_EXT_COM1          21
+#define RX_EXT_COM2          22
+#define RX_EXT_COM3          23
 
 #define SIM_TEST_RX_0        50
 #define SIM_TEST_RX_1        51
@@ -118,6 +124,7 @@
 #define SIM_USB_OUT          82
 #define SIM_TEST_LOWSPEED_DEVICE   83                                    // {22}
 #define SIM_TEST_FULLSPEED_DEVICE  84
+#define SIM_TEST_HIGHSPEED_DEVICE  85
 
 #define MODEM_COM_0          100                                         // {4}
 #define MODEM_COM_1          101
@@ -229,6 +236,11 @@
 #define CHANNEL_2_EXT_SERIAL_INT 0x00100000
 #define CHANNEL_3_EXT_SERIAL_INT 0x00200000
 #define USBHS_INT                0x00400000                              // {46}
+
+#define CHANNEL_0_SPI_INT    0x01000000
+#define CHANNEL_1_SPI_INT    0x02000000
+#define CHANNEL_2_SPI_INT    0x04000000
+#define CHANNEL_3_SPI_INT    0x08000000
 
 #define DMA_CONTROLLER_0     0x00000001
 #define DMA_CONTROLLER_1     0x00000002
@@ -370,6 +382,7 @@ extern int  fnLogExtTx0(void);                                           // {32}
 extern int  fnLogExtTx1(void);
 extern int  fnLogExtTx2(void);
 extern int  fnLogExtTx3(void);
+extern void fnLogRx(int iPort, unsigned char *ptrDebugIn, unsigned short usLen); // {53}
 extern void fnFollowOnFrame(void);
 extern void fnSimPhyInt(void);
 
@@ -425,11 +438,32 @@ extern void fnSimulateKeyChange(int *intTable);
     #define TOGGLE_INPUT_NEG    0x04                                     // {15}
     #define TOGGLE_INPUT_POS    0x08                                     // {50}
     #define TOGGLE_INPUT_ANALOG 0x10                                     // {50}
+    #define DEFINE_INPUT        0x20
 
 extern void fnSimMatrixKB(void);
 
 #define KEY_CHANGED       0x01
 #define INPUT_CHANGED     0x02
+
+#if defined _EXCLUDE_WINDOWS_ && !defined _WINSIM_INCLUDE_
+    extern "C" void fnInitKeys(void);
+    extern "C" unsigned long fnKeyPadState(unsigned long ulInitialState, int iPortRef);
+    extern "C" void fnSyncKeyPadState(int iPortRef, unsigned long ulInput, int iOnOff);
+#else
+    extern void fnInitKeys(void);
+    extern unsigned long fnKeyPadState(unsigned long ulInitialState, int iPortRef);
+    extern void fnSyncKeyPadState(int iPortRef, unsigned long ulInput, int iOnOff);
+#endif
+
+// Segment LED 
+//
+#if defined _EXCLUDE_WINDOWS_ && !defined _WINSIM_INCLUDE_
+    extern "C" void fnSegLED(int iDigit, unsigned char ucData, unsigned char ucMaxDigits, int iType);
+#else
+    extern void fnSegLED(int iDigit, unsigned char ucData, unsigned char ucMaxDigits, int iType);
+#endif
+    #define LED_SEGMENT_REFRESH       0
+    #define LED_14_SEGMENT_MAX9655    1
 
 // Ethernet interface
 //
@@ -440,7 +474,7 @@ extern void fnUpdateIPConfig(void);
 
 // USB interface
 //
-#ifdef USB_INTERFACE
+#if defined USB_INTERFACE
     extern int fnSimulateUSB(int iDevice, int iEndPoint, unsigned char ucPID, unsigned char *ptrDebugIn, unsigned short usLenEvent);
       #define USB_RESET_CMD             0x0001
       #define USB_SLEEP_CMD             0x0002
@@ -452,6 +486,7 @@ extern void fnUpdateIPConfig(void);
       #define USB_FULLSPEED_ATTACH_CMD  0x0080
       #define USB_STALL_SUCCESS         0x0100                           // {22}
       #define USB_SOF_EVENT             0x0200
+      #define USB_HIGHSPEED_ATTACH_CMD  0x0400
     extern void fnSimUSB(int iType, int iEndpoint, USB_HW *ptrUSB_HW);
       #define USB_SIM_TX           1
       #define USB_SIM_RESET        2
@@ -473,7 +508,6 @@ extern void fnSimCAN(int iChannel, int iBufferNumber, int iSpecial);     // {41}
   #define CAN_SIM_CHECK_RX    3                                          // {42}
   #define CAN_SIM_TERMINATE   4
 extern signed char fnGetCANOwner(int iChannel, int i);                   // {41}
-
 
 
 extern void fnInitTime(char *argv[]);
@@ -507,21 +541,34 @@ extern int fnPutSimDiskData(unsigned char *ptrBuffer, unsigned char ucLUN, unsig
 
 // I2C devices
 //
-unsigned char fnSimI2C_devices(unsigned char ucType, unsigned char ucData);
-    #define I2C_ADDRESS     0
-    #define I2C_TX_DATA     1
-    #define I2C_RX_DATA     2
-    #define I2C_RX_COMPLETE 3
-    #define I2C_TX_COMPLETE 4
+extern unsigned char fnSimI2C_devices(unsigned char ucType, unsigned char ucData);
+    #define I2C_ADDRESS         0x00
+    #define I2C_TX_DATA         0x01
+    #define I2C_RX_DATA         0x02
+    #define I2C_RX_COMPLETE     0x03
+    #define I2C_TX_COMPLETE     0x04
+    #define SPI_MODE_CS_ASSERT  0x80                                     // allow the interface to be shared with SPI devices
+    #define SPI_MODE_CS_NEGATE  0x40
+    #define SPI_MODE_DATA_0     0xc0                                     // data on SPI 0
+    #define SPI_MODE_DATA_1     0xc1                                     // data on SPI 1
+    #define SPI_MODE_DATA_2     0xc2                                     // data on SPI 2
+    #define SPI_MODE_DATA_3     0xc3                                     // data on SPI 3
+    #define SPI_MODE_DATA_4     0xc4                                     // data on SPI 4
 
 extern void fnInitI2C_EEPROM(void);                                      // {39}
 extern unsigned char *fnGetI2CEEPROMStart(void);
 extern unsigned long fnGetI2CEEPROMSize(void);
 
+extern void fnInitI2C_FRAM(void);                                        // {54}
+extern unsigned char *fnGetI2CFRAMStart(void);
+extern unsigned long fnGetI2CFRAMSize(void);
+
 extern void fnInitExtFlash(void);                                        // {40}
 extern unsigned char *fnGetExtFlashStart(void);
 extern unsigned long fnGetExtFlashSize(void);
 
+// SPI devices
+//
 extern void fnInitSPI_Flash(void);
 extern unsigned char fnSimM95xxx(int iSimType, unsigned char ucTxByte, unsigned long ulSSEL);
     #define M95XXX_READ     0
@@ -566,7 +613,7 @@ extern unsigned long fnGetEEPROMSize(void);                              // {1}
 //
 #if !defined _EXCLUDE_WINDOWS_
     #if defined NAND_FLASH_FAT
-        #define SD_card_state(a,b)
+        #define SD_card_state(a, b)
     #else
         extern int SD_card_state(int iSetState, int iClearState);        // {44}
     #endif

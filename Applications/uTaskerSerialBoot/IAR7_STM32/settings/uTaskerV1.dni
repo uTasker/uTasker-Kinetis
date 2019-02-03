@@ -1,0 +1,206 @@
+[DebugChecksum]
+Checksum=-1156291070
+[DisAssemblyWindow]
+NumStates=_ 1
+State 1=_ 1
+[InstructionProfiling]
+Enabled=_ 0
+[CodeCoverage]
+Enabled=_ 0
+[Exceptions]
+StopOnUncaught=_ 0
+StopOnThrow=_ 0
+[StackPlugin]
+Enabled=1
+OverflowWarningsEnabled=1
+WarningThreshold=90
+SpWarningsEnabled=1
+WarnHow=0
+UseTrigger=1
+TriggerName=main
+LimitSize=0
+ByteLimit=50
+[Interrupts]
+Enabled=1
+[MemoryMap]
+Enabled=0
+Base=0
+UseAuto=0
+TypeViolation=1
+UnspecRange=1
+ActionState=1
+[TraceHelper]
+Enabled=0
+ShowSource=1
+[Stack]
+FillEnabled=0
+OverflowWarningsEnabled=1
+WarningThreshold=90
+SpWarningsEnabled=1
+WarnLogOnly=1
+UseTrigger=1
+TriggerName=main
+LimitSize=0
+ByteLimit=50
+[CallStack]
+ShowArgs=0
+[Disassembly]
+MixedMode=1
+[SWOTraceHWSettings]
+OverrideDefaultClocks=0
+CpuClock=72000000
+ClockAutoDetect=0
+ClockWanted=2000000
+JtagSpeed=2000000
+Prescaler=36
+TimeStampPrescIndex=0
+TimeStampPrescData=0
+PcSampCYCTAP=1
+PcSampPOSTCNT=15
+PcSampIndex=0
+DataLogMode=0
+ITMportsEnable=0
+ITMportsTermIO=0
+ITMportsLogFile=0
+ITMlogFile=$PROJ_DIR$\ITM.log
+[JLinkDriver]
+CStepIntDis=_ 0
+LeaveTargetRunning=_ 0
+[stlink]
+stlinkserialNo=69CAB789
+stlinkfoundProbes=
+[StLinkDriver]
+stlinkserialNo=67163932
+stlinkfoundProbes=
+CStepIntDis=_ 0
+LeaveTargetRunning=_ 0
+[array_types]
+Fmt0=int[100]	5	0
+Fmt1=unsigned long[100]	4	0
+Fmt2=unsigned long[16]	4	0
+Fmt3=unsigned long[200]	4	0
+Fmt4=unsigned long[2048]	4	0
+Fmt5=unsigned long[5]	4	0
+[watch_formats]
+Fmt0={W}0:ulUSBEvents	0	6
+[PE_STARTUP]
+CPUTARGETTYPENAME=_ "ARM Processor - Autodetect"
+USE_CYCLONEPRO_RELAYS=_ "0"
+CyclonePro_poweroffonexit=_ "0"
+CyclonePro_currentvoltage=_ "128"
+CyclonePro_PowerDownDelay=_ "250"
+CyclonePro_PowerUpDelay=_ "250"
+Multilink_PowerDownDelay=_ "250"
+Multilink_PowerUpDelay=_ "1000"
+USE_SWD=_ "1"
+IO_DELAY_CNT=_ "0"
+FREQ_FX=_ "4"
+FREQ_NORMAL=_ "0"
+FREQ_OSJTAG=_ "0"
+FREQ_CYCLONE=_ "3"
+FREQ_TRACELINK=_ "3"
+FREQ_LIGHTNING=_ "1"
+FREQ_OPENSDA=_ "3"
+RESET_DELAY=_ "0"
+PORT=_ "21"
+PORT_NAME_STRING=_ "PE5655870"
+interface_selection=_ "1"
+TraceLink_MaxBufferSize=_ "1"
+SHOWDIALOG=_ "1"
+[PE_STORED_DEVICES]
+device0=_ "ST_STM32F1_STM32F103C8"
+[PE_PEDEBUG]
+CURRENTDEVICE=_ "ST_STM32F1_STM32F103C8"
+ERASE_PROGRAM_WITHOUT_ASKING=_ "1"
+CURRENTMODE=_ "4"
+[PE_DEVICE]
+CHIPMODE=_ "ST_STM32F1_STM32F103C8"
+[PE_SETTINGS]
+DEFAULT_SOURCE_PATH=_ "D:\Programs\IAR Systems\Embedded Workbench 7.5\arm\bin\pemicro\P&E"
+[PE_STARTUP12]
+show_hstep_assembly_details_new=_ "0"
+[PE_ARM]
+FILE1=_ ""
+BINTORAM=_ "1"
+BINTOFLASH=_ "0"
+BINTOFLASHDEFAULT=_ "0"
+GOTILMAINDEFAULTON=_ "1"
+KEEPCPROGOPEN=_ "0"
+[PEMICRODriver]
+PEM_LeaveTargetRunning=0x00000000
+[Breakpoints]
+Count=0
+[Trace2]
+Enabled=0
+ShowSource=0
+[SWOTraceWindow]
+PcSampling=0
+InterruptLogs=0
+ForcedTimeStamps=0
+EventCPI=0
+EventEXC=0
+EventFOLD=0
+EventLSU=0
+EventSLEEP=0
+[DataLog]
+LogEnabled=0
+GraphEnabled=0
+ShowTimeLog=1
+SumEnabled=0
+ShowTimeSum=1
+[EventLog]
+Title_0=Ch3
+Symbol_0=0 4 1
+Title_1=Ch2
+Symbol_1=0 4 1
+Title_2=Ch1
+Symbol_2=0 4 1
+Title_3=Ch0
+Symbol_3=0 4 1
+LogEnabled=0
+GraphEnabled=0
+ShowTimeLog=1
+SumEnabled=0
+ShowTimeSum=1
+SumSortOrder=0
+[InterruptLog]
+LogEnabled=0
+GraphEnabled=0
+ShowTimeLog=1
+SumEnabled=0
+ShowTimeSum=1
+SumSortOrder=0
+[Log file]
+LoggingEnabled=_ 0
+LogFile=_ ""
+Category=_ 0
+[TermIOLog]
+LoggingEnabled=_ 0
+LogFile=_ ""
+[DriverProfiling]
+Enabled=0
+Mode=3
+Graph=0
+Symbiont=0
+Exclusions=
+[CallStackLog]
+Enabled=0
+[CallStackStripe]
+ShowTiming=1
+[Disassemble mode]
+mode=1
+[Breakpoints2]
+Bp0=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\Hardware\STM32\STM32.c}.377.5" 0 0 1 "" 0 "" 0
+Bp1=_ 0 "EMUL_CODE" "0x0800C6DC" 0 0 1 "" 0 "" 0
+Bp2=_ 0 "EMUL_CODE" "0x0800073E" 0 0 1 "" 0 "" 0
+Bp3=_ 0 "EMUL_CODE" "0x0800E5A4" 0 0 1 "" 0 "" 0
+Bp4=_ 0 "EMUL_CODE" "0x0800E67C" 0 0 1 "" 0 "" 0
+Bp5=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\uTasker\Tty_drv.c}.669.13" 0 0 1 "" 0 "" 0
+Bp6=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\Hardware\STM32\stm32_UART.h}.171.5" 0 0 1 "" 0 "" 0
+Bp7=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\Hardware\STM32\stm32_FLASH.h}.108.9" 0 0 1 "" 0 "" 0
+Bp8=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\Hardware\STM32\STM32.c}.3300.1" 0 0 1 "" 0 "" 0
+Bp9=_ 0 "EMUL_CODE" "0x08000188" 0 0 1 "" 0 "" 0
+Count=10
+[Aliases]
+Count=0
+SuppressDialog=0

@@ -180,9 +180,6 @@
     <ClCompile Include="..\..\..\WinSim\FileToDisk.c">
       <Filter>WinSim</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Hardware\IIC_devices\IIC_dev.c">
-      <Filter>WinSim</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\WinSim\LCD\KeyPadSim.cpp">
       <Filter>WinSim</Filter>
     </ClCompile>
@@ -2141,6 +2138,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\stack\mqtt.c">
       <Filter>TCP/IP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\WinSim\serial_dev.c">
+      <Filter>WinSim</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

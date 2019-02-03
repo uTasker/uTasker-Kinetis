@@ -203,6 +203,13 @@ Bp4=_ 0 "EMUL_CODE" "0x0000114E" 0 0 1 "" 0 "" 0
 Bp5=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\Hardware\Kinetis\kinetis_USB_HS_Device.h}.775.9" 0 0 1 "" 0 "" 0
 Bp6=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\..\Hardware\Kinetis\kinetis_USB_HS_Device.h}.839.1" 0 0 1 "" 0 "" 0
 Count=7
+[Log file]
+LoggingEnabled=_ 0
+LogFile=_ ""
+Category=_ 0
+[TermIOLog]
+LoggingEnabled=_ 0
+LogFile=_ ""
 [Disassemble mode]
 mode=3
 [Breakpoints]
@@ -222,13 +229,6 @@ Bp12=_ "STD_CODE" "0x000038E6" 0 0 0 0 "" 0 "" 0
 Bp13=_ "STD_CODE" "{C:\MJBC\Internal\Freescale\Kinetis\workspace\uTaskerV1_4\Hardware\Kinetis\kinetis_ADC.h}.502.1" 0 0 0 0 "" 0 "" 0
 Bp14=_ "STD_CODE" "0x00001208" 0 0 0 0 "" 0 "" 0
 Count=15
-[Log file]
-LoggingEnabled=_ 0
-LogFile=_ ""
-Category=_ 0
-[TermIOLog]
-LoggingEnabled=_ 0
-LogFile=_ ""
 [Aliases]
 Count=0
 SuppressDialog=0

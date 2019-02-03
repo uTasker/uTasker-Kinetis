@@ -569,12 +569,14 @@ static void fnPushLastLength(USBQUE *endpoint_queue, unsigned short usLength)
 // 
 static unsigned short fnPullLastLength(USB_ENDPOINT *endpoint_control)
 {
-    int iEntry = 1;
     unsigned short usLength = endpoint_control->usLength[0];             // length of last data token
+#if USB_FIFO_BUFFER_DEPTH > 1
+    int iEntry = 1;
     while (iEntry < endpoint_control->ucFIFO_depth) {
         endpoint_control->usLength[iEntry - 1] = endpoint_control->usLength[iEntry]; // shift the lengths in the queue
         iEntry++;
     }
+#endif
 #if defined _USB_CATCH_ERROR
     if (endpoint_control->ucFIFO_depth == 0) {                           // catch writing before start of FIFO length buffer
         fnError(2);

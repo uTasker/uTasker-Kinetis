@@ -89,7 +89,7 @@
         </option>
         <option>
           <name>OGChipSelectEditMenu</name>
-          <state>MK20DX128xxx5	NXP MK20DX128xxx5</state>
+          <state>MKM34Z128xxx5	NXP MKM34Z128xxx5</state>
         </option>
         <option>
           <name>GenLowLevelInterface</name>
@@ -128,7 +128,7 @@
         <option>
           <name>GBECoreSlave</name>
           <version>24</version>
-          <state>39</state>
+          <state>35</state>
         </option>
         <option>
           <name>OGUseCmsis</name>
@@ -145,11 +145,11 @@
         <option>
           <name>CoreVariant</name>
           <version>24</version>
-          <state>39</state>
+          <state>35</state>
         </option>
         <option>
           <name>GFPUDeviceSlave</name>
-          <state>MK20DX128xxx5	NXP MK20DX128xxx5</state>
+          <state>MKM34Z128xxx5	NXP MKM34Z128xxx5</state>
         </option>
         <option>
           <name>FPU2</name>
@@ -168,7 +168,7 @@
         <option>
           <name>GFPUCoreSlave2</name>
           <version>24</version>
-          <state>39</state>
+          <state>35</state>
         </option>
       </data>
     </settings>
@@ -727,7 +727,7 @@
         </option>
         <option>
           <name>IlinkIcfFile</name>
-          <state>$PROJ_DIR$\settings\K_128_16.icf</state>
+          <state>$PROJ_DIR$\settings\KM_128_16.icf</state>
         </option>
         <option>
           <name>IlinkIcfFileSlave</name>
