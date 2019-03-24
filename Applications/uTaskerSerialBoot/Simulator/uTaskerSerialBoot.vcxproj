@@ -130,9 +130,13 @@
       <OutputFile>.\uTasker___Win32_uTasker_Kinetis_plus_GNU_build/uTaskerSerialBoot.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
+      <Command>cd ..\GNU_Kinetis
+Build_Kinetis.bat</Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
       <Command>
       </Command>
-    </PostBuildEvent>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='uTasker Kinetis|Win32'">
     <Midl>
