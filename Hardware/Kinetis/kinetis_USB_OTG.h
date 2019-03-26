@@ -2,7 +2,7 @@
     Mark Butcher    Bsc (Hons) MPhil MIET
 
     M.J.Butcher Consulting
-    Birchstrasse 20f,    CH-5406, Rütihof
+    Birchstrasse 20f,    CH-5406, Rï¿½tihof
     Switzerland
 
     www.uTasker.com    Skype: M_J_Butcher
@@ -973,7 +973,7 @@ extern void fnConfigUSB(QUEUE_HANDLE Channel, USBTABLE *pars)
     #if !defined KINETIS_KL
     FMC_PFAPR |= FMC_FPAPR_USB_FS;                                       // allow USB controller to read from Flash
     #endif
-    #if !defined KINETIS_KL82 && !(defined KINETIS_K22 && (SIZE_OF_RAM == (24 * 1024))) {3} KL82 doesn't have regulator control
+    #if !defined KINETIS_KL82 && !(defined KINETIS_K22 && (SIZE_OF_RAM == (24 * 1024))) // {3} KL82 doesn't have regulator control
     SIM_SOPT1_SET(SIM_SOPT1_USBREGEN, SIM_SOPT1CFG_URWE);                // ensure USB regulator is enabled
     SIM_SOPT1_CLR(SIM_SOPT1_USBSTBY, SIM_SOPT1CFG_UVSWE);                // and not in standby
     #endif
