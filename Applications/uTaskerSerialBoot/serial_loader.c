@@ -1648,6 +1648,9 @@ static void fnReturnResponse(QUEUE_HANDLE hInterface, int iInterfaceType, KBOOT_
     #endif
     #if (defined USB_INTERFACE && defined HID_LOADER && defined KBOOT_HID_LOADER)
         fnWrite(hInterface, (unsigned char *)ptrKBOOT_response, sizeof(KBOOT_PACKET));
+        #if defined KBOOT_COMMAND_LIMIT
+        uTaskerStopTimer(TASK_USB);                                      // stop timer as soon as a valid KBOOT message has been responded to
+        #endif
     #endif
     #if (defined SERIAL_INTERFACE && defined KBOOT_LOADER)
     }

@@ -11,7 +11,7 @@
     File:      usb_device_loader.c - USB-based firmware loading
     Project:   uTasker Demonstration project
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2019
     *********************************************************************
     17.05.2011 Official USB VID/PID for Freescale MSD                    {1}
     31.05.2011 Add optional password protection on SW uploads            {2}
@@ -44,6 +44,8 @@
     23.10.2015 Added optional operation together with host mode loading [renamed to usb_device_loader.c] {29}
     05.11.2015 Add volume entry in root directory to ensure that the content is displayed by all host OSs {30}
     20.11.2015 Add USB-CDC option to allow SREC loading via virtual COM  {31}
+    28.03.2019 Add option to start the application in KBOOT mode when there is no enumeration within time KBOOT_HID_ENUMERATION_LIMIT
+    28.03.2019 Add option to start the application in KBOOT mode when there is no command received within time KBOOT_COMMAND_LIMIT
 
 */
 
@@ -359,8 +361,8 @@ typedef struct _PACK stUSB_CONFIGURATION_DESCRIPTOR_COLLECTION
     USB_ENDPOINT_DESCRIPTOR                    endpoint_4;
     #else
     USB_INTERFACE_DESCRIPTOR                   interface_desc_1;         // first interface descriptor
-    USB_ENDPOINT_DESCRIPTOR                    endpoint_1;               // end points of second interface
-    USB_ENDPOINT_DESCRIPTOR                    endpoint_2;
+    USB_ENDPOINT_DESCRIPTOR                    endpoint_2;               // end points of second interface
+    USB_ENDPOINT_DESCRIPTOR                    endpoint_3;
     #endif
 #elif defined HID_LOADER                                                 // {16}
     USB_CONFIGURATION_DESCRIPTOR               config_desc;              // compulsory configuration descriptor
@@ -1330,6 +1332,9 @@ extern void fnTaskUSB(TTASKTABLE *ptrTaskTable)
         uTaskerMonoTimer(OWN_TASK, (DELAY_LIMIT)(0.5 * SEC), TIMEOUT_USB_ENUMERATION); // 500ms in which the device must enumerate otherwise the host mode will be switched to instead
         #endif
     #endif
+    #if defined HID_LOADER && defined KBOOT_HID_LOADER && defined KBOOT_HID_ENUMERATION_LIMIT
+        uTaskerMonoTimer(OWN_TASK, KBOOT_HID_ENUMERATION_LIMIT, TIMEOUT_USB_ENUMERATION);
+    #endif
     }
 
     while (fnRead(PortIDInternal, ucInputMessage, HEADER_LENGTH)) {      // check input queue
@@ -1419,6 +1424,10 @@ extern void fnTaskUSB(TTASKTABLE *ptrTaskTable)
         #else
                 fnJumpToValidApplication(1);
         #endif
+                break;
+    #elif defined HID_LOADER && defined KBOOT_HID_LOADER && defined KBOOT_HID_ENUMERATION_LIMIT
+            case TIMEOUT_USB_ENUMERATION:                                // there has been no enumeration after an initial delay
+                fnJumpToValidApplication(1);
                 break;
     #endif
     #if defined HID_LOADER
@@ -1544,6 +1553,11 @@ extern void fnTaskUSB(TTASKTABLE *ptrTaskTable)
         #else
                 uTaskerMonoTimer(OWN_TASK, (DELAY_LIMIT)(2 * SEC), TIMEOUT_ACCEPT_UPLOAD); // start a period where writes will be ignored - when the timer has expired uploads are accepted
         #endif
+    #endif
+    #if defined HID_LOADER && defined KBOOT_HID_LOADER && defined KBOOT_COMMAND_LIMIT
+                uTaskerMonoTimer(OWN_TASK, KBOOT_COMMAND_LIMIT, TIMEOUT_USB_ENUMERATION);
+    #elif defined HID_LOADER && defined KBOOT_HID_LOADER && defined KBOOT_HID_ENUMERATION_LIMIT
+                uTaskerStopTimer(OWN_TASK);
     #endif
                 break;
             }

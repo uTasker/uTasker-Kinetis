@@ -105,6 +105,7 @@
     //#define TWR_K24F120M                                               // tower board http://www.utasker.com/kinetis/TWR-K24F120M.html
     //#define K24FN1M0_120
     //#define K26FN2_180                                                 // development board with 180MHz K26F
+    //#define FRDM_K28F                                                  // freedom board http://www.utasker.com/kinetis/FRDM-K28F.html
 
     //#define KWIKSTIK                                                   // K processors Cortex M4 with USB and segment LCD http://www.utasker.com/kinetis/KWIKSTIK.html
     //#define TWR_K40X256                                                // tower board http://www.utasker.com/kinetis/TWR-K40X256.html
@@ -119,10 +120,10 @@
 
     //#define EMCRAFT_K61F150M                                           // K processors Cortex M4 with Ethernet, USB, encryption, tamper, key storage protection area - http://www.utasker.com/kinetis/EMCRAFT_K61F150M.html
 
-    //#define FRDM_K64F                                                  // next generation K processors Cortex M4 with Ethernet, USB, encryption, tamper, key storage protection area - freedom board http://www.utasker.com/kinetis/FRDM-K64F.html
+      #define FRDM_K64F                                                  // next generation K processors Cortex M4 with Ethernet, USB, encryption, tamper, key storage protection area - freedom board http://www.utasker.com/kinetis/FRDM-K64F.html
     //#define TWR_K64F120M                                               // tower board http://www.utasker.com/kinetis/TWR-K64F120M.html
     //#define HEXIWEAR_K64F                                              // hexiwear - wearable development kit for IoT (K64FN1M0VDC12 main processor) http://www.hexiwear.com/
-      #define TEENSY_3_5                                                 // USB development board with K64FX512 - http://www.utasker.com/kinetis/TEENSY_3.5.html
+    //#define TEENSY_3_5                                                 // USB development board with K64FX512 - http://www.utasker.com/kinetis/TEENSY_3.5.html
     //#define TWR_K65F180M                                               // tower board http://www.utasker.com/kinetis/TWR-K65F180M.html
     //#define K66FX1M0                                                   // development board with K66FX1M0
     //#define FRDM_K66F                                                  // freedom board http://www.utasker.com/kinetis/FRDM-K66F.html
@@ -613,6 +614,16 @@
     #define KINETIS_K26                                                  // extra sub-family type precision
     #define DEVICE_WITHOUT_ETHERNET                                      // K26 doesn't have Ethernet controller
     #define USB_HS_INTERFACE                                             // use HS interface rather than FS interface
+#elif defined FRDM_K28F
+    #define TARGET_HW            "FRDM-K28F"
+    #define OUR_HEAP_SIZE        (HEAP_REQUIREMENTS)((48 * 1024) * MEM_FACTOR) // large SRAM parts
+    #define KINETIS_MAX_SPEED    150000000
+    #define KINETIS_K_FPU                                                // part with floating point unit
+    #define KINETIS_K60                                                  // specify the sub-family
+    #define KINETIS_REVISION_2
+    #define KINETIS_K66                                                  // extra sub-family type precision
+    #define USB_HS_INTERFACE                                             // use HS interface rather than FS interface
+    #define DEVICE_WITHOUT_ETHERNET                                      // K20 doesn't have Ethernet controller
 #elif defined TWR_K40X256
     #define TARGET_HW       "TWR-K40X256 Kinetis"
     #define DEBUG_ON_VIRT_COM                                            // optionally set UART debug on virtual COM rather than the serial board
@@ -1065,9 +1076,11 @@
       //#define USE_USB_MSD                                              // full USB-MSD to SD card interface on USB (no emulated loader function) - requires SDCARD_SUPPORT (USB_MSD_DEVICE_LOADER can be disabled)
           //#define DISK_COUNT         1                                 // single upload disk (set to 2 for two upload disks)
           //#define DEBUG_MAC                                            // activate debug output used to monitor the operation of MAC OS X
-      //#define HID_LOADER                                               // Freescale HIDloader.exe or KBOOT compatible
-          //#define KBOOT_HID_LOADER                                     // select KBOOT mode of operation (rather than HIDloader.exe)
-          //#define KBOOT_SECURE_LOADER                                  // decrypt and accept only encrypted/authenticated firmware
+        #define HID_LOADER                                               // Freescale HIDloader.exe or KBOOT compatible
+            #define KBOOT_HID_LOADER                                     // select KBOOT mode of operation (rather than HIDloader.exe)
+              //#define KBOOT_SECURE_LOADER                              // decrypt and accept only encrypted/authenticated firmware
+                #define KBOOT_HID_ENUMERATION_LIMIT  (DELAY_LIMIT)(5 * SEC)  // if there is no USB enumeration we start the application after this delay
+                #define KBOOT_COMMAND_LIMIT          (DELAY_LIMIT)(10 * SEC) // if there is no valid KBOOT command received after this delay the application will be started
         #undef _NO_CHECK_QUEUE_INPUT
         #define WAKE_BLOCKED_USB_TX                                      // allow a blocked USB transmitter to continue after an interrupt event
         #define NUMBER_USB     (5 + 1)                                   // 6 physical queues (control plus 5 endpoints) needed for USB interface
