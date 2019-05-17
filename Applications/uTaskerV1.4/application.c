@@ -11,7 +11,7 @@
     File:      application.c
     Project:   uTasker project
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2018
+    Copyright (C) M.J.Butcher Consulting 2004..2019
     *********************************************************************
     16.02.2006 Add SMTP LOGIN support
     18.02.2006 Add SMTP parameter settings
@@ -2133,7 +2133,7 @@ static void fnTestRTC(void)
 #define DATA_FILE_1_LENGTH    3722                                       // the number of raw data samples for file 1 (even)
 #define DATA_FILE_2_LENGTH    74982                                      // the number of raw data samples for file 2 (even)
 #define MAX_DATA_FILE_LENGTH  (128 * 1024)
-#define LINEAR_DATA_1         (const unsigned char *)(256 * 1024)        // internal flash address of the start of the file's raw data
+#define LINEAR_DATA_1         (const unsigned char *)(FLASH_START_ADDRESS + (256 * 1024)) // internal flash address of the start of the file's raw data
 #define LINEAR_DATA_2         (const unsigned char *)(LINEAR_DATA_1 + MAX_DATA_FILE_LENGTH) // internal flash address of the start of the file's raw data
 
 static const CHAR cHTML_link[] = "<html><head><title>Emulated FAT</title></head><body bgcolor=#d8d8d8 marginheight=30><center><font color=#ff0000 style=font-size:30px><b style='mso-bidi-font-weight:normal'>&micro;Tasker FAT Emulation</font></b><br><br><br>Full details of this and many other features can be found at <a href=""http://www.uTasker.com/"">the uTasker web site</a>.</body></html>";
