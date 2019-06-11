@@ -11,7 +11,7 @@
     File:      serial_loader.c
     Project:   uTasker serial loader
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2019
     *********************************************************************
     07.01.2010 Provisional optional GCC workaround                       {1}
     25.03.2010 Use fnEraseFlashSector() rather than uFileErase()         {2}
@@ -791,13 +791,13 @@ extern void fnApplication(TTASKTABLE *ptrTaskTable)
         #endif
         #if defined SPI_SW_UPLOAD
                 fnDebugMsg("\r\n\nDeleting area...");
-                switch (fnEraseFlashSector((unsigned char *)(SIZE_OF_FLASH + UPLOAD_OFFSET), (UTASKER_APP_END - (unsigned char *)UTASKER_APP_START))) // delete space in SPI FLASH
+                switch (fnEraseFlashSector((unsigned char *)(SIZE_OF_FLASH + UPLOAD_OFFSET), (MAX_FILE_LENGTH)(UTASKER_APP_END - (unsigned char *)UTASKER_APP_START))) // delete space in SPI FLASH
         #else
                 fnDebugMsg("\r\n\nDeleting code...");
             #if defined MEMORY_SWAP && defined ADD_FILE_OBJECT_AFTER_LOADING
                 fnEraseFlashSector((unsigned char *)(UTASKER_APP_START + (SIZE_OF_FLASH/2) - (2 * FLASH_GRANULARITY)), 0); // delete the firmware's file object
             #endif
-                switch (fnEraseFlashSector((unsigned char *)UTASKER_APP_START, (UTASKER_APP_END - (unsigned char *)UTASKER_APP_START))) // delete application space {2}
+                switch (fnEraseFlashSector((unsigned char *)UTASKER_APP_START, (MAX_FILE_LENGTH)(UTASKER_APP_END - (unsigned char *)UTASKER_APP_START))) // delete application space {2}
         #endif
                 {
                 case CODE_DELETED:

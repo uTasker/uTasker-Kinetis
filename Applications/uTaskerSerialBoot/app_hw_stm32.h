@@ -61,6 +61,21 @@
     #define PCLK1_DIVIDE        4
     #define PCLK2_DIVIDE        2
     #define HCLK_DIVIDE         1
+#elif defined STM32F746G_DISCO                                           // STM32F746NGH6 (216MHz)
+    #define CRYSTAL_FREQ        25000000
+  //#define DISABLE_PLL                                                  // run from clock source directly
+  //#define USE_HSI_CLOCK                                                // use internal HSI clock source
+    #define PLL_INPUT_DIV       25                                       // 2..64 - should set the input to pll in the range 1..2MHz (with preference near to 2MHz)
+    #define PLL_VCO_MUL         336                                      // 64 ..432 where VCO must be 64..432MHz
+    #define PLL_POST_DIVIDE     2                                        // post divide VCO by 2, 4, 6, or 8 to get the system clock speed
+    #define PIN_COUNT           PIN_COUNT_216_PIN
+    #define PACKAGE_TYPE        PACKAGE_BGA
+    #define SIZE_OF_RAM         (320 * 1024)                             // 320k SRAM (DTCM + SRAM1 + SRAM2)
+    #define SIZE_OF_FLASH       (1024 * 1024)                            // 1M FLASH
+    #define SUPPLY_VOLTAGE      SUPPLY_2_7__3_6                          // power supply is in the range 2.7V..3.6V
+    #define PCLK1_DIVIDE        4
+    #define PCLK2_DIVIDE        2
+    #define HCLK_DIVIDE         1
 #elif defined ST_MB997A_DISCOVERY || defined STM32F405_BOARD             // STM32F407VGT6 (168MHz)
     #define CRYSTAL_FREQ        8000000
   //#define DISABLE_PLL                                                  // run from clock source directly
@@ -469,6 +484,45 @@
                                        POWER_DOWN(AHB2, RCC_AHB2ENR_OTGFSEN); \
                                        POWER_DOWN(APB2, RCC_APB2ENR_SYSCFGEN); \
                                        SDIO_POWER = SDIO_POWER_POWER_OFF;
+#elif defined STM32F746G_DISCO
+    #define USER_KEY_BUTTON            PORTI_BIT11
+
+    #define LED1                       PORTI_BIT1                        // green LED
+    #define LED2                       PORTI_BIT2                        // no further LEDs available on the board
+    #define LED3                       PORTI_BIT3
+    #define LED4                       PORTI_BIT4
+
+    #define BLINK_LED                  LED1
+
+    #define INIT_WATCHDOG_LED()        _CONFIG_PORT_OUTPUT(I, BLINK_LED, (OUTPUT_SLOW | OUTPUT_PUSH_PULL))
+    #define TOGGLE_WATCHDOG_LED()      _TOGGLE_PORT(I, BLINK_LED)        // blink the LED, if set as output
+
+    #define INIT_WATCHDOG_DISABLE()
+    #define WATCHDOG_DISABLE()         0
+
+    #define FORCE_BOOT()               (_READ_PORT_MASK(I, (USER_KEY_BUTTON))) // hold user key at reset to force boot loader mode
+    #define RETAIN_LOADER_MODE()       FORCE_BOOT()                      // force retaining boot loader mode after SD card update
+
+    // LEDs
+    //
+                                       // '0'            '1'        input state  center (x,   y)  0 = circle, radius, controlling port, controlling pin
+    #define KEYPAD_LED_DEFINITIONS     {RGB(50, 50, 50), RGB(0, 255, 0), 0, {14, 163, 27, 168}, _PORTI, LED1}
+
+    #define BUTTON_KEY_DEFINITIONS     {_PORTI, USER_KEY_BUTTON, {16, 235, 31, 250}}
+
+    #define KEYPAD "../../uTaskerV1.4/Simulator/KeyPads/STM32F746-DISC.bmp"
+
+    // Power down the USB controller and disable interrupts before jumping to the application
+    //
+    #define RESET_PERIPHERALS()        IRQ0_31_CER  = 0xffffffff; \
+                                       IRQ32_63_CER = 0xffffffff; \
+                                       IRQ64_95_CER = 0xffffffff; \
+                                       IRQ0_31_CPR  = 0xffffffff; \
+                                       IRQ32_63_CPR = 0xffffffff; \
+                                       IRQ64_95_CPR = 0xffffffff; \
+                                       POWER_DOWN(AHB2, RCC_AHB2ENR_OTGFSEN); \
+                                       POWER_DOWN(APB2, RCC_APB2ENR_SYSCFGEN); \
+                                       SDIO_POWER = SDIO_POWER_POWER_OFF;
 #elif defined STM3210C_EVA
     #define USER_KEY_BUTTON            PORTB_BIT9
     #define LED1                       PORTD_BIT7
@@ -643,7 +697,7 @@
 #endif
 
 #if defined SDCARD_SUPPORT
-    #if defined STM3240G_EVAL || defined ST_MB997A_DISCOVERY
+    #if defined STM3240G_EVAL || defined ST_MB997A_DISCOVERY || defined STM32F746G_DISCO
         #define SD_CONTROLLER_AVAILABLE                                  // use SDIO rather than SPI (necessary on STM3240G-EVAL board)
 
         #if defined SD_CONTROLLER_AVAILABLE
@@ -900,6 +954,8 @@
 #define PRIORITY_USART1            6
 #define PRIORITY_USART2            6
 #define PRIORITY_USART3            6
+#define PRIORITY_UART7             6
+#define PRIORITY_UART8             6
 #define PRIORITY_HW_TIMER          5
 #define PRIORITY_TIMERS            5
 #define PRIORITY_DEVICE_LP_FS      4
@@ -914,16 +970,38 @@
 #define PRIORITY_OTG_FS            1
 
 
-// Initial port input states for simulator
-//
-#define GPIO_DEFAULT_INPUT_A       0xffff
-#define GPIO_DEFAULT_INPUT_B       0xffff
-#define GPIO_DEFAULT_INPUT_C       0xffff
-#define GPIO_DEFAULT_INPUT_D       0xffff
-#define GPIO_DEFAULT_INPUT_E       0xffff
-#define GPIO_DEFAULT_INPUT_F       0xffff
-#define GPIO_DEFAULT_INPUT_G       0xffff
-#define GPIO_DEFAULT_INPUT_H       0xffff
-#define GPIO_DEFAULT_INPUT_I       0xffff
+#if !defined GPIO_DEFAULT_INPUT_A
+    #define GPIO_DEFAULT_INPUT_A   0xffff                                // initial port input states for simulator
+#endif
+#if !defined GPIO_DEFAULT_INPUT_B
+    #define GPIO_DEFAULT_INPUT_B   0xffff
+#endif
+#if !defined GPIO_DEFAULT_INPUT_C
+    #define GPIO_DEFAULT_INPUT_C   0xffff
+#endif
+#if !defined GPIO_DEFAULT_INPUT_D
+    #define GPIO_DEFAULT_INPUT_D   0xffff
+#endif
+#if !defined GPIO_DEFAULT_INPUT_E
+    #define GPIO_DEFAULT_INPUT_E   0xffff
+#endif
+#if !defined GPIO_DEFAULT_INPUT_F
+    #define GPIO_DEFAULT_INPUT_F   0xffff
+#endif
+#if !defined GPIO_DEFAULT_INPUT_G
+    #define GPIO_DEFAULT_INPUT_G   0xffff
+#endif
+#if !defined GPIO_DEFAULT_INPUT_H
+    #define GPIO_DEFAULT_INPUT_H   0xffff
+#endif
+#if !defined GPIO_DEFAULT_INPUT_I
+    #define GPIO_DEFAULT_INPUT_I   0xffff
+#endif
+#if !defined GPIO_DEFAULT_INPUT_J
+    #define GPIO_DEFAULT_INPUT_J   0xffff
+#endif
+#if !defined GPIO_DEFAULT_INPUT_K
+    #define GPIO_DEFAULT_INPUT_K   0xffff
+#endif
 
 #endif

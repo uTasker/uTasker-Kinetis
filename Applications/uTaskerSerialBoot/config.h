@@ -831,6 +831,11 @@
     #define _STM32F2XX
     #define _STM32F207
     #define OUR_HEAP_SIZE (HEAP_REQUIREMENTS)((24 * 1024) * MEM_FACTOR)  // we have the LAN buffers in HEAP and big RX/TX
+#elif defined STM32F746G_DISCO
+    #define TARGET_HW            "STM32F746-Discovery"
+    #define _STM32F7XX
+    #define _STM32F746
+    #define OUR_HEAP_SIZE        (HEAP_REQUIREMENTS)((24 * 1024) * MEM_FACTOR) // we have the LAN buffers in HEAP and big RX/TX
 #endif
 
 
@@ -1076,8 +1081,8 @@
       //#define USE_USB_MSD                                              // full USB-MSD to SD card interface on USB (no emulated loader function) - requires SDCARD_SUPPORT (USB_MSD_DEVICE_LOADER can be disabled)
           //#define DISK_COUNT         1                                 // single upload disk (set to 2 for two upload disks)
           //#define DEBUG_MAC                                            // activate debug output used to monitor the operation of MAC OS X
-        #define HID_LOADER                                               // Freescale HIDloader.exe or KBOOT compatible
-            #define KBOOT_HID_LOADER                                     // select KBOOT mode of operation (rather than HIDloader.exe)
+      //#define HID_LOADER                                               // Freescale HIDloader.exe or KBOOT compatible
+          //#define KBOOT_HID_LOADER                                     // select KBOOT mode of operation (rather than HIDloader.exe)
               //#define KBOOT_SECURE_LOADER                              // decrypt and accept only encrypted/authenticated firmware
                 #define KBOOT_HID_ENUMERATION_LIMIT  (DELAY_LIMIT)(5 * SEC)  // if there is no USB enumeration we start the application after this delay
                 #define KBOOT_COMMAND_LIMIT          (DELAY_LIMIT)(10 * SEC) // if there is no valid KBOOT command received after this delay the application will be started
