@@ -11,7 +11,7 @@
     File:      kinetis.h
     Project:   Single Chip Embedded Internet
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2017
+    Copyright (C) M.J.Butcher Consulting 2004..2019
     *********************************************************************
     03.03.2012 Correct PORT5_BLOCK address (K61/K70)                     {1}
     03.03.2012 Add UART2 alternative port mapping on K70                 {2}
@@ -9962,6 +9962,16 @@ typedef struct stKINETIS_ADMA2_BD
         #define PH_6_KBI1_P30            PORT_MUX_ALT1
         #define PH_7_KBI1_P31            PORT_MUX_ALT1
     #else
+        #if defined KINETIS_KEA8
+            #define PB_4_KBI1_P6         PORT_MUX_ALT1
+            #define PB_5_KBI1_P7         PORT_MUX_ALT1
+            #define PC_0_KBI1_P2         PORT_MUX_ALT1
+            #define PC_1_KBI1_P3         PORT_MUX_ALT1
+            #define PC_2_KBI1_P4         PORT_MUX_ALT1
+            #define PC_3_KBI1_P5         PORT_MUX_ALT1
+            #define PC_4_KBI1_P0         PORT_MUX_ALT1
+            #define PC_5_KBI1_P1         PORT_MUX_ALT1
+        #endif
         #define PB_0_KBI0_P4             PORT_MUX_ALT1
         #define PB_1_KBI0_P5             PORT_MUX_ALT1
         #define PB_2_KBI0_P6             PORT_MUX_ALT1
