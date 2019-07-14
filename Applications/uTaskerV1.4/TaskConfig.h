@@ -11,7 +11,7 @@
     File:      TaskConfig.h
     Project:   Single Chip Embedded Internet
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2018
+    Copyright (C) M.J.Butcher Consulting 2004..2019
     *********************************************************************
     28.04.2007 Add SNMP task
     13.05.2007 Add PPP task
@@ -33,6 +33,7 @@
     18.11.2015 Add USB host task                                         {13}
     18.04.2017 Add BLINKY configuration
     10.11.2017 Add MQTT task                                             {14}
+    20.01.2019 Add HELLO_WORLD configuration                             {16}
 
 */
  
@@ -169,11 +170,11 @@ const UTASK_TASK ctNodes[] = {                                           // we u
 #if defined USE_MODBUS
     TASK_MODBUS,                                                         // MODBUS task
 #endif
-#if !defined BLINKY
+#if !defined BLINKY || defined HELLO_WORLD                               // {16}
     TASK_APPLICATION,                                                    // application task
-    #if defined USE_MAINTENANCE
+#endif
+#if defined USE_MAINTENANCE && (!defined BLINKY && !defined HELLO_WORLD)
     TASK_DEBUG,                                                          // maintenance task
-    #endif
 #endif
 #if defined SDCARD_SUPPORT || defined SPI_FLASH_FAT || defined FLASH_FAT || defined MANAGED_FILES || defined USB_MSD_HOST
     TASK_MASS_STORAGE,                                                   // {5} mass storage task
@@ -220,16 +221,16 @@ const UTASK_TASK ctNodes[] = {                                           // we u
 #if defined USE_IGMP
     TASK_IGMP,                                                           // {10} IGMP task
 #endif
-#if (defined LAN_REPORT_ACTIVITY || defined PHY_POLL_LINK || defined INTERRUPT_TASK_PHY) && !defined BLINKY // {11}
+#if (defined LAN_REPORT_ACTIVITY || defined PHY_POLL_LINK || defined INTERRUPT_TASK_PHY) && (!defined BLINKY && !defined HELLO_WORLD) // {11}{16}
     TASK_NETWORK_INDICATOR,                                              // network activity indicator task
 #endif
-#if (defined USE_SNTP || defined USE_TIME_SERVER || defined USE_TIME_SERVER || defined SUPPORT_RTC || defined SUPPORT_SW_RTC) && !defined BLINKY // {12}
+#if (defined USE_SNTP || defined USE_TIME_SERVER || defined USE_TIME_SERVER || defined SUPPORT_RTC || defined SUPPORT_SW_RTC) && (!defined BLINKY && !defined HELLO_WORLD) // {12}{16}
     TASK_TIME_KEEPER,
 #endif
 #if defined STEPPER_MOTOR_EXAMPLE
     TASK_STEPPER_MOTOR,
 #endif
-#if defined QUICK_DEV_TASKS && !defined BLINKY
+#if defined QUICK_DEV_TASKS && (!defined BLINKY && !defined HELLO_WORLD) // {16}
     TASK_DEV_1,
     TASK_DEV_2,
     TASK_DEV_3,
@@ -270,10 +271,10 @@ const UTASKTABLEINIT ctTaskTable[] = {
 #if defined USE_MODBUS
     {"O-MOD",     fnMODBUS,     MEDIUM_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP}, // MODBUS task  
 #endif
-#if defined _EXE && defined ETH_INTERFACE && !defined BLINKY
-    {"app",       fnApplication,  MEDIUM_QUEUE, (DELAY_LIMIT)((0.5 * SEC) + (PHY_POWERUP_DELAY)), 0, UTASKER_STOP}, // application - start after Ethernet to be sure we have Ethernet handle
-#elif !defined BLINKY
-    {"app",       fnApplication,  MEDIUM_QUEUE, (DELAY_LIMIT)((0.10 * SEC) + (PHY_POWERUP_DELAY)), 0, UTASKER_STOP}, // application - start after Ethernet to be sure we have Ethernet handle
+#if defined _EXE && defined ETH_INTERFACE && (!defined BLINKY || defined HELLO_WORLD)
+    {"app",       fnApplication,MEDIUM_QUEUE, (DELAY_LIMIT)((0.5 * SEC) + (PHY_POWERUP_DELAY)), 0, UTASKER_STOP}, // application - start after Ethernet to be sure we have Ethernet handle
+#elif (!defined BLINKY || defined HELLO_WORLD)
+    {"app",       fnApplication,MEDIUM_QUEUE, (DELAY_LIMIT)((0.10 * SEC) + (PHY_POWERUP_DELAY)), 0, UTASKER_STOP}, // application - start after Ethernet to be sure we have Ethernet handle
 #endif
 #if defined SDCARD_SUPPORT || defined SPI_FLASH_FAT || defined FLASH_FAT || defined MANAGED_FILES || defined USB_MSD_HOST
     {"MassSt",    fnMassStorage,  MEDIUM_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP}, // mass storage task
@@ -326,23 +327,23 @@ const UTASKTABLEINIT ctTaskTable[] = {
 #if defined USE_MAINTENANCE
     {"maintenace",fnDebug,      SMALL_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP}, // task used for debug messages (started by application)
 #endif
-#if (defined LAN_REPORT_ACTIVITY || defined PHY_POLL_LINK || defined INTERRUPT_TASK_PHY) && !defined BLINKY // {9}{11}
+#if (defined LAN_REPORT_ACTIVITY || defined PHY_POLL_LINK || defined INTERRUPT_TASK_PHY) && (!defined BLINKY && !defined HELLO_WORLD) // {9}{11}{16}
     {"NetInd",    fnNetworkIndicator, LARGE_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP}, // network activity task
 #endif
 #if defined USB_INTERFACE
     {"usb",       fnTaskUSB,    SMALL_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP}, // USB (application) task
 #endif
-#if (defined USE_SNTP || defined USE_TIME_SERVER || defined USE_TIME_SERVER || defined SUPPORT_RTC || defined SUPPORT_SW_RTC) && !defined BLINKY // {12}
+#if (defined USE_SNTP || defined USE_TIME_SERVER || defined USE_TIME_SERVER || defined SUPPORT_RTC || defined SUPPORT_SW_RTC) && (!defined BLINKY && !defined HELLO_WORLD) // {12}{16}
     {"keeper",    fnTimeKeeper, SMALL_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP}, // time keeper task
 #endif
 #if defined STEPPER_MOTOR_EXAMPLE
     { "0_step",   fnStepper, SMALL_QUEUE, (DELAY_LIMIT)(0.5 * SEC), 0, UTASKER_STOP }, // time keeper task
 #endif
-#if defined QUICK_DEV_TASKS && !defined BLINKY
-    {"1",    fnQuickTask1, MEDIUM_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP}, // quick development  tasks
-    {"2",    fnQuickTask2, MEDIUM_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP},
-    {"3",    fnQuickTask3, MEDIUM_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP},
-    {"4",    fnQuickTask4, MEDIUM_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP},
+#if defined QUICK_DEV_TASKS && (!defined BLINKY && !defined HELLO_WORLD)
+    {"1",         fnQuickTask1, MEDIUM_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP}, // quick development  tasks
+    {"2",         fnQuickTask2, MEDIUM_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP},
+    {"3",         fnQuickTask3, MEDIUM_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP},
+    {"4",         fnQuickTask4, MEDIUM_QUEUE, (DELAY_LIMIT)(NO_DELAY_RESERVE_MONO), 0, UTASKER_STOP},
 #endif
 #if defined SUPPORT_LOW_POWER
     {"lowPower",  fnLowPower,   NO_QUEUE,  0, 0, UTASKER_GO},          // low power task

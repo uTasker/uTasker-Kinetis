@@ -1437,7 +1437,7 @@ static void fnDisplayPorts(HDC hdc)
             }
             ulBit >>= 1;
         }
-#if defined _KINETIS || defined _iMX && (!defined KINETIS_KE || defined KINETIS_KE15)
+#if (defined _KINETIS || defined _iMX) && (!defined KINETIS_KE || defined KINETIS_KE15)
         if (i == PORTS_AVAILABLE) {                                      // handle dedicated ADC inputs
             int b;
             cPorts[0] = 'A';

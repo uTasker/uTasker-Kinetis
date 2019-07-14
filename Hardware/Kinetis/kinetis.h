@@ -648,7 +648,7 @@ extern int fnSwapMemory(int iCheck);                                     // {70}
 
 #if defined USB_INTERFACE
     #if SYSTEM_CLOCK < 20000000
-        #error system clock much be at least 20MHz to allow USB operation!
+        #error system clock must be at least 20MHz to allow USB operation!
     #endif
 #endif
 
@@ -9292,6 +9292,8 @@ typedef struct stKINETIS_ADMA2_BD
     #define PB_0_UART0_RX                PORT_MUX_ALT2
     #define PC_6_UART1_RX                PORT_MUX_ALT2
     #define PD_6_UART2_RX                PORT_MUX_ALT2
+    #define PI_0_UART2_RX                PORT_MUX_ALT3
+    #define PI_1_UART2_TX                PORT_MUX_ALT3
 #elif defined KINETIS_KV31
     #define PB_1_UART0_TX                PORT_MUX_ALT7
     #define PB_0_UART0_RX                PORT_MUX_ALT7

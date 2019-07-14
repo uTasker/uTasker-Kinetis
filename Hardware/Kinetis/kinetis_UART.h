@@ -11,7 +11,7 @@
     File:      kinetis_UART.h
     Project:   Single Chip Embedded Internet
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2017
+    Copyright (C) M.J.Butcher Consulting 2004..2019
     *********************************************************************
     03.03.2012 Add K70 UART2 alternative port mapping                    {3}
     05.04.2012 Add UART DMA support for Tx                               {6}
@@ -1905,7 +1905,12 @@ extern void fnTxOn(QUEUE_HANDLE Channel)
         #if (UARTS_AVAILABLE > 2 && (LPUARTS_AVAILABLE < 3 || defined LPUARTS_PARALLEL)) || (UARTS_AVAILABLE == 1 && LPUARTS_AVAILABLE == 2)
     case 2:                                                              // configure the UART Tx 2 pin
             #if defined KINETIS_KE
-        _CONFIG_PERIPHERAL(D, 7, (PD_7_UART2_TX | UART_PULL_UPS));       // UART2_TX on PD7 (alt. function 2)
+                #if defined UART2_ON_I
+            SIM_PINSEL1 |= (SIM_PINSEL1_UART2PS);                        // UART2_TX on PI1
+            _CONFIG_PERIPHERAL(I, 1, (PI_1_UART2_TX | UART_PULL_UPS));
+                #else
+            _CONFIG_PERIPHERAL(D, 7, (PD_7_UART2_TX | UART_PULL_UPS));   // UART2_TX on PD7 (alt. function 2)
+                #endif
             #else
                 #if (defined KINETIS_K61 || defined KINETIS_K70 || defined KINETIS_K21 || defined KINETIS_KL || defined KINETIS_KV31 || defined KINETIS_KW2X || defined KINETIS_K26 || defined KINETIS_K65) && defined UART2_ON_E // {25}
         _CONFIG_PERIPHERAL(E, 16, (PE_16_UART2_TX | UART_PULL_UPS));     // UART2_TX on PE16 (alt. function 3)
@@ -2202,7 +2207,12 @@ extern void fnRxOn(QUEUE_HANDLE Channel)
         #if (UARTS_AVAILABLE > 2 && LPUARTS_AVAILABLE < 3) || (UARTS_AVAILABLE == 1 && LPUARTS_AVAILABLE == 2)
     case 2:                                                              // configure the UART Rx 2 pin
             #if defined KINETIS_KE
-        _CONFIG_PERIPHERAL(D, 6, (PD_6_UART2_RX | UART_PULL_UPS));       // UART2_RX on PD6 (alt. function 2)
+                #if defined UART2_ON_I
+            SIM_PINSEL1 |= (SIM_PINSEL1_UART2PS);                        // UART2_RX on PI0
+            _CONFIG_PERIPHERAL(I, 0, (PI_0_UART2_RX | UART_PULL_UPS));
+                #else
+            _CONFIG_PERIPHERAL(D, 6, (PD_6_UART2_RX | UART_PULL_UPS));   // UART2_RX on PD6
+                #endif
             #else
                 #if (defined KINETIS_K61 || defined KINETIS_K70 || defined KINETIS_K21 || defined KINETIS_KL || defined KINETIS_KV31 || defined KINETIS_KW2X || defined KINETIS_K26 || defined KINETIS_K65) && defined UART2_ON_E // {25}
         _CONFIG_PERIPHERAL(E, 17, (PE_17_UART2_RX | UART_PULL_UPS));     // UART2_RX on PE17 (alt. function 3)

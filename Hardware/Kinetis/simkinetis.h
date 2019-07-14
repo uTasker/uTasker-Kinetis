@@ -11,7 +11,7 @@
     File:      simkinetis.h
     Project:   Single Chip Embedded Internet
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2017
+    Copyright (C) M.J.Butcher Consulting 2004..2019
     *********************************************************************
     04.03.2012 Add NAND Flash controller                                 {1}
     17.03.2012 Add ADC                                                   {2}
@@ -1739,71 +1739,119 @@ typedef struct stKINETIS_TSI
 
 typedef struct stKINETIS_SIM
 {
-#if defined KINETIS_KE
+#if defined KINETIS_KE15
+    unsigned long ulRes0;
+    unsigned long SIM_CHIPCTL;
+    unsigned long ulRes1;
+    unsigned long SIM_FTMOPT0;
+    unsigned long ulRes2[2];
+    unsigned long SIM_ADCOPT;
+    unsigned long SIM_FTMOPT1;
+    unsigned long ulRes3;
+    unsigned long SIM_SDID;
+    unsigned long ulRes4[9];
+    unsigned long SIM_FCFG1;
+    unsigned long SIM_FCFG2;
+    unsigned long SIM_UIDH;
+    unsigned long SIM_UIDMH;
+    unsigned long SIM_UIDML;
+    unsigned long SIM_UIDL;
+    unsigned long ulRes5[2];
+    unsigned long SIM_MISCTRL;
+#elif defined KINETIS_KE
     unsigned long SIM_SRSID;
-    unsigned long SIM_SOPT0;
-    #if defined KINETIS_KE04 || defined KINETIS_KE06 || (defined KINETIS_KEA64 && !defined KINETIS_KEAN64) || defined KINETIS_KEA128
+    #if (defined KINETIS_KE04 && (SIZE_OF_FLASH > (8 * 1024))) || defined KINETIS_KE06 || (defined KINETIS_KEA64 && !defined KINETIS_KEAN64) || defined KINETIS_KEA128
+        unsigned long SIM_SOPT0;
         unsigned long SIM_SOPT1;
-    #endif
-    unsigned long SIM_PINSEL0;
-    #if defined KINETIS_KE04 || defined KINETIS_KE06 || (defined KINETIS_KEA64 && !defined KINETIS_KEAN64) || defined KINETIS_KEA128
+        unsigned long SIM_PINSEL0;
+    #else
+        unsigned long SIM_SOPT0;
+        unsigned long SIM_PINSEL0;                                       // SIM_PINSEL
+        #endif
+    #if (defined KINETIS_KE04 && (SIZE_OF_FLASH > (8 * 1024))) || defined KINETIS_KE06 || (defined KINETIS_KEA64 && !defined KINETIS_KEAN64) || defined KINETIS_KEA128
         unsigned long SIM_PINSEL1;
+        unsigned long SIM_SCGC;
+    #else
+        unsigned long SIM_SCGC;
     #endif
-    unsigned long SIM_SCGC;
-    unsigned long SIM_UUIDL;
-    #if defined KINETIS_KE04 || defined KINETIS_KE06 || (defined KINETIS_KEA64 && !defined KINETIS_KEAN64) || defined KINETIS_KEA128
+    #if (defined KINETIS_KE04 && (SIZE_OF_FLASH > (8 * 1024))) || defined KINETIS_KE06 || (defined KINETIS_KEA64 && !defined KINETIS_KEAN64) || defined KINETIS_KEA128
+        unsigned long SIM_UUIDL;
         unsigned long SIM_UUIDML;
         unsigned long SIM_UUIDMH;
         unsigned long SIM_CLKDIV;
     #else
-        unsigned long SIM_UUIDH;
-        unsigned long SIM_BUSDIV;
-    #endif
-    #if (defined KINETIS_KE04 && (SIZE_OF_FLASH <= (8 * 1024))) || (defined KINETIS_KEA && !defined KINETIS_KEAN64)
-        unsigned long SIM_CLKDIV;
+        unsigned long SIM_UUIDL;
+          #if defined KINETIS_KEA8 || (defined KINETIS_KE04 && (SIZE_OF_FLASH <= (8 * 1024)))
+            unsigned long SIM_UUIDML;
+            unsigned long SIM_UUIDMH;
+          #else
+            unsigned long SIM_UUIDH;
+            unsigned long SIM_BUSDIV;
+          #endif
+        #if (defined KINETIS_KE04 && (SIZE_OF_FLASH <= (8 * 1024))) || (defined KINETIS_KEA && !defined KINETIS_KEAN64)
+            unsigned long SIM_CLKDIV;
+        #endif
     #endif
 #else
     #if !defined KINETIS_KL02
         unsigned long SIM_SOPT1;
     #endif
     #if defined KINETIS_K_FPU || defined KINETIS_KL                      // {15}
-        unsigned long SIM_SOPT1CGF;
+        unsigned long SIM_SOPT1CFG;
+        #if defined KINETIS_WITH_USBPHY
+        unsigned long SIM_USBPHYCTL;
+        unsigned char ucRes0[0x1000 - 8];
+        #else
         unsigned char ucRes0[0x1000 - 4];
+        #endif
     #else
         unsigned char ucRes0[0x1000];
     #endif
+    #if defined KINETIS_WITH_PCC
+        unsigned long ulRes1[8];
+    #else
     unsigned long SIM_SOPT2;
     unsigned long ulRes1;
     unsigned long SIM_SOPT4;
     unsigned long SIM_SOPT5;
-    #if defined KINETIS_KL
-        unsigned long ulRes1a;
-    #else
-        unsigned long SIM_SOPT6;
-    #endif
+        #if defined KINETIS_KL
+            unsigned long ulRes1a;
+        #else
+            unsigned long SIM_SOPT6;
+        #endif
     unsigned long SIM_SOPT7;
-    unsigned long ulRes2[2];
-    unsigned long SIM_SDID;
-    #if defined KINETIS_KL
-        unsigned long ulRes2a[3];
+    #if defined KINETIS_K65 || defined KINETIS_K66 || defined KINETIS_K80 || defined KINETIS_K22_SF7
+        unsigned long SIM_SOPT8;
+        unsigned long ulRes2[1];
     #else
-        unsigned long SIM_SCGC1;
-        unsigned long SIM_SCGC2;
-        unsigned long SIM_SCGC3;
+        unsigned long ulRes2[2];
     #endif
-    unsigned long SIM_SCGC4;
-    unsigned long SIM_SCGC5;
-    unsigned long SIM_SCGC6;
-    unsigned long SIM_SCGC7;
-    unsigned long SIM_CLKDIV1;
-    #if defined KINETIS_KL && !defined KINETIS_KL82
-        unsigned long ulRes2b;
+    #endif
+    unsigned long SIM_SDID;
+    #if defined KINETIS_WITH_PCC
+        unsigned long ulRes2a[8];
     #else
-        unsigned long SIM_CLKDIV2;
+        #if defined KINETIS_KL || defined KINETIS_K22_SF7
+            unsigned long ulRes2a[3];
+        #else
+            unsigned long SIM_SCGC1;
+            unsigned long SIM_SCGC2;
+            unsigned long SIM_SCGC3;
+        #endif
+        unsigned long SIM_SCGC4;
+        unsigned long SIM_SCGC5;
+        unsigned long SIM_SCGC6;
+        unsigned long SIM_SCGC7;
+        unsigned long SIM_CLKDIV1;
+        #if defined KINETIS_KL && !defined KINETIS_KL82
+            unsigned long ulRes2b;
+        #else
+            unsigned long SIM_CLKDIV2;
+        #endif
     #endif
     unsigned long SIM_FCFG1;
     unsigned long SIM_FCFG2;
-    #if defined KINETIS_KL
+    #if defined KINETIS_KL && !defined KINETIS_KL82
         unsigned long ulRes2c;
     #else
         unsigned long SIM_UIDH;
@@ -1811,7 +1859,19 @@ typedef struct stKINETIS_SIM
     unsigned long SIM_UIDMH;
     unsigned long SIM_UIDML;
     unsigned long SIM_UIDL;
-    #if defined KINETIS_KL && !defined KINETIS_KL82                      // {15}
+    #if defined KINETIS_WITH_PCC
+        unsigned long ulRes3[39];
+        unsigned long SIM_PCSR;
+    #elif defined KINETIS_KL82
+        unsigned long SIM_CLKDIV3;
+        unsigned long ulRes3;
+        unsigned long SIM_MISCCTRL;
+        unsigned long ulRes4[8];
+        unsigned long SIM_SECKEY0;
+        unsigned long SIM_SECKEY1;
+        unsigned long SIM_SECKEY2;
+        unsigned long SIM_SECKEY3;
+    #elif defined KINETIS_WITH_COP
         unsigned long ulRes3[39];
         unsigned long SIM_COPC;
         unsigned long SIM_SRVCOPC;

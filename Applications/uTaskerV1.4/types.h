@@ -11,7 +11,7 @@
     File:      types.h
     Project:   Single Chip Embedded Internet
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2019
     *********************************************************************
     01.03.2007 Increased SAM7 file system dimensions {1} to allow boot loader to operate
     15.09.2007 Add support for Luminary LM3SXXXX
@@ -32,6 +32,7 @@
     09.08.2012 Add multiple networks/interface configuration             {10}
     06.03.2014 Add USER_INFO_MASK and USER_INFO_SHIFT                    {11}
     13.04.2014 Add USOCKET configuration for two networks                {12}
+    04.07.2018 Add package definition includes here                      {13}
 
 */
 
@@ -201,6 +202,7 @@ typedef char              CHAR;
 
 typedef unsigned int size_t;
 
+#include "../../Hardware/packages.h"                                     // {13} include the general package defines
 #if defined _HW_NE64
     #if defined (_CODE_WARRIOR) && !defined (_WINDOWS)
         #include "stdtypes.h"                                            // some non-standard typedefs required with this compiler

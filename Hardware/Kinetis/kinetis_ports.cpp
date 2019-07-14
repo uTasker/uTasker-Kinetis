@@ -11,7 +11,7 @@
     File:      kinetis_ports.cpp
     Project:   Single Chip Embedded Internet
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2019
     *********************************************************************
     16.04.2012 New method for K20, K61, K70                              {1}
     18.04.2012 Add dedicated ADC display                                 {2}
@@ -120,9 +120,13 @@ extern void fnSetPortDetails(char *cPortDetails, int iPort, int iBit, unsigned l
     case _PORTC:
         STRCPY(cPortDetails, "Port C");
         break;
+#endif
+#if defined KINETIS_KE || (PORTS_AVAILABLE > 3)
     case _PORTD:
         STRCPY(cPortDetails, "Port D");
         break;
+#endif
+#if defined KINETIS_KE || (PORTS_AVAILABLE > 4)
     case _PORTE:
         STRCPY(cPortDetails, "Port E");
         break;
