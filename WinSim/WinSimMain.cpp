@@ -3496,7 +3496,7 @@ extern int APIENTRY WinMain(HINSTANCE hInstance,
             }
         #endif
             while ((iRxSize = fnCheckRx(sm_hComm6, ucRxBuffer)) != 0) {
-                fnProcessRx(ucRxBuffer, (unsigned short)iRxSize, 5);     // if we have received something from the serial port (UART6), process it here
+                fnProcessRx(ucRxBuffer, (unsigned short)iRxSize, 6);     // if we have received something from the serial port (UART6), process it here
             }
         }
     #endif
@@ -3515,7 +3515,7 @@ extern int APIENTRY WinMain(HINSTANCE hInstance,
             }
         #endif
             while ((iRxSize = fnCheckRx(sm_hComm7, ucRxBuffer)) != 0) {
-                fnProcessRx(ucRxBuffer, (unsigned short)iRxSize, 5);     // if we have received something from the serial port (UART7), process it here
+                fnProcessRx(ucRxBuffer, (unsigned short)iRxSize, 7);     // if we have received something from the serial port (UART7), process it here
             }
         }
     #endif

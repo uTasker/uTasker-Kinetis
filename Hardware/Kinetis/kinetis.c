@@ -1017,7 +1017,7 @@ extern void fnStartTick(void)
     #if !defined INTERRUPT_VECTORS_IN_FLASH                              // {111}
     VECTOR_TABLE *ptrVect;
         #if defined _WINDOWS
-    ptrVect = (VECTOR_TABLE *)((unsigned char *)((unsigned char *)&vector_ram));
+    ptrVect = (VECTOR_TABLE *)&vector_ram;
         #else
     ptrVect = (VECTOR_TABLE *)(RAM_START_ADDRESS);
         #endif
@@ -2085,7 +2085,7 @@ static void _LowLevelInit(void)
     VECTOR_TABLE_OFFSET_REG = ((unsigned long)&__vector_table);
 #else
     #if defined _WINDOWS
-    ptrVect = (VECTOR_TABLE *)((unsigned char *)((unsigned char *)&vector_ram));
+    ptrVect = (VECTOR_TABLE *)&vector_ram;
     #else
     ptrVect = (VECTOR_TABLE *)(RAM_START_ADDRESS);
     #endif
