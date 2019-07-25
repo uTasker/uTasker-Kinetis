@@ -232,12 +232,12 @@
     #define USB_CRYSTAL_LESS                                             // use 48MHz IRC as USB source (according to Freescale AN4905 - only possibel in device mode)
   //#define USB_CLOCK_GENERATED_INTERNALLY                               // use USB clock from internal source rather than external pin - 120MHz is suitable
   //#define USB_CLOCK_SOURCE_MCGPLL0CLK                                  // the clock source for the USB clock
-#elif defined FRDM_K22F || defined TWR_K22F120M
+#elif defined FRDM_K22F || defined TWR_K22F120M || defined tinyK22
   //#define RUN_FROM_DEFAULT_CLOCK                                       // default mode is FLL Engaged Internal - the 32kHz IRC is multiplied by FLL factor of 640 to obtain 20.9715MHz nominal frequency (20MHz..25MHz)
-    #define RUN_FROM_HIRC                                                // clock directly from internal 48MHz RC clock
+  //#define RUN_FROM_HIRC                                                // clock directly from internal 48MHz RC clock
     #if !defined RUN_FROM_DEFAULT_CLOCK
         #define OSC_LOW_GAIN_MODE
-        #define CRYSTAL_FREQUENCY    8000000                             // 8 MHz crystal
+        #define CRYSTAL_FREQUENCY    16000000                             // 8 MHz crystal
         #define _EXTERNAL_CLOCK      CRYSTAL_FREQUENCY
       //#define USE_HIGH_SPEED_RUN_MODE
         #if defined RUN_FROM_HIRC                                        // use IRC48M internal oscillator directly (no PLL or FLL)
@@ -251,7 +251,7 @@
             #define FLASH_CLOCK_DIVIDE   5                               // 120/5 to give 24MHz
             #define BUS_CLOCK_DIVIDE     2                               // 120/2 to give 60MHz
         #else                                                            // faster run mode operation of 80MHz
-            #define CLOCK_DIV            4                               // input must be divided to 2MHz..4MHz range (/1 to /24)
+            #define CLOCK_DIV            8                               // input must be divided to 2MHz..4MHz range (/1 to /24)
             #define CLOCK_MUL            40                              // the PLL multiplication factor to achieve operating frequency of 80MHz (x24 to x55 possible) - uses normal run mode and can program flash
             #define FLASH_CLOCK_DIVIDE   3                               // 80/3 to give 26.7MHz
             #define FLEX_CLOCK_DIVIDE    4                               // 80/3 to give 20MHz
@@ -493,6 +493,15 @@
     #define FLASH_CLOCK_DIVIDE   5                                       // 120/5 to give 24MHz
     #define USB_CLOCK_GENERATED_INTERNALLY                               // use USB clock from internal source rather than external pin - 120MHz is suitable
     #define USB_CLOCK_SOURCE_MCGPLL0CLK                                  // the clock source for the USB clock
+#elif defined BLAZE_K22
+    #define OSC_LOW_GAIN_MODE                                            // oscillator without feedback resistor or load capacitors so use low gain mode
+    #define CRYSTAL_FREQUENCY    16000000                                // 16 MHz crystal
+    #define _EXTERNAL_CLOCK      CRYSTAL_FREQUENCY
+    #define CLOCK_DIV            4                                       // input must be divided to 2MHz..4MHz range (/1 to /24 for 120MHz parts)
+    #define CLOCK_MUL            30                                      // the PLL multiplication factor to achieve operating frequency of 120MHz (x24 to x55 possible)
+    #define FLEX_CLOCK_DIVIDE    3                                       // 120/3 to give 40MHz
+    #define FLASH_CLOCK_DIVIDE   5                                       // 120/5 to give 24MHz
+    #define USB_CLOCK_GENERATED_INTERNALLY                               // use USB clock from internal source rather than external pin - 120MHz is suitable
 #elif defined TWR_K80F150M || defined FRDM_K82F
     #define OSC_LOW_GAIN_MODE
     #define CRYSTAL_FREQUENCY    12000000                                // 12 MHz crystal
@@ -590,10 +599,16 @@
     #define PACKAGE_TYPE        PACKAGE_MAPBGA
     #define SIZE_OF_FLASH       (512 * 1024)                             // 512 program FLASH
     #define SIZE_OF_RAM         (256 * 1024)                             // 256k SRAM
-#elif defined FRDM_K22F
+#elif defined FRDM_K22F || defined tinyK22
     #define PIN_COUNT           PIN_COUNT_64_PIN                         // 64 LQFP pin package
     #define PACKAGE_TYPE        PACKAGE_LQFP
     #define SIZE_OF_FLASH       (512 * 1024)                             // 512k FLASH
+    #define SIZE_OF_RAM         (128 * 1024)                             // 128k SRAM
+#elif defined BLAZE_K22
+    #define MASK_0N50M                                                   // mask relevant to this device
+    #define PIN_COUNT           PIN_COUNT_64_PIN                         // 64 LQFP pin package
+    #define PACKAGE_TYPE        PACKAGE_LQFP
+    #define SIZE_OF_FLASH       (1024 * 1024)                            // 1M FLASH
     #define SIZE_OF_RAM         (128 * 1024)                             // 128k SRAM
 #elif defined TWR_K22F120M
     #define PIN_COUNT           PIN_COUNT_121_PIN                        // 121 XFBGA package
@@ -1021,7 +1036,7 @@
         #define LOADER_UART           4                                  // use UART 4
     #elif defined TWR_K70F120M || defined TWR_KL46Z48M || defined TWR_K21D50M || defined TWR_KL43Z48M || defined TRK_KEA128 || defined TRK_KEA64 || defined KL25_TEST_BOARD || defined TWR_K65F180M || defined K26FN2_180 || defined FRDM_KEAZN32Q64 || defined FRDM_KEAZ64Q64 || defined FRDM_KEAZ128Q80 || defined TEENSY_3_5 || defined TEENSY_3_6
         #define LOADER_UART           2                                  // the serial interface used by the serial loader
-    #elif defined TWR_K20D50M || defined TWR_K80F150M || defined tinyK20 || defined TWR_K20D72M || defined FRDM_KE02Z || defined FRDM_KE02Z40M || defined FRDM_KE06Z || defined FRDM_K22F || defined TWR_K22F120M || defined TWR_K24F120M || defined TWR_K64F120M || defined TWR_KW21D256 || defined TWR_KW24D512
+    #elif defined TWR_K20D50M || defined TWR_K80F150M || defined tinyK20 || defined TWR_K20D72M || defined FRDM_KE02Z || defined FRDM_KE02Z40M || defined FRDM_KE06Z || defined FRDM_K22F || defined TWR_K22F120M || defined TWR_K24F120M || defined TWR_K64F120M || defined TWR_KW21D256 || defined TWR_KW24D512 || defined BLAZE_K22 || defined tinyK22 || defined FRDM_KE15Z
         #define LOADER_UART           1                                  // the serial interface used by the serial loader
     #elif defined K02F100M || defined FRDM_K20D50M || defined FRDM_KL46Z || defined FRDM_KL43Z || defined FRDM_KL25Z || defined FRDM_KL26Z || defined FRDM_KL27Z || defined TEENSY_LC || defined TWR_KL25Z48M || defined FRDM_KL02Z || defined FRDM_KL03Z || defined FRDM_KL05Z || defined TEENSY_3_1 || defined FRDM_K64F || defined FRDM_K66F || defined FRDM_KE04Z || defined TWR_KV10Z32 || defined TWR_KV31F120M || ((defined TWR_K40X256 || defined TWR_K40D100M) && defined DEBUG_ON_VIRT_COM)
         #define LOADER_UART           0                                  // the serial interface used by the serial loader
@@ -1092,6 +1107,11 @@
 #else
     #define TX_BUFFER_SIZE   (256)
     #define RX_BUFFER_SIZE   (256)
+#endif
+
+#if defined BLAZE_K22
+    #define OUR_I2C_CHANNEL       0                                      // use I2C0 for touch-screen controller
+    #define I2C0_B_LOW                                                   // I2C0_SCL on PB0 and I2C0_SDA on PB1
 #endif
 
 
@@ -1416,6 +1436,18 @@
 
     #define DEL_USB_SYMBOL()
     #define SET_USB_SYMBOL()
+#elif defined tinyK22
+    #define LED_BLUE               (PORTC_BIT2)                          // blue LED - if the port is changed (eg. A to B) the port macros will require appropriate adjustment too
+    #define SWITCH_1               (PORTB_BIT17)                         // switch 1 - if the port is changed (eg. A to B) the port macros will require appropriate adjustment too
+    #define SWITCH_2               (PORTC_BIT11)                         // switch 2 - if the port is changed (eg. A to B) the port macros will require appropriate adjustment too
+
+    #define INIT_WATCHDOG_LED()    _CONFIG_DRIVE_PORT_OUTPUT_VALUE(C, (LED_BLUE), (LED_BLUE), (PORT_SRE_SLOW | PORT_DSE_HIGH)); _CONFIG_PORT_INPUT_FAST_LOW(C, (SWITCH_1), PORT_PS_UP_ENABLE);
+    #define INIT_WATCHDOG_DISABLE() _CONFIG_PORT_INPUT_FAST_HIGH(B, (SWITCH_1), PORT_PS_UP_ENABLE) // configure as input
+
+    #define WATCHDOG_DISABLE()     (_READ_PORT_MASK(C, SWITCH_2) == 0)   // pull this input low at reset to disable watchdog
+    #define FORCE_BOOT()           (_READ_PORT_MASK(B, SWITCH_1) == 0)   // pull this input low at reset to force the boot loader
+    #define TOGGLE_WATCHDOG_LED()   _TOGGLE_PORT(C, LED_BLUE)
+
 #elif defined FRDM_K22F
     #define LED_GREEN              (PORTA_BIT2)                          // green LED - if the port is changed (eg. A to B) the port macros will require appropriate adjustment too
     #define LED_BLUE               (PORTD_BIT5)                          // blue LED - if the port is changed (eg. A to B) the port macros will require appropriate adjustment too
@@ -1474,6 +1506,168 @@
     #define POWER_DOWN_SD_CARD()                                         // remove power from SD card interface
     #define GET_SDCARD_WP_STATE() 0                                      // no write protect switch available
     #define SDCARD_DETECTION()    0                                      // card detection input not present
+#elif defined BLAZE_K22
+    #define EXT_IO0                (PORTA_BIT0)                          // warning - this pin is JTAG_TCLK
+    #define EXT_IO1                (PORTA_BIT1)                          // IoT UART; warning - this pin is JTAG_TDI
+    #define EXT_IO2                (PORTA_BIT2)                          // IoT UART; warning - this pin is JTAG_TDO
+    #define EXT_IO3                (PORTA_BIT3)                          // warning - this pin is JTAG_TMS
+    #define EXT_IO4                (PORTB_BIT18)
+    #define EXT_IO5                (PORTB_BIT19)
+    #define EXT_IO6                (PORTC_BIT1)
+    #define EXT_IO7                (PORTC_BIT2)
+    #define EXT_IO8                (PORTC_BIT3)
+    #define EXT_IO9                (PORTC_BIT4)
+    #define EXT_IO10               (PORTE_BIT0)                          // IoT UART
+    #define EXT_IO11               (PORTE_BIT1)                          // IoT UART
+    #define TSI_RESET_LINE         (PORTB_BIT2)
+    #define TSI_INTERRUPT_LINE     (PORTB_BIT3)
+    #define SDCARD_DETECT_PIN      (PORTD_BIT7)                          // '0' when SD card is inserted
+    #define SYS_LED_GREEN          (PORTB_BIT16)
+
+    #define DEMO_LED_1             (SYS_LED_GREEN)                       // (green led) if the port is changed (eg. A to B) the port macros will require appropriate adjustment too
+    #define DEMO_LED_2             (EXT_IO4)                             // if the port is changed (eg. A to B) the port macros will require appropriate adjustment too
+    #define DEMO_LED_3             (EXT_IO5)                             // if the port is changed (eg. A to B) the port macros will require appropriate adjustment too
+    #define DEMO_LED_4             (EXT_IO6)                             // if the port is changed (eg. A to B) the port macros will require appropriate adjustment too
+    #define BLINK_LED              (DEMO_LED_1)
+    #define SWITCH_1               (EXT_IO7)                             // if the port is changed (eg. A to B) the port macros will require appropriate adjustment too
+    #define SWITCH_2               (EXT_IO8)                             // if the port is changed (eg. A to B) the port macros will require appropriate adjustment too
+    #define WRITE_PROTECT_INPUT    (0)
+    #define USB_HOST_POWER_ENABLE  (0)
+
+    #define SWITCH_1_PORT          _PORTC
+    #define SWITCH_2_PORT          _PORTC
+
+    #define FORCE_BOOT()            1                                    // always start the boot loader
+
+    #define INIT_WATCHDOG_LED() _CONFIG_DRIVE_PORT_OUTPUT_VALUE(B, (BLINK_LED), (BLINK_LED), (PORT_SRE_SLOW | PORT_DSE_HIGH)); _CONFIG_DRIVE_PORT_OUTPUT_VALUE(B, (DEMO_LED_2), (DEMO_LED_2), (PORT_SRE_SLOW | PORT_DSE_HIGH))
+
+    #define SHIFT_DEMO_LED_1        16                                    // since the port bits may be spread out shift each to the lowest 4 bits
+    #define SHIFT_DEMO_LED_2        17
+    #define SHIFT_DEMO_LED_3        17
+    #define SHIFT_DEMO_LED_4        2
+
+    #define MAPPED_DEMO_LED_1       (DEMO_LED_1 >> SHIFT_DEMO_LED_1)
+    #define MAPPED_DEMO_LED_2       (DEMO_LED_2 << SHIFT_DEMO_LED_2)
+    #define MAPPED_DEMO_LED_3       (DEMO_LED_3 >> SHIFT_DEMO_LED_3)
+    #define MAPPED_DEMO_LED_4       (DEMO_LED_4 << SHIFT_DEMO_LED_4)
+
+    #define INIT_WATCHDOG_DISABLE() _CONFIG_PORT_INPUT_FAST_LOW(C, (SWITCH_1 | SWITCH_2), PORT_PS_UP_ENABLE) // use fast access version (beware that this can only operate on half of the 32 bits at a time)
+    #define WATCHDOG_DISABLE()      (_READ_PORT_MASK(C, SWITCH_2) == 0)  // pull this input down to disable watchdog (hold SW2 at reset)
+    #define TOGGLE_WATCHDOG_LED()   _TOGGLE_PORT(B, BLINK_LED)
+
+    #define CONFIG_TEST_OUTPUT()                                         // we use DEMO_LED_2 which is configured by the user code (and can be disabled in parameters if required)
+    #define TOGGLE_TEST_OUTPUT()    _TOGGLE_PORT(B, DEMO_LED_2)
+    #define SET_TEST_OUTPUT()       _SETBITS(B, DEMO_LED_2)
+    #define CLEAR_TEST_OUTPUT()     _CLEARBITS(B, DEMO_LED_2)
+
+    #define TOUCHRESET_H()          _SETBITS(B, TSI_RESET_LINE)          // take touch screen controller out of reset
+    #define TC_INT_PRIORTY          PRIORITY_PORT_B_INT                  // touch screen interrupt priority level
+    #define TC_INT_PORT             PORTB                                // the port that the touch screen interrupt input is on
+    #define TC_INT_PORT_BIT         TSI_INTERRUPT_LINE                   // the touch screen interrupt input
+
+    #define PEN_DOWN_ACTION()       fnInterruptMessage(TASK_APPLICATION, USER_FORCE_LOADER) // if the touch screen is tapped before the application starts the USB loader will be activated
+
+    #define BUTTON_KEY_DEFINITIONS  {_PORTA, EXT_IO0, {544,   4, 633,  30}}, \
+                                    {_PORTA, EXT_IO1, {544,  39, 633,  69}}, \
+                                    {_PORTA, EXT_IO2, {544,  77, 633, 106}}, \
+                                    {_PORTA, EXT_IO3, {544, 114, 633, 144}}, \
+                                    {_PORTB, EXT_IO4, {544, 191, 633, 220}}, \
+                                    {_PORTB, EXT_IO5, {544, 228, 633, 258}}, \
+                                    {_PORTC, EXT_IO6, {544, 266, 633, 294}}, \
+                                    {_PORTC, EXT_IO7, {544, 304, 633, 333}}, \
+                                    {_PORTC, EXT_IO8, {544, 341, 633, 372}}, \
+                                    {_PORTC, EXT_IO9, {544, 381, 633, 409}}, \
+                                    {_PORTE, EXT_IO10,{7,   341,  94, 372}}, \
+                                    {_PORTE, EXT_IO11,{7,   381,  94, 409}},
+
+        // '0'           '1'           input state   center (x,   y)   0 = circle, radius, controlling port, controlling pin 
+    #define KEYPAD_LED_DEFINITIONS \
+        {RGB(0, 255, 0), RGB(0,   0,   0), 1, {425, 56,  0, 7 }, _PORTB, SYS_LED_GREEN}, \
+        {RGB(0, 0, 0),   RGB(255, 255, 0), 0, {472, 114, 0, 4 }, _PORTA, EXT_IO0}, \
+        {RGB(0, 0, 0),   RGB(255, 255, 0), 0, {472, 135, 0, 4 }, _PORTA, EXT_IO1}, \
+        {RGB(0, 0, 0),   RGB(255, 255, 0), 0, {472, 155, 0, 4 }, _PORTA, EXT_IO2}, \
+        {RGB(0, 0, 0),   RGB(255, 255, 0), 0, {472, 175, 0, 4 }, _PORTA, EXT_IO3}, \
+        {RGB(0, 0, 0),   RGB(255, 255, 0), 0, {472, 215, 0, 4 }, _PORTB, EXT_IO4}, \
+        {RGB(0, 0, 0),   RGB(255, 255, 0), 0, {472, 235, 0, 4 }, _PORTB, EXT_IO5}, \
+        {RGB(0, 0, 0),   RGB(255, 255, 0), 0, {472, 255, 0, 4 }, _PORTC, EXT_IO6}, \
+        {RGB(0, 0, 0),   RGB(255, 255, 0), 0, {472, 275, 0, 4 }, _PORTC, EXT_IO7}, \
+        {RGB(0, 0, 0),   RGB(255, 255, 0), 0, {472, 295, 0, 4 }, _PORTC, EXT_IO8}, \
+        {RGB(0, 0, 0),   RGB(255, 255, 0), 0, {472, 315, 0, 4 }, _PORTC, EXT_IO9}, \
+        {RGB(0, 0, 0),   RGB(255, 255, 0), 0, {168, 295, 0, 4 }, _PORTE, EXT_IO10}, \
+        {RGB(0, 0, 0),   RGB(255, 255, 0), 0, {168, 315, 0, 4 }, _PORTE, EXT_IO11},
+
+    #define KEYPAD "../../uTaskerV1.4/Simulator/KeyPads/blaze.bmp"
+    #define LCD_ON_KEYPAD                                                // simulator positions the LCD on top of the key pad/panel
+        #define LCD_X_OFFSET       252
+        #define LCD_Y_OFFSET       50
+
+    #if defined _WINDOWS
+        extern unsigned short _ucCommand;
+        #define GLCD_COMMAND_ADDR     &_ucCommand
+        #define GLCD_DATA_ADDR        &_ucData
+    #else
+        #define GLCD_COMMAND_ADDR     0x60000000                         // write address
+        #define GLCD_DATA_ADDR        0x60010000                         // read address
+    #endif
+
+    #define GLCD_RESET_LINE           (PORTA_BIT12)
+    #define GLCD_BACK_LIGHT           (PORTA_BIT5)
+
+    #define BACK_LIGHT_MAX_INTENSITY() _CONFIG_DRIVE_PORT_OUTPUT_VALUE(A, GLCD_BACK_LIGHT, GLCD_BACK_LIGHT, PORT_SRE_SLOW)
+    #define BACK_LIGHT_MIN_INTENSITY() _CONFIG_DRIVE_PORT_OUTPUT_VALUE(A, GLCD_BACK_LIGHT, 0, PORT_SRE_SLOW)
+    #define ENABLE_BACKLIGHT()
+
+    #define FTM_DEBUG_BEHAVIOUR       FTM_CONF_BDMMODE_3                 // allow timer to continue operating when debugging
+    #define _GLCD_BACKLIGHT_PWM_FREQUENCY  PWM_FREQUENCY(1000, 16)       // 1000Hz PWM with divide by 16 prescaler
+    #define BACK_LIGHT_INTENSITY()    POWER_UP_ATOMIC(6, FTM0); \
+                                      _CONFIG_PERIPHERAL(A, 5, (PA_5_FTM0_CH2 | PORT_SRE_FAST | PORT_DSE_HIGH)); \
+                                      FTM0_CONF = FTM_DEBUG_BEHAVIOUR; \
+                                      FTM0_C2SC = FTM_CSC_MS_ELS_PWM_HIGH_TRUE_PULSES; \
+                                      FTM0_CNTIN = 0; \
+                                      FTM0_MOD = (_GLCD_BACKLIGHT_PWM_FREQUENCY - 1); \
+                                      FTM0_C2V = _PWM_PERCENT(35, _GLCD_BACKLIGHT_PWM_FREQUENCY); \
+                                      FTM0_SC = (PWM_SYS_CLK | PWM_PRESCALER_16)
+
+    // BLAZE uses 16 bit FlexBus interface using RS, RD and WR. The address range is set to 128K because the DC signal is connected on address wire. FlexBus setup as fast as possible in multiplexed mode
+    // the 8 bit data appears at AD0..AD7
+    //
+    #define CONFIGURE_GLCD()        BACK_LIGHT_MIN_INTENSITY(); \
+                                    if (IS_POWERED_UP(6, FTM0) != 0) {FTM0_SC = 0;} \
+                                    _CONFIG_DRIVE_PORT_OUTPUT_VALUE_FAST_LOW(A, GLCD_RESET_LINE, 0, (PORT_SRE_SLOW | PORT_DSE_LOW)); \
+                                    _CONFIG_DRIVE_PORT_OUTPUT_VALUE(B, (TSI_RESET_LINE), (0), (PORT_SRE_FAST | PORT_DSE_LOW)); \
+                                    POWER_UP_ATOMIC(7, FLEXBUS); \
+                                    SIM_SOPT2 |= SIM_SOPT2_FBSL_ALL; \
+                                    _CONFIG_PERIPHERAL(B, 17, (PB_17_FB_AD16 | PORT_DSE_HIGH | PORT_PS_DOWN_ENABLE)); \
+                                    _CONFIG_PERIPHERAL(C, 11, (PC_11_FB_RW | PORT_DSE_HIGH | PORT_PS_DOWN_ENABLE)); \
+                                    _CONFIG_PERIPHERAL(D, 0,  (PD_0_FB_ALE | PORT_DSE_HIGH | PORT_PS_DOWN_ENABLE)); \
+                                    _CONFIG_PERIPHERAL(C, 8,  (PC_8_FB_AD7 | PORT_DSE_HIGH | PORT_PS_DOWN_ENABLE)); \
+                                    _CONFIG_PERIPHERAL(C, 9,  (PC_9_FB_AD6 | PORT_DSE_HIGH | PORT_PS_DOWN_ENABLE)); \
+                                    _CONFIG_PERIPHERAL(C, 10, (PC_10_FB_AD5 | PORT_DSE_HIGH | PORT_PS_DOWN_ENABLE)); \
+                                    _CONFIG_PERIPHERAL(D, 2,  (PD_2_FB_AD4 | PORT_DSE_HIGH | PORT_PS_DOWN_ENABLE)); \
+                                    _CONFIG_PERIPHERAL(D, 3,  (PD_3_FB_AD3 | PORT_DSE_HIGH | PORT_PS_DOWN_ENABLE)); \
+                                    _CONFIG_PERIPHERAL(D, 4,  (PD_4_FB_AD2 | PORT_DSE_HIGH | PORT_PS_DOWN_ENABLE)); \
+                                    _CONFIG_PERIPHERAL(D, 5,  (PD_5_FB_AD1 | PORT_DSE_HIGH | PORT_PS_DOWN_ENABLE)); \
+                                    _CONFIG_PERIPHERAL(D, 6,  (PD_6_FB_AD0 | PORT_DSE_HIGH | PORT_PS_DOWN_ENABLE)); \
+                                    _CONFIG_PERIPHERAL(D, 1,  (PD_1_FB_CS0 | PORT_DSE_HIGH | PORT_PS_DOWN_ENABLE)); \
+                                    _CONFIG_PERIPHERAL(D, 0,  (PD_0_FB_ALE | PORT_DSE_HIGH | PORT_PS_DOWN_ENABLE)); \
+                                    CSAR0  = (unsigned long)GLCD_COMMAND_ADDR; \
+  	                                CSCR0  = (FB_BLS | FB_AA | PORT_SIZE_16); \
+  	                                CSMR0  = (FB_CS_VALID | 0x10000);
+
+    #define GLCD_RST_H()            _SETBITS(A, GLCD_RESET_LINE)
+
+    #if defined _WINDOWS
+        #define MAX_GLCD_WRITE_BURST   10000                             // the maximum number of writes to the GLCD before the task yields
+    #else
+        #define MAX_GLCD_WRITE_BURST   1000                              // the maximum number of writes to the GLCD before the task yields
+    #endif
+
+    #define SUPPORT_PORT_INTERRUPTS                                      // port interrupts needed for touch screen
+        #define NO_PORT_INTERRUPTS_PORTA                                 // remove non-needed ports
+        #define NO_PORT_INTERRUPTS_PORTC
+        #define NO_PORT_INTERRUPTS_PORTD
+        #define NO_PORT_INTERRUPTS_PORTE
+
 #elif defined TWR_K24F120M
     #define LED_YELLOW             (PORTD_BIT4)                          // (yellow led) if the port is changed (eg. A to B) the port macros will require appropriate adjustment too
     #define LED_RED                (PORTD_BIT5)                          // (red led) if the port is changed (eg. A to B) the port macros will require appropriate adjustment too
@@ -2939,7 +3133,11 @@
 #define PORT0_DEFAULT_INPUT        0xffffffff
 #define PORT1_DEFAULT_INPUT        0xffffffff
 #define PORT2_DEFAULT_INPUT        0xffffffff
-#define PORT3_DEFAULT_INPUT        0xffffffff
+#if defined BLAZE_K22 && defined SDCARD_SUPPORT
+    #define PORT3_DEFAULT_INPUT    0xffffff7f                            // port D - PTD7 low to detect SD card by default
+#else
+    #define PORT3_DEFAULT_INPUT    0xffffffff                            // port D
+#endif
 #define PORT4_DEFAULT_INPUT        0xffffffff
 #define PORT5_DEFAULT_INPUT        0xffffffff                            // K70
 
