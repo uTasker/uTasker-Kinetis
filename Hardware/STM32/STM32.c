@@ -54,6 +54,7 @@
     01.11.2018 Use an include file for the clock configuration           {39}
     28.11.2018 Add automatic flash option configuration option           {40}
     13.01.2019 Include USB-OTG header                                    {41}
+    27.08.2019 Correct SYSTICK based loop delay that could quit too early with long delays {46}
 
 */
 
@@ -1487,7 +1488,7 @@ extern void fnSetSD_clock(unsigned long ulSpeed)
 #if 0
     SDHC_SYSCTL &= ~SDHC_SYSCTL_SDCLKEN;                                 // stop clock to set frequency
     SDHC_SYSCTL = (SDHC_SYSCTL_DTOCV_227 | ulSpeed);                     // set new speed
-    while (!(SDHC_PRSSTAT & SDHC_PRSSTAT_SDSTB)) {                       // wait for new speed to stabilise
+    while ((SDHC_PRSSTAT & SDHC_PRSSTAT_SDSTB) == 0) {                   // wait for new speed to stabilise
 #if defined _WINDOWS
         SDHC_PRSSTAT |= SDHC_PRSSTAT_SDSTB;
 #endif
@@ -2392,7 +2393,7 @@ static void irq_default(void)
 //
 extern void fnDelayLoop(unsigned long ulDelay_us)
 {
-#if !defined TICK_USES_LPTMR && !defined TICK_USES_RTC                   // if the SYSTICK is operating we use it as a us timer for best independence of code execution speed and compiler (KL typically +15% longer then requested value between 100us and 10ms)
+#if !defined TICK_USES_LPTMR && !defined TICK_USES_RTC                   // if the SYSTICK is operating we use it as a us timer for best independence of code execution speed and compiler
     #if defined SYSTICK_DIVIDE_8
         #define CORE_US (HCLK/8/1000000)                                 // the number of core clocks in a us
     #else
@@ -2400,21 +2401,26 @@ extern void fnDelayLoop(unsigned long ulDelay_us)
     #endif
     register unsigned long ulMatch;
     register unsigned long _ulDelay_us = ulDelay_us;                     // ensure that the compiler puts the variable in a register rather than work with it on the stack
+    (void)SYSTICK_CSR;                                                   // clear the SysTick reload flag
+    ulMatch = SYSTICK_CURRENT;                                           // counter reference on entry
     if (_ulDelay_us == 0) {                                              // minimum delay is 1us
         _ulDelay_us = 1;
     }
-    (void)SYSTICK_CSR;                                                   // clear the SysTick reload flag
-    ulMatch = ((SYSTICK_CURRENT - CORE_US) & SYSTICK_COUNT_MASK);        // first 1us match value (SysTick counts down)
     do {
     #if !defined _WINDOWS
+        if (ulMatch >= CORE_US) {                                        // {46} don't allow the match value to underflow
+            ulMatch -= CORE_US;                                          // set the next 1us match
+        }
+        else {
+            ulMatch = 0;                                                 // set to zero instead of under-flowing
+        }
         while (SYSTICK_CURRENT > ulMatch) {                              // wait until the us period has expired
             if ((SYSTICK_CSR & SYSTICK_COUNTFLAG) != 0) {                // if we missed a reload (that is, the SysTick was reloaded with its reload value after reaching zero)
+                ulMatch = SYSTICK_RELOAD;                                // {46} prepare the next match value based on the fact that the SYSTICK has reloaded
                 (void)SYSTICK_CSR;                                       // clear the SysTick reload flag
                 break;                                                   // assume a single us period expired
             }
         }
-        ulMatch -= CORE_US;                                              // set the next 1us match
-        ulMatch &= SYSTICK_COUNT_MASK;                                   // respect SysTick 24 bit counter mask
     #endif
     } while (--_ulDelay_us != 0);                                        // one us period has expired so count down the requested periods until zero
 #else

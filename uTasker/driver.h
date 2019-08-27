@@ -631,7 +631,9 @@ typedef struct stSPITABLE {
 } SPITABLE;
 
 
-
+#if !defined ETHERNET_INTERFACES
+    #define ETHERNET_INTERFACES   1
+#endif
 
 // Ethernet table structure used to configure an Ethernet interface
 //
@@ -825,10 +827,6 @@ typedef struct stUSBQUE
     QUEQUE         USB_queue;
     USB_ENDPOINT  *endpoint_control;
 } USBQUE;
-#endif
-
-#if !defined ETHERNET_INTERFACES
-    #define ETHERNET_INTERFACES   1
 #endif
 
 // This structure is a basic driver entity specifying which driver call is used to process this interface and
