@@ -633,7 +633,7 @@ typedef struct stSPITABLE {
 
 #if !defined ETHERNET_INTERFACES
     #define ETHERNET_INTERFACES   1
-#endif
+#endif 
 
 // Ethernet table structure used to configure an Ethernet interface
 //

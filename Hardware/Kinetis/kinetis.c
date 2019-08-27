@@ -592,7 +592,7 @@ extern void fnClearSLCD(void)
 #endif
 
 extern void fnDelayLoop(unsigned long ulDelay_us)
-{
+{ 
 #if !defined TICK_USES_LPTMR && !defined TICK_USES_RTC                   // if the SYSTICK is operating we use it as a us timer for best independence of code execution speed and compiler
     #define CORE_US (CORE_CLOCK/1000000)                                 // the number of core clocks in a us
     register unsigned long ulMatch;

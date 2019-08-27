@@ -2392,7 +2392,7 @@ static void irq_default(void)
 // Delay loop for simple but accurate short delays (eg. for stabilisation delays)
 //
 extern void fnDelayLoop(unsigned long ulDelay_us)
-{
+{ 
 #if !defined TICK_USES_LPTMR && !defined TICK_USES_RTC                   // if the SYSTICK is operating we use it as a us timer for best independence of code execution speed and compiler
     #if defined SYSTICK_DIVIDE_8
         #define CORE_US (HCLK/8/1000000)                                 // the number of core clocks in a us
