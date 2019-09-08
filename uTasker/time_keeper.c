@@ -15,6 +15,7 @@
     *********************************************************************
     19.08.2015 Use uMemset() to initialise strcture to avoid GCC using memset() {1}
     15.09.2015 Add dusk and dawn calculations                            {2}
+    08.09.2019 Limit units passed to fnConvertTimeSeconds() to avoid potentially long loops when invalid {5}
 
 */
           
@@ -712,7 +713,7 @@ extern unsigned long fnConvertTimeSeconds(RTC_SETUP *ptr_rtc_setup, int iSetTime
         }
     }
     iLeapYear = LEAP_YEAR(ulUnit);                                       // check whether present year is a leap year
-    ulUnit = (ptr_rtc_setup->ucMonthOfYear - 1);                         // the full months passed in this year
+    ulUnit = (unsigned char)(ptr_rtc_setup->ucMonthOfYear - 1);          // {5} the full months passed in this year
     while (ulUnit != 0) {
         ulPassedSeconds += ((unsigned long)(monthDays[ulUnit - 1]) * (60 * 60 * 24)); // count seconds in full months passed
         ucNewWeekDay = fnIncDayOfWeek(ucNewWeekDay, monthDays[ulUnit-- - 1]);
@@ -721,7 +722,7 @@ extern unsigned long fnConvertTimeSeconds(RTC_SETUP *ptr_rtc_setup, int iSetTime
         ulPassedSeconds += (60 * 60 * 24);
         ucNewWeekDay = fnIncDayOfWeek(ucNewWeekDay, 1);
     }
-    ulUnit = (ptr_rtc_setup->ucDayOfMonth - 1);                          // passed days in month
+    ulUnit = (unsigned char)(ptr_rtc_setup->ucDayOfMonth - 1);           // passed days in month
     ucNewWeekDay = fnIncDayOfWeek(ucNewWeekDay, (unsigned char)ulUnit);
     while (ulUnit--) {
         ulPassedSeconds += (60 * 60 * 24);                               // count passed days in present month
@@ -768,7 +769,7 @@ extern unsigned short fnConvertTimeDays(RTC_SETUP *ptr_rtc_setup, int iSetTime)
         }
     }
     iLeapYear = LEAP_YEAR(ulUnit);                                       // check whether present year is a leap year
-    ulUnit = (ptr_rtc_setup->ucMonthOfYear - 1);                         // the full months passed in this year
+    ulUnit = (unsigned char)(ptr_rtc_setup->ucMonthOfYear - 1);          // {5} the full months passed in this year
     while (ulUnit != 0) {
         ulPassedDays += (monthDays[ulUnit - 1]);                         // count days in full months passed
         ucNewWeekDay = fnIncDayOfWeek(ucNewWeekDay, monthDays[ulUnit-- - 1]);
@@ -777,7 +778,7 @@ extern unsigned short fnConvertTimeDays(RTC_SETUP *ptr_rtc_setup, int iSetTime)
         ulPassedDays++;
         ucNewWeekDay = fnIncDayOfWeek(ucNewWeekDay, 1);
     }
-    ulUnit = (ptr_rtc_setup->ucDayOfMonth - 1);                          // passed days in month
+    ulUnit = (unsigned char)(ptr_rtc_setup->ucDayOfMonth - 1);           // {5} passed days in month
     ucNewWeekDay = fnIncDayOfWeek(ucNewWeekDay, (unsigned char)ulUnit);
     if (iSetTime != 0) {
         usYear = ptr_rtc_setup->usYear;                                  // set the new time
