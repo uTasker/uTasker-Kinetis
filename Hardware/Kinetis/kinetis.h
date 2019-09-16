@@ -228,7 +228,7 @@ extern int fnSwapMemory(int iCheck);                                     // {70}
     #endif
 #endif
 
-#if !defined KINETIS_KL && !defined KINETIS_KE
+#if !defined KINETIS_KL && !defined KINETIS_KM && !defined KINETIS_KE && !defined KINETIS_KV10 && !defined KINETIS_KV40
     #define FLEXBUS_AVAILABLE
 #endif
 

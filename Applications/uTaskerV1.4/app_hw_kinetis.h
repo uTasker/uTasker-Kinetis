@@ -7639,7 +7639,7 @@ static inline void QSPI_HAL_ClearSeqId(QuadSPI_Type * base, qspi_command_seq_t s
         #define POWER_UP_SD_CARD()                                       // apply power to the SD card if appropriate
         #define POWER_DOWN_SD_CARD()
         #define GET_SDCARD_WP_STATE()  0                                 // never write protect
-    #elif defined tinyK20 || defined BLAZE_K22
+    #elif defined tinyK20 || defined BLAZE_K22 || defined TWR_KV10Z32
         // Configure to suit special connection SPI mode at between 100k and 400k (SPI0)
         //
         #if defined BLAZE_K22

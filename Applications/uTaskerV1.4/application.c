@@ -1063,7 +1063,7 @@ extern void fnApplication(TTASKTABLE *ptrTaskTable)
     #else
     if (((iAppState & (STATE_ACTIVE | STATE_DELAYING | STATE_ESCAPING | STATE_RESTARTING | STATE_VALIDATING)) != 0) && ((Length = fnMsgs(SerialPortID)) != 0)) {
         while ((Length = fnRead(SerialPortID, ucInputMessage, MEDIUM_MESSAGE)) != 0) { // handle UART input
-        #if defined USE_USB_CDC || defined USB_CDC_HOST                  // {24}{70}
+        #if (defined USE_USB_CDC || defined USB_CDC_HOST) && !defined HELLO_WORLD // {24}{70}
             #if defined USE_MAINTENANCE
             if ((usUSB_state & ES_USB_RS232_MODE) != 0) {                // if in USB-CDC mode
             #endif
