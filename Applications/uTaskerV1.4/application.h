@@ -11,7 +11,7 @@
     File:      application.h
     Project:   uTasker project
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2018
+    Copyright (C) M.J.Butcher Consulting 2004..2019
     *********************************************************************
     18.02.2006 Add SMTP parameter settings                               {1}
     03.06.2007 Add FTP user definable FTP timeout and ACTIVE_FTP_LOGIN   {2}
