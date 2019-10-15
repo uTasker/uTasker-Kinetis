@@ -1671,6 +1671,21 @@ static QUEUE_HANDLE fnOpenUART(TTYTABLE *PtrInterfaceParameters, unsigned char u
     return serialHandle;
 }
 
+#if defined RUN_IN_FREE_RTOS && defined FREE_RTOS_USB
+// Called by FreeRTOS task to get the USB interface handled
+//
+QUEUE_HANDLE fnGetUSB_Handle(void)
+{
+    #if USB_CDC_VCOM_COUNT > 1
+    return USBPortID_comms[FIRST_CDC_INTERFACE + 1];
+    #elif USB_CDC_VCOM_COUNT > 0
+    return USBPortID_comms[FIRST_CDC_INTERFACE];
+    #else
+    return (NO_ID_ALLOCATED);
+    #endif
+}
+#endif
+
 static void fnOpenUSB_UARTs(int iInterface)
 {
     static const QUEUE_HANDLE UART_channels[USB_CDC_VCOM_COUNT - 1] = {  // the UARTs mapped to each USB-CDC interface

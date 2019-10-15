@@ -31,8 +31,11 @@
 #endif
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       // new users who would like to see just a blinking LED before enabling the project's many powerful features can set this
-//#define BLINKY                                                         // to give simplest scheduling of a single task called at 200ms rate that retriggers the watchdog and toggles the board's heartbeat LED
+#define BLINKY                                                           // to give simplest scheduling of a single task called at 200ms rate that retriggers the watchdog and toggles the board's heartbeat LED
 //#define HELLO_WORLD                                                    // gives the classic first step project with just a message on a UART start and echos back input afterwards [enter key shows memory use] (also blinks LED and is identical with or without BLINKY enabled)
+#if defined BLINKY                                                       //
+  //#define APPLICATION_WITHOUT_OS                                       // use together with BLINKY to remove all OS components and have a simple main loop and delays (still uses interrupt-free SYSTICK for timing accuracy but not low power mode)
+#endif                                                                   //
 //                                                                       // 
 ///////////////////////////////////////////////////////////////////////////
 //#define EXTERNAL_TEST
@@ -114,7 +117,7 @@
     //#define TWR_KL46Z48M                                               // tower board http://www.utasker.com/kinetis/TWR-KL46Z48M.html
 
     //#define TWR_KL82Z72M                                               // tower board http://www.utasker.com/kinetis/FRDM-KL82Z72M
-      #define FRDM_KL82Z                                                 // freedom board http://www.utasker.com/kinetis/FRDM-KL82Z.html
+    //#define FRDM_KL82Z                                                 // freedom board http://www.utasker.com/kinetis/FRDM-KL82Z.html
 
     //#define TWR_KM34Z50M                                               // M processors Cortex M0+ (metrology) - tower board http://www.utasker.com/kinetis/TWR-KM34Z50M.html
     //#define TWR_KM34Z75M                                               // tower board http://www.utasker.com/kinetis/TWR-KM34Z75M.html
@@ -165,7 +168,7 @@
     //#define EMCRAFT_K61F150M                                           // K processors Cortex M4 with Ethernet, USB, encryption, tamper, key storage protection area - http://www.utasker.com/kinetis/EMCRAFT_K61F150M.html
     //#define K61FN1_50M                                                 // board with 150MHz K61 and 50MHz clock (HS USB and KSZ8863 ethernet switch)
 
-    //#define FRDM_K64F                                                  // next generation K processors Cortex M4 with Ethernet, USB, encryption, tamper, key storage protection area - freedom board http://www.utasker.com/kinetis/FRDM-K64F.html
+      #define FRDM_K64F                                                  // next generation K processors Cortex M4 with Ethernet, USB, encryption, tamper, key storage protection area - freedom board http://www.utasker.com/kinetis/FRDM-K64F.html
     //#define TWR_K64F120M                                               // tower board http://www.utasker.com/kinetis/TWR-K64F120M.html
     //#define HEXIWEAR_K64F                                              // hexiwear - wearable development kit for IoT (K64FN1M0VDC12 main processor) http://www.hexiwear.com/
     //#define TEENSY_3_5                                                 // USB development board with K64FX512 - http://www.utasker.com/kinetis/TEENSY_3.5.html
@@ -255,10 +258,10 @@
     //#define NUCLEO_H743ZI                                              // evaluation board with STM32H743ZIT6U
 
     //#define ST_MB913C_DISCOVERY                                        // discovery board with STM32F100RB
-      #define ARDUINO_BLUE_PILL                                          // board with STM32F103C8T6 (48 pin LQFP, 64k Flash/20k SRAM performance line processor)
+    //#define ARDUINO_BLUE_PILL                                          // board with STM32F103C8T6 (48 pin LQFP, 64k Flash/20k SRAM performance line processor)
     //#define STM3210C_EVAL                                              // evaluation board with STM32F107VCT
     //#define STM32_P207                                                 // olimex prototyping board with STM32F207ZET6
-    //#define STM32F746G_DISCO                                           // evaluation board with STM32F746NGH6
+      #define STM32F746G_DISCO                                           // evaluation board with STM32F746NGH6
     //#define WISDOM_STM32F407                                           // evaluation board with STM32F407ZET6
     //#define STM3241G_EVAL                                              // evaluation board with STM32F417IGH6
     //#define ST_MB997A_DISCOVERY                                        // discovery board with STM32F407VGT6
@@ -2683,12 +2686,12 @@
     #undef USE_MODBUS
     #undef QUICK_DEV_TASKS
     #undef RANDOM_NUMBER_GENERATOR
+    #undef RUN_IN_FREE_RTOS
     #define NO_FLASH_SUPPORT
     #define REMOVE_PORT_INITIALISATIONS
     #define NO_PERIPHERAL_DEMONSTRATIONS
 #endif
 
-#if !defined _FREE_RTOS_APPLICATION && !defined INC_FREERTOS_H
     // Project includes are set here for all files in the correct order
     //
     #include "types.h"                                                   // project specific type settings (include the hardware configuration headers)
@@ -2699,6 +2702,7 @@
     #include "../../uTasker/driver.h"                                    // driver and general formatting routines
     #include "../../Hardware/hardware.h"                                 // general hardware
     #include "../../uTasker/uTasker.h"                                   // operating system defines
+#if !defined _FREE_RTOS_APPLICATION && !defined INC_FREERTOS_H
     #if defined USE_MODBUS
         #include "../../uTasker/MODBUS/modbus.h"
     #endif

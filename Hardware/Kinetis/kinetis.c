@@ -216,6 +216,12 @@
 /*                global function prototype declarations               */
 /* =================================================================== */
 
+#if defined RUN_IN_FREE_RTOS
+    extern void xPortPendSVHandler(void);                                // PendSV interrupt handler
+    extern void vPortSVCHandler(void);                                   // SCV interrupt handler
+    extern void xPortSysTickHandler(void);                               // FreeRTOS tick handler callback
+#endif
+
 /* =================================================================== */
 /*                 local function prototype declarations               */
 /* =================================================================== */
@@ -449,6 +455,11 @@ static void disable_watchdog(void)
 /* =================================================================== */
 /*                                main()                               */
 /* =================================================================== */
+#if !defined RUN_IN_FREE_RTOS && !defined APPLICATION_WITHOUT_OS && !defined _WINDOWS
+    static void fn_uTasker_main(void);
+#elif defined RUN_IN_FREE_RTOS && !defined _WINDOWS
+    extern void fnFreeRTOS_main(void);
+#endif
 
 // Main entry for the target code
 //
@@ -467,13 +478,36 @@ extern int main(void)
     }
 #endif
     fnInitHW();                                                          // perform hardware initialisation (note that we do not have heap yet)
-#if defined RANDOM_NUMBER_GENERATOR && !defined RND_HW_SUPPORT
-    ptrSeed = RANDOM_SEED_LOCATION;                                      // {23}
+#if !defined APPLICATION_WITHOUT_OS
+    fnInitialiseHeap(ctOurHeap, HEAP_START_ADDRESS);                     // initialise heap
+    #if defined RUN_IN_FREE_RTOS
+    fnFreeRTOS_main();                                                   // never return in normal situations
+    FOREVER_LOOP() {
+        // This only happens when there was a failure to initialise and start FreeRTOS (usually not enough heap)
+        //
+        _EXCEPTION("FreeRTOS failed to initialise");
+    }
+    #else
+    fn_uTasker_main();                                                   // never return
+    #endif
 #endif
-#if defined MULTISTART
+    return 0;                                                            // we never return....
+}
+#endif                                                                   // end if not _WINDOWS
+
+#if !defined APPLICATION_WITHOUT_OS
+    #if defined RUN_IN_FREE_RTOS
+    extern void fn_uTasker_main(void *pars)
+    #else
+    static void fn_uTasker_main(void)
+    #endif
+{
+    #if !defined _WINDOWS && defined MULTISTART
+    MULTISTART_TABLE *prtInfo;
+    unsigned char *pucHeapStart;
     prtInfo = ptMultiStartTable;                                         // if the user has already set to alternative start configuration
     if (prtInfo == 0) {                                                  // no special start required
-_abort_multi:
+    _abort_multi:
         fnInitialiseHeap(ctOurHeap, HEAP_START_ADDRESS);                 // initialise heap
         uTaskerStart((UTASKTABLEINIT *)ctTaskTable, ctNodes, PHYSICAL_QUEUES); // start the operating system (and TICK interrupt)
         while ((prtInfo = (MULTISTART_TABLE *)uTaskerSchedule()) == 0) {}// schedule uTasker
@@ -483,7 +517,7 @@ _abort_multi:
         pucHeapStart = HEAP_START_ADDRESS;
         if (prtInfo->new_hw_init) {                                      // info to next task configuration available
             pucHeapStart = prtInfo->new_hw_init(JumpTable);              // get heap details from next configuration
-            if (!pucHeapStart) {
+            if (0 == pucHeapStart) {
                 goto _abort_multi;                                       // this can happen if the jump table version doesn't match - prefer to stay in boot mode than start an application which will crash
             }
         }
@@ -493,17 +527,16 @@ _abort_multi:
         uTaskerStart((UTASKTABLEINIT *)prtInfo->ptTaskTable, prtInfo->ptNodesTable, PHYSICAL_QUEUES);
         while ((prtInfo = (MULTISTART_TABLE *)uTaskerSchedule()) == 0) {}// schedule uTasker
 
-    } while (1);
-#else
-    fnInitialiseHeap(ctOurHeap, HEAP_START_ADDRESS);                     // initialise heap
+    } FOREVER_LOOP();
+    #elif !defined _WINDOWS || defined RUN_IN_FREE_RTOS
+  //fnInitialiseHeap(ctOurHeap, HEAP_START_ADDRESS);                     // initialise heap
     uTaskerStart((UTASKTABLEINIT *)ctTaskTable, ctNodes, PHYSICAL_QUEUES); // start the operating system (and TICK interrupt)
-    while (1) {
+    FOREVER_LOOP() {
         uTaskerSchedule();                                               // schedule uTasker
     }
-#endif
-    return 0;                                                            // we never return....
+    #endif
 }
-#endif                                                                   // end if not _WINDOWS
+#endif
 
 #if defined _COMPILE_KEIL
 // Keil demands the use of a __main() call to correctly initialise variables - it then calls main()
@@ -884,9 +917,13 @@ extern void uEnable_Interrupt(void)
         _EXCEPTION("Unsymmetrical use of interrupt disable/enable detected!!");
     }
 #endif
-    if ((--iInterruptLevel) == 0) {                                      // only when no more interrupt nesting,
+    if ((--iInterruptLevel) == 0) {                                      // only when no more interrupt nesting
 #if defined _WINDOWS
+        extern void fnExecutePendingInterrupts(int iRecursive);
         kinetis.CORTEX_M4_REGS.ulPRIMASK = 0;                            // mark that interrupts are not masked
+    #if defined RUN_IN_FREE_RTOS
+        fnExecutePendingInterrupts(0);                                   // pending interrupts that were blocked by the main task can be executed now
+    #endif
 #else
         __enable_interrupt();                                            // enable processor interrupts
 #endif
@@ -945,22 +982,29 @@ extern void fnEnterInterrupt(int iInterruptID, unsigned char ucPriority, void (*
 /*                                 TICK                                */
 /* =================================================================== */
 
+#if !defined APPLICATION_WITHOUT_TICK
+// Tick interrupt
+//
 static __interrupt void _RealTimeInterrupt(void)
 {
-#if defined TICK_USES_LPTMR                                              // {94} tick interrupt from low power timer
+    #if defined TICK_USES_LPTMR                                          // {94} tick interrupt from low power timer
     LPTMR0_CSR = LPTMR0_CSR;                                             // clear pending interrupt
-#elif defined TICK_USES_RTC                                              // {100} tick interrupt from RTC
+    #elif defined TICK_USES_RTC                                          // {100} tick interrupt from RTC
     RTC_SC |= RTC_SC_RTIF;                                               // clear pending interrupt
-#else                                                                    // tick interrupt from systick
+    #else                                                                // tick interrupt from systick
     INT_CONT_STATE_REG = PENDSTCLR;                                      // reset interrupt
-    #if defined _WINDOWS
+        #if defined _WINDOWS
     INT_CONT_STATE_REG &= ~(PENDSTSET | PENDSTCLR);
+        #endif
     #endif
-#endif
+    #if defined RUN_IN_FREE_RTOS && !defined _WINDOWS
+    xPortSysTickHandler();
+    #endif
     uDisable_Interrupt();                                                // ensure tick handler cannot be interrupted
         fnRtmkSystemTick();                                              // operating system tick
     uEnable_Interrupt();
 }
+#endif
 
 
 // Routine to initialise the tick interrupt (uses Cortex M4/M0+ SysTick timer, RTC or low power timer)
@@ -1629,13 +1673,15 @@ static void irq_NMI(void)
 {
 }
 
-static void irq_pend_sv(void)
-{
-}
-
+    #if !defined RUN_IN_FREE_RTOS
 static void irq_SVCall(void)
 {
 }
+
+static void irq_pend_sv(void)
+{
+}
+    #endif
 #endif
 
 
@@ -2083,7 +2129,7 @@ static void _LowLevelInit(void)
   //fnClkout(INTERNAL_IRC48M_CLOCK_OUT);
   //fnClkout(INTERNAL_LIRC_CLOCK_OUT);                                   // equivalent to INTERNAL_MCGIRCLK_CLOCK_OUT
   //fnClkout(EXTERNAL_OSCILLATOR_CLOCK_OUT);
-    fnClkout(RTC_CLOCK_OUT);
+  //fnClkout(RTC_CLOCK_OUT);
 #endif
 #if defined INTERRUPT_VECTORS_IN_FLASH                                   // {111}
     VECTOR_TABLE_OFFSET_REG = ((unsigned long)&__vector_table);
@@ -2100,9 +2146,16 @@ static void _LowLevelInit(void)
     ptrVect->ptrBusFault      = irq_bus_fault;
     ptrVect->ptrUsageFault    = irq_usage_fault;
     ptrVect->ptrDebugMonitor  = irq_debug_monitor;
+    ptrVect->ptrSysTick = irq_default;
     ptrVect->ptrNMI           = irq_NMI;
+        #if defined RUN_IN_FREE_RTOS
+    ptrVect->ptrPendSV        = xPortPendSVHandler;                      // FreeRTOS's PendSV handler
+    ptrVect->ptrSVCall        = vPortSVCHandler;                         // FreeRTOS's SCV handler
+    ptrVect->reset_vect.ptrResetSP = (void *)(RAM_START_ADDRESS + (SIZE_OF_RAM - NON_INITIALISED_RAM_SIZE)); // the stack pointer value will be taken from the vector base area so enter it in SRAM
+        #else
     ptrVect->ptrPendSV        = irq_pend_sv;
     ptrVect->ptrSVCall        = irq_SVCall;
+        #endif
     processor_ints = (void (**)(void))&ptrVect->processor_interrupts;    // fill all processor specific interrupts with a default handler
     do {
         *processor_ints = irq_default;
@@ -2188,6 +2241,53 @@ extern void start_application(unsigned long app_link_location)
     asm(" ldr pc, [r0,#4]");                                             // load the program counter value from the program's reset vector to cause operation to continue from there
         #endif
     #endif
+}
+#endif
+
+#if !defined FREERTOS_NOT_COMPILED /*defined RUN_IN_FREE_RTOS || defined _WINDOWS*/ // to satisfy FreeRTOS callbacks - even when FreeRTOS not linked
+extern void *pvPortMalloc(int iSize)
+{
+    #if defined _WINDOWS
+    static unsigned long ulFreeRTOS_stack = 0;
+    ulFreeRTOS_stack += iSize;
+    #endif
+    #if defined FREERTOS_SAFE_CALLOC && defined SUPPORT_UCALLOC
+    return (uCalloc((size_t)iSize, 1));                                  // use uTasker safe calloc() as basis for heap
+    #elif defined FREERTOS_SECONDARY_HEAP && defined SECONDARY_UMALLOC   // use secondard heap in fast memory or DDRAM
+    return uMalloc((MAX_MALLOC)iSize);                                   // use uMalloc() which assumes that memory is never freed
+    #else
+    return uMalloc((MAX_MALLOC)iSize);                                   // use uMalloc() which assumes that memory is never freed
+    #endif
+}
+
+extern void vPortFree(void *free)
+{
+    _EXCEPTION("Unexpected free call!!");
+}
+
+extern void vApplicationStackOverflowHook(void)
+{
+}
+
+extern void vApplicationTickHook(void)                                   // FreeRTOS tick interrupt
+{
+}
+
+extern void vMainConfigureTimerForRunTimeStats(void)
+{
+}
+
+extern unsigned long ulMainGetRunTimeCounterValue(void)
+{
+    return uTaskerSystemTick;
+}
+
+extern void vApplicationIdleHook(void)
+{
+}
+
+extern void prvSetupHardware(void)
+{
 }
 #endif
 

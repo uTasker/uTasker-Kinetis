@@ -100,6 +100,9 @@ static unsigned long ulPeripherals[PORTS_AVAILABLE] = {0};
     static unsigned short usADC_values[ADC_CHANNELS * ADC_CONTROLLERS];
     static void *ptrPorts[2] = {(void *)ucPortFunctions, (void *)usADC_values}; // {2}
 #endif
+#if defined RUN_IN_FREE_RTOS
+    extern void fnExecutePendingInterrupts(int iRecursive);
+#endif
 
 static const unsigned long ulDisabled[PORTS_AVAILABLE] = {
 #if defined KINETIS_K00
@@ -6970,7 +6973,8 @@ extern int fnSimTimers(void)
         }
     }
 #endif
-
+    // SysTick
+    //
     if ((SYSTICK_CSR & SYSTICK_ENABLE) != 0) {                           // SysTick is enabled
         unsigned long ulTickCount = 0;
         if ((SYSTICK_CSR & SYSTICK_CORE_CLOCK) != 0) {
@@ -6983,9 +6987,13 @@ extern int fnSimTimers(void)
             SYSTICK_CURRENT = SYSTICK_RELOAD;
             if ((SYSTICK_CSR & SYSTICK_TICKINT) != 0) {                  // if interrupt enabled
                 INT_CONT_STATE_REG |= PENDSTSET;
-                if ((kinetis.CORTEX_M4_REGS.ulPRIMASK & INTERRUPT_MASKED) == 0) { // if interrupt have been enabled, call interrupt handler
-                    ptrVect->ptrSysTick();
+#if defined RUN_IN_FREE_RTOS
+                fnExecutePendingInterrupts(0);
+#else
+                if ((kinetis.CORTEX_M4_REGS.ulPRIMASK & INTERRUPT_MASKED) == 0) { // if global interrupts have been enabled, call interrupt handler
+                    ptrVect->ptrSysTick();                               // call the systick interrupt service routine
                 }
+#endif
             }
         }
     }
@@ -7777,6 +7785,36 @@ extern int fnSimTimers(void)
 #endif
     return 0;
 }
+
+#if defined RUN_IN_FREE_RTOS
+extern void fnExecutePendingInterrupts(int iRecursive)
+{
+    static int iExecuting = 0;
+    static unsigned char ucPresentPriority = 255;                        // lowest priority that doesn't block anything
+    unsigned char ucPreviousPriority = ucPresentPriority;
+    VECTOR_TABLE *ptrVect = (VECTOR_TABLE *)VECTOR_TABLE_OFFSET_REG;
+    if (iExecuting != 0) {
+        if (iRecursive == 0) {
+            return;                                                      // ignore when called non-recursively when already executing
+        }
+    }
+    iExecuting = 1;
+    if ((kinetis.CORTEX_M4_REGS.ulPRIMASK & INTERRUPT_MASKED) != 0) {
+        iExecuting = 0;
+        return;                                                          // if the global interrupt is masked we quit
+    }
+    if ((INT_CONT_STATE_REG & PENDSTSET) != 0) {                         // systick is pending
+        unsigned char ucPriority = (SYSTEM_HANDLER_12_15_PRIORITY_REGISTER >> (24 + __NVIC_PRIORITY_SHIFT)); // systick interrupt priority
+        if (ucPriority < ucPresentPriority) {                            // check that the interrupt has adequate priority to be called
+            ucPresentPriority = ucPriority;                              // set the new priority level
+            ptrVect->ptrSysTick();                                       // call the systick interrupt service routine
+            ucPresentPriority = ucPreviousPriority;
+            fnExecutePendingInterrupts(1);                               // allow further pending interrupt to be executed if needed
+        }
+    }
+    iExecuting = 0;
+}
+#endif
 
 
 extern unsigned char *fnGetSimTxBufferAdd(void)
@@ -9027,6 +9065,39 @@ extern void fnGetPenSamples(unsigned short *ptrX, unsigned short *ptrY)
     else {
         *ptrX = (MIN_X_TOUCH + ((iPenLocationX * ((MAX_X_TOUCH - MIN_X_TOUCH)))/GLCD_X));
         *ptrY = (MIN_Y_TOUCH + ((iPenLocationY * ((MAX_Y_TOUCH - MIN_Y_TOUCH)))/GLCD_Y));
+    }
+}
+#endif
+
+#if 1 //defined RUN_IN_FREE_RTOS
+extern unsigned long *fnGetRegisterAddress(unsigned long ulAddress)
+{
+    ulAddress -= 0xe000e000;
+    ulAddress += (unsigned long)CORTEX_M4_BLOCK;
+    return (unsigned long *)ulAddress;
+}
+
+extern void fnSetReg(int iRef, unsigned long ulValue)
+{
+    switch (iRef) {
+    case 0:
+        kinetis.CORTEX_M4_REGS.ulR0 = ulValue;
+        break;
+    case 14:
+        kinetis.CORTEX_M4_REGS.ulPSP = ulValue;
+        break;
+    case 15:
+        kinetis.CORTEX_M4_REGS.ulMSP = ulValue;
+        break;
+    case 19:
+        kinetis.CORTEX_M4_REGS.ulPRIMASK = ulValue;
+        break;
+    case 20:
+        kinetis.CORTEX_M4_REGS.ulFAULTMASK = ulValue;
+        break;
+    case 22:
+        kinetis.CORTEX_M4_REGS.ulCONTROL = ulValue;
+        break;
     }
 }
 #endif

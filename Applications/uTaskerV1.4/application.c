@@ -2777,6 +2777,7 @@ QUEUE_HANDLE fnGetUART_Handle(void)
     #endif
 #endif
 
+
 #if defined SUPPORT_SLCD && defined STOP_WATCH_APPLICATION
 // Called at 10ms intervals from the tick interrupt
 //

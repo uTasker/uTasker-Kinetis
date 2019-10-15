@@ -49,6 +49,15 @@
     <Filter Include="WinSim\SIMstm32">
       <UniqueIdentifier>{e91847d0-8a16-4eb0-b4c7-9b7d42554f41}</UniqueIdentifier>
     </Filter>
+    <Filter Include="FreeRTOS">
+      <UniqueIdentifier>{59b513ad-e0c9-4fd6-a056-f84b90d57682}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FreeRTOS\include">
+      <UniqueIdentifier>{2c026f73-0f04-475d-bfa4-e15bc0461c37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FreeRTOS\portable">
+      <UniqueIdentifier>{c9b371ef-4671-4328-82ba-b50865b668a0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\application.c">
@@ -2157,6 +2166,30 @@
     <ClCompile Include="..\..\..\Hardware\STM32\STM32_ports.cpp">
       <Filter>WinSim\SIMstm32</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\FreeRTOS\Source\croutine.c">
+      <Filter>FreeRTOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\FreeRTOS\Source\event_groups.c">
+      <Filter>FreeRTOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\FreeRTOS\Source\list.c">
+      <Filter>FreeRTOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\FreeRTOS\Source\queue.c">
+      <Filter>FreeRTOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\FreeRTOS\Source\tasks.c">
+      <Filter>FreeRTOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\FreeRTOS\Source\timers.c">
+      <Filter>FreeRTOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\FreeRTOS\Source\portable\GCC\ARM_CM4F\port.c">
+      <Filter>FreeRTOS\portable</Filter>
+    </ClCompile>
+    <ClCompile Include="..\FreeRTOSapplication.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ADC_Timers.h">
@@ -2505,6 +2538,33 @@
       <Filter>WinSim\SIMstm32</Filter>
     </ClInclude>
     <ClInclude Include="..\debug_hal_kinetis.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\FreeRTOS\Source\portable\GCC\ARM_CM4F\portmacro.h">
+      <Filter>FreeRTOS\portable</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\FreeRTOS\Source\include\croutine.h">
+      <Filter>FreeRTOS\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\FreeRTOS\Source\include\event_groups.h">
+      <Filter>FreeRTOS\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\FreeRTOS\Source\include\FreeRTOS.h">
+      <Filter>FreeRTOS\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\FreeRTOS\Source\include\list.h">
+      <Filter>FreeRTOS\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\FreeRTOS\Source\include\queue.h">
+      <Filter>FreeRTOS\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\FreeRTOS\Source\include\task.h">
+      <Filter>FreeRTOS\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\FreeRTOS\Source\include\timers.h">
+      <Filter>FreeRTOS\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\FreeRTOSConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

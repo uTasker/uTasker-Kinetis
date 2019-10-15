@@ -299,6 +299,34 @@ Build_STM32.bat</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\FreeRTOS\Source\croutine.c">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='uTasker Kinetis|Win32'">..\..\..\FreeRTOS\Source\include;..\..\..\FreeRTOS\Source\portable\GCC\ARM_CM4F;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='uTasker Kinetis plus GNU build|Win32'">..\..\..\FreeRTOS\Source\include;..\..\..\FreeRTOS\Source\portable\GCC\ARM_CM4F;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="..\..\..\FreeRTOS\Source\event_groups.c">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='uTasker Kinetis|Win32'">..\..\..\FreeRTOS\Source\include;..\..\..\FreeRTOS\Source\portable\GCC\ARM_CM4F;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='uTasker Kinetis plus GNU build|Win32'">..\..\..\FreeRTOS\Source\include;..\..\..\FreeRTOS\Source\portable\GCC\ARM_CM4F;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="..\..\..\FreeRTOS\Source\list.c">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='uTasker Kinetis|Win32'">..\..\..\FreeRTOS\Source\include;..\..\..\FreeRTOS\Source\portable\GCC\ARM_CM4F;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='uTasker Kinetis plus GNU build|Win32'">..\..\..\FreeRTOS\Source\include;..\..\..\FreeRTOS\Source\portable\GCC\ARM_CM4F;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="..\..\..\FreeRTOS\Source\portable\GCC\ARM_CM4F\port.c">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='uTasker Kinetis|Win32'">..\..\..\FreeRTOS\Source\include;..\..\..\FreeRTOS\Source\portable\GCC\ARM_CM4F;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='uTasker Kinetis plus GNU build|Win32'">..\..\..\FreeRTOS\Source\include;..\..\..\FreeRTOS\Source\portable\GCC\ARM_CM4F;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="..\..\..\FreeRTOS\Source\queue.c">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='uTasker Kinetis|Win32'">..\..\..\FreeRTOS\Source\include;..\..\..\FreeRTOS\Source\portable\GCC\ARM_CM4F;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='uTasker Kinetis plus GNU build|Win32'">..\..\..\FreeRTOS\Source\include;..\..\..\FreeRTOS\Source\portable\GCC\ARM_CM4F;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="..\..\..\FreeRTOS\Source\tasks.c">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='uTasker Kinetis|Win32'">..\..\..\FreeRTOS\Source\include;..\..\..\FreeRTOS\Source\portable\GCC\ARM_CM4F;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='uTasker Kinetis plus GNU build|Win32'">..\..\..\FreeRTOS\Source\include;..\..\..\FreeRTOS\Source\portable\GCC\ARM_CM4F;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="..\..\..\FreeRTOS\Source\timers.c">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='uTasker Kinetis|Win32'">..\..\..\FreeRTOS\Source\include;..\..\..\FreeRTOS\Source\portable\GCC\ARM_CM4F;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='uTasker Kinetis plus GNU build|Win32'">..\..\..\FreeRTOS\Source\include;..\..\..\FreeRTOS\Source\portable\GCC\ARM_CM4F;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
     <ClCompile Include="..\..\..\Hardware\Kinetis\kinetis.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='uTasker STM32|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='uTasker STM32 plus GNU build|Win32'">true</ExcludedFromBuild>
@@ -4149,6 +4177,10 @@ Build_STM32.bat</Command>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='uTasker STM32 plus GNU build|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="..\FreeMaster.c" />
+    <ClCompile Include="..\FreeRTOSapplication.c">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='uTasker Kinetis|Win32'">..\..\..\FreeRTOS\Source\include;..\..\..\FreeRTOS\Source\portable\GCC\ARM_CM4F;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='uTasker Kinetis plus GNU build|Win32'">..\..\..\FreeRTOS\Source\include;..\..\..\FreeRTOS\Source\portable\GCC\ARM_CM4F;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
     <ClCompile Include="..\KeyScan.c">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='uTasker Kinetis plus GNU build|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='uTasker Kinetis|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -4663,6 +4695,14 @@ Build_STM32.bat</Command>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\FreeRTOS\Source\include\croutine.h" />
+    <ClInclude Include="..\..\..\FreeRTOS\Source\include\event_groups.h" />
+    <ClInclude Include="..\..\..\FreeRTOS\Source\include\FreeRTOS.h" />
+    <ClInclude Include="..\..\..\FreeRTOS\Source\include\list.h" />
+    <ClInclude Include="..\..\..\FreeRTOS\Source\include\queue.h" />
+    <ClInclude Include="..\..\..\FreeRTOS\Source\include\task.h" />
+    <ClInclude Include="..\..\..\FreeRTOS\Source\include\timers.h" />
+    <ClInclude Include="..\..\..\FreeRTOS\Source\portable\GCC\ARM_CM4F\portmacro.h" />
     <ClInclude Include="..\..\..\Hardware\Kinetis\kinetis.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='uTasker STM32|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='uTasker STM32 plus GNU build|Win32'">true</ExcludedFromBuild>
@@ -4982,6 +5022,7 @@ Build_STM32.bat</Command>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='uTasker Kinetis|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='uTasker Kinetis plus GNU build|Win32'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\FreeRTOSConfig.h" />
     <ClInclude Include="..\iic_tests.h" />
     <ClInclude Include="..\Port_Interrupts.h" />
     <ClInclude Include="..\slcd_time.h" />

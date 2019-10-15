@@ -18,6 +18,7 @@
 # 21.11.2015 Exchanged HW dependency to kinetis_USB_OTG.h
 # 30.03.2018 Add mqtt.c
 # 03.02.2019 Rename debug_hal.h to debug_hal_kinetis.h
+# 16.10.2019 Add FreeRTOS files and application
 
 
 #
@@ -28,20 +29,21 @@
 # Compiler flags (thumb mode - little endian)
 # (set to Cortex-M4 or Cortex-M0+ accordingly)
 #C_FLAGS = -mcpu=cortex-m0plus -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections
-C_FLAGS = -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections 
-#C_FLAGS = -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections 
+#C_FLAGS = -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections 
+C_FLAGS = -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections 
 #C_FLAGS = -mcpu=cortex-m7 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections 
 
 
 # All objects (Hardware, application, uTasker, stack)
 #
-OBJS = Build/application.o Build/debug.o Build/webInterface.o Build/KeyScan.o Build/NetworkIndicator.o Build/usb_application.o Build/snmp_mib_handlers.o Build/FreeMaster.o Build/nRF24201.o \
+OBJS = Build/application.o Build/debug.o Build/webInterface.o Build/KeyScan.o Build/NetworkIndicator.o Build/usb_application.o Build/snmp_mib_handlers.o Build/FreeMaster.o Build/nRF24201.o Build/FreeRTOSapplication.o \
        Build/MODBUS.o Build/modbus_app.o \
        Build/mass_storage.o \
        Build/GLCD.o Build/LCD.o \
        Build/eth_drv.o Build/Driver.o Build/uMalloc.o Build/uTasker.o Build/Tty_drv.o Build/iic_drv.o Build/USB_drv.o Build/uFile.o Build/Watchdog.o Build/GlobalTimer.o Build/time_keeper.o Build/low_power.o Build/can_drv.o \
        Build/Ethernet.o Build/arp.o Build/dhcp.o Build/dns.o Build/ftp.o Build/http.o Build/icmp.o Build/ip_utils.o Build/ip.o Build/pop3.o Build/smtp.o Build/snmp.o \
-                        Build/tcp.o Build/telnet.o Build/tftp.o Build/udp.o Build/webutils.o Build/NetBIOS.o Build/zero_config.o Build/ftp_client.o Build/igmp.o Build/mqtt.o
+       Build/tcp.o Build/telnet.o Build/tftp.o Build/udp.o Build/webutils.o Build/NetBIOS.o Build/zero_config.o Build/ftp_client.o Build/igmp.o Build/mqtt.o \
+	   Build/tasks.o Build/timers.o Build/queue.o Build/list.o Build/event_groups.o Build/croutine.o Build/port.o
 
 OBJS2 = Build/kinetis.o
 
@@ -57,6 +59,17 @@ DEPENDS = ../config.h ../app_hw_kinetis.h ../types.h ../TaskConfig.h ../../../uT
        ../../../uTasker/uGLCDLIB/glcd.h \
        ../../../stack/tcpip.h \
        make_uTaskerV1.4_GNU_Kinetis
+
+FREERTOS_INC = ../../../FreeRTOS/Source/include
+FREERTOS_PORT_INC = ../../../FreeRTOS/Source/portable/GCC/ARM_CM4F
+
+DEPENDS_FREERTOS = $(FREERTOS_INC) \
+                   $(FREERTOS_PORT_INC) \
+                   ../config.h ../app_hw_kinetis.h ../FreeRTOSConfig.h \
+                   make_uTaskerV1.4_GNU_Kinetis
+
+FREERTOS_INCLUDE = -I$(FREERTOS_INC) \
+                   -I$(FREERTOS_PORT_INC)
 
 INC     = -I../
 OPTS    = -D _GNU -D _KINETIS -g -c -Os
@@ -130,6 +143,9 @@ Build/FreeMaster.o: ../FreeMaster.c $(DEPENDS) ../application.h
 
 Build/nRF24201.o: ../nRF24201.c $(DEPENDS) ../application.h
 		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../nRF24201.c -o Build/nRF24201.o
+
+Build/FreeRTOSapplication.o: ../FreeRTOSapplication.c $(DEPENDS) $(DEPENDS_FREERTOS) ../application.h
+		$(CC) $(C_FLAGS) $(INC) $(FREERTOS_INCLUDE) $(OPTS) ../FreeRTOSapplication.c -o Build/FreeRTOSapplication.o
 
 
 
@@ -275,6 +291,28 @@ Build/MODBUS.o: ../../../uTasker/MODBUS/MODBUS.c $(DEPENDS)
 
 Build/modbus_app.o: ../modbus_app.c $(DEPENDS)
 		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../modbus_app.c -o Build/modbus_app.o
+
+# Free RTOS
+Build/tasks.o : ../../../FreeRTOS/Source/tasks.c $(DEPENDS_FREERTOS)
+		$(CC) $(C_FLAGS) $(INC) $(FREERTOS_INCLUDE) $(OPTS) ../../../FreeRTOS/Source/tasks.c -o Build/tasks.o
+
+Build/timers.o : ../../../FreeRTOS/Source/timers.c $(DEPENDS_FREERTOS)
+		$(CC) $(C_FLAGS) $(INC) $(FREERTOS_INCLUDE) $(OPTS) ../../../FreeRTOS/Source/timers.c -o Build/timers.o
+
+Build/queue.o : ../../../FreeRTOS/Source/queue.c $(DEPENDS_FREERTOS)
+		$(CC) $(C_FLAGS) $(INC) $(FREERTOS_INCLUDE) $(OPTS) ../../../FreeRTOS/Source/queue.c -o Build/queue.o
+
+Build/list.o : ../../../FreeRTOS/Source/list.c $(DEPENDS_FREERTOS)
+		$(CC) $(C_FLAGS) $(INC) $(FREERTOS_INCLUDE) $(OPTS) ../../../FreeRTOS/Source/list.c -o Build/list.o
+
+Build/event_groups.o : ../../../FreeRTOS/Source/event_groups.c $(DEPENDS_FREERTOS)
+		$(CC) $(C_FLAGS) $(INC) $(FREERTOS_INCLUDE) $(OPTS) ../../../FreeRTOS/Source/event_groups.c -o Build/event_groups.o
+
+Build/croutine.o : ../../../FreeRTOS/Source/croutine.c $(DEPENDS_FREERTOS)
+		$(CC) $(C_FLAGS) $(INC) $(FREERTOS_INCLUDE) $(OPTS) ../../../FreeRTOS/Source/croutine.c -o Build/croutine.o
+
+Build/port.o : ../../../FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c $(DEPENDS_FREERTOS)
+		$(CC) $(C_FLAGS) $(INC) $(FREERTOS_INCLUDE) $(OPTS) ../../../FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c -o Build/port.o
 
 
 # Link

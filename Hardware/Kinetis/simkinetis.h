@@ -182,7 +182,31 @@ unsigned long CPACR;
 
 typedef struct stKINETIS_CORTEX_M4_REGS
 {
-unsigned long ulPRIMASK;
+    unsigned long ulR0;                                                  // low registers
+    unsigned long ulR1;
+    unsigned long ulR2;
+    unsigned long ulR3;
+    unsigned long ulR4;
+    unsigned long ulR5;
+    unsigned long ulR6;
+    unsigned long ulR7;
+    unsigned long ulR8;                                                  // high registers
+    unsigned long ulR9;
+    unsigned long ulR10;
+    unsigned long ulR11;
+    unsigned long ulR12;
+    unsigned long ulR13_SP;                                              // stack pointer
+    unsigned long ulPSP;                                                 // banked versions of stack pointer
+    unsigned long ulMSP;
+    unsigned long ulR14_LR;                                              // link register
+    unsigned long ulR15_PC;                                              // program counter
+                                                                         // Special registers
+                                                                         //
+    unsigned long ulPSR;                                                 // program status register
+    unsigned long ulPRIMASK;
+    unsigned long ulFAULTMASK;
+    unsigned long ulBASEPRI;
+    unsigned long ulCONTROL;                                             // control
 } KINETIS_CORTEX_M4_REGS;
 
 #define INTERRUPT_MASKED 0x00000001
