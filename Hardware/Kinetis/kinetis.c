@@ -2017,7 +2017,7 @@ static void _LowLevelInit(void)
     MCG_C1 = (MCG_C1_CLKS_EXTERN_CLK | MCG_C1_FRDIV_256);                // switch to external source (the FLL input clock is set to as close to its input range as possible, although this is not absolutely necessary if the FLL will not be used)
         #elif CRYSTAL_FREQUENCY == 16000000
     MCG_C1 = (MCG_C1_CLKS_EXTERN_CLK | MCG_C1_FRDIV_512);                // switch to external source (the FLL input clock is set to as close to its input range as possible, although this is not absolutely necessary if the FLL will not be used)
-        #elif CRYSTAL_FREQUENCY == 24000000
+        #elif CRYSTAL_FREQUENCY >= 24000000
     MCG_C1 = (MCG_C1_CLKS_EXTERN_CLK | MCG_C1_FRDIV_1024);               // switch to external source (the FLL input clock is set to as close to its input range as possible, although this is not absolutely necessary if the FLL will not be used)
         #elif CRYSTAL_FREQUENCY >= 10000000 && CRYSTAL_FREQUENCY <= 12000000
     MCG_C1 = (MCG_C1_CLKS_EXTERN_CLK | MCG_C1_FRDIV_256);                // switch to external source (the FLL input clock is set to as close to its input range as possible, although this is not absolutely necessary if the FLL will not be used)
