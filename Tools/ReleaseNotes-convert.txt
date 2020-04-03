@@ -59,3 +59,23 @@ Version 1.9 allow encryption offset values larger than the file length
 Version V1.10 02-10-2015
 ========================
 Version 1.10 protect against motorola to raw binary conversion when (invalid) 0xffffffff length block is found
+
+Version V1.11 06-11--2018
+=========================
+Version V1.11 adds AES256 encryption:
+
+Usage 1: uTaskerConvert.exe uTaskerV1.4_BM.bin aes256_coded.bin $"aes256 secret key" $"initial vector"
+$"aes256 secret key" is a AES256 encryption key string that can be up to 32 characters long
+If shorter than 32 bytes it is extended to 32 bytes in length by adding 'X' characters.
+$"initial vector" is the AES256' initial vector value, which is up to 16 characters long (padded with 'x's when shorter).
+This string is optional and when not present a reset (all 0) initial vector is used.
+
+Usage 2: uTaskerConvert.exe uTaskerV1.4_BM.bin aes256_coded.bin +"8d5E5f42ffs4a9000135f2" +"001122f354e4b8"
++"8d5E5f42ffs4a9000135f2" is a hex AES256 encryption key string that can be up to 32 characters long.
+If shorter than 32 bytes it is extended to 32 bytes in length by adding 'X' characters.
++"001122f354e4b8" is the AES256' initial vector value, which is up to bytes long (padded with 'X's when shorter).
+This string is optional and when not present a reset (all 0) initial vector is used.
+
+The length of the encrypted file is always divisible by 32 and so may be up to 31 bytes longer than the input file.
+
+

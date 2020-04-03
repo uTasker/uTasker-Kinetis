@@ -41,4 +41,19 @@ Allow concatenating two binary files by defining 0 offset.
 Option = "uTaskerCombine file1.bin file2.bin 0 file3.bin file4.srec"
 
 
+Version V1.4 19-04-2016
+=======================
 
+Correct optional offset when building with VS2010, respecting that the input is now in unicode
+
+
+Version V1.5 31-07-2017
+=======================
+
+Terminate iHex line with CR + LF (rather than just LF)
+
+
+Version V1.6 17-03-2020
+=======================
+
+Correctly recognise srec/ihex files in unicode
