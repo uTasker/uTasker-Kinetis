@@ -17,6 +17,7 @@
     04.06.2014 Add nework indicator task to allow PHY polling when necessary {2}
     21.01.2015 Add file object whenever USB-MSD is enabled               {3}
     12.06.2015 Close outstanding flash buffer before committing start of code {4}
+    07.07 2020 Parameters for fnStartHTTP() modified                     {5}
 
 */
 
@@ -119,16 +120,20 @@ static const CHAR cSuccessSW_HTML[]    = SW_UPLOAD_COMPLETED;
 
 extern void fnConfigureAndStartWebServer(void)
 {
+    HTTP_FUNCTION_SET FunctionSet;                                       // {5}
+    FunctionSet.ucParameters = (WEB_SUPPORT_PARAM_GEN | WEB_SUPPORT_HANDLER);
     #if defined AUTHENTICATE_WEB_ACCESS
-    unsigned char ucHttpProperties = (WEB_SUPPORT_PARAM_GEN | WEB_SUPPORT_HANDLER | WEB_AUTHENTICATE);
+    FunctionSet.ucParameters = (WEB_SUPPORT_PARAM_GEN | WEB_SUPPORT_HANDLER | WEB_AUTHENTICATE);
     #else
-    unsigned char ucHttpProperties = (WEB_SUPPORT_PARAM_GEN | WEB_SUPPORT_HANDLER);
+    FunctionSet.ucParameters = (WEB_SUPPORT_PARAM_GEN | WEB_SUPPORT_HANDLER);
     #endif
+    FunctionSet.fnWebHandler = fnHandleWeb;
+    FunctionSet.fnInsertRoutine = fnInsertString;
+    FunctionSet.fnGenerator = fnIsSelected;
     #ifdef _VARIABLE_HTTP_PORT
-    fnStartHTTP(fnHandleWeb, fnIsSelected, fnInsertString, ucHttpProperties, HTTP_SERVERPORT); // {27} pass the port number to be used, which can be variable of required
-    #else
-    fnStartHTTP(fnHandleWeb, fnIsSelected, fnInsertString, ucHttpProperties);
+    FunctionSet.usPort = HTTP_SERVERPORT;
     #endif
+    fnStartHTTP(&FunctionSet);
 }
 
 
