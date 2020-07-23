@@ -48,9 +48,17 @@ SECTIONS
   }
   __text_end__ = __text_start__ + SIZEOF(.text);
 
+  __fini_start__ = ALIGN(__text_end__ , 4);
+  .fini ALIGN(__text_end__ , 4) :
+  {
+    __fini_start__ = .;
+    KEEP (*(SORT(.fini.*))) KEEP (*(.fini))
+  }
+  __fini_end__ = __fini_start__ + SIZEOF(.fini);
+
  
-  __dtors_load_start__ = ALIGN(__text_end__ , 4);
-  .dtors ALIGN(__text_end__ , 4) :
+  __dtors_load_start__ = ALIGN(__fini_end__ , 4);
+  .dtors ALIGN(__fini_end__ , 4) :
   {
     __dtors_start__ = .;
     KEEP (*(SORT(.dtors.*))) KEEP (*(.dtors))

@@ -322,6 +322,21 @@
     #define STM32F100RB                                                  // exact processor type
     #define PCLK1_DIVIDE        2
     #define PCLK2_DIVIDE        1
+#elif defined NUCLEO_F746ZG                                              // STM32F746ZGT6 (216MHz)
+    #define CRYSTAL_FREQ        8000000                                  // this is in fact an 8MHz clock output from the ST link
+  //#define DISABLE_PLL                                                  // run from clock source directly
+  //#define USE_HSI_CLOCK                                                // use internal HSI clock source
+    #define PLL_INPUT_DIV       4                                        // 2..64 - should set the input to pll in the range 1..2MHz (with preference near to 2MHz)
+    #define PLL_VCO_MUL         168                                      // 64 ..432 where VCO must be 64..432MHz
+    #define PLL_POST_DIVIDE     2                                        // post divide VCO by 2, 4, 6, or 8 to get the system clock speed
+    #define PIN_COUNT           PIN_COUNT_144_PIN
+    #define PACKAGE_TYPE        PACKAGE_LQFP
+    #define SIZE_OF_RAM         (320 * 1024)                             // 320k SRAM (DTCM + SRAM1 + SRAM2)
+    #define SIZE_OF_FLASH       (1024 * 1024)                            // 1M FLASH
+    #define SUPPLY_VOLTAGE      SUPPLY_2_7__3_6                          // power supply is in the range 2.7V..3.6V
+    #define PCLK1_DIVIDE        4
+    #define PCLK2_DIVIDE        2
+    #define HCLK_DIVIDE         1
 #elif defined STM32F746G_DISCO                                           // STM32F746NGH6 (216MHz)
     #define CRYSTAL_FREQ        25000000
   //#define DISABLE_PLL                                                  // run from clock source directly
@@ -471,7 +486,7 @@
     #define SPI_FLASH_SECTOR_LENGTH (64 * 4 * SPI_FLASH_PAGE_LENGTH)     // exception sector 0a is 2k and sector 0b is 62k
 #endif
 
-#if defined STM3241G_EVAL || defined WISDOM_STM32F407 || defined NUCLEO_F401RE || defined STM32F746G_DISCO || defined NUCLEO_F429ZI
+#if defined STM3241G_EVAL || defined WISDOM_STM32F407 || defined NUCLEO_F401RE || defined STM32F746G_DISCO || defined NUCLEO_F429ZI || defined NUCLEO_F746ZG
     // SPI FLASH system setup
     //
     //#define SPI_FLASH_MULTIPLE_CHIPS                                   // activate when multiple physical chips are used
@@ -532,7 +547,7 @@
   //#define SDCARD_DETECT_INPUT_POLL                                     // {4} use card detect switch for detection polling (use together with T_CHECK_CARD_REMOVAL)
   //#define SDCARD_DETECT_INPUT_INTERRUPT                                // {4} use card detect switch for detection by interrupt (T_CHECK_CARD_REMOVAL and SDCARD_DETECT_INPUT_POLL should be disabled)
 
-    #if defined STM3241G_EVAL || defined ST_MB997A_DISCOVERY || defined WISDOM_STM32F407 || defined NUCLEO_F401RE || defined STM32F746G_DISCO
+    #if defined STM3241G_EVAL || defined ST_MB997A_DISCOVERY || defined WISDOM_STM32F407 || defined NUCLEO_F401RE || defined STM32F746G_DISCO || defined NUCLEO_F746ZG
         #define SD_CONTROLLER_AVAILABLE                                  // use SDIO rather than SPI (necessary on STM3240G-EVAL board)
 
         #if defined SD_CONTROLLER_AVAILABLE
@@ -756,13 +771,13 @@
   //#define SERIAL_SUPPORT_DMA                                           // enable UART DMA support
   //#define SUPPORT_HW_FLOW                                              // enable hardware flow control support
 
-    #if defined ST_MB913C_DISCOVERY || defined NUCLEO_F429ZI || defined ARDUINO_BLUE_PILL
-        #define DEMO_UART    2                                           // use UART channel 2 (USART 3 since ST USARTs count from 1)
+    #if defined ST_MB913C_DISCOVERY || defined NUCLEO_F429ZI || defined ARDUINO_BLUE_PILL || defined NUCLEO_F746ZG
+        #define DEMO_UART    STM32_USART_3                               // use UART channel 2 (USART 3 since ST USARTs count from 1)
     #elif defined NUCLEO_L496RG
         #define DEMO_UART    5                                           // use LPUART1 (channel 5) [0 = USART1, 1 = USART2, 2= USART3, 3 = UART4, 4 = UART5, 5 = LPUART1]
         #define LPUART_REMAP_G                                           // STLink VCOM
     #elif defined WISDOM_STM32F407 || defined STM32F746G_DISCO || defined NUCLEO_F031K6
-        #define DEMO_UART    0                                           // use UART channel 0 (USART 1 since ST USARTs count from 1)
+        #define DEMO_UART    STM32_USART_1                               // use UART channel 0 (USART 1 since ST USARTs count from 1)
     #elif defined STM3241G_EVAL || defined STM32_P207 || defined STM32F407ZG_SK 
         #define DEMO_UART    2                                           // use UART channel 2 (USART 3 since ST USARTs count from 1) - the STM3241G can't use USART 4 and SD card at the same time so needs a modification for this
       //#define DEMO_UART    3                                           // use UART channel 3 (USART 4 since ST USARTs count from 1)
@@ -801,7 +816,7 @@
     #else
         #define USART2_REMAP                                             // use USART2 on remapped pins (note that this is channel 1)
     #endif
-    #if defined STM32_P207 || defined STM32F407ZG_SK || defined NUCLEO_F429ZI
+    #if defined STM32_P207 || defined STM32F407ZG_SK || defined NUCLEO_F429ZI || defined NUCLEO_F746ZG
         #define USART3_FULL_REMAP                                        // use USART3 on second set of remapped pins (note that this is channel 2)
     #elif !defined STM3241G_EVAL && !defined ARDUINO_BLUE_PILL
         #define USART3_PARTIAL_REMAP                                     // use USART3 on first set of remapped pins (note that this is channel 2)
@@ -934,7 +949,7 @@
     #define SENDERS_EMAIL_ADDRESS             "STM32F407_EVAL@uTasker.com" // fictional Email address of the board being used
     #define EMAIL_SUBJECT                     "STM32F407 Test"           // email subject
     #define EMAIL_CONTENT                     "Hello!!\r\nThis is an email message from the STM32F407.\r\nI hope that you have received this test and have fun using the uTasker operating system with integrated TCP/IP stack.\r\r\nRegards your STM32F407!!";
-#elif defined STM3241G_EVAL || defined STM32F746G_DISCO
+#elif defined STM3241G_EVAL || defined STM32F746G_DISCO || defined NUCLEO_F746ZG
     #define SENDERS_EMAIL_ADDRESS             "STM3241G_EVAL@uTasker.com"// fictional Email address of the board being used
     #define EMAIL_SUBJECT                     "STM3241G Test"            // email subject
     #define EMAIL_CONTENT                     "Hello!!\r\nThis is an email message from the STM3241G-EVAL.\r\nI hope that you have received this test and have fun using the uTasker operating system with integrated TCP/IP stack.\r\r\nRegards your STM3241G!!";
@@ -1427,7 +1442,7 @@
     #define BUTTON_KEY_DEFINITIONS     {_PORTA, USER_KEY_BUTTON, {73, 248, 93, 268}},
 
     #define KEYPAD "KeyPads/STM32F4-DISC.bmp"
-#elif defined NUCLEO_F429ZI
+#elif defined NUCLEO_F429ZI || defined NUCLEO_F746ZG
     #define USERS_BUTTON               PORTC_BIT13
 
     #define LED1                       PORTB_BIT0                        // green LED
@@ -1737,7 +1752,7 @@
         #define SUPPORT_PORT_INTERRUPTS                                  // support code for port interrupts due to the PHY interrupt
         #define PHY_INT_PORT           PORTA                             // interrupt on PA3
         #define PHY_INT_PIN_STATE()    _READ_PORT_MASK(A, PHY_INTERRUPT)
-    #elif defined STM32F746G_DISCO || defined NUCLEO_F429ZI
+    #elif defined STM32F746G_DISCO || defined NUCLEO_F429ZI || defined NUCLEO_F746ZG
         #define _LAN8742
         #define PHY_ADDRESS_           0x00                              // address of PHY on DiscoverMo board (RMII mode)
         #define VNDR_MDL               0x13                              // vendor model number
@@ -1907,7 +1922,7 @@
 #define GPIO_DEFAULT_INPUT_J       0xffff
 #define GPIO_DEFAULT_INPUT_K       0xffff
 
-#if defined STM3241G_EVAL || defined WISDOM_STM32F407 || defined NUCLEO_F401RE || defined STM32F746G_DISCO // {2}
+#if defined STM3241G_EVAL || defined WISDOM_STM32F407 || defined NUCLEO_F401RE || defined STM32F746G_DISCO || defined NUCLEO_F746ZG // {2}
     // User port mapping
     //
     #define USER_PORT_1_BIT        PORTI_BIT0                            // use free pins on Eval board

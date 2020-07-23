@@ -258,12 +258,14 @@ extern void fnSetFlashOption(unsigned long ulOption, unsigned long ulOption1, un
     #define LPUARTS_AVAILABLE  0
 #endif
 
-#define STM32_UART_1          0
-#define STM32_UART_2          1
-#define STM32_UART_3          2
+#define STM32_USART_1         0
+#define STM32_USART_2         1
+#define STM32_USART_3         2
 #define STM32_UART_4          3
 #define STM32_UART_5          4
-#define STM32_UART_6          5
+#define STM32_USART_6         5
+#define STM32_UART_7          6
+#define STM32_UART_8          7
 
 // ADC configuration
 //
