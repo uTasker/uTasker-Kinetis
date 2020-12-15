@@ -35,9 +35,6 @@
     <ClCompile Include="..\..\..\WinSim\FileToDisk.c">
       <Filter>WinSim</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Hardware\IIC_devices\IIC_dev.c">
-      <Filter>WinSim</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\WinSim\LCD\KeyPadSim.cpp">
       <Filter>WinSim</Filter>
     </ClCompile>
@@ -61,6 +58,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Hardware\Kinetis\kinetisSim.c">
       <Filter>WinSim\SIMKINETIS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\WinSim\serial_dev.c">
+      <Filter>WinSim</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -103,6 +103,7 @@
       <Filter>Rescource Files</Filter>
     </None>
     <None Include="..\GNU_Kinetis\make_uTaskerBoot_GNU_Kinetis" />
+    <None Include="..\GNU_Kinetis\Build_Kinetis.bat" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="uTasker.rc">

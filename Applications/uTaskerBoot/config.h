@@ -11,9 +11,10 @@
     File:        config.h
     Project:     Single Chip Embedded Internet - boot loader
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2020
     *********************************************************************
     02.02.2017 Adapt for us tick resolution (_TICK_RESOLUTION)
+    15.12.2020 Added KINETIS_K64 configuration
 
 */
 
@@ -24,22 +25,22 @@
 
 #define MY_PROJECT_NAME     "uTasker Bootloader"
 
-#define BOOT_LOADER                                                      // {4}
+#define BOOT_LOADER
 
 #define uDisable_Interrupt  __disable_interrupt
 #define uEnable_Interrupt   __enable_interrupt
 
 #define TARGET_HW           "Bare-Minimum Boot"
 
-//#define SPI_SW_UPLOAD                                                  // new SW is situated in SPI FLASH {1}{2}
-//#define SPI_FLASH_SST25                                                // {15} use SST SPI FLASH rather than ATMEL
-//#define SPI_FLASH_ST                                                   // define that we are using ST FLASH rather than default ATMEL {9}
-//#define SPI_DATA_FLASH                                                 // FLASH type is data FLASH supporting sub-sectors (relevant for ST types) {9}
+//#define SPI_SW_UPLOAD                                                  // new SW is situated in SPI FLASH
+//#define SPI_FLASH_SST25                                                // {use SST SPI FLASH rather than ATMEL
+//#define SPI_FLASH_ST                                                   // define that we are using ST FLASH rather than default ATMEL
+//#define SPI_DATA_FLASH                                                 // FLASH type is data FLASH supporting sub-sectors (relevant for ST types)
 
-//#define MULTIPLE_INTERMEDIATE_CODE_LOCATIONS                           // {22} allow the intermediate code to be located at multiple possible addresses
+//#define MULTIPLE_INTERMEDIATE_CODE_LOCATIONS                           // allow the intermediate code to be located at multiple possible addresses
 
 
-#define SET_SPI_FLASH_MODE()                                             // {18}
+#define SET_SPI_FLASH_MODE()
 #define REMOVE_SPI_FLASH_MODE()
 
 #if !defined _BOOT_LOADER_ASSEMBLER
@@ -50,17 +51,75 @@
     #define OUR_HEAP_SIZE (unsigned short)((25 * 1024))                  // for simulator compatibility only
     #define _TICK_RESOLUTION     TICK_UNIT_MS(50)                        // 50ms system tick period - max possible at 50MHz SYSTICK would be about 335ms !
 
-    #if defined _KINETIS                                                 // {20}
+    #if defined _KINETIS
       //#define KINETIS_K40
       //#define KINETIS_K60
-        #define KINETIS_K70
+        #define KINETIS_K64                                              // next generation K processors Cortex M4 with Ethernet, USB, encryption, tamper, key storage protection area
+      //#define KINETIS_K70
         #define KINETIS_K_FPU                                            // 120MHz FPU version
 
       //#define NET_KBED
       //#define NET_K60
-        // Initialise for 100MHz(120MHz) from 50MHz external clock
-        //
-        #if defined KINETIS_K60 || defined KINETIS_K70
+        #if defined KINETIS_K64
+            #define MASK_1N83J
+            #define KINETIS_MAX_SPEED    120000000                       // part with inherent floating point unit
+            #define KINETIS_K60                                          // specify the sub-family
+            #define KINETIS_REVISION_2
+          //#define RUN_FROM_DEFAULT_CLOCK                               // default mode is FLL Engaged Internal - the 32kHz IRC is multiplied by FLL factor of 640 to obtain 20.9715MHz nominal frequency (20MHz..25MHz)
+          //#define RUN_FROM_HIRC                                        // clock directly from internal 48MHz RC clock
+            #define RUN_FROM_HIRC_PLL                                    // use 48MHz RC clock as input to the PLL
+          //#define RUN_FROM_HIRC_FLL                                    // use 48MHz RC clock as input to the FLL
+          //#define RUN_FROM_RTC_FLL                                     // use 32.76kHz crystal clock as input to the FLL
+            #if defined RUN_FROM_DEFAULT_CLOCK
+              //#define FLL_FACTOR           2929                        // use FLL (factors available are 640, 732, 1280, 1464, 1920, 2197, 2560 and 2929)
+                #define FLEX_CLOCK_DIVIDE    1                           // approx. 22.5MHz
+                #define FLASH_CLOCK_DIVIDE   1                           // approx. 22.5MHz 
+                #define BUS_CLOCK_DIVIDE     1                           // approx. 22.5MHz
+            #elif defined RUN_FROM_HIRC                                  // use IRC48M internal oscillator directly (no PLL or FLL)
+                #define FLEX_CLOCK_DIVIDE    2                           // approx. 24MHz
+                #define FLASH_CLOCK_DIVIDE   2                           // approx. 24MHz 
+                #define BUS_CLOCK_DIVIDE     1                           // approx. 48MHz
+            #elif defined RUN_FROM_HIRC_FLL
+                #define EXTERNAL_CLOCK       48000000                    // this is not really external but the IRC48MCLK is otherwise selected as if it were (Ethernet not possible!)
+                #define _EXTERNAL_CLOCK      EXTERNAL_CLOCK
+                #define FLL_FACTOR           2929                        // use FLL (factors available are 640, 732, 1280, 1464, 1920, 2197, 2560 and 2929)
+                #define FLEX_CLOCK_DIVIDE    3                           // 120/3 to give 40MHz
+                #define FLASH_CLOCK_DIVIDE   5                           // 120/5 to give 24MHz
+            #elif defined RUN_FROM_RTC_FLL
+                #define EXTERNAL_CLOCK       32768
+                #define _EXTERNAL_CLOCK      EXTERNAL_CLOCK
+                #define FLL_FACTOR           2929                        // use FLL (factors available are 640, 732, 1280, 1464, 1920, 2197, 2560 and 2929)
+                #define FLEX_CLOCK_DIVIDE    3                           // 96/2 to give 48MHz
+                #define FLASH_CLOCK_DIVIDE   4                           // 96/4 to give 24MHz
+            #elif defined RUN_FROM_HIRC_PLL
+                #define EXTERNAL_CLOCK       48000000                    // this is not really external but the IRC48MCLK is otherwise selected as if it were (Ethernet not possible!)
+                #define _EXTERNAL_CLOCK      EXTERNAL_CLOCK
+                #define CLOCK_DIV            20                          // input must be divided to 2MHz..4MHz range (/1 to /24)
+                #define CLOCK_MUL            50                          // the PLL multiplication factor to achieve operating frequency of 120MHz (x24 to x55 possible)
+                #define FLEX_CLOCK_DIVIDE    3                           // 120/3 to give 40MHz
+                #define FLASH_CLOCK_DIVIDE   5                           // 120/5 to give 24MHz
+            #else                                                        // run from external clock (typical configuration when Ethernet is required)
+                #define EXTERNAL_CLOCK       50000000                    // this must be 50MHz in order to use Ethernet in RMII mode
+                #define _EXTERNAL_CLOCK      EXTERNAL_CLOCK
+                #define CLOCK_DIV            20                          // input must be divided to 2MHz..4MHz range (/1 to /24)
+                #define CLOCK_MUL            48                          // the PLL multiplication factor to achieve operating frequency of 120MHz (x24 to x55 possible)
+                #define FLEX_CLOCK_DIVIDE    3                           // 120/3 to give 40MHz
+                #define FLASH_CLOCK_DIVIDE   5                           // 120/5 to give 24MHz
+            #endif
+          //#define USB_CRYSTAL_LESS                                     // use 48MHz IRC as USB source (according to Freescale AN4905 - only possible in device mode)
+          //#define USB_CLOCK_GENERATED_INTERNALLY                       // use USB clock from internal source rather than external pin - 120MHz is suitable from PLL
+
+            #define SIZE_OF_FLASH      (1024 * 1024)                     // K64 has 1M flash
+            #define SIZE_OF_RAM        (256 * 1024)                      // and 256k SRAM
+
+            #define FILE_GRANULARITY   (1 * FLASH_GRANULARITY)           // each file a multiple of 2k/4k
+
+            #define uFILE_START        0x60000                           // FLASH location at 384k start
+            #define FILE_SYSTEM_SIZE   (128 * 1024)                      // 128k reserved for file system
+
+            #define PIN_COUNT          PIN_COUNT_100_PIN                 // used only by the simulator
+            #define KINETIS_K_FPU                                        // 120MHz FPU version
+        #elif defined KINETIS_K60 || defined KINETIS_K70                 // initialise for 100MHz(120MHz) from 50MHz external clock
             #if defined KINETIS_K_FPU
                 #define EXTERNAL_CLOCK       50000000                    // this must be 50MHz in order to use Ethernet in RMII mode
                 #define _EXTERNAL_CLOCK      EXTERNAL_CLOCK
@@ -99,13 +158,22 @@
             #define FLASH_CLOCK_DIVIDE   4                               // 1 to 16
         #endif
 
-        #define SIZE_OF_FLASH      (512 * 1024)                          // K60 has 512k
-        #define SIZE_OF_RAM        (64 * 1024)                           // suitable for K40, K60 and K70
+        #if !defined SIZE_OF_FLASH
+            #define SIZE_OF_FLASH  (512 * 1024)                          // K60 has 512k
+        #endif
+        #if !defined SIZE_OF_RAM
+            #define SIZE_OF_RAM    (64 * 1024)                           // suitable for K40, K60 and K70
+        #endif
 
-        #define FILE_GRANULARITY   (1 * FLASH_GRANULARITY)               // each file a multiple of 2k/4k
-
-        #define uFILE_START        0x60000                               // FLASH location at 384k start
-        #define FILE_SYSTEM_SIZE   (128 * 1024)                          // 128k reserved for file system
+        #if !defined FILE_GRANULARITY
+            #define FILE_GRANULARITY   (1 * FLASH_GRANULARITY)           // each file a multiple of 2k/4k
+        #endif
+        #if !defined uFILE_START
+            #define uFILE_START        0x60000                           // FLASH location at 384k start
+        #endif
+        #if !defined FILE_SYSTEM_SIZE
+            #define FILE_SYSTEM_SIZE   (128 * 1024)                      // 128k reserved for file system
+        #endif
 
         // FLASH configuration settings
         //
@@ -121,14 +189,18 @@
         #define KINETIS_FLASH_CONFIGURATION_BACKDOOR_KEY       {BACKDOOR_KEY_0, BACKDOOR_KEY_1, BACKDOOR_KEY_2, BACKDOOR_KEY_3, BACKDOOR_KEY_4, BACKDOOR_KEY_5, BACKDOOR_KEY_6, BACKDOOR_KEY_7}
         #define KINETIS_FLASH_CONFIGURATION_PROGRAM_PROTECTION (0xffffffff) // PROT[24:31]:PROT[23:16]:PROT[15:8]:PROT[7:0] - no protection when all are '1'
         #define KINETIS_FLASH_CONFIGURATION_SECURITY           (FTFL_FSEC_SEC_UNSECURE | FTFL_FSEC_FSLACC_GRANTED | FTFL_FSEC_MEEN_ENABLED | FTFL_FSEC_KEYEN_ENABLED)
-        #define KINETIS_FLASH_CONFIGURATION_NONVOL_OPTION      (FTFL_FOPT_EZPORT_ENABLED | FTFL_FOPT_LPBOOT_NORMAL)
+        #if defined KINETIS_REVISION_2
+            #define KINETIS_FLASH_CONFIGURATION_NONVOL_OPTION  (FTFL_FOPT_EZPORT_ENABLED | FTFL_FOPT_LPBOOT_NORMAL | FTFL_FOPT_NMI_DISABLED)
+        #else
+            #define KINETIS_FLASH_CONFIGURATION_NONVOL_OPTION  (FTFL_FOPT_EZPORT_ENABLED | FTFL_FOPT_LPBOOT_NORMAL)
+        #endif
         #define KINETIS_FLASH_CONFIGURATION_EEPROM_PROT        0xff
         #define KINETIS_FLASH_CONFIGURATION_DATAFLASH_PROT     0xff
 
         #define CONFIGURE_WATCHDOG()  WDOG_STCTRLH = (WDOG_STCTRLH_STNDBYEN | WDOG_STCTRLH_WAITEN | WDOG_STCTRLH_STOPEN | WDOG_STCTRLH_ALLOWUPDATE | WDOG_STCTRLH_CLKSRC); // disable watchdog
       //#define CONFIGURE_WATCHDOG()  WDOG_TOVALL = 2000; WDOG_TOVALH = 0; WDOG_STCTRLH = (WDOG_STCTRLH_STNDBYEN | WDOG_STCTRLH_WAITEN | WDOG_STCTRLH_STOPEN | WDOG_STCTRLH_WDOGEN); // watchdog enabled to generate reset on 2s timeout (no further updates allowed)
 
-        #if defined NET_KBED || defined NET_K60                          // {23} these require the external PHY to be configured with the correct clock speed before continuing
+        #if defined NET_KBED || defined NET_K60                          // these require the external PHY to be configured with the correct clock speed before continuing
             #define USER_STARTUP_CODE   PHY_RESET_20MS
             #if defined NET_KBED
                 #define INIT_PHY_RESET()     _CONFIG_PORT_OUTPUT_FAST_HIGH(A, (PORTA_BIT29), (PORT_ODE | PORT_SRE_SLOW | PORT_DSE_HIGH)) // PA29 is the PHY-/RESET 
@@ -146,7 +218,7 @@
 
         // SPI FLASH system setup
         //
-        #if defined NET_KBED || defined NET_K60                       // {23} KBED and NETK60 use SPI0
+        #if defined NET_KBED || defined NET_K60                       // KBED and NETK60 use SPI0
             #if defined NET_KBED
                 #define CS0_LINE                     SPI_PUSHR_PCS5   // CS5 line used when SPI FLASH is enabled
             #else

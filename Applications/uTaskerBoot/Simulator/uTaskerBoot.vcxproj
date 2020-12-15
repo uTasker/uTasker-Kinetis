@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -13,17 +13,20 @@
   <PropertyGroup Label="Globals">
     <ProjectName>uTasker</ProjectName>
     <ProjectGuid>{0E9D41E1-33BA-4CF4-B6DA-F17ECE8CDCEB}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win32 Debug and GNU target|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -60,7 +63,7 @@
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\..\.;.\..\..\..\WinSim\WpdPack_3_1\WpdPack\Include;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_KINETIS;ETHEREAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <MinimalRebuild>true</MinimalRebuild>
+      <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeaderOutputFile>.\uTasker___Win32_Win32_Debug_and_GNU_target/uTaskerBoot.pch</PrecompiledHeaderOutputFile>
@@ -88,6 +91,7 @@
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -112,7 +116,7 @@ Build_Kinetis.bat</Command>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\..\.;.\..\..\..\WinSim\WpdPack_3_1\WpdPack\Include;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_KINETIS;ETHEREAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <MinimalRebuild>true</MinimalRebuild>
+      <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeaderOutputFile>.\Debug/uTaskerBoot.pch</PrecompiledHeaderOutputFile>
@@ -140,6 +144,7 @@ Build_Kinetis.bat</Command>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -150,6 +155,7 @@ Build_Kinetis.bat</Command>
     <ClCompile Include="..\..\..\Hardware\Kinetis\kinetisSim.c" />
     <ClCompile Include="..\..\..\Hardware\Kinetis\kinetis_boot.c" />
     <ClCompile Include="..\..\..\Hardware\Kinetis\kinetis_ports.cpp" />
+    <ClCompile Include="..\..\..\WinSim\serial_dev.c" />
     <ClCompile Include="..\uTaskerBootLoader.c">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -163,12 +169,6 @@ Build_Kinetis.bat</Command>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Win32 Debug and GNU target|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="..\..\..\WinSim\FileToDisk.c">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Win32 Debug and GNU target|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Win32 Debug and GNU target|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Hardware\IIC_devices\IIC_dev.c">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Win32 Debug and GNU target|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -217,7 +217,12 @@ Build_Kinetis.bat</Command>
     <ClInclude Include="..\..\..\Hardware\hardware.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\GNU_Kinetis\make_uTaskerBoot_GNU_Kinetis" />
+    <None Include="..\GNU_Kinetis\Build_Kinetis.bat">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </None>
+    <None Include="..\GNU_Kinetis\make_uTaskerBoot_GNU_Kinetis">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </None>
     <None Include="cursor1.cur" />
     <None Include="small.ico" />
     <None Include="uTasker.ico" />
