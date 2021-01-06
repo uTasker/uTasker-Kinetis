@@ -11,12 +11,13 @@
     File:      kinetis_boot.c
     Project:   Single Chip Embedded Internet - boot loader
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2021
     *********************************************************************
     17.04.2012 Add start_application() and flash support for KINETIS_K_FPU types {1}
     25.08.2013 Allow user defined start-up code immediately after the watchdog configuration and before clock configuration to be defined {2}
     18.06.2014 Implement fnFlashRoutine() as assemble code to avoid possibility of compilers in-lining it {3}
     27.01.2015 Add Green Hills project support (_COMPILE_GHS)            {4}
+    06.01.2021 Add start_application() for Cortex-M0+ cores              {5}
 
     */
 
@@ -580,10 +581,21 @@ extern void fnResetBoard(void)
 //
 extern void start_application(unsigned long app_link_location)
 {
-    #ifndef _WINDOWS
-    asm(" ldr sp, [r0,#0]");
-    asm(" ldr pc, [r0,#4]");
+#if !defined _WINDOWS
+    #if defined KINETIS_K_FPU
+    asm(" mov r1, #0");
+    asm(" msr control, r1");                                             // {142} disable potential FPU access flag so that subsequent exceptions do not save FPU registers
     #endif
+    #if defined ARM_MATH_CM0PLUS                                         // {10} cortex-M0+ assembler code
+    asm(" ldr r1, [r0,#0]");                                             // get the stack pointer value from the program's reset vector
+    asm(" mov sp, r1");                                                  // copy the value to the stack pointer
+    asm(" ldr r0, [r0,#4]");                                             // get the program counter value from the program's reset vector
+    asm(" blx r0");                                                      // jump to the start address
+    #else                                                                // cortex-M3/M4/M7 assembler code
+    asm(" ldr sp, [r0,#0]");                                             // load the stack pointer value from the program's reset vector
+    asm(" ldr pc, [r0,#4]");                                             // load the program counter value from the program's reset vector to cause operation to continue from there
+    #endif
+#endif
 }
 #endif
 
@@ -672,7 +684,6 @@ extern void
 #endif
 {
 #ifndef _COMPILE_IAR
-    UNLOCK_WDOG();                                                       // enable watchdog modification
     CONFIGURE_WATCHDOG();                                                // allow user configuration of internal watch dog timer
     #if defined USER_STARTUP_CODE                                        // {2} allow user defined start-up code immediately after the watchdog configuration and before clock configuration to be defined
     USER_STARTUP_CODE;

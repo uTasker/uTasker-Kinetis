@@ -2,7 +2,7 @@
     Mark Butcher    Bsc (Hons) MPhil MIET
 
     M.J.Butcher Consulting
-    Birchstrasse 20f,    CH-5406, Rütihof
+    Birchstrasse 20f,    CH-5406, RÃ¼tihof
     Switzerland
 
     www.uTasker.com    Skype: M_J_Butcher
@@ -376,7 +376,7 @@
     #if defined FRDM_K20D50M || defined TWR_KL46Z48M || defined FRDM_KL25Z || defined FRDM_KL26Z || defined TWR_KL25Z48M || defined TWR_K21D50M || defined tinyK20
         #define OSC_LOW_GAIN_MODE                                        // oscillator without feedback resistor or load capacitors so use low gain mode
     #endif
-#define RUN_FROM_DEFAULT_CLOCK
+  //#define RUN_FROM_DEFAULT_CLOCK
     #define CRYSTAL_FREQUENCY    8000000                                 // 8 MHz crystal
     #define _EXTERNAL_CLOCK      CRYSTAL_FREQUENCY
     #define CLOCK_DIV            4                                       // input must be divided to 2MHz..4MHz range (/1 to /25 possible)

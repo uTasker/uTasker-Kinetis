@@ -2,7 +2,7 @@
     Mark Butcher    Bsc (Hons) MPhil MIET
 
     M.J.Butcher Consulting
-    Birchstrasse 20f,    CH-5406, Rütihof
+    Birchstrasse 20f,    CH-5406, RÃ¼tihof
     Switzerland
 
     www.uTasker.com    Skype: M_J_Butcher
@@ -11,10 +11,11 @@
     File:        config.h
     Project:     Single Chip Embedded Internet - boot loader
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2020
+    Copyright (C) M.J.Butcher Consulting 2004..2021
     *********************************************************************
     02.02.2017 Adapt for us tick resolution (_TICK_RESOLUTION)
     15.12.2020 Added KINETIS_K64 configuration
+    06.01.2021 Added FRDM_KL25Z configuration
 
 */
 
@@ -52,11 +53,12 @@
     #define _TICK_RESOLUTION     TICK_UNIT_MS(50)                        // 50ms system tick period - max possible at 50MHz SYSTICK would be about 335ms !
 
     #if defined _KINETIS
+        #define FRDM_KL25Z
       //#define KINETIS_K40
       //#define KINETIS_K60
-        #define KINETIS_K64                                              // next generation K processors Cortex M4 with Ethernet, USB, encryption, tamper, key storage protection area
+      //#define KINETIS_K64                                              // next generation K processors Cortex M4 with Ethernet, USB, encryption, tamper, key storage protection area
       //#define KINETIS_K70
-        #define KINETIS_K_FPU                                            // 120MHz FPU version
+      //#define KINETIS_K_FPU                                            // 120MHz FPU version
 
       //#define NET_KBED
       //#define NET_K60
@@ -137,6 +139,30 @@
                 #define CLOCK_MUL            32                          // the PLL multiplication factor to achieve operating frequency of 100MHz (x24 to x55 possible)
                 #define PIN_COUNT            PIN_COUNT_100_PIN
             #endif
+        #elif defined FRDM_KL25Z
+            #define ARM_MATH_CM0PLUS
+            #define OSC_LOW_GAIN_MODE                                    // oscillator without feedback resistor or load capacitors so use low gain mode
+          //#define RUN_FROM_LIRC                                        // clock from internal 4MHz RC clock
+          //#define RUN_FROM_DEFAULT_CLOCK                               // run from FLL default setting
+          //#define RUN_FROM_EXTERNAL_CLOCK                              // run directly from external 8MHz clock (without PLL)
+            #define CRYSTAL_FREQUENCY    8000000                         // 8 MHz crystal
+            #define _EXTERNAL_CLOCK      CRYSTAL_FREQUENCY
+            #define CLOCK_DIV            4                               // input must be divided to 2MHz..4MHz range (/1 to /25 possible)
+            #define CLOCK_MUL        48                                  // the PLL multiplication factor to achieve MCGPLLCLK operating frequency of 98MHz (x24 to x55 possible) (MCGPLLCLK/2 is 48MHz - required by USB)
+            #define SYSTEM_CLOCK_DIVIDE 2                                // divide (1,2,3..16 possible) to get core clock of 48MHz
+            #define BUS_CLOCK_DIVIDE    2                                // divide from core clock for bus and flash clock (1,2,3..8 possible) 24MHz
+            #define FLASH_CLOCK_DIVIDE  2
+            #define KINETIS_KL
+            #define KINETIS_KL25
+            #define MASK_2N97F
+            #define PIN_COUNT           PIN_COUNT_80_PIN                 // 80 pin package
+            #define PACKAGE_TYPE        PACKAGE_LQFP                     // LQFP
+            #define SIZE_OF_FLASH       (128 * 1024)                     // 128k program Flash
+            #define SIZE_OF_RAM         (16 * 1024)                      // 16k SRAM
+
+            #define uFILE_START        (0)
+            #define FILE_SYSTEM_SIZE   (SIZE_OF_FLASH)                   // 128k reserved for file system
+            #define FILE_GRANULARITY   (1 * FLASH_GRANULARITY)           // each file a multiple of 1k
         #else
             #define CRYSTAL_FREQUENCY    8000000                         // 8MHz crystal on K40 board
             #define _EXTERNAL_CLOCK      CRYSTAL_FREQUENCY
@@ -189,16 +215,43 @@
         #define KINETIS_FLASH_CONFIGURATION_BACKDOOR_KEY       {BACKDOOR_KEY_0, BACKDOOR_KEY_1, BACKDOOR_KEY_2, BACKDOOR_KEY_3, BACKDOOR_KEY_4, BACKDOOR_KEY_5, BACKDOOR_KEY_6, BACKDOOR_KEY_7}
         #define KINETIS_FLASH_CONFIGURATION_PROGRAM_PROTECTION (0xffffffff) // PROT[24:31]:PROT[23:16]:PROT[15:8]:PROT[7:0] - no protection when all are '1'
         #define KINETIS_FLASH_CONFIGURATION_SECURITY           (FTFL_FSEC_SEC_UNSECURE | FTFL_FSEC_FSLACC_GRANTED | FTFL_FSEC_MEEN_ENABLED | FTFL_FSEC_KEYEN_ENABLED)
-        #if defined KINETIS_REVISION_2
-            #define KINETIS_FLASH_CONFIGURATION_NONVOL_OPTION  (FTFL_FOPT_EZPORT_ENABLED | FTFL_FOPT_LPBOOT_NORMAL | FTFL_FOPT_NMI_DISABLED)
+        #if defined KINETIS_KL || defined KINETIS_KV || defined KINETIS_KE15
+            #if defined ROM_BOOTLOADER
+            #if !defined FRDM_KL28Z && !defined KINETIS_KE15
+                #define BOOTLOADER_ERRATA
+            #endif
+                #if defined CAPUCCINO_KL27 && (defined DEV5 || defined DEV6)
+                    #define KINETIS_FLASH_CONFIGURATION_NONVOL_OPTION  (FTFL_FOPT_LPBOOT_CLK_DIV_1 | FTFL_FOPT_RESET_PIN_ENABLED | FTFL_FOPT_BOOTSRC_SEL_FLASH | FTFL_FOPT_BOOTPIN_OPT_ENABLE | FTFL_FOPT_NMI_DISABLED) // use boot ROM if NMI is held low at reset
+                #elif defined TWR_KL43Z48M || defined FRDM_KL43Z || defined FRDM_KL03Z || defined FRDM_KL27Z || defined FRDM_KL28Z || defined FRDM_KL82Z || defined CAPUCCINO_KL27 || defined KINETIS_KE15
+                    #define KINETIS_FLASH_CONFIGURATION_NONVOL_OPTION  (FTFL_FOPT_LPBOOT_CLK_DIV_1 | FTFL_FOPT_RESET_PIN_ENABLED | FTFL_FOPT_BOOTSRC_SEL_FLASH | FTFL_FOPT_BOOTPIN_OPT_DISABLE | FTFL_FOPT_NMI_DISABLED) // never use boot ROM
+                  //#define KINETIS_FLASH_CONFIGURATION_NONVOL_OPTION  (FTFL_FOPT_LPBOOT_CLK_DIV_1 | FTFL_FOPT_RESET_PIN_ENABLED | FTFL_FOPT_BOOTSRC_SEL_FLASH | FTFL_FOPT_BOOTPIN_OPT_ENABLE | FTFL_FOPT_NMI_DISABLED) // use boot ROM if NMI is held low at reset
+                  //#define KINETIS_FLASH_CONFIGURATION_NONVOL_OPTION (FTFL_FOPT_BOOTSRC_SEL_ROM | FTFL_FOPT_BOOTPIN_OPT_DISABLE | FTFL_FOPT_FAST_INIT | FTFL_FOPT_LPBOOT_CLK_DIV_1 | FTFL_FOPT_RESET_PIN_ENABLED | FTFL_FOPT_NMI_DISABLED) // always use boot ROM
+                #else
+                    #define KINETIS_FLASH_CONFIGURATION_NONVOL_OPTION  (FTFL_FOPT_LPBOOT_CLK_DIV_1 | FTFL_FOPT_RESET_PIN_ENABLED | FTFL_FOPT_BOOTSRC_SEL_FLASH | FTFL_FOPT_BOOTPIN_OPT_DISABLE | FTFL_FOPT_NMI_ENABLED)
+                #endif
+            #else
+                #define KINETIS_FLASH_CONFIGURATION_NONVOL_OPTION  (FTFL_FOPT_LPBOOT_CLK_DIV_8 | FTFL_FOPT_RESET_PIN_ENABLED)
+            #endif
         #else
-            #define KINETIS_FLASH_CONFIGURATION_NONVOL_OPTION  (FTFL_FOPT_EZPORT_ENABLED | FTFL_FOPT_LPBOOT_NORMAL)
+            #if defined KINETIS_REVISION_2
+                #if defined FRDM_K64F
+                    #define KINETIS_FLASH_CONFIGURATION_NONVOL_OPTION  (FTFL_FOPT_EZPORT_DISABLED | FTFL_FOPT_LPBOOT_NORMAL | FTFL_FOPT_NMI_DISABLED) // there is a large capacitor on the NMI/EzP_CS input so these are disabled to allow it to start without requiring an NMI handler or moving to EzPort mode
+                #else
+                    #define KINETIS_FLASH_CONFIGURATION_NONVOL_OPTION  (FTFL_FOPT_EZPORT_ENABLED | FTFL_FOPT_LPBOOT_NORMAL | FTFL_FOPT_NMI_DISABLED)
+                #endif
+            #else
+                #define KINETIS_FLASH_CONFIGURATION_NONVOL_OPTION  (FTFL_FOPT_EZPORT_ENABLED | FTFL_FOPT_LPBOOT_NORMAL | FTFL_FOPT_NMI_ENABLED)
+            #endif
         #endif
         #define KINETIS_FLASH_CONFIGURATION_EEPROM_PROT        0xff
         #define KINETIS_FLASH_CONFIGURATION_DATAFLASH_PROT     0xff
 
-        #define CONFIGURE_WATCHDOG()  WDOG_STCTRLH = (WDOG_STCTRLH_STNDBYEN | WDOG_STCTRLH_WAITEN | WDOG_STCTRLH_STOPEN | WDOG_STCTRLH_ALLOWUPDATE | WDOG_STCTRLH_CLKSRC); // disable watchdog
-      //#define CONFIGURE_WATCHDOG()  WDOG_TOVALL = 2000; WDOG_TOVALH = 0; WDOG_STCTRLH = (WDOG_STCTRLH_STNDBYEN | WDOG_STCTRLH_WAITEN | WDOG_STCTRLH_STOPEN | WDOG_STCTRLH_WDOGEN); // watchdog enabled to generate reset on 2s timeout (no further updates allowed)
+        #if !defined KINETIS_KL || defined KINETIS_KL82
+            #define CONFIGURE_WATCHDOG()  UNLOCK_WDOG(); WDOG_STCTRLH = (WDOG_STCTRLH_STNDBYEN | WDOG_STCTRLH_WAITEN | WDOG_STCTRLH_STOPEN | WDOG_STCTRLH_ALLOWUPDATE | WDOG_STCTRLH_CLKSRC); // disable watchdog
+          //#define CONFIGURE_WATCHDOG()  UNLOCK_WDOG(); WDOG_TOVALL = /2000/5); WDOG_TOVALH = 0; WDOG_STCTRLH = (WDOG_STCTRLH_STNDBYEN | WDOG_STCTRLH_WAITEN | WDOG_STCTRLH_STOPEN | WDOG_STCTRLH_WDOGEN); // watchdog enabled to generate reset on 2s timeout (no further updates allowed)
+        #else
+            #define CONFIGURE_WATCHDOG()  SIM_COPC = (SIM_COPC_COPCLKS_1K | SIM_COPC_COPT_LONGEST) // 1.024s watchdog timeout
+        #endif
 
         #if defined NET_KBED || defined NET_K60                          // these require the external PHY to be configured with the correct clock speed before continuing
             #define USER_STARTUP_CODE   PHY_RESET_20MS
@@ -264,6 +317,49 @@
             #define READ_SPI_FLASH_DATA()            (volatile unsigned char)SPI0_POPR
             #define WAIT_SPI_RECEPTION_END()         while (!(SPI0_SR & SPI_SR_RFDF)) {}
             #define CLEAR_RECEPTION_FLAG()           SPI0_SR |= SPI_SR_RFDF
+        #elif defined FRDM_KL25Z
+            // - SPI1_CS   PTE-4 (J9-13)
+            // - SPI1_SCK  PTE-2 (J9-9)
+            // - SPI1_MOSI PTE-1 (J2-20)
+            // - SPI1_MISO PTE-3 (J9-11)
+            //
+            #define CS0_LINE                        PORTE_BIT4           // CS0 line used when SPI FLASH is enabled
+            #define CS1_LINE                                             // CS1 line used when extended SPI FLASH is enabled
+            #define CS2_LINE                                             // CS2 line used when extended SPI FLASH is enabled
+            #define CS3_LINE                                             // CS3 line used when extended SPI FLASH is enabled
+
+            #define ASSERT_CS_LINE(ulChipSelectLine) _CLEARBITS(E, ulChipSelectLine)
+            #define NEGATE_CS_LINE(ulChipSelectLine) _SETBITS(E, ulChipSelectLine)
+
+            #define SPI_CS0_PORT                    GPIOE_PDOR           // for simulator
+            #define SPI_TX_BYTE                     SPI1_D               // for simulator
+            #define SPI_RX_BYTE                     SPI1_D               // for simulator
+
+            #define POWER_UP_SPI_FLASH_INTERFACE()  POWER_UP_ATOMIC(4, SPI1)
+            #define CONFIGURE_SPI_FLASH_INTERFACE() _CONFIG_PERIPHERAL(E, 2, PE_2_SPI1_SCK); \
+                                                    _CONFIG_PERIPHERAL(E, 1, (PE_1_SPI1_MOSI | PORT_SRE_FAST | PORT_DSE_HIGH)); \
+                                                    _CONFIG_PERIPHERAL(E, 3, (PE_3_SPI1_MISO | PORT_PS_UP_ENABLE)); \
+                                                    _CONFIG_DRIVE_PORT_OUTPUT_VALUE(E, CS0_LINE, CS0_LINE, (PORT_SRE_FAST | PORT_DSE_HIGH)); \
+                                                    SPI1_C1 = (SPI_C1_CPHA | SPI_C1_CPOL | SPI_C1_MSTR | SPI_C1_SPE); \
+                                                    SPI1_BR = (SPI_BR_SPPR_PRE_1 | SPI_BR_SPR_DIV_2); \
+                                                    (unsigned char)SPI1_S; (unsigned char)SPI1_D
+
+            #define POWER_DOWN_SPI_FLASH_INTERFACE() POWER_DOWN_ATOMIC(4, SPI1) // power down SPI interface if no SPI Flash detected
+
+            #define FLUSH_SPI_FIFO_AND_FLAGS()
+
+            #define WRITE_SPI_CMD0(byte)            SPI1_D = (byte)      // write a single byte
+            #define WRITE_SPI_CMD0_LAST(byte)       SPI1_D = (byte)      // write final byte
+            #define READ_SPI_FLASH_DATA()           (unsigned char)SPI1_D
+            #if defined _WINDOWS
+                #define WAIT_SPI_RECEPTION_END()    while ((SPI1_S & (SPI_S_SPRF)) == 0) {SPI1_S |= SPI_S_SPRF;}
+            #else
+                #define WAIT_SPI_RECEPTION_END()    while ((SPI1_S & (SPI_S_SPRF)) == 0) {}
+            #endif
+            #define CLEAR_RECEPTION_FLAG()
+
+            #define SET_SPI_FLASH_MODE()                                 // this can be used to change SPI settings on-the-fly when the SPI is shared with SPI Flash and other devices
+            #define REMOVE_SPI_FLASH_MODE()                              // this can be used to change SPI settings on-the-fly when the SPI is shared with SPI Flash and other devices
         #else
             #define CS0_LINE                         SPI_PUSHR_PCS0      // CS0 line used when SPI FLASH is enabled
 
