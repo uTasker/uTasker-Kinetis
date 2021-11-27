@@ -11,7 +11,7 @@
     File:        types.h
     Project:     Single Chip Embedded Internet
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2021
     *********************************************************************
     02.11.2007 Add typedef MEMORY_RANGE_POINTER for compatibility
     13.03.2008 Add typedef LENGTH_CHUNK_COUNT
@@ -22,6 +22,7 @@
     04.04.2010 Add LPC17XX support
     29.11.2010 Add RX6XX support
     29.03.2011 Add Kinetis support
+    27.11.2021 Add STM32 support
    
 */
 
@@ -99,6 +100,9 @@ typedef char              CHAR;
 #endif
 #ifdef _RX6XX
     #include "../../Hardware/RX6XX/RX6XX.h"
+#endif
+#if defined _STM32
+    #include "../../Hardware/STM32/STM32.h"
 #endif
 #endif
 

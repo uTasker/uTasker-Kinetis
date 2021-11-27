@@ -135,12 +135,14 @@ extern void *uMemcpy(void *ptrTo, const void *ptrFrom, size_t Size)
 // This routine runs from SRAM - the reason why the pointer is passed is to avoid the routine taking it from a const value in FLASH, which is then not code location independent
 //
     #if defined _WINDOWS
+#define PROG_WORD_SIZE 30                                                // adequate space for the small program
 static void fnFlashRoutine(volatile unsigned char *ptrFTFL_BLOCK)
 {
     *ptrFTFL_BLOCK = FTFL_STAT_CCIF;                                     // launch the command - this clears the FTFL_STAT_CCIF flag (register is FTFL_FSTAT)
     while (!(*ptrFTFL_BLOCK & FTFL_STAT_CCIF)) {}                        // wait for the command to terminate
 }
     #else                                                                // {3}
+#define PROG_WORD_SIZE 6                                                 // exact size of the small program
 static unsigned short fnFlashRoutine[] = {                               // to avoid potential compiler in-lining of the routine (removing position independency) the machine code is used directly
     0x2180,    // MOVS   r1,#0x80                                           load the value 0x80 (command complete interrupt flag) to register r1
     0x7001,    // STRB   r1,[r0,#0x00]                                      write r1 (0x80) to the passed pointer location (r0)
@@ -154,7 +156,6 @@ static int fnFlashNow(unsigned char ucCommand, unsigned long *ptrWord, unsigned 
 {
     static void (*fnRAM_code)(volatile unsigned char *) = 0;
     if (!fnRAM_code) {                                                   // the first time this is used it will load the program to SRAM
-        #define PROG_WORD_SIZE 30                                        // adequate space for the small program
         int i = 0;
         unsigned char *ptrThumb2 = (unsigned char *)fnFlashRoutine;
         static unsigned short usProgSpace[PROG_WORD_SIZE];               // make space for the routine on stack (this will have an even boundary)

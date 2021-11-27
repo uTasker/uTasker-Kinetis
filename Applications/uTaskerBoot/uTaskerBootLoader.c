@@ -11,7 +11,7 @@
     File:      uTaskerBootLoader.c [FREESCALE Coldfire, SAM7X, LPC23XX, LM3Sxxxx, STR91XF, AVR32, RX6XX, Kinetis]
     Project:   Single Chip Embedded Internet
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2021
     *********************************************************************
     27.02.2007 Changed header interpretation so that it is endian-independent {1}
     29.03.2007 Added decryption support                                  {2}
@@ -39,6 +39,7 @@
     24.08.2013 Add option for multiple intermediate locations (MULTIPLE_INTERMEDIATE_CODE_LOCATIONS) {24}
     25.08.2013 Add NET_KBED and NET_K60 configuration                    {25}
     26.05.2013 Option added to operate without uFileSystem header (working directly with upload header) {26}
+    27.11.2021 Add STM32 targets
 
 */
 
@@ -335,6 +336,36 @@
     #else
         #define VALID_VERSION_MAGIC_NUMBER  0x1234                       // ensure encrypted version has different magic number
     #endif
+    #if !defined _WINDOWS
+        #define uTaskerBoot        uTaskerBoot                           // main calls this routine
+    #endif
+#elif defined _STM32
+    #if defined FLASH_GRANULARITY_BOOT                                   // F2/F4 reserve first boot sector for boot loader and start the application after it
+        #define UTASKER_APP_START  (FLASH_START_ADDRESS + (3 * FLASH_GRANULARITY_BOOT)) // 48k - 0xc000 from start of flash (after boot loader plus 2 swap block sectors)
+    #else
+        #define UTASKER_APP_START  (FLASH_START_ADDRESS + FLASH_GRANULARITY) // F1 devices reserve first sector in flash for boot loader and start the application after it
+    #endif
+
+    #if defined SPI_SW_UPLOAD  
+        #define uFILE_START    (unsigned char *)(FLASH_START_ADDRESS + SIZE_OF_FLASH) // the address where the new application is located when present
+    #else
+        #define uFILE_START    (unsigned char *)(FLASH_START_ADDRESS + 0x60000) // the address where the new application is located when present
+    #endif
+    #define FILE_SYSTEM_SIZE   (128 * 1024)                              // maximum size of new application
+    static const unsigned char ucKey[] = { 0x62, 0x23, 0x19, 0xde, 0x22, 0xb1 };
+    //#define _ENCRYPTED
+    #if defined _ENCRYPTED
+        static const unsigned char ucDecrypt[] = {0xee, 0x23, 0xa9, 0xa1, 0x98, 0xa9, 0x00, 0x21, 0xba, 0x2a};   // must be even in length (dividable by unsigned short)
+        #define KEY_PRIME               0x8862                           // never set to 0
+        #define CODE_OFFSET             0x3cde
+        #define VALID_VERSION_MAGIC_NUMBER  0x9876
+    #else
+        #define VALID_VERSION_MAGIC_NUMBER  0x5432                       // ensure encrypted version has different magic number
+    #endif
+
+    #define FILE_GRANULARITY       (1 * FLASH_GRANULARITY)
+    #define UPLOAD_FILE_LOCATION   uFILE_START
+    #define UTASK_APP_LENGTH       FILE_SYSTEM_SIZE
     #if !defined _WINDOWS
         #define uTaskerBoot        uTaskerBoot                           // main calls this routine
     #endif

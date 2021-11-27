@@ -24,6 +24,12 @@
     <Filter Include="Hardware\KINETIS">
       <UniqueIdentifier>{bafcd213-8054-4934-a4f6-02039dfb0e06}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Hardware\STM32">
+      <UniqueIdentifier>{80b02cd5-4e97-498c-8772-c33332640253}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WinSim\SIMstm32">
+      <UniqueIdentifier>{6f341328-bd1a-46f1-b492-cdb4ca7152e1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\uTaskerBootLoader.c">
@@ -62,6 +68,15 @@
     <ClCompile Include="..\..\..\WinSim\serial_dev.c">
       <Filter>WinSim</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Hardware\STM32\STM32_boot.c">
+      <Filter>Hardware\STM32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Hardware\STM32\STM32_ports.cpp">
+      <Filter>WinSim\SIMstm32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Hardware\STM32\STM32Sim.c">
+      <Filter>WinSim\SIMstm32</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\config.h">
@@ -91,6 +106,18 @@
     <ClInclude Include="..\..\..\Hardware\Kinetis\simkinetis.h">
       <Filter>WinSim\SIMKINETIS</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Hardware\STM32\STM32.h">
+      <Filter>Hardware\STM32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Hardware\STM32\stm32_CLOCK.h">
+      <Filter>Hardware\STM32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Hardware\STM32\stm32_FLASH.h">
+      <Filter>Hardware\STM32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Hardware\STM32\simSTM32.h">
+      <Filter>WinSim\SIMstm32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="cursor1.cur">
@@ -104,6 +131,11 @@
     </None>
     <None Include="..\GNU_Kinetis\make_uTaskerBoot_GNU_Kinetis" />
     <None Include="..\GNU_Kinetis\Build_Kinetis.bat" />
+    <None Include="..\..\..\Hardware\STM32\STM32_keil_asm.s">
+      <Filter>Hardware\STM32</Filter>
+    </None>
+    <None Include="..\GNU_STM32\make_uTaskerBoot_GNU_STM32" />
+    <None Include="..\GNU_STM32\Build_STM32.bat" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="uTasker.rc">

@@ -1,0 +1,72 @@
+# Make file for uTasker "Bare-minimum" boot loader build for STM32
+#
+
+# Compiler flags (thumb mode - little endian)
+# (set to Cortex-M4, Cortex-M7 [with or without hard FPU] or Cortex-M0+ accordingly)
+#C_FLAGS = -mcpu=cortex-m0plus -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -Wundef
+#C_FLAGS = -mcpu=cortex-m3 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -Wundef
+#C_FLAGS = -mcpu=cortex-m3 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -Wundef
+#C_FLAGS = -mcpu=cortex-m4 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -Wundef
+#C_FLAGS = -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -Wundef
+C_FLAGS = -mcpu=cortex-m7 -mthumb -mlittle-endian -mthumb -Wall -Wstrict-prototypes -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -Wundef
+
+LINKER_SCRIPT = uTaskerSTM32_F7
+
+# All objects (Hardware, application, uTasker, stack)
+#
+OBJS = Build/uTaskerBootLoader.o \
+       Build/STM32_boot.o
+
+#General dependencies
+#
+DEPENDS = ../config.h ../types.h  \
+       ../../../Hardware/hardware.h ../../../Hardware/packages.h \
+	   make_uTaskerBoot_GNU_STM32
+
+INC     = -I../../uTaskerBoot
+OPTS    = -D _GNU -D _STM32 -g -c -Os
+CC      = arm-none-eabi-gcc
+CC_OBJ  = arm-none-eabi-objcopy
+CC_SIZE = arm-none-eabi-size
+
+# Hardware peripheral dependencies
+#
+PERIPH_DEP = ../../../Hardware/STM32/stm32_FLASH.h \
+             ../../../Hardware/STM32/stm32_CLOCK.h
+
+
+all: uTaskerBoot.elf
+
+# Application files
+#
+Build/uTaskerBootLoader.o: ../uTaskerBootLoader.c $(DEPENDS)
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../uTaskerBootLoader.c -o Build/uTaskerBootLoader.o
+
+# Hardware files
+#
+Build/STM32_boot.o: ../../../Hardware/STM32/STM32_boot.c $(DEPENDS)  $(PERIPH_DEP)
+		$(CC) $(C_FLAGS) $(INC) $(OPTS) ../../../Hardware/STM32/STM32_boot.c -o Build/STM32_boot.o
+
+
+# Link
+# Create output file and show its size
+#
+uTaskerBoot.elf: $(OBJS) uTaskerSTM32.ld uTaskerSTM32_F4.ld STM32F4_512_128.ld uTaskerSTM32_F7.ld
+	$(CC) $(C_FLAGS) -Os -g -T$(LINKER_SCRIPT).ld -nostartfiles -Xlinker --gc-sections -Wl,-Map,"uTaskerBoot.map" -o "uTaskerBoot.elf" $(OBJS)
+	$(CC_OBJ) --only-section=.data --only-section=.init --only-section=.text --only-section=.rodata --only-section=.vectors --output-target=ihex uTaskerBoot.elf uTaskerBoot.hex
+	$(CC_OBJ) --only-section=.data --only-section=.init --only-section=.text --only-section=.rodata --only-section=.vectors --output-target=binary uTaskerBoot.elf uTaskerBoot.bin
+	$(CC_SIZE) uTaskerBoot.elf
+	$(CC) -v
+
+
+.PHONY: clean
+clean:
+	rm uTaskerBoot.map
+	rm uTaskerBoot.elf
+	rm uTaskerBoot.bin
+	rm uTaskerBoot.hex
+
+
+# *** EOF ***
+    
+    

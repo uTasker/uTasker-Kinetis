@@ -16,6 +16,7 @@
     02.02.2017 Adapt for us tick resolution (_TICK_RESOLUTION)
     15.12.2020 Added KINETIS_K64 configuration
     06.01.2021 Added FRDM_KL25Z configuration
+    27.11.2021 Add STM32
 
 */
 
@@ -31,8 +32,6 @@
 #define uDisable_Interrupt  __disable_interrupt
 #define uEnable_Interrupt   __enable_interrupt
 
-#define TARGET_HW           "Bare-Minimum Boot"
-
 //#define SPI_SW_UPLOAD                                                  // new SW is situated in SPI FLASH
 //#define SPI_FLASH_SST25                                                // {use SST SPI FLASH rather than ATMEL
 //#define SPI_FLASH_ST                                                   // define that we are using ST FLASH rather than default ATMEL
@@ -40,6 +39,9 @@
 
 //#define MULTIPLE_INTERMEDIATE_CODE_LOCATIONS                           // allow the intermediate code to be located at multiple possible addresses
 
+#if !defined SPI_SW_UPLOAD
+    #define ONLY_INTERNAL_FLASH_STORAGE                                  // use only internal flash drivers
+#endif
 
 #define SET_SPI_FLASH_MODE()
 #define REMOVE_SPI_FLASH_MODE()
@@ -53,6 +55,8 @@
     #define _TICK_RESOLUTION     TICK_UNIT_MS(50)                        // 50ms system tick period - max possible at 50MHz SYSTICK would be about 335ms !
 
     #if defined _KINETIS
+        #define TARGET_HW           "Bare-Minimum Boot"
+
         #define FRDM_KL25Z
       //#define KINETIS_K40
       //#define KINETIS_K60
@@ -200,6 +204,12 @@
         #if !defined FILE_SYSTEM_SIZE
             #define FILE_SYSTEM_SIZE   (128 * 1024)                      // 128k reserved for file system
         #endif
+
+        // Include the hardware header here
+        // - beware that the header delivers rules for subsequent parts of this header file but also accepts some rules from previous parts,
+        // therefore its position should only be moved after careful consideration of its consequences
+        //
+        #include "types.h"                                               // project specific type settings and the processor header at this location
 
         // FLASH configuration settings
         //
@@ -524,6 +534,177 @@
             #define SPI_DATA_FLASH_SIZE         SPI_DATA_FLASH_0_SIZE
             #define CONFIGURE_CS_LINES()        FIO0SET = CS0_LINE; FIO0DIR |= CS0_LINE; _SIM_PORTS
         #endif
+    #elif defined _STM32
+      //#define STM3210C_EVAL                                            // evaluation board with STM32F107VCT
+      //#define STM3240G_EVAL                                            // evaluation board with STM32F407IGH6
+      //#define ST_MB913C_DISCOVERY                                      // discovery board with STM32F100RB
+     // #define ST_MB997A_DISCOVERY                                      // discovery board with STM32F407VGT6
+        #define NUCLEO_F746ZG                                            // evaluation board with STM32F746ZGT6U
+      //#define NUCLEO_F411RE                                            // evaluation board with STM32F411RET6 (cortex-m4 with FPU)
+      //#define NUCLEO_F429ZI                                            // evaluation board with STM32F429ZIT6
+        #if defined STM3210C_EVAL
+            #define TARGET_HW       "STM3210C-EVAL (STM32F107VCT)"
+        #elif defined STM3240G_EVAL
+            #define TARGET_HW       "STM3240C-EVAL (STM32F407IGH6)"
+        #elif defined ST_MB997A_DISCOVERY
+            #define TARGET_HW       "MB997A DISCOVERY (STM32F407VGT6)"
+        #elif defined ST_MB913C_DISCOVERY
+            #define TARGET_HW       "MB913C DISCOVERY (STM32F100RBT6B)"
+        #elif defined NUCLEO_F411RE
+            #define TARGET_HW       "NUCLEO-F411RE (STM32F411RET6)"
+        #elif defined NUCLEO_F429ZI
+            #define TARGET_HW       "NUCLEO-F429ZI (STM32F429ZI)"
+        #elif defined NUCLEO_F746ZG
+            #define TARGET_HW       "NUCLEO-F746ZG (STM32F746ZGT6)"
+        #endif
+
+        #if defined STM3210C_EVAL                                        // STM32F107VCT (72MHz)
+            #define CRYSTAL_FREQ        25000000
+          //#define DISABLE_PLL                                          // run from clock source directly
+          //#define USE_HSI_CLOCK                                        // use internal HSI clock source
+            #define USE_PLL2_CLOCK                                       // use the PLL2 output as PLL input (don't use USE_HSI_CLOCK in this configuration)
+            #define PLL2_INPUT_DIV      5                                // clock input is divided by 5 to give 5MHz to the PLL2 input (range 1..16)
+            #define PLL2_VCO_MUL        8                                // the pll2 frequency is multiplied by 8 to 40MHz (range 8..14 or 16 or 20)
+            #define PLL_INPUT_DIV       5                                // 1..16 - should set the input to pll in the range 3..12MHz - not valid for HSI clock source
+            #define PLL_VCO_MUL         9                                // 4..9 where PLL out must be 18..72MHz. Also 65 is accepted as x6.5 (special case)
+            #define PIN_COUNT           PIN_COUNT_100_PIN
+            #define PACKAGE_TYPE        PACKAGE_LQFP
+            #define _STM32F107X                                          // part group
+            #define SIZE_OF_RAM         (64 * 1024)                      // 64k SRAM
+            #define SIZE_OF_FLASH       (256 * 1024)                     // 256k FLASH
+            #define PCLK1_DIVIDE        2
+            #define PCLK2_DIVIDE        1
+        #elif defined STM3240G_EVAL                                      // STM32F407IGH6 (168MHz)
+            #define CRYSTAL_FREQ        25000000
+          //#define DISABLE_PLL                                          // run from clock source directly
+          //#define USE_HSI_CLOCK                                        // use internal HSI clock source
+            #define PLL_INPUT_DIV       25                               // 2..64 - should set the input to pll in the range 1..2MHz (with preference near to 2MHz)
+            #define PLL_VCO_MUL         336                              // 64 ..432 where VCO must be 64..432MHz
+            #define PLL_POST_DIVIDE     2                                // post divide VCO by 2, 4, 6, or 8 to get the system clock speed
+            #define PIN_COUNT           PIN_COUNT_176_PIN
+            #define PACKAGE_TYPE        PACKAGE_BGA
+            #define _STM32F4XX
+            #define SIZE_OF_RAM         (128 * 1024)                     // 128k SRAM
+            #define SIZE_OF_CCM         (64 * 1024)                      // 64k Core Coupled Memory
+            #define SIZE_OF_FLASH       (1024 * 1024)                    // 1M FLASH
+            #define SUPPLY_VOLTAGE      SUPPLY_2_7__3_6                  // power supply is in the range 2.7V..3.6V
+            #define PCLK1_DIVIDE        4
+            #define PCLK2_DIVIDE        2
+            #define HCLK_DIVIDE         1
+        #elif defined ST_MB997A_DISCOVERY                                // STM32F407VGT6 (168MHz)
+            #define CRYSTAL_FREQ        8000000
+          //#define DISABLE_PLL                                          // run from clock source directly
+          //#define USE_HSI_CLOCK                                        // use internal HSI clock source
+            #define PLL_INPUT_DIV       4                                // 2..64 - should set the input to pll in the range 1..2MHz (with preference near to 2MHz)
+            #define PLL_VCO_MUL         168                              // 64 ..432 where VCO must be 64..432MHz
+            #define PLL_POST_DIVIDE     2                                // post divide VCO by 2, 4, 6, or 8 to get the system clock speed
+            #define PIN_COUNT           PIN_COUNT_100_PIN
+            #define PACKAGE_TYPE        PACKAGE_LQFP
+            #define _STM32F4XX
+            #define SIZE_OF_RAM         (128 * 1024)                     // 128k SRAM
+            #define SIZE_OF_CCM         (64 * 1024)                      // 64k Core Coupled Memory
+            #define SIZE_OF_FLASH       (1024 * 1024)                    // 1M FLASH
+            #define SUPPLY_VOLTAGE      SUPPLY_2_7__3_6                  // power supply is in the range 2.7V..3.6V
+            #define PCLK1_DIVIDE        4
+            #define PCLK2_DIVIDE        2
+            #define HCLK_DIVIDE         1
+        #elif defined ST_MB913C_DISCOVERY                                // STM32F100RB (24MHz)
+            #define CRYSTAL_FREQ        8000000
+          //#define DISABLE_PLL                                          // run from clock source directly
+          //#define USE_HSI_CLOCK                                        // use internal HSI clock source
+            #define PLL_INPUT_DIV       2                                // 1..16 - should set the input to pll in the range 1..24MHz (with preference near to 8MHz) - not valid for HSI clock source
+            #define PLL_VCO_MUL         6                                // 2 ..16 where PLL out must be 16..24MHz
+            #define _STM32F100X                                          // part group
+            #define SIZE_OF_RAM         (8 * 1024)                       // 8k SRAM
+            #define SIZE_OF_FLASH       (128 * 1024)                     // 128k FLASH
+            #define PIN_COUNT           PIN_COUNT_64_PIN
+            #define PACKAGE_TYPE        PACKAGE_LQFP
+            #define STM32F100RB                                          // exact processor type
+            #define PCLK1_DIVIDE        2
+            #define PCLK2_DIVIDE        1
+        #elif defined NUCLEO_F411RE
+            #define _STM32F4XX                                           // part family
+            #define _STM32F411                                           // part group
+            #define STM32_FPU                                            // FPU present
+            #define CRYSTAL_FREQ        8000000                          // 4..26MHz possible
+          //#define DISABLE_PLL                                          // run from clock source directly
+          //#define USE_HSI_CLOCK                                        // use internal HSI clock source
+            #define PLL_INPUT_DIV       4                                // 2..64 - should set the input to pll in the range 0.95..2.1MHz (with preference near to 2MHz)
+            #define PLL_VCO_MUL         100                              // 64..432 where VCO must be 100..432MHz
+            #define PLL_POST_DIVIDE     2                                // post divide VCO by 2, 4, 6, or 8 to get the system clock speed (range 24.. 100Hz)
+            #define PIN_COUNT           PIN_COUNT_64_PIN
+            #define PACKAGE_TYPE        PACKAGE_LQFP
+            #define SIZE_OF_RAM         (128 * 1024)                     // 64k SRAM
+            #define SIZE_OF_FLASH       (512 * 1024)                     // 512 FLASH
+            #define SUPPLY_VOLTAGE      SUPPLY_2_7__3_6                  // power supply is in the range 2.7V..3.6V
+            #define PCLK1_DIVIDE        4
+            #define PCLK2_DIVIDE        2
+            #define HCLK_DIVIDE         1
+            #if defined SPI_SW_UPLOAD
+                #define CS0_LINE                    PORTC_BIT15          // CS0 line used when SPI FLASH is enabled
+                #define CS1_LINE                                         // CS1 line used when extended SPI FLASH is enabled
+                #define CS2_LINE                                         // CS2 line used when extended SPI FLASH is enabled
+                #define CS3_LINE                                         // CS3 line used when extended SPI FLASH is enabled
+
+                #define SPI_CS0_PORT                GPIOC_ODR            // for simulator
+                #define __ASSERT_CS(cs_line)        _CLEARBITS(C, cs_line)
+                #define __NEGATE_CS(cs_line)        _SETBITS(C, cs_line)
+
+                #define SSPDR_X                     SPI1_DR
+                #define SSPSR_X                     SPI1_SR
+
+                // SPI 1 used for SPI Flash interface - speed set to 12.5MHz (PCLK1 100MHz/8)
+                //
+                #define POWER_UP_SPI_FLASH_INTERFACE()      POWER_UP(APB2, (RCC_APB2ENR_SPI1EN))
+                #define POWER_DOWN_SPI_FLASH_INTERFACE()    POWER_DOWN(APB2, (RCC_APB2ENR_SPI1EN))
+                #define CONFIGURE_SPI_FLASH_INTERFACE()     _CONFIG_DRIVE_PORT_OUTPUT_VALUE(C, CS0_LINE, (OUTPUT_FAST | OUTPUT_PUSH_PULL), CS0_LINE); \
+                _CONFIG_PERIPHERAL_OUTPUT(A, (PERIPHERAL_SPI1_2_I2S2ext), (SPI1_CLK_A_5 | SPI1_MOSI_A_7), (OUTPUT_FAST | OUTPUT_PUSH_PULL | INPUT_PULL_DOWN)); \
+                _CONFIG_PERIPHERAL_INPUT(A,  (PERIPHERAL_SPI1_2_I2S2ext), (SPI1_MISO_A_6), INPUT_PULL_DOWN); \
+                _RESET_CYCLE_PERIPHERAL(APB2, RCC_APB2RSTR_SPI1RST); \
+                SPI1_CR1 = (SPICR1_BR_PCLK2_DIV2 | SPICR1_MSTR | SPICR1_SSI | SPICR1_CPOL | SPICR1_CPHA | SPICR1_SSM); \
+                SPI1_I2SCFGR = 0; \
+                SPI1_CR1 = (SPICR1_SPE | SPICR1_BR_PCLK2_DIV2 | SPICR1_MSTR | SPICR1_SSI | SPICR1_CPOL | SPICR1_CPHA | SPICR1_SSM)
+            #endif
+        #elif defined NUCLEO_F746ZG
+            #define _STM32F7XX
+            #define _STM32F746
+            #define CRYSTAL_FREQ        8000000                          // this is in fact an 8MHz clock output from the ST link
+          //#define DISABLE_PLL                                          // run from clock source directly
+          //#define USE_HSI_CLOCK                                        // use internal HSI clock source
+            #define PLL_INPUT_DIV       4                                // 2..64 - should set the input to pll in the range 1..2MHz (with preference near to 2MHz)
+            #define PLL_VCO_MUL         168                              // 64 ..432 where VCO must be 64..432MHz
+            #define PLL_POST_DIVIDE     2                                // post divide VCO by 2, 4, 6, or 8 to get the system clock speed
+            #define PIN_COUNT           PIN_COUNT_144_PIN
+            #define PACKAGE_TYPE        PACKAGE_LQFP
+            #define SIZE_OF_RAM         (320 * 1024)                     // 320k SRAM (DTCM + SRAM1 + SRAM2)
+            #define SIZE_OF_FLASH       (1024 * 1024)                    // 1M FLASH
+            #define SUPPLY_VOLTAGE      SUPPLY_2_7__3_6                  // power supply is in the range 2.7V..3.6V
+            #define PCLK1_DIVIDE        4
+            #define PCLK2_DIVIDE        2
+            #define HCLK_DIVIDE         1
+        #elif defined NUCLEO_F429ZI
+            #define _STM32F4XX                                           // part group
+            #define _STM32F42X
+            #define PIN_COUNT           PIN_COUNT_144_PIN
+            #define CRYSTAL_FREQ        8000000                          // 8MHz Crystal
+            #define PLL_INPUT_DIV       4                                // 2..64 - should set the input to pll in the range 1..2MHz (with preference near to 2MHz)
+            #define PLL_VCO_MUL         168                              // 64 ..432 where VCO must be 192..432MHz
+            #define _STM32F429
+            #define PLL_POST_DIVIDE     2                                // post divide VCO by 2, 4, 6, or 8 to get the system clock speed
+            #define HCLK_DIVIDE         1                                // HCLK is divided by 1 (1, 2, 4, 8, 16, 64, 128 or 512 are possible) - max. 168MHz
+            #define PCLK1_DIVIDE        4                                // PCLK1 is HCLK divided by 4 (1, 2, 4, 8, or 16 are possible) - max. 42MHz
+            #define PCLK2_DIVIDE        2                                // PCLK2 is HCLK divided by 2 (1, 2, 4, 8, or 16 are possible) - max. 84MHz
+            #define PACKAGE_TYPE        PACKAGE_LQFP
+            #define SIZE_OF_RAM         (192 * 1024)                     // 192k SRAM (0x20000000)
+            #define SIZE_OF_CCM         (64 * 1024)                      // 64k Core Coupled Memory (0x10000000)
+            #define SIZE_OF_FLASH       (2 * 1024 * 1024)                // 2M FLASH
+            #define SUPPLY_VOLTAGE      SUPPLY_2_7__3_6                  // power supply is in the range 2.7V..3.6V
+        #endif
+        // Include the hardware header here
+        // - beware that the header delivers rules for subsequent parts of this header file but also accepts some rules from previous parts,
+        // therefore its position should only be moved after careful consideration of its consequences
+        //
+        #include "types.h"                                               // project specific type settings and the processor header at this location
     #endif
 
 
@@ -645,7 +826,7 @@
 /**********************************************************************************************************/
 
 
-#include "types.h"                                                       // project specific type settings
+
 #include "../../uTasker\uTasker.h"
 #include "../../uTasker\driver.h"
 #include "../../stack\tcpip.h"
