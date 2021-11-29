@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+    <fileVersion>5</fileVersion>
+    <fileChecksum>1955777835</fileChecksum>
+    <configuration>
+        <name>uTaskerBoot - Flash</name>
+        <outputs>
+            <file>$PROJ_DIR$\uTaskerBoot - Flash\Obj\uTaskerBootLoader.o</file>
+            <file>$PROJ_DIR$\uTaskerBoot - Flash\Obj\Hardware\kinetis_boot.o</file>
+            <file>$PROJ_DIR$\..\uTaskerBootLoader.c</file>
+            <file>$PROJ_DIR$\..\config.h</file>
+            <file>$PROJ_DIR$\..\..\..\Hardware\Kinetis\spi_flash_kinetis_stmicro.h</file>
+            <file>$PROJ_DIR$\..\..\..\Hardware\Kinetis\kinetis_boot.c</file>
+            <file>$PROJ_DIR$\..\..\..\Hardware\Kinetis\spi_flash_kinetis_sst25.h</file>
+            <file>$PROJ_DIR$\..\types.h</file>
+            <file>$PROJ_DIR$\..\..\..\Hardware\Kinetis\spi_flash_kinetis_atmel.h</file>
+            <file>$PROJ_DIR$\..\..\..\Hardware\Kinetis\kinetis.h</file>
+            <file>$PROJ_DIR$\..\..\..\Hardware\STM32\STM32.h</file>
+            <file>$PROJ_DIR$\..\..\..\Hardware\STM32\stm32_FLASH.h</file>
+            <file>$PROJ_DIR$\..\..\..\Hardware\STM32\stm32_CLOCK.h</file>
+            <file>$PROJ_DIR$\..\..\..\stack\tcpip.h</file>
+            <file>$PROJ_DIR$\..\..\..\uTasker\uTasker.h</file>
+            <file>$TOOLKIT_DIR$\lib\rt7M_tl.a</file>
+            <file>$TOOLKIT_DIR$\lib\dl7M_tln.a</file>
+            <file>$TOOLKIT_DIR$\lib\m7M_tls.a</file>
+            <file>$PROJ_DIR$\..\..\..\Hardware\hardware.h</file>
+            <file>$PROJ_DIR$\..\..\..\uTasker\driver.h</file>
+            <file>$PROJ_DIR$\settings\STM32_F7_Flash.icf</file>
+            <file>$PROJ_DIR$\uTaskerBoot - Flash\Exe\uTaskerBoot.bin</file>
+            <file>$PROJ_DIR$\uTaskerBoot - Flash\List\uTaskerBoot.map</file>
+            <file>$PROJ_DIR$\uTaskerBoot - Flash\Obj\Hardware\STM32_boot.o</file>
+            <file>$PROJ_DIR$\..\..\..\Hardware\STM32\STM32_boot.c</file>
+            <file>$PROJ_DIR$\uTaskerBoot - Flash\Exe\uTaskerBoot.out</file>
+        </outputs>
+        <file>
+            <name>$PROJ_DIR$\..\uTaskerBootLoader.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 0</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 3 7 10 18 13 19 14</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\Hardware\Kinetis\kinetis_boot.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 1</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\uTaskerBoot - Flash\Exe\uTaskerBoot.bin</name>
+            <inputs>
+                <tool>
+                    <name>OBJCOPY</name>
+                    <file> 25</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\Hardware\STM32\STM32_boot.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 23</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 3 7 10 12 11 18 13 19 14</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\uTaskerBoot - Flash\Exe\uTaskerBoot.out</name>
+            <outputs>
+                <tool>
+                    <name>OBJCOPY</name>
+                    <file> 21</file>
+                </tool>
+                <tool>
+                    <name>ILINK</name>
+                    <file> 22</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ILINK</name>
+                    <file> 20 23 0 16 17 15</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>[ROOT_NODE]</name>
+            <outputs>
+                <tool>
+                    <name>ILINK</name>
+                    <file> 25 22</file>
+                </tool>
+            </outputs>
+        </file>
+        <forcedrebuild>
+            <name>[MULTI_TOOL]</name>
+            <tool>ILINK</tool>
+        </forcedrebuild>
+        <forcedrebuild>
+            <name>$PROJ_DIR$\..\uTaskerBootLoader.c</name>
+            <tool>ICCARM</tool>
+        </forcedrebuild>
+        <forcedrebuild>
+            <name>$PROJ_DIR$\..\..\..\Hardware\STM32\STM32_boot.c</name>
+            <tool>ICCARM</tool>
+        </forcedrebuild>
+        <forcedrebuild>
+            <name>[REBUILD_ALL]</name>
+        </forcedrebuild>
+    </configuration>
+</project>
