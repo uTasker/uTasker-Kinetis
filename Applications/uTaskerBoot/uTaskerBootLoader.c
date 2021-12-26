@@ -547,7 +547,7 @@ extern MAIN_FUNCTION_TYPE uTaskerBoot(void)
     #if !defined _WINDOWS
     main_call();                                                         // call code
     #endif
-#elif defined _HW_AVR32 || defined _RX6XX || defined _KINETIS || defined _LM3SXXXX || defined _LPC17XX || (defined _M5223X && (defined _GNU || defined _COMPILE_IAR)) // {14}{17}{19}{20}{21}
+#elif defined _STM32 || defined _HW_AVR32 || defined _RX6XX || defined _KINETIS || defined _LM3SXXXX || defined _LPC17XX || (defined _M5223X && (defined _GNU || defined _COMPILE_IAR)) // {14}{17}{19}{20}{21}
     #if !defined _WINDOWS
     start_application(UTASKER_CODE_START);                               // jump to the application
     #endif
