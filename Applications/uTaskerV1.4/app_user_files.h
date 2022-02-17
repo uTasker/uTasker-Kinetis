@@ -2,7 +2,7 @@
     Mark Butcher    Bsc (Hons) MPhil MIET
 
     M.J.Butcher Consulting
-    Birchstrasse 20f,    CH-5406, Rütihof
+    Birchstrasse 20f,    CH-5406, RÃ¼tihof
     Switzerland
 
     www.uTasker.com    Skype: M_J_Butcher
@@ -266,12 +266,12 @@ static const unsigned char ST_favicon[] = {
     #define LCD_WEB_INTERFACE                                            // allow posting an image to the display and displaying the image in the LCD on a web page
 #endif
 
-//static const CHAR ajax1[]      = "<Dummy>£vX4</Dummy>";                // example of file used for ajax interpetation
+//static const CHAR ajax1[]      = "<Dummy>\xA3vX4</Dummy>";                // example of file used for ajax interpetation
 //static const CHAR link_page[]  = "This is another embedded page - <a href=""0.htm"">Go to main start page</a>";
 //static const CHAR start_page[] = "<html><head><title>uTasker Test</title></head><body>This is a start test page embedded in the code<br><a href=""0.htm"">Go to main start page</a><br><a href=""link.htm"">Test another embedded page</a></body></html>";
-static const CHAR gen_binary[]   = "£H10";                               // command generation of large binary content
+static const CHAR gen_binary[]   = "\xA3H10";                               // command generation of large binary content
 #if defined LCD_WEB_INTERFACE                                            // {1}{2}
-    static const CHAR gen_bmp[]  = "£H20";                               // command to generate a BMP from the present LCD display content
+    static const CHAR gen_bmp[]  = "\xA3H20";                               // command to generate a BMP from the present LCD display content
 #endif
 
 static const USER_FILE user_files[] = {

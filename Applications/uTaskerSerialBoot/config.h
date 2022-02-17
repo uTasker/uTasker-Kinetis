@@ -2,7 +2,7 @@
     Mark Butcher    Bsc (Hons) MPhil MIET
 
     M.J.Butcher Consulting
-    Birchstrasse 20f,    CH-5406, Rütihof
+    Birchstrasse 20f,    CH-5406, RÃ¼tihof
     Switzerland
 
     www.uTasker.com    Skype: M_J_Butcher
@@ -1404,7 +1404,7 @@
 
             #define WEB_PARAMETER_GENERATION                             // support of parameter generating (eg. manipulating select and adding values)
             #define WEB_PARAMETER_HANDLING                               // support  handling of received web parameters
-            #define WEB_PARSER_START          '£'                        // this symbol is used in Web pages to instruct parsing to begin
+            #define WEB_PARSER_START          '\xA3'                     // this symbol is used in Web pages to instruct parsing to begin
             #define WEB_INSERT_STRING         'v'
             #define WEB_DISABLE_FIELD         'D'
             #define WEB_NOT_DISABLE_FIELD     'd'
@@ -1416,11 +1416,11 @@
                 #define FILE404_IN_PROG                                  // fixed FILE404 in Code (no NE64 support since it pages the file system in memory)
             #endif
 
-            #define FILE_404_CONTENT        "<html><head><title>£vN0 Loader</title></head><body bgcolor=#d0d000 text=#000000 topmargin=3 marginheight=3><center><td valign=top class=h> \
-<font color=#ff0000 style=font-size:30px><b style='mso-bidi-font-weight:normal'>£vN0</font> - Loader (£vV0)</b></td><br><td align=left><br><br> \
-<form action=webpage.html name=e1><input type=submit value=""Erase-Application"" name=e>Enter Password <input maxLength=17 size=17 name=c1 value=""£ve0""> £vV1</form> \
-<form action=0S.bin enctype=""multipart/form-data"" method=""post""><p><input type=""file"" name=""datafile"" size=""30""><input type=""submit"" value=""Upload"" £ds0></p></form> \
-<br><form action=webpage.html name=e0><input type=submit value=""Mass-Erase"" name=e>Enter Password <input maxLength=17 size=17 name=c0 value=""£ve0""></form> \
+            #define FILE_404_CONTENT        "<html><head><title>\xA3vN0 Loader</title></head><body bgcolor=#d0d000 text=#000000 topmargin=3 marginheight=3><center><td valign=top class=h> \
+<font color=#ff0000 style=font-size:30px><b style='mso-bidi-font-weight:normal'>\xA3vN0</font> - Loader (\xA3vV0)</b></td><br><td align=left><br><br> \
+<form action=webpage.html name=e1><input type=submit value=""Erase-Application"" name=e>Enter Password <input maxLength=17 size=17 name=c1 value=""\xA3ve0""> \xA3vV1</form> \
+<form action=0S.bin enctype=""multipart/form-data"" method=""post""><p><input type=""file"" name=""datafile"" size=""30""><input type=""submit"" value=""Upload"" \xA3ds0></p></form> \
+<br><form action=webpage.html name=e0><input type=submit value=""Mass-Erase"" name=e>Enter Password <input maxLength=17 size=17 name=c0 value=""\xA3ve0""></form> \
 <br></font></td></body></html>";
 
             #define _FIXED_WEB_PAGE_404                                  // force 404 error on every file served

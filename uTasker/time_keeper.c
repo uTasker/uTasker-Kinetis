@@ -2,7 +2,7 @@
     Mark Butcher    Bsc (Hons) MPhil MIET
 
     M.J.Butcher Consulting
-    Birchstrasse 20f,    CH-5406, Rütihof
+    Birchstrasse 20f,    CH-5406, RÃ¼tihof
     Switzerland
 
     www.uTasker.com    Skype: M_J_Butcher
@@ -1368,7 +1368,7 @@ extern CHAR *fnUpTime(CHAR *cValue)
 
 static int isSummerTime(unsigned long timeStamp);
 
-// Globaler Struct für Sonnenaufgang/Untergangszeiten
+// Globaler Struct fÃ¼r Sonnenaufgang/Untergangszeiten
 struct sonnenstand
 {
     unsigned short SAG_Std,        // Sonnenaufgang h
@@ -1386,7 +1386,7 @@ struct sonnenstand
 // timeStamp: current Time, sonnenstand: struct to hold the values, T: day of year
 short fnCalculateDawnDusk(unsigned long timeStamp, struct sonnenstand *sonne,unsigned short T)
 {
-    #define hoehe   -0.0145     // Sonnenhöhe in RAD
+    #define hoehe   -0.0145     // SonnenhÃ¶he in RAD
     #define PI        3.141592654
 
     float   B,
@@ -1494,8 +1494,8 @@ static int isSummerTime(unsigned long timeStamp){
 #define DegtoRad (2.0 * pi/360.0)
 
 // Aachen
-// Latitude: 50°46'N (+50.77)
-// Longitude: 6°05'E (+6.09)
+// Latitude: 50Â°46'N (+50.77)
+// Longitude: 6Â°05'E (+6.09)
 // LOCATION loc = {{50,46,30,NORTH},{6,5,3,EAST}};
 // TIMEZONE tz = {{'C','E','T'}, 3600, 3600};
 

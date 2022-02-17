@@ -2,7 +2,7 @@
     Mark Butcher    Bsc (Hons) MPhil MIET
 
     M.J.Butcher Consulting
-    Birchstrasse 20f,    CH-5406, Rütihof
+    Birchstrasse 20f,    CH-5406, RÃ¼tihof
     Switzerland
 
     www.uTasker.com    Skype: M_J_Butcher
@@ -51,7 +51,7 @@ typedef struct tagLCD_MEM
 	unsigned char	ucCursorInc__Dec;		                             // 1 = inkrementiere Cursor Position beim Schreiben, 0 = dekrementieren
 	unsigned char	ucShiftPosition;		                             // anzahl Stellen der LCD Verschiebung
 	unsigned char	ucFontType;				                             // font bit: 1 = 5x8 2 = 5x11
-	unsigned char	init;					                             // zumindest VORLÄUFIG: 0 = LCD Struktur noch nicht initialisiert
+	unsigned char	init;					                             // zumindest VORLÃ„UFIG: 0 = LCD Struktur noch nicht initialisiert
 	unsigned char	ucLines;				                             // 1 oder 2
 	unsigned char	dummy;
 	unsigned char	ucDDRAMLineLength;
@@ -62,19 +62,19 @@ typedef struct tagLCD_MEM
 typedef struct
 {
 	unsigned int	uiCGRamStart;			                             // start der frei definierbaren zeichen in der Fonttabelle 
-	unsigned int	uiCGRamLength;			                             // länge dieses Speichers
+	unsigned int	uiCGRamLength;			                             // lÃ¤nge dieses Speichers
 	unsigned char	ucNrOfDDRAMLines;		                             // anzahl der Speicherzeilen des Display-Speichers (max 2 momentan)
 	unsigned char	ucNrOfLCDLines;			                             // anzahl der sichtbaren Zeilen des LCDs (maximal 4 momentan)
 	unsigned int	uiDDRAMStartLine[4];	                             // startpunkte der RAM Zeilen
 	unsigned int	uiLCDStartLine[4];		                             // startpunkte der LCD Zeilen
 	unsigned char	ucNrOfVisibleCharacters;                             // character pro LCD Zeile
-	unsigned char	ucDDRAMLineLength[4];	                             // länge der Speicherzeilen
-	unsigned int	uiDDRamLength[2];		                             // max Speicherzelle für [0] einzeiligen Modus, [1] zweizeiligen Modus
-	unsigned int	uiType;					                             // typ des Displays, wird für Sonderfälle verwendet
+	unsigned char	ucDDRAMLineLength[4];	                             // lÃ¤nge der Speicherzeilen
+	unsigned int	uiDDRamLength[2];		                             // max Speicherzelle fÃ¼r [0] einzeiligen Modus, [1] zweizeiligen Modus
+	unsigned int	uiType;					                             // typ des Displays, wird fÃ¼r SonderfÃ¤lle verwendet
 											                             // 0 = generischer K0066 Typ ohne Macken
 											                             // 1 = Ampire AC164A (4zeiler): Cursor springt im ShiftLeft-Modus von
 											                             //     0 auf 7
-											                             // 2 = .... andere Marken hier anhängen und im INI-File eintragen
+											                             // 2 = .... andere Marken hier anhÃ¤ngen und im INI-File eintragen
 
 } tLCD_Info;
 
@@ -83,7 +83,7 @@ typedef struct
 
 // Low level display commands
 //
-#define LCD_CLEAR				0x01                                     // löscht ddram inhalt
+#define LCD_CLEAR				0x01                                     // lÃ¶scht ddram inhalt
 #define LCD_RETURN_HOME			0x02                                     // zeile 1 pos 1 
 
 #define LCD_ENTRY_MODE			0x04 
@@ -105,7 +105,7 @@ typedef struct
 
 #define LCD_FUNCTION_SET		0x20 
 #define LCD_8_BIT_MODE			0x10                                     // 1: 8 bit modus, 0: 4 bit modus
-									                                     // warning: ändert die konfiguration für die kommunikation 
+									                                     // warning: Ã¤ndert die konfiguration fÃ¼r die kommunikation 
 									                                     // mit dem proz 
 #define LCD_2_LINE				0x08                                     // 1: 2-zeiliges lcd, 0: 1-zeiliges LCD
 #define LCD_FONT_TYPE			0x04                                     // 1: larger font (5x11), 0: smaller font (5x8)

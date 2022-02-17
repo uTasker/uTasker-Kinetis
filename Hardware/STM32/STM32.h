@@ -2,7 +2,7 @@
     Mark Butcher    Bsc (Hons) MPhil MIET
 
     M.J.Butcher Consulting
-    Birchstrasse 20f,    CH-5406, Rütihof
+    Birchstrasse 20f,    CH-5406, RÃ¼tihof
     Switzerland
 
     www.uTasker.com    Skype: M_J_Butcher
@@ -189,9 +189,9 @@ extern void fnSetFlashOption(unsigned long ulOption, unsigned long ulOption1, un
 #endif
 
 #if defined _STM32F2XX || defined _STM32F4XX || defined _STM32F7XX || defined _STM32L432 || defined _STM32L0x1
-    #define HSI_FREQUENCY 16000000                                       // high speed internal RC oscillator speed (+/- 1% at 25°C)
+    #define HSI_FREQUENCY 16000000                                       // high speed internal RC oscillator speed (+/- 1% at 25Â°C)
 #else
-    #define HSI_FREQUENCY 8000000                                        // high speed internal RC oscillator speed (+/- 1% at 25°C)
+    #define HSI_FREQUENCY 8000000                                        // high speed internal RC oscillator speed (+/- 1% at 25Â°C)
 #endif
 
 // Ethernet configuration
@@ -4007,7 +4007,7 @@ typedef struct stSTM32_ADC_REGS
 
 // ADC1 only
 //
-#define ADC1_TEMPERATURE_SENSOR  16                                      // -40°C..°125°C with +/-1.5% precision
+#define ADC1_TEMPERATURE_SENSOR  16                                      // -40Â°C..Â°125Â°C with +/-1.5% precision
 #define ADC1_VREFINT             17
 #define ADC1_VBAT                18
 #if defined _STM32F42X || defined _STM32F43X

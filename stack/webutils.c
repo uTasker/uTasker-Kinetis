@@ -2,7 +2,7 @@
     Mark Butcher    Bsc (Hons) MPhil MIET
 
     M.J.Butcher Consulting
-    Birchstrasse 20f,    CH-5406, Rütihof
+    Birchstrasse 20f,    CH-5406, RÃ¼tihof
     Switzerland
 
     www.uTasker.com    Skype: M_J_Butcher
@@ -38,7 +38,7 @@
 
 
 #if !defined WEB_ESCAPE_LEN                                              // {3}
-    #define WEB_ESCAPE_LEN 4                                             // standard escape length, eg. "£xyz"
+    #define WEB_ESCAPE_LEN 4                                             // standard escape length, eg. "\xA3xyz"
 #endif
 
 #if defined HTTP_AUTHENTICATION || defined USE_SMTP_AUTHENTICATION || defined SUPPORT_WEBSOCKET
@@ -211,9 +211,9 @@ extern int fnDecode64(CHAR *ptrInput, CHAR *ptrOutput)                   // {15}
 #endif
 
 #if defined USE_HTTP && defined WEB_PARAMETER_GENERATION
-// This routine is used to insert a string in place of the £XABCD... marker, which is assumed to be always WEB_ESCAPE_LEN bytes long
+// This routine is used to insert a string in place of the \xA3XABCD... marker, which is assumed to be always WEB_ESCAPE_LEN bytes long
 // Typically this routine is used to set check boxes or selected fields, etc.
-// When not specifically specified, WEB_ESCAPE_LEN defaults to 4 "£XAB" {3}
+// When not specifically specified, WEB_ESCAPE_LEN defaults to 4 "\xA3XAB" {3}
 //
 extern int fnInsertHTMLString(CHAR *cToAdd, unsigned short usAddLength, unsigned char **ptrBuffer, unsigned short *usMaxLen, unsigned short *usLen, unsigned char *ptrBufferEnd) // {5}
 {

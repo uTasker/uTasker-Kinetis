@@ -2,7 +2,7 @@
     Mark Butcher    Bsc (Hons) MPhil MIET
 
     M.J.Butcher Consulting
-    Birchstrasse 20f,    CH-5406, Rütihof
+    Birchstrasse 20f,    CH-5406, RÃ¼tihof
     Switzerland
 
     www.uTasker.com    Skype: M_J_Butcher
@@ -113,7 +113,7 @@
     #define HTTP_MALLOC(x) uMalloc((MAX_MALLOC)(x))
 #endif
 #if !defined WEB_ESCAPE_LEN                                              // {9}
-    #define WEB_ESCAPE_LEN 4                                             // standard escape length, eg. "£xyz"
+    #define WEB_ESCAPE_LEN 4                                             // standard escape length, eg. "\xA3xyz"
 #endif
 #if defined SUB_FILE_SIZE                                                // used by some devices with large flash granularity
     #define SUBFILE_WRITE  ,http_session->ucSubFileWrite
@@ -1621,7 +1621,7 @@ static unsigned short fnWebParGenerator(unsigned char *ptrBuffer, HTTP *http_ses
 
     while (usLen) {                                                      // we scan the HTTP frame to be sent, looking for a position to fill out
         if (*ptrBuffer++ == (unsigned char)WEB_PARSER_START) {           // a field has been found which needs to be filled out
-                                                                         // example £sAB - insert select, parameter A / B
+                                                                         // example \xA3sAB - insert select, parameter A / B
             if (usLen < WEB_ESCAPE_LEN) {                                // check whether long enough to ensure correct interpretation in all cases {9}{25}(change <= to <)
                 *usMaxLen -= usLen;
                 return (usToSend - usLen);                               // parameter list cut off, handle it next time around

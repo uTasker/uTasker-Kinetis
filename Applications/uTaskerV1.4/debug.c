@@ -2,7 +2,7 @@
     Mark Butcher    Bsc (Hons) MPhil MIET
 
     M.J.Butcher Consulting
-    Birchstrasse 20f,    CH-5406, Rütihof
+    Birchstrasse 20f,    CH-5406, RÃ¼tihof
     Switzerland
 
     www.uTasker.com    Skype: M_J_Butcher
@@ -2904,7 +2904,7 @@ static void fnShowCoordinates(COORDINATE *coord)
 
 static int fnGetCoordinates(COORDINATE *coord, CHAR *ptrInput)
 {
-	// Input: 50D46M30S or 50° 46' 30''
+	// Input: 50D46M30S or 50Â° 46' 30''
 	CHAR *pInput = ptrInput;
 
 	pInput = fStrchr(ptrInput, 'D');
