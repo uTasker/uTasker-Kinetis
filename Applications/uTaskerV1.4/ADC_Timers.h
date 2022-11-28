@@ -38,6 +38,8 @@
 
     09.02.2018 Add ADC polling reference (rather than using end of conversion interrupt) {25}
 
+    03.07.2019 Add STM32 ADC reference (single input and scan mode)      {33}
+
     The file is otherwise not specifically linked in to the project since it is included by application.c when needed.
     The reason for ADC and timer configurations in a single file is that a HW timer is very often used togther with and ADC.
 
@@ -49,6 +51,7 @@
     #if defined SUPPORT_ADC                                              // if HW support is enabled
         #define TEST_ADC                                                 // enable test of ADC operation
           //#define TEST_POLL_ADC                                        // {25} poll ADC conversion complete rather than use end of conversion interrupt
+            #define STM32_SCAN_MODE                                      // {33} STM32 scan mode operation rather than single input// 
       //#define TEST_AD_DA                                               // {14} enable test of reading ADC and writing (after delay) to DAC
           //#define VOICE_RECORDER                                       // {15} needs TEST_AD_DA and mass-storage and saves sampled input to SD card
       //#define INTERNAL_TEMP                                            // {2} read also internal temperature (Luminary Micro)
@@ -450,6 +453,31 @@
                     }
                 }
         #endif
+    #elif defined _STM32
+                if (ADC_TRIGGER == ucInputMessage[MSG_INTERRUPT_EVENT]) {                // {33}
+                    int x;
+                    ADC_SETUP adc_setup;                                                 // interrupt configuration parameters
+                    ADC_RESULTS results;
+                    adc_setup.int_type = ADC_INTERRUPT;                                  // identifier when configuring
+                    adc_setup.int_adc_mode = (ADC_GET_RESULT);
+                    adc_setup.int_adc_result = 0;
+                    adc_setup.int_adc_controller = 1;
+                    adc_setup.int_adc_result = &results;
+                    fnConfigureInterrupt((void *)&adc_setup);                            // get the results
+
+                    fnDebugMsg("ADC Value:\r\n");
+                    fnDebugMsg("==========");
+                    for (x = 0; x < ADC_CHANNELS; x++) {
+                        if (results.ucADC_status[x] == ADC_RESULT_VALID) {
+                            fnDebugMsg("\r\nSample-");
+                            fnDebugDec(x, 0);
+                            fnDebugMsg(" = ");
+                            fnDebugHex(results.usADC_value[x], (WITH_LEADIN | sizeof(results.usADC_value[x])));
+                        }
+                    }
+                    fnDebugMsg("\r\n");
+                    uTaskerMonoTimer(OWN_TASK, (DELAY_LIMIT)(5 * SEC), E_NEXT_SAMPLE);
+                }
     #elif defined _LM3SXXXX
                 if (ADC_TRIGGER == ucInputMessage[MSG_INTERRUPT_EVENT]) {
                     int x;
@@ -613,6 +641,86 @@ static void fnConfigureADC(void)
     adc_setup.int_sequence_count = ADC_SEQUENCES;
     fnConfigureInterrupt((void *)&adc_setup);                            // configure and start sequence
 }
+    #elif defined _STM32                                                 // {33}
+#if !defined TEST_POLL_ADC
+// This interrupt is called when the ADC conversion has completed
+//
+static void __callback_interrupt adc_ready(ADC_INTERRUPT_RESULT *adc_result)
+{
+    fnInterruptMessage(OWN_TASK, (unsigned char)(ADC_TRIGGER));
+}
+#endif
+
+static void fnConfigureADC(void)
+{
+#if !defined STM32_SCAN_MODE
+    ADC_SETUP adc_setup;                                                 // interrupt configuration parameters
+    adc_setup.int_type = ADC_INTERRUPT;                                  // identifier when configuring
+    adc_setup.int_adc_controller = 1;
+    #if defined TEST_POLL_ADC
+    adc_setup.int_handler = 0;                                           // no interrupt
+    ucADC_converting[adc_setup.int_adc_controller] = 1;                  // conversion is in progress
+    uTaskerStateChange(OWN_TASK, UTASKER_POLLING);                       // set the task to polling mode to regularly check the receive buffer
+    #else
+    adc_setup.int_handler = adc_ready;                                   // handling function
+    #endif
+    adc_setup.int_priority = PRIORITY_ADC;                               // ADC interrupt priority
+    adc_setup.int_adc_mode = (ADC_CONFIGURE_ADC | ADC_CONFIGURE_CHANNEL | ADC_CLOCK_PCLK_DIV_8 | ADC_RESULT_RIGHT_ALIGNED | ADC_12_BIT_MODE | ADC_SINGLE_SHOT_MODE | ADC_CHANNEL_CYCLES_480 | ADC_START_OPERATION); // immediate start under SW control
+    adc_setup.int_adc_int_type = 0;
+    adc_setup.int_adc_result = 0;
+    #if defined _STM32L4XX
+        adc_setup.int_adc_bit = ADC12_INN10;
+        adc_setup.int_watchdog_bit = ADC12_INN10;
+    #else
+    adc_setup.int_adc_bit = ADC123_IN10;
+    adc_setup.int_watchdog_bit = ADC123_IN10;
+    #endif
+    fnConfigureInterrupt((void *)&adc_setup);                            // configure and start sequence
+#else
+    ADC_SETUP adc_setup;                                                 // interrupt configuration parameters
+    static int init = 0;
+    adc_setup.int_type = ADC_INTERRUPT;                                  // identifier when configuring
+    adc_setup.int_adc_controller = 1;
+    if (init != 0) {
+        adc_setup.int_adc_mode = (ADC_START_OPERATION);                  // avoid adding additional scan channels after first call
+    }
+    else {
+        adc_setup.int_handler = adc_ready;                               // handling function
+        adc_setup.int_priority = PRIORITY_ADC;                           // ADC interrupt priority
+        adc_setup.int_adc_mode = (ADC_CONFIGURE_ADC | ADC_CONFIGURE_CHANNEL | ADC_CLOCK_PCLK_DIV_8 | ADC_RESULT_RIGHT_ALIGNED | ADC_12_BIT_MODE | ADC_SINGLE_SHOT_MODE | ADC_CHANNEL_CYCLES_480 | ADC_SEQUENTIAL_MODE); // configure ADC and channel but don't start yet
+        adc_setup.int_adc_int_type = 0;
+        adc_setup.int_adc_result = 0;
+    #if defined _STM32L4XX
+        adc_setup.int_adc_bit = ADC12_INN10;
+    #else
+        adc_setup.int_adc_bit = ADC123_IN10;
+    #endif
+        fnConfigureInterrupt((void *)&adc_setup);                        // configure ADC and first scan channel
+        adc_setup.int_adc_mode = (ADC_CONFIGURE_CHANNEL | ADC_SEQUENTIAL_MODE);
+    #if defined _STM32L4XX
+        adc_setup.int_adc_bit = ADC12_INN11;
+    #else
+        adc_setup.int_adc_bit = ADC123_IN11;
+    #endif
+        fnConfigureInterrupt((void *)&adc_setup);                        // configure next scan channel
+    #if defined _STM32L4XX
+        adc_setup.int_adc_bit = ADC12_INN12;
+    #else
+        adc_setup.int_adc_bit = ADC123_IN12;
+    #endif
+        fnConfigureInterrupt((void *)&adc_setup);                        // configure next scan channel
+    #if defined _STM32L4XX
+        adc_setup.int_adc_bit = ADC12_INN13;
+    #else
+        adc_setup.int_adc_bit = ADC123_IN13;
+    #endif
+        adc_setup.int_adc_mode = (ADC_CONFIGURE_CHANNEL | ADC_SEQUENTIAL_MODE | ADC_START_OPERATION); // configure next sequence channel and immediate start under SW control
+        init = 1;
+    }
+    fnConfigureInterrupt((void *)&adc_setup);                            // configure and start sequence
+#endif
+}
+
     #else                                                                // M5223X / Kinetis
 #if defined TEST_ADC && defined TEST_POLL_ADC                            // {25}
 static int fnCheckADC(int iChannel)

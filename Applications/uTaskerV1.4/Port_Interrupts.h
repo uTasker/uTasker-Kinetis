@@ -31,7 +31,7 @@ is included by application.c when needed.
     #define _PORT_INTS_CONFIG
 
     #if !defined K70F150M_12M && !defined TWR_K53N512 && !defined TWR_K40X256 && !defined TWR_K40D100M && !defined KWIKSTIK
-      //#define IRQ_TEST                                                 // test IRQ port interrupts
+        #define IRQ_TEST                                                 // test IRQ port interrupts
       //#define DMA_PORT_MIRRORING                                       // demonstrate using DMA to control one or more output ports to follow an input port
         #if defined SUPPORT_LOW_POWER
           //#define WAKEUP_TEST                                          // test wake-up port interrupts
@@ -339,6 +339,14 @@ static void fnInitIRQ(void)
             #endif
     fnConfigureInterrupt((void *)&interrupt_setup);                      // configure interrupt
         #endif
+    #elif defined _STM32                                                 // connects only one input at a time
+    interrupt_setup.int_type = PORT_INTERRUPT;                           // identifier when configuring
+    interrupt_setup.int_handler = test_irq_4;                            // handling function
+    interrupt_setup.int_port = PORTB;                                    // the port used
+    interrupt_setup.int_priority = 15;                                   // port interrupt priority (0..15:highest..lowest)
+    interrupt_setup.int_port_bit = PORTB_BIT12;                          // the input connected
+    interrupt_setup.int_port_sense = (IRQ_FALLING_EDGE);                 // interrupt on this edge
+    fnConfigureInterrupt(&interrupt_setup);                              // configure test interrupt
     #elif defined _HW_SAM7X
     interrupt_setup.int_type = PORT_INTERRUPT;                           // identifier when configuring
     interrupt_setup.int_handler = test_irq_4;                            // handling function
