@@ -2,7 +2,7 @@
     Mark Butcher    Bsc (Hons) MPhil MIET
 
     M.J.Butcher Consulting
-    Birchstrasse 20f,    CH-5406, Rütihof
+    Birchstrasse 20f,    CH-5406, RÃ¼tihof
     Switzerland
 
     www.uTasker.com    Skype: M_J_Butcher
@@ -142,7 +142,7 @@ extern void fnConfigureAndStartWebServer(void)
 static unsigned char fnIsSelected(unsigned char *ptrBuffer)
 {
     int iDisabled = 0;
-    // Format £sAB (length assumed to be 4 bytes, even when both parameters are not used)
+    // Format \xA3sAB (length assumed to be 4 bytes, even when both parameters are not used)
     //
     switch (*(ptrBuffer + 1)) {
     case 's':
@@ -259,7 +259,7 @@ static CHAR *fnInsertString(unsigned char *ptrBuffer, LENGTH_CHUNK_COUNT TxLengt
 static CHAR *fnInsertString(unsigned char *ptrBuffer, LENGTH_CHUNK_COUNT TxLength, unsigned short *usLengthToSend)
 #endif
 {
-    // £vXY commands - to display a value, string etc.
+    // \xA3vXY commands - to display a value, string etc.
     //
 #if !defined WEB_ESCAPE_LEN
     #define WEB_ESCAPE_LEN 4

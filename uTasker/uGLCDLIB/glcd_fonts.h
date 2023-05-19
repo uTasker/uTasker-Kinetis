@@ -2,7 +2,7 @@
     Mark Butcher    Bsc (Hons) MPhil MIET
 
     M.J.Butcher Consulting
-    Birchstrasse 20f,    CH-5406, Rütihof
+    Birchstrasse 20f,    CH-5406, RÃ¼tihof
     Switzerland
 
     www.uTasker.com    Skype: M_J_Butcher
@@ -674,7 +674,7 @@ const unsigned char seven_five_lcd_glyph_table[] = {                     // {3}
     0x08 << 3,
     0x0e << 3,
     0x00 << 3,
-    // '¥' charwidth: 5
+    // 'Â¥' charwidth: 5
     0x11 << 3,
     0x0a << 3,
     0x1f << 3,

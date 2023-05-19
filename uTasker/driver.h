@@ -2,7 +2,7 @@
     Mark Butcher    Bsc (Hons) MPhil MIET
 
     M.J.Butcher Consulting
-    Birchstrasse 20f,    CH-5406, Rütihof
+    Birchstrasse 20f,    CH-5406, RÃ¼tihof
     Switzerland
 
     www.uTasker.com    Skype: M_J_Butcher
@@ -1334,7 +1334,7 @@ extern void fnAdjustLocalTime(unsigned char ucNewTimeZone, int iSNTP_active);
 
 /* References:
  * http://en.wikipedia.org/wiki/Twilight
- * http://de.wikipedia.org/wiki/Dämmerung
+ * http://de.wikipedia.org/wiki/DÃ¤mmerung
  * http://www.timeanddate.com/worldclock/sunrise.html
  * http://aa.usno.navy.mil/data/docs/RS_OneYear.php
  * http://williams.best.vwh.net/sunrise_sunset_algorithm.htm
@@ -1360,7 +1360,7 @@ enum _direction
 
 typedef struct
 {
-    signed char   scDegree;                                              // degree -90°..90° positive for north or east and negative for south or west
+    signed char   scDegree;                                              // degree -90Â°..90Â° positive for north or east and negative for south or west
     unsigned char ucMinute;                                              // minutes 0'..90'
     unsigned char ucSecond;                                              // seconds 0''..90''
     //enum _direction cdir;

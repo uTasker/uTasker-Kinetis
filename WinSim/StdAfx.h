@@ -1,6 +1,6 @@
-// stdafx.h : Include-Datei f¸r Standard-System-Include-Dateien,
-//  oder projektspezifische Include-Dateien, die h‰ufig benutzt, aber
-//      in unregelm‰ﬂigen Abst‰nden ge‰ndert werden.
+// stdafx.h : Include-Datei f√ºr Standard-System-Include-Dateien,
+//  oder projektspezifische Include-Dateien, die h√§ufig benutzt, aber
+//      in unregelm√§√üigen Abst√§nden ge√§ndert werden.
 //
 
 #if !defined(AFX_STDAFX_H__A9DB83DB_A9FD_11D0_BFD1_444553540000__INCLUDED_)

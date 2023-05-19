@@ -2,7 +2,7 @@
     Mark Butcher    Bsc (Hons) MPhil MIET
 
     M.J.Butcher Consulting
-    Birchstrasse 20f,    CH-5406, Rütihof
+    Birchstrasse 20f,    CH-5406, RÃ¼tihof
     Switzerland
 
     www.uTasker.com    Skype: M_J_Butcher
@@ -817,7 +817,7 @@ typedef struct stSHT21
     unsigned char  usHumidity[3];
 } SHT21;
 
-static SHT21 simSHT21 = {0x80, 0, 0, 0, 0x02, 0x61, 0x64, 0x55, 0x63, 0x52, 0x63}; // temperatire 20.0°C, humidity 42.5%
+static SHT21 simSHT21 = {0x80, 0, 0, 0, 0x02, 0x61, 0x64, 0x55, 0x63, 0x52, 0x63}; // temperatire 20.0Â°C, humidity 42.5%
 #endif
 
 
@@ -2624,7 +2624,7 @@ extern unsigned char fnSimI2C_devices(unsigned char ucType, unsigned char ucData
             if (simDS1621.ucCommand == 0xaa) {                           // if the get temperature command was previously executed 
                 if (simDS1621.ucState == 2) {
                     simDS1621.ucState--;
-                    if (simDS1621.ucTemperature[0] == 10) {              // change between 10 and 35°C on each read
+                    if (simDS1621.ucTemperature[0] == 10) {              // change between 10 and 35Â°C on each read
                         simDS1621.ucTemperature[0] = 35;
                     }
                     else {

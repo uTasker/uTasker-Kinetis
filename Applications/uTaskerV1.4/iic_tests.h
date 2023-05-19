@@ -2,7 +2,7 @@
     Mark Butcher    Bsc (Hons) MPhil MIET
 
     M.J.Butcher Consulting
-    Birchstrasse 20f,    CH-5406, Rütihof
+    Birchstrasse 20f,    CH-5406, RÃ¼tihof
     Switzerland
 
     www.uTasker.com    Skype: M_J_Butcher
@@ -561,7 +561,7 @@ static void acc_data_ready(void)
                 slTemperature |= (ucInputMessage[1] & 0xfc);             // remove status bits
                 slTemperature *= 17572;
                 slTemperature >>= 16;
-                slTemperature -= 4685;                                   // calculated temperature in °C x 100
+                slTemperature -= 4685;                                   // calculated temperature in Â°C x 100
                 ptrDecimalPoint = fnBufferDec(slTemperature, DISPLAY_NEGATIVE, cTemp);
                 *ptrDecimalPoint = *(ptrDecimalPoint - 1);
                 *(ptrDecimalPoint - 1) = *(ptrDecimalPoint - 2);
@@ -581,7 +581,7 @@ static void acc_data_ready(void)
                 else if (slTemperature > 30) {
                     slTemperature = 30;
                 }
-                slTemperature -= 20;                                     // referenced to 20°C (max °10)
+                slTemperature -= 20;                                     // referenced to 20Â°C (max Â°10)
                 slTemperature *= 20;                                     // range 0..200
                 slTemperature += 55;                                     // range 55..255
                 graphic_style.color = (COLORREF)RGB((unsigned char)slTemperature, (255 - ((unsigned char)slTemperature)), (255 - ((unsigned char)slTemperature))); // set color according to temperature
@@ -606,7 +606,7 @@ static void acc_data_ready(void)
                 slTemperature |= (ucInputMessage[1] & 0xfc);             // remove status bits
                 slTemperature *= 17572;
                 slTemperature >>= 16;
-                slTemperature -= 4685;                                   // calculated temperature in °C x 100
+                slTemperature -= 4685;                                   // calculated temperature in Â°C x 100
                 ptrDecimalPoint = fnBufferDec(slTemperature, DISPLAY_NEGATIVE, cTemp);
                 *ptrDecimalPoint = *(ptrDecimalPoint - 1);
                 *(ptrDecimalPoint - 1) = *(ptrDecimalPoint - 2);
