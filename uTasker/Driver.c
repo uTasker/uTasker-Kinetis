@@ -11,7 +11,7 @@
     File:      Driver.c (containing queue driver and some library replacement routines)
     Project:   Single Chip Embedded Internet
     ---------------------------------------------------------------------
-    Copyright (C) M.J.Butcher Consulting 2004..2016
+    Copyright (C) M.J.Butcher Consulting 2004..2026
     *********************************************************************
     24.03.2007 Cast to quieten GNU compiler                              {1}
     25.08.2007 uStrlen() const type to match prototype                   {2}
@@ -45,6 +45,7 @@
     12.09.2013 Added uReverseMemcpy()                                    {30}
     01.03.2015 Add FIFO queue                                            {31}
     01.03.2015 Control flush of input or output and return flushed content size {32}
+    18.10.2026 Add new_chars to buffer limit checking to ensure that multiple nested interrupt calls can't cause a buffer overflow - identified by Jorik {33}
 
 */
 
@@ -451,16 +452,23 @@ extern QUEUE_TRANSFER fnGetBufPeek(QUEQUE *ptQUEQue, unsigned char *output_buffe
 }
 #endif
 
+//#define _NESTED_CALL_CHECK_                                            // enable nested call emulation test (assumed first use is due to fnDebugMsg("\r\n\nHello, world... "); in application.c)
 // This routine always enters and leaves with enabled interrupts.
 //
 extern QUEUE_TRANSFER fnFillBuf(QUEQUE *ptQUEQue, unsigned char *input_buffer, QUEUE_TRANSFER nr_of_bytes)
 {
+#if defined _NESTED_CALL_CHECK_
+    static int test = 0;                                                 // counter used to allow nested call checking emulation
+#endif
     QUEUE_TRANSFER FirstCopy;
+    QUEUE_TRANSFER TotalPrepared;
     unsigned char *ptrTo;
 
     uDisable_Interrupt();                                                // protect entry into function, interrupts are reactivated in the function
-    if ((ptQUEQue->chars + ptQUEQue->reserved_chars + nr_of_bytes) > ptQUEQue->buf_length) { // {25} check that there is space (including any reserved count)
-        nr_of_bytes = (ptQUEQue->buf_length - ptQUEQue->chars - ptQUEQue->reserved_chars); // {25} if not, cut message - user must ensure that this doesn't happen
+
+    TotalPrepared = (ptQUEQue->chars + ptQUEQue->new_chars + ptQUEQue->reserved_chars); // {33}
+    if ((TotalPrepared + nr_of_bytes) > ptQUEQue->buf_length) {          // {25} check that there is space (including any reserved count)
+        nr_of_bytes = (ptQUEQue->buf_length - TotalPrepared);            // {25} if not, cut message - user must ensure that this doesn't happen
     }
     ptQUEQue->reserved_chars += nr_of_bytes;                             // {25} the additional count that will be added during the copy
     FirstCopy = nr_of_bytes;
@@ -476,6 +484,12 @@ extern QUEUE_TRANSFER fnFillBuf(QUEQUE *ptQUEQue, unsigned char *input_buffer, Q
         uEnable_Interrupt();                                             // ensure copies do not block interrupts
         // Nested write to the queue may happen here from interrupts
         //
+#if defined _NESTED_CALL_CHECK_
+        if ((test == 0) || (test == 2)) {
+            test++;
+            fnDebugMsg("012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789");
+        }
+#endif
         uMemcpy(ptrTo, input_buffer, FirstCopy);
         if (nr_of_bytes != FirstCopy) {
             uMemcpy(ptQUEQue->QUEbuffer, (input_buffer + FirstCopy), (nr_of_bytes - FirstCopy));
@@ -494,6 +508,12 @@ extern QUEUE_TRANSFER fnFillBuf(QUEQUE *ptQUEQue, unsigned char *input_buffer, Q
         ptQUEQue->reserved_chars -= nr_of_bytes;                         // reserved characters passed to new characters
     }
     uEnable_Interrupt();
+#if defined _NESTED_CALL_CHECK_
+    if ((test == 1) || (test == 3)) {
+        test++;
+        fnDebugMsg("012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789");
+    }
+#endif
     return nr_of_bytes;                                                  // the number of bytes actually copied
 }
 
@@ -504,13 +524,15 @@ extern QUEUE_TRANSFER fnFillBuf(QUEQUE *ptQUEQue, unsigned char *input_buffer, Q
 extern QUEUE_TRANSFER fnFillBuf_FIFO(QUEQUE *ptQUEQue, unsigned char *fifo_buffer, QUEUE_TRANSFER nr_of_bytes)
 {
     QUEUE_TRANSFER FirstCopy;
+    QUEUE_TRANSFER TotalPrepared;
     QUEUE_TRANSFER CopyCount;
     unsigned char *ptrTo;
 
     uDisable_Interrupt();                                                // protect entry into function, interrupts are reactivated in the function
 
-    if ((ptQUEQue->chars + ptQUEQue->reserved_chars + nr_of_bytes) > ptQUEQue->buf_length) { // {25} check that there is space (including any reserved count)
-        nr_of_bytes = (ptQUEQue->buf_length - ptQUEQue->chars - ptQUEQue->reserved_chars); // {25} if not, cut message - user must ensure that this doesn't happen
+    TotalPrepared = (ptQUEQue->chars + ptQUEQue->new_chars + ptQUEQue->reserved_chars); // {33}
+    if ((TotalPrepared + nr_of_bytes) > ptQUEQue->buf_length) {          // {25} check that there is space (including any reserved count)
+        nr_of_bytes = (ptQUEQue->buf_length - TotalPrepared);            // {25} if not, cut message - user must ensure that this doesn't happen
     }
     ptQUEQue->reserved_chars += nr_of_bytes;                             // {25} the additional count that will be added during the copy
     FirstCopy = nr_of_bytes;
